@@ -1,0 +1,33 @@
+---
+title: "Bank Peer Groups"
+format: html
+---
+
+## Peer Group Membership {#sec-peers}
+
+```{r}
+#| warning: false
+#| echo: false
+source('functions.R')
+``` 
+
+
+```{r}
+#| warning: false
+#| label: tbl-banks
+#| tbl-cap: "Peer Group Membership"
+#| tbl-subcap: 
+#|   - "Large Banks"
+#|   - "Large Credit Card Banks"
+#|   - "Other Banks"
+#| layout-ncol: 3
+bank_members <- credit_card.overdue_3089() |> 
+                as_tibble() |> 
+                group_by(BankName,BankType) |> 
+                summarise(total_bal = sum(abs(Value),na.rm=T)) |>
+                filter(!(is.na(total_bal)|total_bal==0))
+knitr::kable(bank_members |> filter(BankType=="LargeBank") |> select(BankName)) 
+knitr::kable(bank_members |> filter(BankType=="LargeCreditCardBank") |> select(BankName))
+knitr::kable(bank_members |> filter(BankType=="OtherBank") |> select(BankName))
+```
+

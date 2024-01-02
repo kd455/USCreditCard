@@ -1,0 +1,11 @@
+# References {.unnumbered}
+
+::: {#refs}
+@book{HuntingtonKlein,
+  title={The Effect: An Introduction to Research Design and Causality},
+  author={Huntington-Klein, N.},
+  year={2021},
+  publisher={Chapman and Hall/CRC},
+  DOI={https://doi.org/10.1201/9781003226055}
+}
+:::

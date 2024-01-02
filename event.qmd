@@ -1,0 +1,119 @@
+---
+title: "Event study"
+format: html
+---
+
+Event studies are a common approach in econometrics to assess the impact of an event such as earnings announcements, mergers and acquisitions, regulatory changes, or macroeconomic news.
+
+The goal is to estimate the portion of post-event change that can be attributed to the event itself, isolating it from other market and firm-specific effects. We do this by predicting what would have happened if the event had not occurred (the counterfactual) and comparing it to the actual observed data to estimate the resulting "abnormal returns".
+
+## Evaluation
+
+The joint test problem arises because we are effectively testing two things: the counterfactual model and the event impact. Consequently, we need an approach to accurately evaluate if our counterfactual model results are credible. One approach is to test using observations where we expect no effect; if there were resulting "abnormal returns" this would point to an issue with the model [see @HuntingtonKlein, chap 17.3.3]. 
+
+
+$$
+Outcome = \beta_0 + \beta_1t + \beta_2After + \beta_3t\times After+\varepsilon
+$$
+where $t$ is the time period and $After$ is a binary variable equal to 1 in any time after the event
+
+```{r}
+source('functions.R')
+library(tidymodels) 
+partner_data <- credit_card.partnerships()
+overdue30to89 <- credit_card.overdue_3089()
+loan_amt <-  credit_card.loan_amount()
+loan_unused <- credit_card.unused()
+loan_unused_ratio <- credit_card.unused_ratio()
+partner_data <- credit_card.partnerships() 
+
+selected_measure <- overdue30to89
+
+partners <- partner_data |> 
+                    select(-caption) |>
+                    pivot_longer(cols = c('old','new'), names_to = "partnership", values_to = "BankName") |> 
+                    filter(partnership %in% c('new','old')) |>
+                    mutate(across(c("acquired", "available"), lubridate::ymd))
+
+agg_data <- aggregate_by_index(selected_measure, "value_diff") |> 
+                rename(value_diff.Agg = value_diff) 
+
+bank_data <- partners |> 
+                left_join(selected_measure, relationship = "many-to-many") |>
+                rename(value_diff.Bank = value_diff) |>
+                left_join(agg_data) |>
+                mutate(Period = Quarter - yearquarter(acquired)) 
+ 
+# Estimate a model 
+#m <- lm(value_diff.Bank  ~ value_diff.Agg + partnership, data = est_data)
+# Estimate And observation data
+est_data <- bank_data |> filter(between(Period, -6, -1))
+obs_data <- bank_data |> filter(between(Period, 0, 5)) 
+
+m_recipe <- recipe(bank_data) |>
+  update_role(everything(), new_role = "support") |> 
+  update_role(value_diff.Bank, new_role = "outcome") |>
+  update_role(value_diff.Agg, partnership, new_role = "predictor") |>
+  step_dummy(partnership, one_hot=T)
+
+# obs_data <- m_recipe |>
+#             prep(obs_data) |>
+#             bake(obs_data)
+
+m_model <- linear_reg() |> set_engine("lm")
+
+m_workflow <- workflow() |>
+                add_recipe(m_recipe) |>
+                add_model(m_model)
+
+m_fitted <- m_workflow |> fit(est_data)
+
+y_hat <- m_fitted |> predict(obs_data)
+
+  #metric_set(rmse, mae, rsq)(obs_data$value_diff.Bank, .pred)
+
+
+#https://mdneuzerling.com/post/machine-learning-pipelines-with-tidymodels-and-targets/
+#In the observation period, subtract the prediction from the actual return to get the “abnormal return.” 
+obs_data_ar <- bind_cols(obs_data, y_hat) |>
+    # Using mean of estimation return
+    mutate(
+        #mean = value_diff.Bank - mean(est_data$value_diff.Bank),
+        # Then comparing to peers
+        #peers = value_diff.Bank - value_diff.Agg,
+        # Then using model fit with estimation data
+        Predicted = .pred,
+        "Actual-Predicted" = value_diff.Bank - .pred)
+
+#put predictions and predictions together for visualisation
+actual <- bank_data |> 
+    filter(between(Period, -6, 5)) |> 
+    select(Period, partner_event = name, BankName, partnership, Actual=value_diff.Bank) 
+   
+predict <- obs_data_ar |> 
+    select(Period, partner_event = name, BankName, partnership, Predicted) 
+    
+actual |> left_join(predict) |>
+as_tsibble(index=Period, key=c(partner_event, BankName)) |>
+pivot_longer(cols=c(Actual,Predicted), names_to = "Values") |> 
+    autoplot(value,aes(color = Values)) + facet_grid(partnership ~ partner_event) +
+    theme(legend.position = "top")
+
+```
+
+##Evaluating the model
+https://theeffectbook.net/ch-EventStudies.html
+The idea is this: when there’s supposed to be an effect, and we test for an effect, we can’t tease apart what part of our findings is the effect, and what part is the counterfactual model being wrong. But what if we knew there were no effect? Then, anything we estimated could only be the counterfactual model being wrong. So if we got an effect under those conditions, we’d know our model was fishy and would have to try something else.
+
+So, get a bunch of different time series to test, especially those unaffected by the event. In the context of stock returns, for example, don’t just include the firm with the great announcement on a certain day, also include stocks for a bunch of other firms that had no announcement.
+
+Then, start doing your event study over and over again. Except each time you do it, pick a random time series to do it on, and pick a random day when the “event” is supposed to have happened.21
+```{r}
+selected_measure |>
+    as_tibble() |>
+    filter(LargeBank==1|LargeCreditCardBank==1) |>
+    left_join(partners, relationship = "many-to-many") |>
+    rename(value_diff.Bank = value_diff) |>
+    mutate(Period = Quarter - yearquarter(acquired)) 
+
+```

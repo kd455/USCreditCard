@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>US Credit Card - 4&nbsp; Event study</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./data_fed.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./event.html">Models</a></li><li class="breadcrumb-item"><a href="./event.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Event study</span></a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">US Credit Card</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Data</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data_ffiec.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Bank Data</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data_fed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">data_fed.html</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text">Models</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./event.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Event study</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#evaluation" id="toc-evaluation" class="nav-link active" data-scroll-target="#evaluation"><span class="header-section-number">4.1</span> Evaluation</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Event study</span></h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<p>Event studies are a common approach in econometrics to assess the impact of an event such as earnings announcements, mergers and acquisitions, regulatory changes, or macroeconomic news.</p>
+<p>The goal is to estimate the portion of post-event change that can be attributed to the event itself, isolating it from other market and firm-specific effects. We do this by predicting what would have happened if the event had not occurred (the counterfactual) and comparing it to the actual observed data to estimate the resulting “abnormal returns”.</p>
+<section id="evaluation" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="evaluation"><span class="header-section-number">4.1</span> Evaluation</h2>
+<p>The joint test problem arises because we are effectively testing two things: the counterfactual model and the event impact. Consequently, we need an approach to accurately evaluate if our counterfactual model results are credible. One approach is to test using observations where we expect no effect; if there were resulting “abnormal returns” this would point to an issue with the model <span class="citation" data-cites="HuntingtonKlein">(see <a href="#ref-HuntingtonKlein" role="doc-biblioref"><strong>HuntingtonKlein?</strong></a>, chap 17.3.3)</span>.</p>
+<p><span class="math display">\[
+Outcome = \beta_0 + \beta_1t + \beta_2After + \beta_3t\times After+\varepsilon
+\]</span> where <span class="math inline">\(t\)</span> is the time period and <span class="math inline">\(After\)</span> is a binary variable equal to 1 in any time after the event</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">'functions.R'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'tidyverse' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'ggplot2' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'tibble' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'tidyr' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'readr' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'dplyr' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'forcats' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'lubridate' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.4
+✔ forcats   1.0.0     ✔ stringr   1.5.0
+✔ ggplot2   3.4.4     ✔ tibble    3.2.1
+✔ lubridate 1.9.3     ✔ tidyr     1.3.0
+✔ purrr     1.0.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'fable' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: fabletools</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'fabletools' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'feasts' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'tsibble' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'tsibble'
+
+The following object is masked from 'package:lubridate':
+
+    interval
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, union</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'arrow' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'arrow'
+
+The following object is masked from 'package:lubridate':
+
+    duration
+
+The following object is masked from 'package:utils':
+
+    timestamp</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'memoise' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'ggrepel' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'ggtext' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'prophet' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: Rcpp
+Loading required package: rlang
+
+Attaching package: 'rlang'
+
+The following object is masked from 'package:arrow':
+
+    string
+
+The following objects are masked from 'package:purrr':
+
+    %@%, flatten, flatten_chr, flatten_dbl, flatten_int, flatten_lgl,
+    flatten_raw, invoke, splice</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'tidymodels' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching packages ────────────────────────────────────── tidymodels 1.1.1 ──
+✔ broom        1.0.5     ✔ rsample      1.2.0
+✔ dials        1.2.0     ✔ tune         1.1.2
+✔ infer        1.0.5     ✔ workflows    1.1.3
+✔ modeldata    1.2.0     ✔ workflowsets 1.0.1
+✔ parsnip      1.1.1     ✔ yardstick    1.2.0
+✔ recipes      1.0.9     </code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'broom' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'dials' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'scales' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'infer' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'modeldata' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'parsnip' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'recipes' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'rsample' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'tune' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'workflows' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'workflowsets' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'yardstick' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Conflicts ───────────────────────────────────────── tidymodels_conflicts() ──
+✖ rlang::%@%()          masks purrr::%@%()
+✖ yardstick::accuracy() masks fabletools::accuracy()
+✖ scales::discard()     masks purrr::discard()
+✖ dplyr::filter()       masks stats::filter()
+✖ recipes::fixed()      masks stringr::fixed()
+✖ rlang::flatten()      masks purrr::flatten()
+✖ rlang::flatten_chr()  masks purrr::flatten_chr()
+✖ rlang::flatten_dbl()  masks purrr::flatten_dbl()
+✖ rlang::flatten_int()  masks purrr::flatten_int()
+✖ rlang::flatten_lgl()  masks purrr::flatten_lgl()
+✖ rlang::flatten_raw()  masks purrr::flatten_raw()
+✖ infer::generate()     masks fabletools::generate()
+✖ infer::hypothesize()  masks fabletools::hypothesize()
+✖ rlang::invoke()       masks purrr::invoke()
+✖ dplyr::lag()          masks stats::lag()
+✖ parsnip::null_model() masks fabletools::null_model()
+✖ rsample::populate()   masks Rcpp::populate()
+✖ yardstick::spec()     masks readr::spec()
+✖ rlang::splice()       masks purrr::splice()
+✖ recipes::step()       masks stats::step()
+✖ rlang::string()       masks arrow::string()
+• Dig deeper into tidy modeling with R at https://www.tmwr.org</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>partner_data <span class="ot">&lt;-</span> <span class="fu">credit_card.partnerships</span>()</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>overdue30to89 <span class="ot">&lt;-</span> <span class="fu">credit_card.overdue_3089</span>()</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>loan_amt <span class="ot">&lt;-</span>  <span class="fu">credit_card.loan_amount</span>()</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>loan_unused <span class="ot">&lt;-</span> <span class="fu">credit_card.unused</span>()</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>loan_unused_ratio <span class="ot">&lt;-</span> <span class="fu">credit_card.unused_ratio</span>()</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>partner_data <span class="ot">&lt;-</span> <span class="fu">credit_card.partnerships</span>() </span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>selected_measure <span class="ot">&lt;-</span> overdue30to89</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>partners <span class="ot">&lt;-</span> partner_data <span class="sc">|&gt;</span> </span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">select</span>(<span class="sc">-</span>caption) <span class="sc">|&gt;</span></span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">'old'</span>,<span class="st">'new'</span>), <span class="at">names_to =</span> <span class="st">"partnership"</span>, <span class="at">values_to =</span> <span class="st">"BankName"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">filter</span>(partnership <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">'new'</span>,<span class="st">'old'</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(<span class="st">"acquired"</span>, <span class="st">"available"</span>), lubridate<span class="sc">::</span>ymd))</span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>agg_data <span class="ot">&lt;-</span> <span class="fu">aggregate_by_index</span>(selected_measure, <span class="st">"value_diff"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>                <span class="fu">rename</span>(<span class="at">value_diff.Agg =</span> value_diff) </span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a>bank_data <span class="ot">&lt;-</span> partners <span class="sc">|&gt;</span> </span>
+<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a>                <span class="fu">left_join</span>(selected_measure, <span class="at">relationship =</span> <span class="st">"many-to-many"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb40-21"><a href="#cb40-21" aria-hidden="true" tabindex="-1"></a>                <span class="fu">rename</span>(<span class="at">value_diff.Bank =</span> value_diff) <span class="sc">|&gt;</span></span>
+<span id="cb40-22"><a href="#cb40-22" aria-hidden="true" tabindex="-1"></a>                <span class="fu">left_join</span>(agg_data) <span class="sc">|&gt;</span></span>
+<span id="cb40-23"><a href="#cb40-23" aria-hidden="true" tabindex="-1"></a>                <span class="fu">mutate</span>(<span class="at">Period =</span> Quarter <span class="sc">-</span> <span class="fu">yearquarter</span>(acquired)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Joining with `by = join_by(BankName)`
+Joining with `by = join_by(Measure, Description, Quarter)`</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate a model </span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="co">#m &lt;- lm(value_diff.Bank  ~ value_diff.Agg + partnership, data = est_data)</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate And observation data</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>est_data <span class="ot">&lt;-</span> bank_data <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="fu">between</span>(Period, <span class="sc">-</span><span class="dv">6</span>, <span class="sc">-</span><span class="dv">1</span>))</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>obs_data <span class="ot">&lt;-</span> bank_data <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="fu">between</span>(Period, <span class="dv">0</span>, <span class="dv">5</span>)) </span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>m_recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(bank_data) <span class="sc">|&gt;</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update_role</span>(<span class="fu">everything</span>(), <span class="at">new_role =</span> <span class="st">"support"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update_role</span>(value_diff.Bank, <span class="at">new_role =</span> <span class="st">"outcome"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update_role</span>(value_diff.Agg, partnership, <span class="at">new_role =</span> <span class="st">"predictor"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(partnership, <span class="at">one_hot=</span>T)</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a><span class="co"># obs_data &lt;- m_recipe |&gt;</span></span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a><span class="co">#             prep(obs_data) |&gt;</span></span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a><span class="co">#             bake(obs_data)</span></span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>m_model <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span> <span class="fu">set_engine</span>(<span class="st">"lm"</span>)</span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>m_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>                <span class="fu">add_recipe</span>(m_recipe) <span class="sc">|&gt;</span></span>
+<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a>                <span class="fu">add_model</span>(m_model)</span>
+<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a>m_fitted <span class="ot">&lt;-</span> m_workflow <span class="sc">|&gt;</span> <span class="fu">fit</span>(est_data)</span>
+<span id="cb42-24"><a href="#cb42-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-25"><a href="#cb42-25" aria-hidden="true" tabindex="-1"></a>y_hat <span class="ot">&lt;-</span> m_fitted <span class="sc">|&gt;</span> <span class="fu">predict</span>(obs_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in predict.lm(object = object$fit, newdata = new_data, type =
+"response", : prediction from rank-deficient fit; consider predict(.,
+rankdeficient="NA")</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">#metric_set(rmse, mae, rsq)(obs_data$value_diff.Bank, .pred)</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="co">#https://mdneuzerling.com/post/machine-learning-pipelines-with-tidymodels-and-targets/</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a><span class="co">#In the observation period, subtract the prediction from the actual return to get the “abnormal return.” </span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>obs_data_ar <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(obs_data, y_hat) <span class="sc">|&gt;</span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Using mean of estimation return</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>        <span class="co">#mean = value_diff.Bank - mean(est_data$value_diff.Bank),</span></span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Then comparing to peers</span></span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>        <span class="co">#peers = value_diff.Bank - value_diff.Agg,</span></span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Then using model fit with estimation data</span></span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">Predicted =</span> .pred,</span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Actual-Predicted"</span> <span class="ot">=</span> value_diff.Bank <span class="sc">-</span> .pred)</span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a><span class="co">#put predictions and predictions together for visualisation</span></span>
+<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a>actual <span class="ot">&lt;-</span> bank_data <span class="sc">|&gt;</span> </span>
+<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="fu">between</span>(Period, <span class="sc">-</span><span class="dv">6</span>, <span class="dv">5</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb44-19"><a href="#cb44-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(Period, <span class="at">partner_event =</span> name, BankName, partnership, <span class="at">Actual=</span>value_diff.Bank) </span>
+<span id="cb44-20"><a href="#cb44-20" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb44-21"><a href="#cb44-21" aria-hidden="true" tabindex="-1"></a>predict <span class="ot">&lt;-</span> obs_data_ar <span class="sc">|&gt;</span> </span>
+<span id="cb44-22"><a href="#cb44-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(Period, <span class="at">partner_event =</span> name, BankName, partnership, Predicted) </span>
+<span id="cb44-23"><a href="#cb44-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb44-24"><a href="#cb44-24" aria-hidden="true" tabindex="-1"></a>actual <span class="sc">|&gt;</span> <span class="fu">left_join</span>(predict) <span class="sc">|&gt;</span></span>
+<span id="cb44-25"><a href="#cb44-25" aria-hidden="true" tabindex="-1"></a><span class="fu">as_tsibble</span>(<span class="at">index=</span>Period, <span class="at">key=</span><span class="fu">c</span>(partner_event, BankName)) <span class="sc">|&gt;</span></span>
+<span id="cb44-26"><a href="#cb44-26" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="fu">c</span>(Actual,Predicted), <span class="at">names_to =</span> <span class="st">"Values"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb44-27"><a href="#cb44-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">autoplot</span>(value,<span class="fu">aes</span>(<span class="at">color =</span> Values)) <span class="sc">+</span> <span class="fu">facet_grid</span>(partnership <span class="sc">~</span> partner_event) <span class="sc">+</span></span>
+<span id="cb44-28"><a href="#cb44-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Joining with `by = join_by(Period, partner_event, BankName, partnership)`</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 6 rows containing missing values (`geom_line()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="event_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>##Evaluating the model https://theeffectbook.net/ch-EventStudies.html The idea is this: when there’s supposed to be an effect, and we test for an effect, we can’t tease apart what part of our findings is the effect, and what part is the counterfactual model being wrong. But what if we knew there were no effect? Then, anything we estimated could only be the counterfactual model being wrong. So if we got an effect under those conditions, we’d know our model was fishy and would have to try something else.</p>
+<p>So, get a bunch of different time series to test, especially those unaffected by the event. In the context of stock returns, for example, don’t just include the firm with the great announcement on a certain day, also include stocks for a bunch of other firms that had no announcement.</p>
+<p>Then, start doing your event study over and over again. Except each time you do it, pick a random time series to do it on, and pick a random day when the “event” is supposed to have happened.21</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>selected_measure <span class="sc">|&gt;</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(LargeBank<span class="sc">==</span><span class="dv">1</span><span class="sc">|</span>LargeCreditCardBank<span class="sc">==</span><span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(partners, <span class="at">relationship =</span> <span class="st">"many-to-many"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">value_diff.Bank =</span> value_diff) <span class="sc">|&gt;</span></span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Period =</span> Quarter <span class="sc">-</span> <span class="fu">yearquarter</span>(acquired)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Joining with `by = join_by(BankName)`</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,994 × 17
+    IDRSSD BankName          Measure Label Description Value LargeBank OtherBank
+     &lt;int&gt; &lt;chr&gt;             &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;       &lt;dbl&gt;     &lt;int&gt;     &lt;int&gt;
+ 1 3284070 ALLY BANK (32840… UBPRE5… LN_C… Credit Car…  1.05         1         0
+ 2 3284070 ALLY BANK (32840… UBPRE5… LN_C… Credit Car…  1.35         1         0
+ 3 3284070 ALLY BANK (32840… UBPRE5… LN_C… Credit Car…  1.47         1         0
+ 4 3284070 ALLY BANK (32840… UBPRE5… LN_C… Credit Car…  2.1          1         0
+ 5 3284070 ALLY BANK (32840… UBPRE5… LN_C… Credit Car…  2.38         1         0
+ 6 3284070 ALLY BANK (32840… UBPRE5… LN_C… Credit Car…  2.38         1         0
+ 7 3284070 ALLY BANK (32840… UBPRE5… LN_C… Credit Car…  2.79         1         0
+ 8 1394676 AMERICAN EXPRESS… UBPRE5… LN_C… Credit Car…  1.74         0         1
+ 9 1394676 AMERICAN EXPRESS… UBPRE5… LN_C… Credit Car…  1.93         0         1
+10 1394676 AMERICAN EXPRESS… UBPRE5… LN_C… Credit Car…  1.6          0         1
+# ℹ 1,984 more rows
+# ℹ 9 more variables: LargeCreditCardBank &lt;int&gt;, Quarter &lt;qtr&gt;,
+#   value_scaled &lt;dbl[,1]&gt;, value_diff.Bank &lt;dbl&gt;, name &lt;chr&gt;, acquired &lt;date&gt;,
+#   available &lt;date&gt;, partnership &lt;chr&gt;, Period &lt;dbl&gt;</code></pre>
+</div>
+</div>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./data_fed.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">data_fed.html</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb50" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Event study"</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>Event studies are a common approach in econometrics to assess the impact of an event such as earnings announcements, mergers and acquisitions, regulatory changes, or macroeconomic news.</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>The goal is to estimate the portion of post-event change that can be attributed to the event itself, isolating it from other market and firm-specific effects. We do this by predicting what would have happened if the event had not occurred (the counterfactual) and comparing it to the actual observed data to estimate the resulting "abnormal returns".</span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a><span class="fu">## Evaluation</span></span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-12"><a href="#cb50-12" aria-hidden="true" tabindex="-1"></a>The joint test problem arises because we are effectively testing two things: the counterfactual model and the event impact. Consequently, we need an approach to accurately evaluate if our counterfactual model results are credible. One approach is to test using observations where we expect no effect; if there were resulting "abnormal returns" this would point to an issue with the model <span class="co">[</span><span class="ot">see @HuntingtonKlein, chap 17.3.3</span><span class="co">]</span>. </span>
+<span id="cb50-13"><a href="#cb50-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-14"><a href="#cb50-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-15"><a href="#cb50-15" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb50-16"><a href="#cb50-16" aria-hidden="true" tabindex="-1"></a>Outcome = \beta_0 + \beta_1t + \beta_2After + \beta_3t\times After+\varepsilon</span>
+<span id="cb50-17"><a href="#cb50-17" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb50-18"><a href="#cb50-18" aria-hidden="true" tabindex="-1"></a>where $t$ is the time period and $After$ is a binary variable equal to 1 in any time after the event</span>
+<span id="cb50-19"><a href="#cb50-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-22"><a href="#cb50-22" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb50-23"><a href="#cb50-23" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">'functions.R'</span>)</span>
+<span id="cb50-24"><a href="#cb50-24" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels) </span>
+<span id="cb50-25"><a href="#cb50-25" aria-hidden="true" tabindex="-1"></a>partner_data <span class="ot">&lt;-</span> <span class="fu">credit_card.partnerships</span>()</span>
+<span id="cb50-26"><a href="#cb50-26" aria-hidden="true" tabindex="-1"></a>overdue30to89 <span class="ot">&lt;-</span> <span class="fu">credit_card.overdue_3089</span>()</span>
+<span id="cb50-27"><a href="#cb50-27" aria-hidden="true" tabindex="-1"></a>loan_amt <span class="ot">&lt;-</span>  <span class="fu">credit_card.loan_amount</span>()</span>
+<span id="cb50-28"><a href="#cb50-28" aria-hidden="true" tabindex="-1"></a>loan_unused <span class="ot">&lt;-</span> <span class="fu">credit_card.unused</span>()</span>
+<span id="cb50-29"><a href="#cb50-29" aria-hidden="true" tabindex="-1"></a>loan_unused_ratio <span class="ot">&lt;-</span> <span class="fu">credit_card.unused_ratio</span>()</span>
+<span id="cb50-30"><a href="#cb50-30" aria-hidden="true" tabindex="-1"></a>partner_data <span class="ot">&lt;-</span> <span class="fu">credit_card.partnerships</span>() </span>
+<span id="cb50-31"><a href="#cb50-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-32"><a href="#cb50-32" aria-hidden="true" tabindex="-1"></a>selected_measure <span class="ot">&lt;-</span> overdue30to89</span>
+<span id="cb50-33"><a href="#cb50-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-34"><a href="#cb50-34" aria-hidden="true" tabindex="-1"></a>partners <span class="ot">&lt;-</span> partner_data <span class="sc">|&gt;</span> </span>
+<span id="cb50-35"><a href="#cb50-35" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">select</span>(<span class="sc">-</span>caption) <span class="sc">|&gt;</span></span>
+<span id="cb50-36"><a href="#cb50-36" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">'old'</span>,<span class="st">'new'</span>), <span class="at">names_to =</span> <span class="st">"partnership"</span>, <span class="at">values_to =</span> <span class="st">"BankName"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb50-37"><a href="#cb50-37" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">filter</span>(partnership <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">'new'</span>,<span class="st">'old'</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb50-38"><a href="#cb50-38" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(<span class="st">"acquired"</span>, <span class="st">"available"</span>), lubridate<span class="sc">::</span>ymd))</span>
+<span id="cb50-39"><a href="#cb50-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-40"><a href="#cb50-40" aria-hidden="true" tabindex="-1"></a>agg_data <span class="ot">&lt;-</span> <span class="fu">aggregate_by_index</span>(selected_measure, <span class="st">"value_diff"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb50-41"><a href="#cb50-41" aria-hidden="true" tabindex="-1"></a>                <span class="fu">rename</span>(<span class="at">value_diff.Agg =</span> value_diff) </span>
+<span id="cb50-42"><a href="#cb50-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-43"><a href="#cb50-43" aria-hidden="true" tabindex="-1"></a>bank_data <span class="ot">&lt;-</span> partners <span class="sc">|&gt;</span> </span>
+<span id="cb50-44"><a href="#cb50-44" aria-hidden="true" tabindex="-1"></a>                <span class="fu">left_join</span>(selected_measure, <span class="at">relationship =</span> <span class="st">"many-to-many"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb50-45"><a href="#cb50-45" aria-hidden="true" tabindex="-1"></a>                <span class="fu">rename</span>(<span class="at">value_diff.Bank =</span> value_diff) <span class="sc">|&gt;</span></span>
+<span id="cb50-46"><a href="#cb50-46" aria-hidden="true" tabindex="-1"></a>                <span class="fu">left_join</span>(agg_data) <span class="sc">|&gt;</span></span>
+<span id="cb50-47"><a href="#cb50-47" aria-hidden="true" tabindex="-1"></a>                <span class="fu">mutate</span>(<span class="at">Period =</span> Quarter <span class="sc">-</span> <span class="fu">yearquarter</span>(acquired)) </span>
+<span id="cb50-48"><a href="#cb50-48" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb50-49"><a href="#cb50-49" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate a model </span></span>
+<span id="cb50-50"><a href="#cb50-50" aria-hidden="true" tabindex="-1"></a><span class="co">#m &lt;- lm(value_diff.Bank  ~ value_diff.Agg + partnership, data = est_data)</span></span>
+<span id="cb50-51"><a href="#cb50-51" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate And observation data</span></span>
+<span id="cb50-52"><a href="#cb50-52" aria-hidden="true" tabindex="-1"></a>est_data <span class="ot">&lt;-</span> bank_data <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="fu">between</span>(Period, <span class="sc">-</span><span class="dv">6</span>, <span class="sc">-</span><span class="dv">1</span>))</span>
+<span id="cb50-53"><a href="#cb50-53" aria-hidden="true" tabindex="-1"></a>obs_data <span class="ot">&lt;-</span> bank_data <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="fu">between</span>(Period, <span class="dv">0</span>, <span class="dv">5</span>)) </span>
+<span id="cb50-54"><a href="#cb50-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-55"><a href="#cb50-55" aria-hidden="true" tabindex="-1"></a>m_recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(bank_data) <span class="sc">|&gt;</span></span>
+<span id="cb50-56"><a href="#cb50-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update_role</span>(<span class="fu">everything</span>(), <span class="at">new_role =</span> <span class="st">"support"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb50-57"><a href="#cb50-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update_role</span>(value_diff.Bank, <span class="at">new_role =</span> <span class="st">"outcome"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb50-58"><a href="#cb50-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update_role</span>(value_diff.Agg, partnership, <span class="at">new_role =</span> <span class="st">"predictor"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb50-59"><a href="#cb50-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(partnership, <span class="at">one_hot=</span>T)</span>
+<span id="cb50-60"><a href="#cb50-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-61"><a href="#cb50-61" aria-hidden="true" tabindex="-1"></a><span class="co"># obs_data &lt;- m_recipe |&gt;</span></span>
+<span id="cb50-62"><a href="#cb50-62" aria-hidden="true" tabindex="-1"></a><span class="co">#             prep(obs_data) |&gt;</span></span>
+<span id="cb50-63"><a href="#cb50-63" aria-hidden="true" tabindex="-1"></a><span class="co">#             bake(obs_data)</span></span>
+<span id="cb50-64"><a href="#cb50-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-65"><a href="#cb50-65" aria-hidden="true" tabindex="-1"></a>m_model <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span> <span class="fu">set_engine</span>(<span class="st">"lm"</span>)</span>
+<span id="cb50-66"><a href="#cb50-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-67"><a href="#cb50-67" aria-hidden="true" tabindex="-1"></a>m_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb50-68"><a href="#cb50-68" aria-hidden="true" tabindex="-1"></a>                <span class="fu">add_recipe</span>(m_recipe) <span class="sc">|&gt;</span></span>
+<span id="cb50-69"><a href="#cb50-69" aria-hidden="true" tabindex="-1"></a>                <span class="fu">add_model</span>(m_model)</span>
+<span id="cb50-70"><a href="#cb50-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-71"><a href="#cb50-71" aria-hidden="true" tabindex="-1"></a>m_fitted <span class="ot">&lt;-</span> m_workflow <span class="sc">|&gt;</span> <span class="fu">fit</span>(est_data)</span>
+<span id="cb50-72"><a href="#cb50-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-73"><a href="#cb50-73" aria-hidden="true" tabindex="-1"></a>y_hat <span class="ot">&lt;-</span> m_fitted <span class="sc">|&gt;</span> <span class="fu">predict</span>(obs_data)</span>
+<span id="cb50-74"><a href="#cb50-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-75"><a href="#cb50-75" aria-hidden="true" tabindex="-1"></a>  <span class="co">#metric_set(rmse, mae, rsq)(obs_data$value_diff.Bank, .pred)</span></span>
+<span id="cb50-76"><a href="#cb50-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-77"><a href="#cb50-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-78"><a href="#cb50-78" aria-hidden="true" tabindex="-1"></a><span class="co">#https://mdneuzerling.com/post/machine-learning-pipelines-with-tidymodels-and-targets/</span></span>
+<span id="cb50-79"><a href="#cb50-79" aria-hidden="true" tabindex="-1"></a><span class="co">#In the observation period, subtract the prediction from the actual return to get the “abnormal return.” </span></span>
+<span id="cb50-80"><a href="#cb50-80" aria-hidden="true" tabindex="-1"></a>obs_data_ar <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(obs_data, y_hat) <span class="sc">|&gt;</span></span>
+<span id="cb50-81"><a href="#cb50-81" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Using mean of estimation return</span></span>
+<span id="cb50-82"><a href="#cb50-82" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb50-83"><a href="#cb50-83" aria-hidden="true" tabindex="-1"></a>        <span class="co">#mean = value_diff.Bank - mean(est_data$value_diff.Bank),</span></span>
+<span id="cb50-84"><a href="#cb50-84" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Then comparing to peers</span></span>
+<span id="cb50-85"><a href="#cb50-85" aria-hidden="true" tabindex="-1"></a>        <span class="co">#peers = value_diff.Bank - value_diff.Agg,</span></span>
+<span id="cb50-86"><a href="#cb50-86" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Then using model fit with estimation data</span></span>
+<span id="cb50-87"><a href="#cb50-87" aria-hidden="true" tabindex="-1"></a>        <span class="at">Predicted =</span> .pred,</span>
+<span id="cb50-88"><a href="#cb50-88" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Actual-Predicted"</span> <span class="ot">=</span> value_diff.Bank <span class="sc">-</span> .pred)</span>
+<span id="cb50-89"><a href="#cb50-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-90"><a href="#cb50-90" aria-hidden="true" tabindex="-1"></a><span class="co">#put predictions and predictions together for visualisation</span></span>
+<span id="cb50-91"><a href="#cb50-91" aria-hidden="true" tabindex="-1"></a>actual <span class="ot">&lt;-</span> bank_data <span class="sc">|&gt;</span> </span>
+<span id="cb50-92"><a href="#cb50-92" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="fu">between</span>(Period, <span class="sc">-</span><span class="dv">6</span>, <span class="dv">5</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb50-93"><a href="#cb50-93" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(Period, <span class="at">partner_event =</span> name, BankName, partnership, <span class="at">Actual=</span>value_diff.Bank) </span>
+<span id="cb50-94"><a href="#cb50-94" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb50-95"><a href="#cb50-95" aria-hidden="true" tabindex="-1"></a>predict <span class="ot">&lt;-</span> obs_data_ar <span class="sc">|&gt;</span> </span>
+<span id="cb50-96"><a href="#cb50-96" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(Period, <span class="at">partner_event =</span> name, BankName, partnership, Predicted) </span>
+<span id="cb50-97"><a href="#cb50-97" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb50-98"><a href="#cb50-98" aria-hidden="true" tabindex="-1"></a>actual <span class="sc">|&gt;</span> <span class="fu">left_join</span>(predict) <span class="sc">|&gt;</span></span>
+<span id="cb50-99"><a href="#cb50-99" aria-hidden="true" tabindex="-1"></a><span class="fu">as_tsibble</span>(<span class="at">index=</span>Period, <span class="at">key=</span><span class="fu">c</span>(partner_event, BankName)) <span class="sc">|&gt;</span></span>
+<span id="cb50-100"><a href="#cb50-100" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="fu">c</span>(Actual,Predicted), <span class="at">names_to =</span> <span class="st">"Values"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb50-101"><a href="#cb50-101" aria-hidden="true" tabindex="-1"></a>    <span class="fu">autoplot</span>(value,<span class="fu">aes</span>(<span class="at">color =</span> Values)) <span class="sc">+</span> <span class="fu">facet_grid</span>(partnership <span class="sc">~</span> partner_event) <span class="sc">+</span></span>
+<span id="cb50-102"><a href="#cb50-102" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span>
+<span id="cb50-103"><a href="#cb50-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-104"><a href="#cb50-104" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb50-105"><a href="#cb50-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-106"><a href="#cb50-106" aria-hidden="true" tabindex="-1"></a>##Evaluating the model</span>
+<span id="cb50-107"><a href="#cb50-107" aria-hidden="true" tabindex="-1"></a>https://theeffectbook.net/ch-EventStudies.html</span>
+<span id="cb50-108"><a href="#cb50-108" aria-hidden="true" tabindex="-1"></a>The idea is this: when there’s supposed to be an effect, and we test for an effect, we can’t tease apart what part of our findings is the effect, and what part is the counterfactual model being wrong. But what if we knew there were no effect? Then, anything we estimated could only be the counterfactual model being wrong. So if we got an effect under those conditions, we’d know our model was fishy and would have to try something else.</span>
+<span id="cb50-109"><a href="#cb50-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-110"><a href="#cb50-110" aria-hidden="true" tabindex="-1"></a>So, get a bunch of different time series to test, especially those unaffected by the event. In the context of stock returns, for example, don’t just include the firm with the great announcement on a certain day, also include stocks for a bunch of other firms that had no announcement.</span>
+<span id="cb50-111"><a href="#cb50-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-112"><a href="#cb50-112" aria-hidden="true" tabindex="-1"></a>Then, start doing your event study over and over again. Except each time you do it, pick a random time series to do it on, and pick a random day when the “event” is supposed to have happened.21</span>
+<span id="cb50-115"><a href="#cb50-115" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb50-116"><a href="#cb50-116" aria-hidden="true" tabindex="-1"></a>selected_measure <span class="sc">|&gt;</span></span>
+<span id="cb50-117"><a href="#cb50-117" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span></span>
+<span id="cb50-118"><a href="#cb50-118" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(LargeBank<span class="sc">==</span><span class="dv">1</span><span class="sc">|</span>LargeCreditCardBank<span class="sc">==</span><span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb50-119"><a href="#cb50-119" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(partners, <span class="at">relationship =</span> <span class="st">"many-to-many"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb50-120"><a href="#cb50-120" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">value_diff.Bank =</span> value_diff) <span class="sc">|&gt;</span></span>
+<span id="cb50-121"><a href="#cb50-121" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Period =</span> Quarter <span class="sc">-</span> <span class="fu">yearquarter</span>(acquired)) </span>
+<span id="cb50-122"><a href="#cb50-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-123"><a href="#cb50-123" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+</body></html>

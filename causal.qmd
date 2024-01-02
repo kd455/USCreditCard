@@ -1,0 +1,11 @@
+---
+title: "Untitled"
+format: html
+---
+
+The 
+
+Detecting   
+https://research.google/pubs/inferring-causal-impact-using-bayesian-structural-time-series-models/
+
+https://google.github.io/CausalImpact/

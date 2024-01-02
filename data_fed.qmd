@@ -1,0 +1,45 @@
+```{r}
+#| echo: false
+#| warning: false
+source('functions.R')
+```
+```{r}
+#| echo: false
+#| warning: false
+us_measures <- us_economy() 
+recessions <- us_economy.recession() |> 
+                filter(Flag == 1, 
+                       yearmonth(Month) >= yearmonth('1992-01-01'))
+
+us_measures_scaled <- us_measures |>
+                        mutate(B069RC1.Pop = B069RC1/POPTHM) |>
+                        mutate(B069RC1.CPI = B069RC1.Pop/CPIAUCSL) |>
+                        mutate(across(!Month, scale))
+
+              
+us_measures_scaled |> 
+    na.omit() |>
+    pivot_longer(cols = !Month) |>
+    autoplot(value)+ facet_wrap(~ name, scales = "free_y" , ncol = 1) +
+    theme(strip.text = element_text(size = 14), legend.position = "none") +
+    labs(y = "Normalised (Normal=0)") 
+
+us_measures_scaled |> 
+    na.omit() |>
+    select(PSAVERT,CSCICP03USM665S,B069RC1,B069RC1.CPI,UNRATE) |>
+    pivot_longer(cols = !Month) |>
+    autoplot()+ facet_wrap(~ name, scales = "free_y" , ncol = 1,labeller =  as_labeller(c(PSAVERT= "US Personal Savings Rate \n(PSAVERT)", 
+    CSCICP03USM665S = "US Composite Confidence Indicator \n(CSCICP03USM665S)",
+    B069RC1 = "US Personal interest payment \n(B069RC1)", 
+    B069RC1.CPI = "US Personal interest payment per capita CPI Adjusted \n(B069RC1/POPTHM/CPIAUCSL)",
+    UNRATE = "Unemployment Rate \n(UNRATE)"))) +
+    labs(y = "Normalised (Normal=0)")+
+    geom_rect(data = recessions,inherit.aes = FALSE, aes(xmin = Month, xmax = Month + 30, ymin = -Inf, ymax = Inf), fill = "lightgrey", alpha = 0.5) +
+    labs(title = "Macro Economic Measures (data series id)",
+        subtitle = "grey areas indicate recessions",
+        ) +theme_bw() +
+    theme(legend.position = 'none',strip.text = element_text(size = 14)) +
+    xlab("")
+        
+```
+

@@ -1,0 +1,16 @@
+---
+title: "Untitled"
+format: html
+---
+
+```{r}
+#| echo: false
+#| warning: false
+source('functions.R')
+```
+```{r}
+#| echo: false
+#| warning: FALSE
+
+
+```

@@ -1,0 +1,50 @@
+# Introduction
+
+
+## Objectives {#objectives}
+
+This project focuses on the US credit card market and whether, using
+publicly available data, we can independently assess Bank's credit card partnership deals.
+
+Structurally, the US credit card market is split between 'bank branded'
+(\~60%) and partnership cards (\~40%). Partnership cards e.g., with
+Cosco, GAP, American Airlines etc. typically reward borrowers with
+benefits such as points, services and discounts.
+
+Each partnership card has a minimum FICO® Score cutoff for applicants.
+FICO® is a US credit Card scoring system; low scores indicate increased
+likelihood of a borrowers defaulting on their credit card loan.
+
+-   **Hypotheses 1**: Adding a partnership with lower FICO® Score
+    cutoff reduces the Bank's overall credit card portfolio quality.
+
+-   **Hypotheses 2**: The sector e.g., retail, energy, airline, of a
+    partnership card is a determinant of the partnership quality.
+
+The project findings could be used in risk assessments of new Bank card
+partnerships by external parties including regulators (internally, Banks
+will have access to granular individual borrower level data to perform a
+more through risk assessment).
+
+### Partnership events
+
+An attribute of the partnership market is that an established
+partnership can breakdown, and the whole partner portfolio moves to a
+new Bank. This means there are two opportunities to understand the
+quality of the partner portfolio by looking for changepoints in the
+"from" and "to" Bank. A changepoint may only be evident if:
+
+1.  The deal is proportionally significant
+2.  There is a quality difference; if the quality of the portfolio stays
+    same in both "from" and "to" Bank then we will not see a
+    changepoint.
+
+In comparison, new partnerships see a gradual increase in borrowers,
+making it difficult to confidently attribute changes due to a
+partnership verses macroeconomic factors and other
+business decisions make by the Bank.
+
+![Partnership card breakups](images/Mercator-Advisory-Group-Co-branded-Credit-Cards-EXHIBITS-Aug2021.jpg){#fig-gap-mercator}
+*Source:* [Javelin Report](https://javelinstrategy.com/research/co-branded-credit-cards-reinventing-themselves-post-covid-losses)
+
+
