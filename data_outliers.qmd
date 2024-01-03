@@ -26,14 +26,6 @@ plot_extremes <- function(data_w_features,feature_name) {
     labs(title = glue("Banks - Most and Least {feature_name}") )
 }
 
-plot_feature_violin <- function(data, feature_name) {
-    data |>
-        ggplot(aes(x = BankType, y = !!as.name(feature_name))) +
-                    geom_violin(trim = FALSE) +
-                    geom_boxplot(width = 0.1, fill = "white") + 
-                    theme_light() +
-                    labs(x = "", y = "")
-}
 
 regulation_cutoff <- "2010-02-22"
 
