@@ -34,7 +34,7 @@ new Bank. This means there are two opportunities to understand the
 quality of the partner portfolio by looking for changepoints in the
 "from" and "to" Bank. A changepoint may only be evident if:
 
-1.  The deal is proportionally significant
+1.  The deal is proportionally significant.
 2.  There is a quality difference; if the quality of the portfolio stays
     same in both "from" and "to" Bank then we will not see a
     changepoint.
@@ -42,7 +42,7 @@ quality of the partner portfolio by looking for changepoints in the
 In comparison, new partnerships see a gradual increase in borrowers,
 making it difficult to confidently attribute changes due to a
 partnership verses macroeconomic factors and other
-business decisions make by the Bank.
+business decisions made by the Bank.
 
 ![Partnership card breakups](images/Mercator-Advisory-Group-Co-branded-Credit-Cards-EXHIBITS-Aug2021.jpg){#fig-gap-mercator}
 *Source:* [Javelin Report](https://javelinstrategy.com/research/co-branded-credit-cards-reinventing-themselves-post-covid-losses)

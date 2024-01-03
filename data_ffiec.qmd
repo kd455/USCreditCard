@@ -5,7 +5,7 @@ format: html
 
 US banks are required to report quarterly financial data e.g., Balance Sheet and Income Statements, to the US Federal Financial Institutions Examination Council (FFIEC) who make this data publicly available in a consolidated format as a part of their Uniform Bank Performance Reporting (UBPR) regime. Data is available from 2002 Q4 @ffiec.
 
-We are interested in measures that will provide insights to Bank's credit card business as shown in @tbl-ccmeasures. 
+We are interested in measures that will provide insights to Bank's credit card businesses as shown in @tbl-ccmeasures. 
 
 ```{r}
 #| tbl-cap: "UBPR Credit Card Measures"
@@ -21,39 +21,37 @@ credit_card() |>
 
 ## Measure of portfolio quality
 
-To measure quality we can use the proportion of credit cards that are deliquient in the portfolio. This is the sum of UBPRE523 and UBPRE524; accounts that are accruing payments but are overdue by 30 day+ or are in non-accrual status i.e. non-performing loans. 
+To measure quality we can use the proportion of credit cards that are delinquent in the portfolio. This is the sum of UBPRE523 and UBPRE524; accounts that are accruing payments but are overdue by 30 day+ or are in non-accrual status i.e. non-performing loans. 
 
-However, given we are interested in the impact of a partnership, using the UBPRE524 **Credit Card Plans-30-89 DAYS P/D %** measure is ideal as it gives us the earliest indicator of delinquency.
+However, given we are interested in the impact of a partnership, using measure **Credit Card Plans-30-89 DAYS P/D %** (UBPRE524) is ideal as it gives us the earliest indicator of delinquency.
 
 ## Bank Peer Groups
 
 The scope of Banks included in our analysis is not limited to the banks involved in credit card partnerships. We can use data from FFIEC to add information about their peers i.e. other banks that are similar. 
 
-@tbl-peergrpcnt details 3 peer groups. National (US-wide) Credit card partnerships occur with Banks in the **Large Bank** and **Large Credit Card Bank** groups, membership of these peer groups are defined by FFIEC (See @sec-peers for full list of Banks in each peer group) [@ffiec].
+@tbl-peergrpcnt details 3 peer groups. National (US-wide) Credit card partnerships occur between banks in the **Large Bank** and **Large Credit Card Bank** groups. These peer groups are defined by FFIEC (see @sec-peers for full list of Banks in each peer group) [@ffiec].
 
-A Large Bank like CITIBANK will have a multiple businesses: household mortgages and credit cards; trading desks; investment banking; private wealth customers and more. In constrast specialised credit card business like BARCLAYS US are credit card only businesses. Consequently, we expect to see the peer groups react differently to external factors, or exhibit different internal dynamics and risk profiles. 
+A Large Bank like CITIBANK will have a multiple businesses: household mortgages and credit cards; market trading; investment banking and more. In contrast, large credit card banks like BARCLAYS US specialise in credit cards only. Consequently, we expect to see the peer groups react differently to external factors, or exhibit different internal dynamics and risk profiles. 
 
 ```{r}
 #| tbl-cap: "Number of Banks in each peer group"
 #| label: tbl-peergrpcnt
 #| warning: false
 overdue30to89 <- credit_card.overdue_3089()
-target_label <- "Credit Card Plans-30-89 DAYS P/D %"
+target_label <- credit_card.target_label()
+
 bank_scope <- overdue30to89 |> 
                 as_tibble() |> 
                 group_by(BankName,BankType) |> 
                 summarise(total_bal = sum(abs(Value),na.rm=T)) |>
                 filter(!(is.na(total_bal)|total_bal==0))
 
-grp <- tibble(BankType = 'LargeBank', FFIEC_Id = '1', Criteria = 'Insured commercial banks having assets greater than $100 billion', Examples = 'CITIBANK, JPMORGAN CHASE BANK, MORGAN STANLEY') |> 
-add_row(BankType = 'LargeCreditCardBank', FFIEC_Id = '201', Criteria = 'Large Credit Card Banks: Credit card specialty banks having assets greater than $ 3 billion', Examples = 'BARCLAYS BANK, SYNCHRONY BANK, DISCOVER BANK')|> 
-add_row(BankType = 'OtherBank', FFIEC_Id = '', Criteria = 'Other - all other Banks that have reported UBPRE524', Examples = '')
+bank_n <- bank_scope |>
+            group_by(BankType) |> 
+            summarise(Number = n())
 
-bank_scope |>
-    group_by(BankType) |> 
-    summarise(Number = n()) |>
-    right_join(grp) |>    
-    knitr::kable(format = "html")    
+bank_n |> right_join(bank_type.desc()) |> relocate(Number, .after = last_col()) |>  
+            knitr::kable(format = "html")    
 ``` 
 
 ::: {.callout-note}
@@ -62,16 +60,16 @@ Why are there thousands of Banks? The US Banking system grew out of 19th-century
 
 ## Data Period
 
-Regulation implemented in 2010 had a material impact on the credit card market [@cfpb2013] and [@boston2014]. It's worth noting that @boston2014 highlight that regulation coincided with the 2008 financial crisis and recession, making it difficult to fully assert causation [-@boston2014].
+Regulation implemented in 2010 had a material impact on the credit card market [@cfpb2013; also @boston2014]. As highlighted by @boston2014, regulation coincided with the 2008 financial crisis and recession, making it difficult to fully assert causation [-@boston2014].
 
 The regulations introduced were:
 
-1. Credit Card Accountability Responsibility and Disclosure (CARD) Act of 2009 which had a staggered implementation in February and August 2010. This Act has led to stricter lending criteria e.g., income and credit history checks, as it requires Banks to assess whether a potential borrower has the means to repay. High-risk borrowers like those under 21, have additional restrictions [@cfpb2013]. 
-2. Regulation Z, or the Truth in Lending Act (TILA), focuses on ensuring transparency and fairness in lending practices. For credit cards this means Banks have to provide full disclosure of the terms and conditions of a credit agreement [@cfpb2010z].
+1. Credit Card Accountability Responsibility and Disclosure (CARD) Act of 2009 which had a staggered implementation in February and August 2010. This Act requires Banks to assess whether a potential borrower has the means to repay. Additionally, high-risk borrowers like those under 21, have additional restrictions. This has led to stricter lending criteria e.g., income and credit history checks [@cfpb2013]. 
+2. Regulation Z, or the Truth in Lending Act (TILA), focuses on ensuring transparency and fairness in lending practices. Banks have to provide full disclosure of the terms and conditions of a loan agreement [@cfpb2010z].
 
-We can see the impact in @fig-regulation which plots a linear trend for **Credit Card Plans-30-89 DAYS P/D %** (UBPRE524) for each peer group. Based on @fig-regulation-3 there was increasing delinquency for Large Banks and Large Credit Card Banks before regulation, but post regulation the trend has reversed and is now trending down.
+We can see the impact in @fig-regulation which plots a linear trend for *`r target_label`* for each peer group. Based on @fig-regulation-3 there was increasing delinquency for Large Banks and Large Credit Card Banks before regulation, but post regulation the trend has reversed and is now trending down.
 
-For our analysis we will focus on the post regulatory period. This does mean that we will reduce our analysis to credit card partnerships post regulation, however, this is more relevant for commenting on future partnership deals. 
+For our analysis we will focus on credit card partnerships post regulation as this is more relevant for commenting on future partnership deals. 
 
 ```{r}
 #| warning: false
@@ -86,23 +84,13 @@ reg_date_z <- as.Date("2010-07-01")
 reg_date_c1 <- as.Date("2010-02-22")
 reg_date_c2 <- as.Date("2010-08-22")
 
-group.colours <- c(LargeBank = "#1B9E77", 
-                    "LargeBank/Before" = "#1B9E77", 
-                    "LargeBank/After" = "#1B9E77", 
-                    LargeCreditCardBank = "#D95F02",
-                    "LargeCreditCardBank/Before" = "#D95F02", 
-                    "LargeCreditCardBank/After" =  "#D95F02", 
-                    OtherBank = "#999999",
-                    "OtherBank/Before" = "#999999",
-                    "OtherBank/After" = "#999999")
-
 overdue30to89 |> 
     filter(value_diff <= 23) |>
     group_by(BankType) |>
         summarise(val_mean = mean(Value, na.rm=T)) |> 
         autoplot(val_mean, aes(colour=BankType)) +
         geom_smooth(method = "lm", se = FALSE, show.legend = F, linewidth=.5) +    
-        scale_color_manual(values = group.colours)+
+        scale_color_manual(values = bank_type.colours())+
         theme(legend.position = "top",
                 legend.title=element_blank()) +
         labs(y=glue("{target_label} \n mean"), x="")
@@ -118,7 +106,7 @@ overdue30to89 |>
     geom_vline(xintercept = reg_date_c2,linetype=2,colour="red") +
     annotate("label",label="iii", x=reg_date_c2, y=16.0, hjust = - 0.05) +
     labs(y=glue("{target_label} \n variance"), x="") +
-    scale_color_manual(values = group.colours)+
+    scale_color_manual(values = bank_type.colours())+
     theme(legend.position = "top", legend.title=element_blank()) 
 
 
@@ -129,7 +117,7 @@ overdue30to89 |>
         summarise(val_mean = mean(Value, na.rm=T)) |> 
         autoplot(val_mean, aes(colour=BankType)) +
         geom_smooth(method = "lm", se = FALSE, show.legend = F,size=.5) +    
-        scale_color_manual(values = group.colours, breaks=c("LargeBank","LargeCreditCardBank","OtherBank"))+
+        scale_color_manual(values = bank_type.colours(), breaks=c("LargeBank","LargeCreditCardBank","OtherBank"))+
         geom_vline(xintercept = reg_date_c1,linetype=2,colour="red")+
         annotate("label",label="CARD Act Part 1 comes into effect", x=reg_date_c1, y=3.5, hjust = - 0.05) +
         labs(y=glue("{target_label} \n mean"), x="") +
@@ -137,9 +125,9 @@ overdue30to89 |>
 ```
 ## Bank Outliers {#sec-outliers}
 
-As we are dealing with time series data, we need to identify banks where their individual data characteristics are markedly different from those of its peers.
+As we are dealing with time series data, we need to identify banks where their individual series characteristics are markedly different from those of its peers.
 
-@fig-outliers takes the approach from @Hyndman2021 who use Principal Components Analysis (PCA) on a set of calculated statistical features such as lumpiness, stability and Seasonal-Trend decomposition using LOESS (STL) [-@Hyndman2021]. 
+@fig-outliers takes the approach from @Hyndman2021 who use Principal Components Analysis (PCA) on a set of calculated statistical features such as intermittency, lumpiness, stability and Seasonal-Trend decomposition using LOESS (STL) [-@Hyndman2021]. 
  
 ```{r}
 #| warning: false
@@ -151,28 +139,8 @@ As we are dealing with time series data, we need to identify banks where their i
 #|   - "Data series for Banks with PC1 > 4 and PC2 > 2.5"
 #| layout-ncol: 1
 
-plot_pcs <- function(pcs) {
-    pcs |>
-        ggplot(aes(x = .fittedPC1, y = .fittedPC2, colour = BankType)) +
-        geom_point(size = 5) +
-        theme(aspect.ratio = 1,plot.title = element_markdown()) +
-        labs(subtitle = "US Credit Cards 30-89 days",
-            x = "PC1",
-            y = "PC2")+ theme(legend.position="none")   + 
-        scale_color_manual(values = group.colours) 
-}
-
-plot_outlier <- function(data, outliers, value_name = "Value") {
-    data |>
-    filter(IDRSSD %in% outliers$IDRSSD) |>
-    ggplot(aes(x = Quarter, y = !!as.name(value_name), col = BankName)) +
-    geom_line() +
-    facet_wrap(~BankName, ncol = 1) +
-    theme(legend.position = "none")  +
-    labs(y = target_label) 
-}
-
 regulation_cutoff <- "2010 Q2"
+selected_feats <- c("lumpiness","stability","seasonal")
 
 overdue30to89_post <- overdue30to89 |>
                     filter_index(regulation_cutoff ~ .) 
@@ -181,7 +149,7 @@ overdue30to89_lbanks <- overdue30to89_post |>
                          filter(BankType %in% c("LargeBank", "LargeCreditCardBank"))
 
 all_f <- overdue30to89_lbanks |> 
-                features(Value, feature_set(tags = c("lumpiness","stability","seasonal")))
+                features(Value, feature_set(tags = selected_feats))
 
 pcs <- all_f |> 
     mutate_if(is.numeric, replace_na, -1) |> #where we could not calc a feature value
@@ -192,38 +160,42 @@ pcs <- all_f |>
 pc1_threshold <- 4
 pc2_threshold <- 2.5
 
-plot_pcs(pcs)
+pcs.plot(pcs)
 
 outliers <- pcs |>
   filter( (.fittedPC2 > pc2_threshold) | (.fittedPC1 > pc1_threshold)) |>
   select(IDRSSD) 
   
-plot_outlier(overdue30to89_lbanks, outliers)
+outlier.plot(overdue30to89_lbanks, outliers)
 
 ```
 
-Interestingly, all the banks in @fig-outliers-2 started or re-started (as was the case for Regions Bank) their credit card businesses after 2010 Q1. With the exception of Ally Bank the series start from 0 and quickly jump after one or two quarters. This is expected as it takes 30+ days for credit cards to become deliquient. 
+Interestingly, all the banks in @fig-outliers-2 started or re-started (as was the case for Regions Bank) their credit card businesses after 2010 Q2 (regulatory period cut-off). With the exception of Ally Bank all series begin at 0 and sharply increase after the first or second quarter. This pattern is expected as it takes 30+ days for credit cards to become delinquent. 
 
-If we drop the first 2 non-zero quarters and re-run the PCA (see @fig-outliers-corrected) the banks are no longer outliers - indicating that it was that initial jump that was unusual.
+If we drop the first 2 non-zero quarters and re-run the PCA (see @fig-outliers-corrected) the banks are no longer outliers - indicating that it was that sharp increase that was unusual.
 
 ```{r}
 #| warning: false
 #| error: false
 #| label: fig-outliers-corrected
 #| fig-cap: "PCA of outliers after their first 2 non-zero quarters are dropped"
-outlier_df <- overdue30to89_lbanks |> 
-                filter(IDRSSD %in% outliers$IDRSSD, Value != 0) |>
-                tsibble::group_by_key() |> 
-                        slice(3:n())
-                                    
+#| fig-width: 4
+#| fig-height: 4
+
+outlier_df <-overdue30to89_lbanks |> 
+    filter(IDRSSD %in% outliers$IDRSSD, Value != 0) |>
+    tsibble::group_by_key() |> 
+            slice(3:n())
+
 all_f_outliers <- outlier_df |> 
-                    features(Value, feature_set(tags = c("lumpiness","stability","seasonal")))
+    features(Value, feature_set(tags = selected_feats))
 
 all_f_outliers |> 
     mutate_if(is.numeric, replace_na, -1) |> #where we could not calc a feature value
     select(-c(IDRSSD,BankName, Measure, Label, Description, BankType)) |>
     prcomp(scale = TRUE) |> 
-    broom::augment(all_f_outliers) |> plot_pcs()
+    broom::augment(all_f_outliers) |> pcs.plot()                            
+                        
 
 ```
 
@@ -232,17 +204,66 @@ all_f_outliers |>
 #| error: false
 
 #apply 1. regulatory cutoff, 2. fixed outliers.
-final_df <- overdue30to89_post |> 
+df_alltypes <- overdue30to89_post |> 
                 filter(!IDRSSD %in% outliers$IDRSSD) |> 
-                add_row(outlier_df) |> fill_gaps()
+                add_row(outlier_df) |> 
+                fill_gaps()
 
-all_ftbanks <- final_df |> 
-                features(Value, feature_set(tags = c("lumpiness","stability","seasonal")))
+all_ftbanks <- df_alltypes |> 
+                features(Value, feature_set(tags = selected_feats))
+
+final_df <- df_alltypes |> 
+                filter(BankType %in% c("LargeBank", "LargeCreditCardBank")) |>
+                mutate(value_diff = difference(Value))
+
 ```
 
 ## Exploration of Statistical Features {#sec-feature-explore}
 
-@fig-lfeature shows the features from @sec-outliers that we can use to explore the characteristics of each peer group (see [@tsfeatures]). 
+@fig-quantile plots the distribution of `r target_label`. We can see that there are two peaks for *Large Credit Card Banks*. There are `r bank_n |> filter(BankType=="LargeCreditCardBank") |> pull(Number)` banks in the this peer group which may be too small to capture the true distribution effectively. However, it may also indicate that there are sub-groups within this peer group. For instance, the first peak could represent banks that have lower risk profiles, while the second represents banks that have a higher risk profiles.
+
+::: {#tbl-quantile .panel-tabset}
+
+## Distribution
+```{r}
+#| warning: false
+#| error: false
+#| fig-height: 4
+#| label: fig-quantile
+#| fig-cap: "Density plot"
+ggplot(final_df, aes(x=Value, colour = BankType))+ 
+    geom_density(alpha = .3) +
+    labs(x=target_label) +
+    theme(legend.position="top",legend.title=element_blank()) +
+    scale_color_manual(values = bank_type.colours())
+```
+
+## Quantiles - Large Credit Card Banks
+```{r}
+#| warning: false
+#| error: false
+final_df |> na.omit() |>
+    filter(BankType == "LargeCreditCardBank") |>
+      features(Value, quantile)|> 
+        select(-c(IDRSSD,Measure,Label,Description,BankType)) |>
+        arrange(`100%`)|> 
+        knitr::kable(format = "html")        
+```
+## Quantiles - Large Banks
+
+```{r}
+#| warning: false
+#| error: false
+final_df |> na.omit() |>
+    filter(BankType == "LargeBank") |>
+      features(Value, quantile)|> 
+        select(-c(IDRSSD,Measure,Label,Description,BankType)) |> 
+        arrange(`100%`)|> 
+        knitr::kable(format = "html")
+```
+::: 
+
+@fig-lfeature shows the features from @sec-outliers that we can use to further explore the characteristics of each peer group (the calculations are documented in the tsfeatures R package by @tsfeatures). 
 
 The *Other Banks* peer group has been added for interest. 
 
@@ -252,56 +273,69 @@ The *Other Banks* peer group has been added for interest.
 #| label: fig-lfeature
 #| fig-cap: "Exploring Statistical Features (Post Regulatory environment)"
 #| fig-subcap:
-#|   - "Lumpiness - variance of the variances based on tiled (non-overlapping) windows"
-#|   - "Stability - the variance of the means based on tiled (non-overlapping) windows"
+#|   - "Lumpiness - variance of the variances based on tiled yearly(non-overlapping) windows"
+#|   - "Stability - the variance of the means based on tiled yearly(non-overlapping) windows"
 #|   - "STL decomposition Seasonal Strength - 0 is week (non-seasonal), 1 is strong"
 #|   - "STL decomposition Trend Strength - 0 is week (no trend), 1 is strong"
 #|   - "Linearity -  values around 0 indicate the series is linear"
 #|   - "Autocorrelation - first autocorrelation coefficient"
+#|   - "Autocorrelation - 10th autocorrelation coefficient. In a completely random series (white noise), we would expect autocorrelation coefficients near zero for all lags"
 #|   - "Minimum number of differences necessary to obtain a stationary time series"
 #| layout-ncol: 2
 
-plot_feature_violin <- function(data, feature_name) {
-    data |>
-        ggplot(aes(x = BankType, y = !!as.name(feature_name))) +
-                    geom_violin(trim = FALSE) +
-                    geom_boxplot(width = 0.1, fill = "white") + 
-                    theme_light() +
-                    labs(x = "", y = "")
-}
+features.plot_violin(all_ftbanks, "var_tiled_var")
 
-plot_feature_violin(all_ftbanks, "var_tiled_var")
+features.plot_violin(all_ftbanks, "var_tiled_mean")
 
-plot_feature_violin(all_ftbanks, "var_tiled_mean")
+features.plot_violin(all_ftbanks, "seasonal_strength_year")
 
-plot_feature_violin(all_ftbanks, "seasonal_strength_year")
+features.plot_violin(all_ftbanks, "trend_strength")
 
-plot_feature_violin(all_ftbanks, "trend_strength")
+features.plot_violin(all_ftbanks, "linearity")
 
-plot_feature_violin(all_ftbanks, "linearity")
+features.plot_violin(all_ftbanks, "stl_e_acf1")
 
-plot_feature_violin(all_ftbanks, "stl_e_acf1")
+features.plot_violin(all_ftbanks, "stl_e_acf10")
 
-plot_feature_violin(all_ftbanks, "nsdiffs")
+features.plot_violin(all_ftbanks, "nsdiffs")
 
 ```
 
-1. @fig-lfeature-1: *Other Banks* are lumpy. Also we can see from @fig-regulation-2 that the variance of *Other Banks* did not significantly reduce, we still see lumpiness post regulatory changes (though they were subject to the same regulation). 
-2. @fig-lfeature-3 *Large Credit Card* Banks are more seasonal. @fig-season shows both *Large Banks* and *Large Credit Card Banks* peak in Q3. This is surprising as I assumed events like Black Friday, Thanksgiving and Christmas would have a noticable impact in Q4 or Q1. 
-3. @fig-lfeature-4 and @fig-lfeature-5 indicates a strong linear trend for *Large Banks* and *Large Credit Card Banks*.
-4. @fig-lfeature-6 Autocorrelation coefficient close to 0 indicates weak or no linear relationship between lagged values. Of note the coefficients are negative indicating a tendency for a short-term reversal. This can be seen in @fig-regulation-1 where the values oscillate.
-5. @fig-lfeature-7 *Large Credit Card Banks* is not stationary. Performing a difference i.e. to get the quarterly change in UBPRE524, makes the series stationary. 
+1. @fig-lfeature-1: *Other Banks* are lumpy. Also we can see from @fig-regulation-2 that lumpiness continued post regulatory changes even though *Other Banks* are subject to the same regulation. 
+2. @fig-lfeature-2: For *Large Banks* and *Large Credit Card Banks* the stability is ~0.8 indicating a degree of fluctuation in the data from one year to the next.
+3. @fig-lfeature-3 *Large Credit Card* Banks are seasonal. This can also be seen in the undulating shape in ACF plot (see @fig-acf-1). 
+
+    @fig-season shows both *Large Banks* and *Large Credit Card Banks* peak in Q3. Given events like Black Friday, Thanksgiving and Christmas occur in Q4, we may have expected peak delinquency in Q4 or Q1. 
 
 ```{r}
 #| warning: false
 #| error: false
 #| label: fig-season
 #| fig-cap: "Quarterly Seasonal Subseries. The blue horizontal lines indicate the means for each quarter."
-final_df |> group_by(BankType) |> 
+df_alltypes |> group_by(BankType) |> 
     summarise(mean = mean(Value, na.rm=T)) |> 
         gg_subseries() +
         labs(y=glue("{target_label} \n mean"))
 ```
+
+
+
+4. @fig-lfeature-4 and @fig-lfeature-5 indicates a strong linear trend for *Large Banks* and *Large Credit Card Banks*.
+5. @fig-lfeature-6 the first autocorrelation coefficient is close to 0 which indicates a weak linear relationship between lagged values. Of note the coefficients are negative indicating a tendency for a short-term reversal. This can be seen in @fig-regulation-1 where the values oscillate.
+6. @fig-lfeature-7 the 10th autocorrelation coefficient. Checking overall autocorrelation using the Ljung-Box test proves autocorrelation i.e. data pattern is not due to chance.
+
+**Ljung-Box test**
+
+::: {.border}
+```{r}
+#| warning: false
+final_df |> na.omit() |> pull(value_diff) |> Box.test(lag = 10, type = "Ljung")
+```
+:::
+
+
+5. @fig-lfeature-8 *Large Credit Card Banks* is not stationary. Performing a difference i.e. to get the quarterly change in UBPRE524, makes the series stationary as shown in @fig-acf. This can be confirmed by performing an augmented Dickey–Fuller (ADF) test on the differenced value. We also see that, post differencing, the autocorrelation coefficient at lag 2 is above the significance threshold. This is likely due to seasonality as there are larger coefficients at regular intervals - lags 2, 6, 10, and 14. The decreasing magnitude of these coefficients tell us the earlier lags have a stronger influence than values further in the past.
+
 ```{r}
 #| warning: false
 #| error: false
@@ -310,30 +344,42 @@ final_df |> group_by(BankType) |>
 #| fig-subcap:
 #|   - ""
 #| layout-ncol: 2
-acf_df <- final_df |> filter(BankType %in% c("LargeBank", "LargeCreditCardBank")) |>
-                group_by(BankType)|> 
-                summarise(mean_val = mean(Value, na.rm=T)) |>
-                mutate(value_diff = difference(mean_val))
+agg_df <- final_df |> 
+            group_by(BankType)|> 
+            summarise(mean_val = mean(Value, na.rm=T),
+                      mean_diff = mean(value_diff, na.rm=T)) 
+       
+agg_df |> ACF(x=mean_val,lag_max = 42) |> autoplot()
+agg_df |> ACF(x=mean_diff,lag_max = 42) |> autoplot()
 
-acf_df |> ACF(x=mean_val,lag_max = 42) |> autoplot()
-acf_df |> ACF(x=value_diff,lag_max = 42) |> autoplot()
 ```
+**Dickey–Fuller (ADF) test**
+
+::: {.border}
+```{r}
+#| warning: false
+
+final_df |> na.omit() |> pull(value_diff) |> tseries::adf.test()
+```
+:::
+
+
 ## Summary
 
-From the original FFIEC dataset we have:
+In summary, based on exploration of the data we will prepare the data for modelling by:
 
-Selected
+***Selecting:***
 
-1. Target measure: *Credit Card Plans-30-89 DAYS P/D %* (UBPRE524).
-2. Banks: All *Large Banks* and *Large Credit Card* Banks.
-3. Date Period: Start from 2010 Q2.
+1. Target measure: *`r target_label`* (UBPRE524).
+2. Banks: *Large Banks* and *Large Credit Card* Banks.
+3. Date Period: from 2010 Q2.
 
-Removed
+***Removing:***
 
 4. Outlier data points: first 2 quarters from banks in @fig-outliers-2.
 
-Transformed
+***Transforming:***
 
-5. Target measure to first difference value.
+5. Target measure to make it stationary by taking the first difference.
 
 ## References

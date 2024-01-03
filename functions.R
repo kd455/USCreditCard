@@ -204,6 +204,59 @@ credit_card.partnerships <- function() {
                 available = "2022-06-20")
 }
 
+credit_card.target_label <- function() {
+  "Credit Card Plans-30-89 DAYS P/D %"
+}
+
+bank_type.desc <- function() {
+  tibble(BankType = 'LargeBank', PeerId = '1', Criteria = 'Insured commercial banks having assets greater than $100 billion', Examples = 'CITIBANK, JPMORGAN CHASE BANK, MORGAN STANLEY') |> 
+    add_row(BankType = 'LargeCreditCardBank', PeerId = '201', Criteria = 'Large Credit Card Banks: Credit card specialty banks having assets greater than $ 3 billion', Examples = 'BARCLAYS BANK, SYNCHRONY BANK, DISCOVER BANK')|> 
+    add_row(BankType = 'OtherBank', PeerId = '', Criteria = 'Other - all other Banks that have reported UBPRE524', Examples = '')
+}
+
+bank_type.colours <- function() {
+  c(LargeBank = "#1B9E77", 
+                    "LargeBank/Before" = "#1B9E77", 
+                    "LargeBank/After" = "#1B9E77", 
+                    LargeCreditCardBank = "#D95F02",
+                    "LargeCreditCardBank/Before" = "#D95F02", 
+                    "LargeCreditCardBank/After" =  "#D95F02", 
+                    OtherBank = "#999999",
+                    "OtherBank/Before" = "#999999",
+                    "OtherBank/After" = "#999999")
+} 
+
+
+pcs.plot <- function(pcs) {
+  pcs |>
+        ggplot(aes(x = .fittedPC1, y = .fittedPC2, colour = BankType)) +
+        geom_point(size = 5) +
+        theme(aspect.ratio = 1,plot.title = element_markdown()) +
+        labs(subtitle = "US Credit Cards 30-89 days",
+            x = "PC1",
+            y = "PC2")+ theme(legend.position="none")   + 
+        scale_color_manual(values = bank_type.colours())
+}
+
+features.plot_violin <-function(data, feature_name) {
+  data |>
+    ggplot(aes(x = BankType, y = !!as.name(feature_name))) +
+                geom_violin(trim = FALSE) +
+                geom_boxplot(width = 0.1, fill = "white") + 
+                theme_light() +
+                labs(x = "", y = "")
+}
+
+outlier.plot <- function(data, outliers, value_name = "Value") {
+    data |>
+    filter(IDRSSD %in% outliers$IDRSSD) |>
+    ggplot(aes(x = Quarter, y = !!as.name(value_name), col = BankName)) +
+    geom_line() +
+    facet_wrap(~BankName, ncol = 1) +
+    theme(legend.position = "none")  +
+    labs(y = target_label) 
+}
+
 partnership.plot <- function(name, old, new, acquired, available, selected_measures,value_name, date_obs_period = 2) {
   date_acquired <- as.Date(acquired)
   date_available <- as.Date(available)
