@@ -50,7 +50,8 @@ bank_n <- bank_scope |>
             group_by(BankType) |> 
             summarise(Number = n())
 
-bank_n |> right_join(bank_type.desc()) |> relocate(Number, .after = last_col()) |>  
+bank_n |> right_join(bank_type.desc()) |> 
+            relocate(Number, .after = last_col()) |>  
             knitr::kable(format = "html")    
 ``` 
 
@@ -99,12 +100,12 @@ overdue30to89 |>
     filter(value_diff <= 23) |>
     group_by(BankType) |> summarise(variance = var(Value)) |> 
     autoplot(variance) +
-    geom_vline(xintercept = reg_date_c1,linetype=2,colour="red", hjust = 0.05) +
+    geom_vline(xintercept = reg_date_c1,linetype=2,colour="red") +
     annotate("label",label="i", x=reg_date_c1, y=20.0) +
     geom_vline(xintercept = reg_date_z,linetype=2,colour="red") +
     annotate("label",label="ii", x=reg_date_z, y=18.0) +
     geom_vline(xintercept = reg_date_c2,linetype=2,colour="red") +
-    annotate("label",label="iii", x=reg_date_c2, y=16.0, hjust = - 0.05) +
+    annotate("label",label="iii", x=reg_date_c2, y=16.0) +
     labs(y=glue("{target_label} \n variance"), x="") +
     scale_color_manual(values = bank_type.colours())+
     theme(legend.position = "top", legend.title=element_blank()) 
@@ -116,7 +117,7 @@ overdue30to89 |>
         group_by(BankType, regulation) |>
         summarise(val_mean = mean(Value, na.rm=T)) |> 
         autoplot(val_mean, aes(colour=BankType)) +
-        geom_smooth(method = "lm", se = FALSE, show.legend = F,size=.5) +    
+        geom_smooth(method = "lm", se = FALSE, show.legend = F,linewidth=.5) +    
         scale_color_manual(values = bank_type.colours(), breaks=c("LargeBank","LargeCreditCardBank","OtherBank"))+
         geom_vline(xintercept = reg_date_c1,linetype=2,colour="red")+
         annotate("label",label="CARD Act Part 1 comes into effect", x=reg_date_c1, y=3.5, hjust = - 0.05) +
@@ -127,42 +128,41 @@ overdue30to89 |>
 
 As we are dealing with time series data, we need to identify banks where their individual series characteristics are markedly different from those of its peers.
 
-@fig-outliers takes the approach from @Hyndman2021 who use Principal Components Analysis (PCA) on a set of calculated statistical features such as intermittency, lumpiness, stability and Seasonal-Trend decomposition using LOESS (STL) [-@Hyndman2021]. 
- 
+Taking the approach from @Hyndman2021 we can use Principal Components Analysis (PCA) to review outliers across different statistical features or feature sets. 
+
+::: {#tbl-outliers .panel-tabset} 
+
 ```{r}
 #| warning: false
 #| error: false
-#| label: fig-outliers 
-#| fig-cap: "Outlier Detection using PCA"
-#| fig-subcap:
-#|   - "PCA for <span style='color:#1B9E77'>Large</span> and <span style='color:#D95F02'>Large Credit Card</span> Banks using features: lumpiness, stability and seasonal. PC1 represents the most variation in the data and PC2 represents the second most variation in the data."
-#|   - "Data series for Banks with PC1 > 4 and PC2 > 2.5"
-#| layout-ncol: 1
-
 regulation_cutoff <- "2010 Q2"
-selected_feats <- c("lumpiness","stability","seasonal")
 
 overdue30to89_post <- overdue30to89 |>
                     filter_index(regulation_cutoff ~ .) 
 
 overdue30to89_lbanks <- overdue30to89_post |>
                          filter(BankType %in% c("LargeBank", "LargeCreditCardBank"))
+```
 
-all_f <- overdue30to89_lbanks |> 
-                features(Value, feature_set(tags = selected_feats))
+## Lumpiness and Stability
+```{r}
+#| warning: false
+#| error: false
+#| label: fig-out-lump
+#| fig-cap: "Outlier Detection using PCA"
+#| fig-subcap:
+#|   - "PCA for <span style='color:#1B9E77'>Large</span> and <span style='color:#D95F02'>Large Credit Card</span> Banks using features: lumpiness and stability"
+#|   - "Data series for Banks with PC1 > 2 and PC2 > 2"
+#| layout-ncol: 1
 
-pcs <- all_f |> 
-    mutate_if(is.numeric, replace_na, -1) |> #where we could not calc a feature value
-    select(-c(IDRSSD,BankName, Measure, Label, Description, BankType)) |>
-    prcomp(scale = TRUE) |> 
-    broom::augment(all_f)
+pca_output <- feature_data(overdue30to89_lbanks, c("lumpiness","stability")) |> feature_prcomp()
 
-pc1_threshold <- 4
-pc2_threshold <- 2.5
+pcs.plot(pca_output)
 
-pcs.plot(pcs)
+pc1_threshold <- 2
+pc2_threshold <- 2
 
-outliers <- pcs |>
+outliers <- pca_output |>
   filter( (.fittedPC2 > pc2_threshold) | (.fittedPC1 > pc1_threshold)) |>
   select(IDRSSD) 
   
@@ -170,43 +170,105 @@ outlier.plot(overdue30to89_lbanks, outliers)
 
 ```
 
-Interestingly, all the banks in @fig-outliers-2 started or re-started (as was the case for Regions Bank) their credit card businesses after 2010 Q2 (regulatory period cut-off). With the exception of Ally Bank all series begin at 0 and sharply increase after the first or second quarter. This pattern is expected as it takes 30+ days for credit cards to become delinquent. 
-
-If we drop the first 2 non-zero quarters and re-run the PCA (see @fig-outliers-corrected) the banks are no longer outliers - indicating that it was that sharp increase that was unusual.
-
+## Seasonal
 ```{r}
 #| warning: false
 #| error: false
-#| label: fig-outliers-corrected
-#| fig-cap: "PCA of outliers after their first 2 non-zero quarters are dropped"
-#| fig-width: 4
-#| fig-height: 4
+#| label: fig-out-season
+#| fig-cap: "Outlier Detection using PCA"
+#| fig-subcap:
+#|   - "PCA for <span style='color:#1B9E77'>Large</span> and <span style='color:#D95F02'>Large Credit Card</span> Banks using features: seasonal"
+#|   - "Data series for Banks with PC1 > 4 and PC2 > 2.5"
+#| layout-ncol: 1
 
-outlier_df <-overdue30to89_lbanks |> 
-    filter(IDRSSD %in% outliers$IDRSSD, Value != 0) |>
-    tsibble::group_by_key() |> 
-            slice(3:n())
+pca_output <- feature_data(overdue30to89_lbanks, "seasonal") |> feature_prcomp()
 
-all_f_outliers <- outlier_df |> 
-    features(Value, feature_set(tags = selected_feats))
+pcs.plot(pca_output)
 
-all_f_outliers |> 
-    mutate_if(is.numeric, replace_na, -1) |> #where we could not calc a feature value
-    select(-c(IDRSSD,BankName, Measure, Label, Description, BankType)) |>
-    prcomp(scale = TRUE) |> 
-    broom::augment(all_f_outliers) |> pcs.plot()                            
-                        
+pc1_threshold <- 4
+pc2_threshold <- 2.5
+
+outliers <- pca_output |>
+  filter( (.fittedPC2 > pc2_threshold) | (.fittedPC1 > pc1_threshold)) |>
+  select(IDRSSD) 
+  
+outlier.plot(overdue30to89_lbanks, outliers)
 
 ```
+## ACF
+```{r}
+#| warning: false
+#| error: false
+#| label: fig-out-acf
+#| fig-cap: "Outlier Detection using PCA"
+#| fig-subcap:
+#|   - "PCA for <span style='color:#1B9E77'>Large</span> and <span style='color:#D95F02'>Large Credit Card</span> Banks using features: acf"
+#|   - "Data series for Banks with PC1 > 4 and PC2 > 2.5"
+#| layout-ncol: 1
+
+pca_output <- feature_data(overdue30to89_lbanks, "acf") |> feature_prcomp()
+
+pcs.plot(pca_output)
+
+pc1_threshold <- 4
+pc2_threshold <- 2.5
+
+outliers <- pca_output |>
+  filter( (.fittedPC2 > pc2_threshold) | (.fittedPC1 > pc1_threshold)) |>
+  select(IDRSSD) 
+  
+outlier.plot(overdue30to89_lbanks, outliers)
+
+```
+## PACF
+```{r}
+#| warning: false
+#| error: false
+#| label: fig-out-pacf
+#| fig-cap: "Outlier Detection using PCA"
+#| fig-subcap:
+#|   - "PCA for <span style='color:#1B9E77'>Large</span> and <span style='color:#D95F02'>Large Credit Card</span> Banks using features: pacf"
+#|   - "Data series for Banks with PC1 <-3, PC2 > 2 and PC2 < -2"
+#| layout-ncol: 1
+
+pca_output <- feature_data(overdue30to89_lbanks, "pacf") |> feature_prcomp()
+
+pcs.plot(pca_output)
+
+pc1_threshold <- -3
+pc2_threshold <- 2
+pc2_2_threshold <- -2
+
+outliers <- pca_output |>
+  filter( (.fittedPC2 > pc2_threshold) | (.fittedPC2 < pc2_2_threshold) | (.fittedPC1 < pc1_threshold)) |>
+  select(IDRSSD) 
+  
+outlier.plot(overdue30to89_lbanks, outliers)
+
+```
+## Data
+```{r}
+#| warning: false
+#| error: false
+selected_feats = c("lumpiness","stability","seasonal", "pacf", "acf")
+all_f <- feature_data(overdue30to89_lbanks,selected_feats)
+knitr::kable(all_f, format = "html")    
+```
+::: 
+
+From these plots we can see that there are a few banks that started their credit card businesses after 2010 Q2 (or started reporting our target measure). These series begin at 0 and sharply increase after the first or second quarter. Considering it takes 30+ days for credit cards to become delinquent this pattern is expected. However, for modelling we may want to drop the first few quarters to remove the impact of this initial sharp increase and reflect the ongoing state.
 
 ```{r}
 #| warning: false
 #| error: false
 
-#apply 1. regulatory cutoff, 2. fixed outliers.
-df_alltypes <- overdue30to89_post |> 
-                filter(!IDRSSD %in% outliers$IDRSSD) |> 
-                add_row(outlier_df) |> 
+selected_feats = c("lumpiness","stability","seasonal")
+
+#remove first 2 quarters (take from start of series)
+df_alltypes <- overdue30to89 |> 
+                tsibble::group_by_key() |> 
+                slice(3:n()) |>
+                filter_index(regulation_cutoff ~ .) |>
                 fill_gaps()
 
 all_ftbanks <- df_alltypes |> 
@@ -217,7 +279,6 @@ final_df <- df_alltypes |>
                 mutate(value_diff = difference(Value))
 
 ```
-
 ## Exploration of Statistical Features {#sec-feature-explore}
 
 @fig-quantile plots the distribution of `r target_label`. We can see that there are two peaks for *Large Credit Card Banks*. There are `r bank_n |> filter(BankType=="LargeCreditCardBank") |> pull(Number)` banks in the this peer group which may be too small to capture the true distribution effectively. However, it may also indicate that there are sub-groups within this peer group. For instance, the first peak could represent banks that have lower risk profiles, while the second represents banks that have a higher risk profiles.
@@ -363,7 +424,6 @@ final_df |> na.omit() |> pull(value_diff) |> tseries::adf.test()
 ```
 :::
 
-
 ## Summary
 
 In summary, based on exploration of the data we will prepare the data for modelling by:
@@ -376,7 +436,7 @@ In summary, based on exploration of the data we will prepare the data for modell
 
 ***Removing:***
 
-4. Outlier data points: first 2 quarters from banks in @fig-outliers-2.
+4. Outlier data points: first 2 quarters from banks that started >= 2010 Q2.
 
 ***Transforming:***
 

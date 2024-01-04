@@ -11,8 +11,9 @@ library(readr)
 library(memoise)
 library(ggrepel)
 library(ggtext)
-library(prophet)
+#library(prophet)
 library(broom)
+library(tseries)
 
 #set seed for reproducibility
 set.seed(42)
@@ -66,7 +67,6 @@ credit_card <- memoise(function() {
   filter(Measure == measure_name) |>
   as_tsibble(index = Quarter, key = (-c(Quarter,Value))) |>
     group_by_key() |>
-    mutate(value_scaled = scale(Value)) |>
     mutate(value_diff = difference(Value)) |>
     ungroup() |>
     fill_gaps()
@@ -181,7 +181,7 @@ white.noise.sample <- function() {
 white.noise.plot <- function() {
   white.noise.sample() |> 
     ggplot(aes(x = Period, y = Value)) +
-    geom_line(size = .2) +
+    geom_line(linewidth = .2) +
     labs(title="White noise")
   
 }
@@ -225,6 +225,22 @@ bank_type.colours <- function() {
                     "OtherBank/Before" = "#999999",
                     "OtherBank/After" = "#999999")
 } 
+
+feature_data <- function(data, feature_names) {
+  data |> fabletools::features(Value, feature_set(tags = feature_names))
+}
+
+feature_prcomp <- function(f_data) {
+  #identify banks where we could not generate feature data
+  #ids <- f_data |> filter_all(any_vars(is.na(.))) |> pull(IDRSSD)
+  data <- f_data |> na.omit()
+  
+  data|>
+    na.omit() |> 
+    select(-c(IDRSSD,BankName, Measure, Label, Description, BankType)) |>
+    prcomp(scale = TRUE) |> 
+    broom::augment(data)
+}
 
 
 pcs.plot <- function(pcs) {
