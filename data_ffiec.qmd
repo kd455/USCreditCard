@@ -267,6 +267,7 @@ selected_feats = c("lumpiness","stability","seasonal")
 #remove first 2 quarters (take from start of series)
 df_alltypes <- overdue30to89 |> 
                 tsibble::group_by_key() |> 
+                filter(Value != 0) |>
                 slice(3:n()) |>
                 filter_index(regulation_cutoff ~ .) |>
                 fill_gaps()
@@ -395,7 +396,7 @@ final_df |> na.omit() |> pull(value_diff) |> Box.test(lag = 10, type = "Ljung")
 :::
 
 
-5. @fig-lfeature-8 *Large Credit Card Banks* is not stationary. Performing a difference i.e. to get the quarterly change in UBPRE524, makes the series stationary as shown in @fig-acf. This can be confirmed by performing an augmented Dickey–Fuller (ADF) test on the differenced value. We also see that, post differencing, the autocorrelation coefficient at lag 2 is above the significance threshold. This is likely due to seasonality as there are larger coefficients at regular intervals - lags 2, 6, 10, and 14. The decreasing magnitude of these coefficients tell us the earlier lags have a stronger influence than values further in the past.
+7. @fig-lfeature-8 *Large Credit Card Banks* is not stationary. Performing a difference i.e. to get the quarterly change in UBPRE524, makes the series stationary as shown in @fig-acf. This can be confirmed by performing an augmented Dickey–Fuller (ADF) test on the differenced value. We also see that, post differencing, there are autocorrelation coefficients above the significance threshold. This is likely due to seasonality as these are at regular intervals. The decreasing magnitude of these coefficients tell us the earlier lags have a stronger influence than values further in the past.
 
 ```{r}
 #| warning: false
@@ -436,7 +437,7 @@ In summary, based on exploration of the data we will prepare the data for modell
 
 ***Removing:***
 
-4. Outlier data points: first 2 quarters from banks that started >= 2010 Q2.
+4. Outlier data points: first 2 quarters.
 
 ***Transforming:***
 
