@@ -112,6 +112,12 @@ credit_card.loan_amount <- function() {
     .measure_to_tsibble("UBPRB538")
 }
 
+credit_card.loan_proportion <- function() {
+  credit_card() |>
+    .measure_to_tsibble("UBPRE425")
+}
+
+
 #' Average Total Assets
 #'
 #' A year-to-date average of the average assets reported in the Call Report Schedule RC-K. 
@@ -120,10 +126,61 @@ credit_card.loan_amount <- function() {
 #'
 #' @return A tsibble with the average total assets for each quarter.
 summary_ratios.assets <- function() {
-  summary_ratios() |>
-    .measure_to_tsibble("UBPRD659")
+  if (file.exists("data/UBPR_Calc_Ratios.parquet")) {
+    calculated_measures() |> filter(Measure == "UBPRD659")
+  } else {
+    summary_ratios() |> filter(Measure == "UBPRD659") |>
+      .measure_to_tsibble("UBPRD659")
+  }
 }
 
+credit_card.loan_amount_ratio_calc <- function() {
+  calculated_measures() |>
+    filter(Measure == "UBPRB538C")
+}
+
+credit_card.unused_ratio_calc <- function() {
+  calculated_measures() |>
+    filter(Measure == "UBPR3815C")
+}
+credit_card.unused_proportion <- function() {
+  calculated_measures() |>
+    filter(Measure == "UBPR3815CP")
+}
+
+calculate_new_measures <- function() {
+  avg_assets <- summary_ratios.assets()
+  cc_unused_r <- as_percent_avg_assets(credit_card.unused(), avg_assets)
+  cc_loans_r <- as_percent_avg_assets(credit_card.loan_amount(), avg_assets)
+  cc_loans_p <- as_percent_loans(credit_card.unused(),credit_card.loan_amount())
+
+  dplyr::bind_rows(avg_assets, cc_unused_r,cc_loans_r,cc_loans_p) |>
+    arrow::write_parquet("data/UBPR_Calc_Ratios.parquet")
+}
+
+calculated_measures <- memoise(function() {
+  arrow::read_parquet("data/UBPR_Calc_Ratios.parquet")
+})
+
+as_percent_loans <- function(numerator_df, loans_df) {
+  numerator_df |> add_column(calc_value = round((numerator_df$Value/loans_df$Value)*100,2)) |>
+              mutate(Value = calc_value,
+                      value_diff = difference(Value),
+                      Measure = paste0(Measure,"CP"),
+                      Label = paste0(Label,"_CP"),
+                      Description = paste(Description,", % Credit Card Loans")) |> 
+                      select(-calc_value)
+}
+
+as_percent_avg_assets <- function(numerator_df, assets_df) {  
+  numerator_df |> add_column(calc_value = round((numerator_df$Value/assets_df$Value)*100,2)) |>
+                mutate(Value = calc_value,
+                        value_diff = difference(Value),
+                        Measure = paste0(Measure,"C"),
+                        Label = paste0(Label,"_CALC"),
+                        Description = paste(Description,", % Avg Assets")) |> 
+                        select(-calc_value)
+}
 
 us_economy <- memoise(function(freq = "M") {
   read_csv(glue("data/US_Economic_Data_{freq}.csv"), show_col_types = FALSE) |>
@@ -278,6 +335,7 @@ partnership.plot <- function(name, old, new, acquired, available, selected_measu
   date_available <- as.Date(available)
   from_date <- year(date_acquired) -date_obs_period
   to_date <- year(date_acquired) +date_obs_period
+  y_label <- ifelse(value_name == "value_diff", "difference from prior period", value_name)
   group.colours <- c(old = "#1B9E77", new = "#D95F02", aggregate = "#999999")
   agg_data <- selected_measures |>
               filter(BankType != "OtherBank") |>
@@ -286,7 +344,10 @@ partnership.plot <- function(name, old, new, acquired, available, selected_measu
                 summarise(
                   !!quo_name(value_name) := mean(!!as.name(value_name), na.rm = TRUE)) |> 
                 tibble::add_column(BankName = "aggregate")
-  measures <- paste0(selected_measures |> as_tibble() |> distinct(Measure) |> pull(Measure), collapse="_")
+  measures <- selected_measures |> as_tibble() |> distinct(Measure)
+  measures_label <- paste0(pull(measures), collapse="_")
+  
+  
 
   selected_measures |>
     filter(BankName %in% c(old, new)) |>
@@ -302,7 +363,7 @@ partnership.plot <- function(name, old, new, acquired, available, selected_measu
                     <span style='color:#1B9E77'>{new}</span>
                     against <span style='color:#333333'>PEER Banks</span>"),
         subtitle = glue("Acquired {date_acquired}. Card available {date_available}"),
-        y = value_name,
+        y = y_label,
         x = "Year")  +
     theme(legend.position = "none",
           plot.title = element_markdown(),
@@ -312,6 +373,6 @@ partnership.plot <- function(name, old, new, acquired, available, selected_measu
     annotate("text", x=as.numeric(date_acquired-10), y=0, label="acquired", angle=90, hjust = 0)+
     geom_vline(xintercept = as.numeric(date_available), linetype=4) +
     annotate("text", x=as.numeric(date_available-10), y=0, label="available", angle=90, hjust = 0) 
-    ggsave(glue("{name}_{measures}_partnership.png"), width = 16, height = 12, dpi = 300)
+    ggsave(glue("images/{name}_{measures_label}_partnership.png"), width = 16, height = nrow(measures)*4, dpi = 300)
 }
 
