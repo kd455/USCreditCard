@@ -26,7 +26,7 @@ partnerships by external parties including regulators (internally, Banks
 will have access to granular individual borrower level data to perform a
 more through risk assessment).
 
-### Partnership events
+### Partnership events {#sec-intro-events}
 
 An attribute of the partnership market is that an established
 partnership can breakdown, and the whole partner portfolio moves to a

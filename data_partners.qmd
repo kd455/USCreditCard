@@ -68,6 +68,15 @@ source: @cosco2016
 source: [@walmart2018; and @walmart2019]
 :::
 
+Interestingly, for all these partnerships, the `r target_label` value appears to increase in the **old** partnership Bank. Clearly we cannot assume patterns of divergence where a Bank's credit card portfolio quality goes up in one Bank and reduces the other. Because the quality is relative to the existing or remaining portfolio.
+
+As mentioned in section @sec-intro-events the event 
+The changepoint can be: 
+Stable
+Both portfolios improve / degrade
+One improves the other degrades.
+
+
 The partnerships shown all have transitional periods. For example, Baclays's acquired GAP Inc. on May 1, 2022 but it wasn't until June 20, 2022 that the old Synchrony borrowers could use their new partnership cards.
 
 Looking at the plots, the `r target_label`  

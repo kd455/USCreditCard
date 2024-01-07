@@ -337,7 +337,9 @@ div.csl-indent {
 </div>
 </div>
 </div>
-<p>The partnerships shown all have transitional periods. For example, Baclays’s acquired GAP Inc.&nbsp;on May 1 2022, but it wasn’t until June 20, 2022 that the old Synchrony borrowers could use their new partnership cards.</p>
+<p>Interestingly, for all these partnerships, the Credit Card Plans-30-89 DAYS P/D % value appears to increase in the <strong>old</strong> partnership Bank. Clearly we cannot assume patterns of divergence where a Bank’s credit card portfolio quality goes up in one Bank and reduces the other. Because the quality is relative to the existing or remaining portfolio.</p>
+<p>As mentioned in section <a href="intro.html#sec-intro-events"><span>Section&nbsp;1.1.1</span></a> the event The changepoint can be: Stable Both portfolios improve / degrade One improves the other degrades.</p>
+<p>The partnerships shown all have transitional periods. For example, Baclays’s acquired GAP Inc.&nbsp;on May 1, 2022 but it wasn’t until June 20, 2022 that the old Synchrony borrowers could use their new partnership cards.</p>
 <p>Looking at the plots, the Credit Card Plans-30-89 DAYS P/D %</p>
 <p>##Means-adjusted model</p>
 <p>Take the average of the target variable in the estimation period before the partnership event.</p>
@@ -346,8 +348,6 @@ div.csl-indent {
 </section>
 <section id="bank-fixed-effect" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="bank-fixed-effect"><span class="header-section-number">4.2</span> Bank Fixed Effect</h2>
-<p>###Stationarity</p>
-<p>Stationarity If the variables of interest (both dependent and independent) exhibit trends or unit roots, there’s a risk of encountering spurious relationships.</p>
 
 
 <!-- -->
@@ -738,27 +738,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>source: <span class="co">[</span><span class="ot">@walmart2018; and @walmart2019</span><span class="co">]</span></span>
 <span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>The partnerships shown all have transitional periods. For example, Baclays's acquired GAP Inc. on May 1 2022, but it wasn't until June 20, 2022 that the old Synchrony borrowers could use their new partnership cards.</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>Interestingly, for all these partnerships, the <span class="in">`r target_label`</span> value appears to increase in the **old** partnership Bank. Clearly we cannot assume patterns of divergence where a Bank's credit card portfolio quality goes up in one Bank and reduces the other. Because the quality is relative to the existing or remaining portfolio.</span>
 <span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>Looking at the plots, the <span class="in">`r target_label`</span>  </span>
-<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>##Means-adjusted model</span>
-<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>Take the average of the target variable in the estimation period before the partnership event.</span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>As mentioned in section @sec-intro-events the event </span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>The changepoint can be: </span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>Stable</span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>Both portfolios improve / degrade</span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>One improves the other degrades.</span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>In the observation period, subtract the prediction from the actual return to get the “abnormal return.” AR</span>
-<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>AR nonzero </span>
-<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a> values after the event give the effect of the event on the target variable</span>
-<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>What if you’re interested in an event that changes the time series in a long-lasting way? In that case, one good tool is an event study design implemented with regression.</span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>The partnerships shown all have transitional periods. For example, Baclays's acquired GAP Inc. on May 1, 2022 but it wasn't until June 20, 2022 that the old Synchrony borrowers could use their new partnership cards.</span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>Looking at the plots, the <span class="in">`r target_label`</span>  </span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>The basic idea is this: estimate one regression of the outcome on the time period before the event. Then estimate another time series of the outcome on the time period after the event. Then see how the two are different.</span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>##Means-adjusted model</span>
 <span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a><span class="fu">## Bank Fixed Effect</span></span>
-<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>###Stationarity</span>
-<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>Stationarity</span>
-<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>If the variables of interest (both dependent and independent) exhibit trends or unit roots, there's a risk of encountering spurious relationships.</span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>Take the average of the target variable in the estimation period before the partnership event.</span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>In the observation period, subtract the prediction from the actual return to get the “abnormal return.” AR</span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>AR nonzero </span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a> values after the event give the effect of the event on the target variable</span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>What if you’re interested in an event that changes the time series in a long-lasting way? In that case, one good tool is an event study design implemented with regression.</span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>The basic idea is this: estimate one regression of the outcome on the time period before the event. Then estimate another time series of the outcome on the time period after the event. Then see how the two are different.</span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a><span class="fu">## Bank Fixed Effect</span></span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
