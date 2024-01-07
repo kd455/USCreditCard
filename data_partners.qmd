@@ -4,12 +4,13 @@ number-sections: true
 format: html
 ---
 
-## Used Peer Groups
+## Exploring Partnership Events
 
 ```{r}
 #| warning: false
 #| echo: false
 source('functions.R')
+target_label <- credit_card.target_label()
 ``` 
 
 
@@ -17,18 +18,18 @@ source('functions.R')
 #| warning: false
 #| output: false
 #| eval: false
-overdue30to89 <- credit_card.overdue_3089()
-loan_amt <-  credit_card.loan_amount()
-loan_amt_ratio <-  credit_card.loan_amount_ratio_calc()
-loan_unused <- credit_card.unused()
-loan_unused_ratio <- credit_card.unused_ratio_calc()
-loan_unused_proportion <- credit_card.unused_proportion()
-loan_proportion <- credit_card.loan_proportion()
+
+overdue30to89 <- credit_card.overdue_3089(T)
+loan_amt <-  credit_card.loan_amount(T)
+loan_unused <- credit_card.unused(T) 
+loan_amt_pct_change <- loan_amt |> group_by(BankName) |> mutate(pct_change = value_diff/lag(Value) *100) 
+loan_unused_pct_change <- loan_unused |> group_by(BankName) |> mutate(pct_change = value_diff/lag(Value) *100) 
 
 partner_data <- credit_card.partnerships() 
-partner_data |> pmap(partnership.plot,overdue30to89, "value_diff")
-partner_data |> pmap(partnership.plot,bind_rows(loan_amt,loan_amt_ratio,loan_proportion), "value_diff")
-partner_data |> pmap(partnership.plot,bind_rows(loan_unused,loan_unused_ratio,loan_unused_proportion), "value_diff")
+
+partner_data |> pmap(partnership.plot,overdue30to89, "Value", "median")
+partner_data |> pmap(partnership.plot,overdue30to89, "value_diff", "median")
+partner_data |> pmap(partnership.plot,bind_rows(loan_amt_pct_change,loan_unused_pct_change), "pct_change", "median")
 
 ```
 
@@ -37,37 +38,40 @@ partner_data |> pmap(partnership.plot,bind_rows(loan_unused,loan_unused_ratio,lo
 
 ## Gap
 
-![Changes in the target variable "30-89 days overdue as a % of total credit cards"](images/GAP_UBPRE524_partnership.png){#fig-gap}
+![`r target_label`](images/GAP_UBPRE524_Value_median_partnership.png){#fig-gap-val}
 
-![Loan Measures](images/GAP_UBPRB538_UBPRB538C_UBPRE425_partnership.png){#fig-gap-loan}
+![`r target_label` quarterly difference](images/GAP_UBPRE524_value_diff_median_partnership.png){#fig-gap-diff}
 
-![Unused Commitment Measures](images/GAP_UBPR3815_UBPR3815C_UBPR3815CP_partnership){#fig-gap-commit}
+![Magnitude Measures](images/GAP_UBPR3815_UBPRB538_pct_change_median_partnership.png){#fig-gap-mag}
 
 source: [@gap2021; and @gap2022]
 
 ## Cosco
 
-![Changes in the target variable "30-89 days overdue as a % of total credit cards"](images/Cosco_UBPRE524_partnership.png){#fig-cosco}
+![`r target_label`](images/Cosco_UBPRE524_Value_median_partnership.png){#fig-cosco-val}
 
-![Loan Measures](images/Cosco_UBPRB538_UBPRB538C_UBPRE425_partnership.png){#fig-cosco-loan}
+![`r target_label` quarterly difference](images/Cosco_UBPRE524_value_diff_median_partnership.png){#fig-cosco-diff}
 
-![Unused Commitment Measures](images/Cosco_UBPR3815_UBPR3815C_UBPR3815CP_partnership.png){#fig-cosco-commit}
+![Magnitude Measures](images/Cosco_UBPR3815_UBPRB538_pct_change_median_partnership.png){#fig-cosco-mag}
 
 source: @cosco2016
 
 
 ## Walmart
-![Changes in the target variable "30-89 days overdue as a % of total credit cards"](images/Walmart_UBPRE524_partnership.png){#fig-walmart}
+![`r target_label`](images/Walmart_UBPRE524_Value_median_partnership.png){#fig-walmart-val}
 
-![Loan Measures](images/Walmart_UBPRB538_UBPRB538C_UBPRE425_partnership.png){#fig-walmart-loan}
+![`r target_label` quarterly difference](images/Walmart_UBPRE524_value_diff_median_partnership.png){#fig-cosco-diff}
 
-![Unused Commitment Measures](images/Walmart_UBPR3815_UBPR3815C_UBPR3815CP_partnership.png){#fig-walmart-commit}
+![Magnitude Measures](images/Walmart_UBPR3815_UBPRB538_pct_change_median_partnership.png){#fig-walmart-mag}
 
 
 source: [@walmart2018; and @walmart2019]
 :::
 
-the mean of the peer groups (Large Banks and Large Credit Card Banks) shows changes that may be due to all Banks rather than due to the partnership. 
+The partnerships shown all have transitional periods. For example, Baclays's acquired GAP Inc. on May 1, 2022 but it wasn't until June 20, 2022 that the old Synchrony borrowers could use their new partnership cards.
+
+Looking at the plots, the `r target_label`  
+
 
 ##Means-adjusted model
 
@@ -81,7 +85,4 @@ What if you’re interested in an event that changes the time series in a long-l
 The basic idea is this: estimate one regression of the outcome on the time period before the event. Then estimate another time series of the outcome on the time period after the event. Then see how the two are different.
 
 ## Bank Fixed Effect
-###Stationarity
 
-Stationarity
-If the variables of interest (both dependent and independent) exhibit trends or unit roots, there's a risk of encountering spurious relationships.

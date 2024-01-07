@@ -54,7 +54,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -207,7 +226,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#used-peer-groups" id="toc-used-peer-groups" class="nav-link active" data-scroll-target="#used-peer-groups"><span class="header-section-number">4.1</span> Used Peer Groups</a></li>
+  <li><a href="#exploring-partnership-events" id="toc-exploring-partnership-events" class="nav-link active" data-scroll-target="#exploring-partnership-events"><span class="header-section-number">4.1</span> Exploring Partnership Events</a></li>
   <li><a href="#bank-fixed-effect" id="toc-bank-fixed-effect" class="nav-link" data-scroll-target="#bank-fixed-effect"><span class="header-section-number">4.2</span> Bank Fixed Effect</a></li>
   </ul>
 </nav>
@@ -232,74 +251,94 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<section id="used-peer-groups" class="level2" data-number="4.1">
-<h2 data-number="4.1" class="anchored" data-anchor-id="used-peer-groups"><span class="header-section-number">4.1</span> Used Peer Groups</h2>
+<section id="exploring-partnership-events" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="exploring-partnership-events"><span class="header-section-number">4.1</span> Exploring Partnership Events</h2>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>overdue30to89 <span class="ot">&lt;-</span> <span class="fu">credit_card.overdue_3089</span>()</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>loan_amt <span class="ot">&lt;-</span>  <span class="fu">credit_card.loan_amount</span>()</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>loan_unused <span class="ot">&lt;-</span> <span class="fu">credit_card.unused</span>()</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>loan_unused_ratio <span class="ot">&lt;-</span> <span class="fu">credit_card.unused_ratio</span>()</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>partner_data <span class="ot">&lt;-</span> <span class="fu">credit_card.partnerships</span>() </span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>overdue30to89 <span class="ot">&lt;-</span> <span class="fu">credit_card.overdue_3089</span>(T)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>loan_amt <span class="ot">&lt;-</span>  <span class="fu">credit_card.loan_amount</span>(T)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>loan_unused <span class="ot">&lt;-</span> <span class="fu">credit_card.unused</span>(T) </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>loan_amt_pct_change <span class="ot">&lt;-</span> loan_amt <span class="sc">|&gt;</span> <span class="fu">group_by</span>(BankName) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">pct_change =</span> value_diff<span class="sc">/</span><span class="fu">lag</span>(Value) <span class="sc">*</span><span class="dv">100</span>) </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>loan_unused_pct_change <span class="ot">&lt;-</span> loan_unused <span class="sc">|&gt;</span> <span class="fu">group_by</span>(BankName) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">pct_change =</span> value_diff<span class="sc">/</span><span class="fu">lag</span>(Value) <span class="sc">*</span><span class="dv">100</span>) </span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>selected_measures <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(loan_amt,loan_unused,loan_unused_ratio)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>partner_data <span class="ot">&lt;-</span> <span class="fu">credit_card.partnerships</span>() </span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>partner_data <span class="sc">|&gt;</span> <span class="fu">pmap</span>(partnership.plot,overdue30to89, <span class="st">"value_diff"</span>)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>partner_data <span class="sc">|&gt;</span> <span class="fu">pmap</span>(partnership.plot,selected_measures, <span class="st">"value_diff"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>partner_data <span class="sc">|&gt;</span> <span class="fu">pmap</span>(partnership.plot,overdue30to89, <span class="st">"Value"</span>, <span class="st">"median"</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>partner_data <span class="sc">|&gt;</span> <span class="fu">pmap</span>(partnership.plot,overdue30to89, <span class="st">"value_diff"</span>, <span class="st">"median"</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>partner_data <span class="sc">|&gt;</span> <span class="fu">pmap</span>(partnership.plot,<span class="fu">bind_rows</span>(loan_amt_pct_change,loan_unused_pct_change), <span class="st">"pct_change"</span>, <span class="st">"median"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="tabset-margin-container"></div><div id="fig-3089days" class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" aria-current="page">Gap</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Cosco</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Walmart</a></li></ul>
 <div id="fig-3089days" class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
-<div id="fig-gap" class="quarto-figure quarto-figure-center anchored">
+<div id="fig-gap-val" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="images/GAP_UBPRE524_partnership.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;4.1: Changes in the target variable “30-89 days overdue as a % of total credit cards”</figcaption>
+<p><img src="images/GAP_UBPRE524_Value_median_partnership.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;4.1: Credit Card Plans-30-89 DAYS P/D %</figcaption>
 </figure>
 </div>
-<div id="fig-gap-multiple" class="quarto-figure quarto-figure-center anchored">
+<div id="fig-gap-diff" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="images/GAP_UBPR3815_UBPRB538_UBPRE263_partnership.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;4.2: Alternative Measures</figcaption>
+<p><img src="images/GAP_UBPRE524_value_diff_median_partnership.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;4.2: Credit Card Plans-30-89 DAYS P/D % quarterly difference</figcaption>
 </figure>
 </div>
-<p>we can see that “source: https://cards.barclaycardus.com/banking/about-us/newsroom/gap-inc–signs-credit-card-program-agreements-with-barclays-and-/ <br> https://www.businesswire.com/news/home/20220608006113/en/Gap-Inc.-Launches-New-Credit-Card-Program-in-Partnership-with-Barclays-and-Mastercard”</p>
+<div id="fig-gap-mag" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="images/GAP_UBPR3815_UBPRB538_pct_change_median_partnership.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;4.3: Magnitude Measures</figcaption>
+</figure>
+</div>
+<p>source: <span class="citation" data-cites="gap2021 gap2022">(<a href="#ref-gap2021" role="doc-biblioref">Barclays 2021</a>; and <a href="#ref-gap2022" role="doc-biblioref">Businesswire 2022</a>)</span></p>
 </div>
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
-<div id="fig-cosco" class="quarto-figure quarto-figure-center anchored">
+<div id="fig-cosco-val" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="images/Cosco_UBPRE524_partnership.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;4.3: Changes in the target variable “30-89 days overdue as a % of total credit cards”</figcaption>
+<p><img src="images/Cosco_UBPRE524_Value_median_partnership.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;4.4: Credit Card Plans-30-89 DAYS P/D %</figcaption>
 </figure>
 </div>
-<div id="fig-cosco-multiple" class="quarto-figure quarto-figure-center anchored">
+<div id="fig-cosco-diff" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="images/Cosco_UBPR3815_UBPRB538_UBPRE263_partnership.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;4.4: Alternative Measures</figcaption>
+<p><img src="images/Cosco_UBPRE524_value_diff_median_partnership.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;4.5: Credit Card Plans-30-89 DAYS P/D % quarterly difference</figcaption>
 </figure>
 </div>
-<p>“source: https://corporate.walmart.com/news/2018/07/26/walmart-and-capital-one-sign-credit-card-program-agreement <br> https://www.spglobal.com/marketintelligence/en/news-insights/trending/VHYZBHXtY1xdBCP2sIlmag2”</p>
+<div id="fig-cosco-mag" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="images/Cosco_UBPR3815_UBPRB538_pct_change_median_partnership.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;4.6: Magnitude Measures</figcaption>
+</figure>
+</div>
+<p>source: <span class="citation" data-cites="cosco2016">Businesswire (<a href="#ref-cosco2016" role="doc-biblioref">2016</a>)</span></p>
 </div>
 <div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
-<div id="fig-walmart" class="quarto-figure quarto-figure-center anchored">
+<div id="fig-walmart-val" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="images/Walmart_UBPRE524_partnership.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;4.5: Changes in the target variable “30-89 days overdue as a % of total credit cards”</figcaption>
+<p><img src="images/Walmart_UBPRE524_Value_median_partnership.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;4.7: Credit Card Plans-30-89 DAYS P/D %</figcaption>
 </figure>
 </div>
-<div class="quarto-figure quarto-figure-center">
+<div id="fig-cosco-diff" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="images/Walmart_UBPR3815_UBPRB538_UBPRE263_partnership.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Alternative Measures</figcaption>
+<p><img src="images/Walmart_UBPRE524_value_diff_median_partnership.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;4.8: Credit Card Plans-30-89 DAYS P/D % quarterly difference</figcaption>
 </figure>
 </div>
-<p>“source: https://corporate.walmart.com/news/2018/07/26/walmart-and-capital-one-sign-credit-card-program-agreement <br> https://www.spglobal.com/marketintelligence/en/news-insights/trending/VHYZBHXtY1xdBCP2sIlmag2”</p>
+<div id="fig-walmart-mag" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="images/Walmart_UBPR3815_UBPRB538_pct_change_median_partnership.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;4.9: Magnitude Measures</figcaption>
+</figure>
+</div>
+<p>source: <span class="citation" data-cites="walmart2018 walmart2019">(<a href="#ref-walmart2018" role="doc-biblioref">Walmart 2018</a>; and <a href="#ref-walmart2019" role="doc-biblioref">Intelligence 2019</a>)</span></p>
 </div>
 </div>
 </div>
-<p>the mean of the peer groups (Large Banks and Large Credit Card Banks) shows changes that may be due to all Banks rather than due to the partnership.</p>
+<p>The partnerships shown all have transitional periods. For example, Baclays’s acquired GAP Inc.&nbsp;on May 1 2022, but it wasn’t until June 20, 2022 that the old Synchrony borrowers could use their new partnership cards.</p>
+<p>Looking at the plots, the Credit Card Plans-30-89 DAYS P/D %</p>
 <p>##Means-adjusted model</p>
 <p>Take the average of the target variable in the estimation period before the partnership event.</p>
 <p>In the observation period, subtract the prediction from the actual return to get the “abnormal return.” AR AR nonzero values after the event give the effect of the event on the target variable What if you’re interested in an event that changes the time series in a long-lasting way? In that case, one good tool is an event study design implemented with regression.</p>
@@ -313,6 +352,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <!-- -->
 
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-gap2021" class="csl-entry" role="listitem">
+Barclays. 2021. <span>“Gap Inc. Signs Credit Card Program Agreements with Barclays and Mastercard.”</span> <a href="https://cards.barclaycardus.com/banking/about-us/newsroom/gap-inc--signs-credit-card-program-agreements-with-barclays-and-/">https://cards.barclaycardus.com/banking/about-us/newsroom/gap-inc--signs-credit-card-program-agreements-with-barclays-and-/</a>.
+</div>
+<div id="ref-cosco2016" class="csl-entry" role="listitem">
+Businesswire. 2016. <span>“Citi Completes Acquisition and Conversion of Costco u.s. Co-Brand Card Portfolio.”</span> <a href="https://www.businesswire.com/news/home/20160620005363/en/Citi-Completes-Acquisition-and-Conversion-of-Costco-U.S.-Co-Brand-Card-Portfolio">https://www.businesswire.com/news/home/20160620005363/en/Citi-Completes-Acquisition-and-Conversion-of-Costco-U.S.-Co-Brand-Card-Portfolio</a>.
+</div>
+<div id="ref-gap2022" class="csl-entry" role="listitem">
+———. 2022. <span>“Gap Inc. Launches New Credit Card Program in Partnership with Barclays and Mastercard.”</span> <a href="https://www.businesswire.com/news/home/20220608006113/en/Gap-Inc.-Launches-New-Credit-Card-Program-in-Partnership-with-Barclays-and-Mastercard">https://www.businesswire.com/news/home/20220608006113/en/Gap-Inc.-Launches-New-Credit-Card-Program-in-Partnership-with-Barclays-and-Mastercard</a>.
+</div>
+<div id="ref-walmart2019" class="csl-entry" role="listitem">
+Intelligence, S&amp;P Global Market. 2019. <span>“Capital One to Acquire Walmart’s Credit Card Receivables.”</span> <a href="https://www.spglobal.com/marketintelligence/en/news-insights/trending/VHYZBHXtY1xdBCP2sIlmag2">https://www.spglobal.com/marketintelligence/en/news-insights/trending/VHYZBHXtY1xdBCP2sIlmag2</a>.
+</div>
+<div id="ref-walmart2018" class="csl-entry" role="listitem">
+Walmart. 2018. <span>“Walmart and Capital One Sign Credit Card Program Agreement.”</span> <a href="https://corporate.walmart.com/news/2018/07/26/walmart-and-capital-one-sign-credit-card-program-agreement">https://corporate.walmart.com/news/2018/07/26/walmart-and-capital-one-sign-credit-card-program-agreement</a>.
+</div>
+</div>
 </section>
 
 </main> <!-- /main -->
@@ -618,78 +674,91 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">## Used Peer Groups</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exploring Partnership Events</span></span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">'functions.R'</span>)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="in">```</span> </span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>target_label <span class="ot">&lt;-</span> <span class="fu">credit_card.target_label</span>()</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="in">```</span> </span>
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: false</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>overdue30to89 <span class="ot">&lt;-</span> <span class="fu">credit_card.overdue_3089</span>()</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>loan_amt <span class="ot">&lt;-</span>  <span class="fu">credit_card.loan_amount</span>()</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>loan_unused <span class="ot">&lt;-</span> <span class="fu">credit_card.unused</span>()</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>loan_unused_ratio <span class="ot">&lt;-</span> <span class="fu">credit_card.unused_ratio</span>()</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>partner_data <span class="ot">&lt;-</span> <span class="fu">credit_card.partnerships</span>() </span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>selected_measures <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(loan_amt,loan_unused,loan_unused_ratio)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: false</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>overdue30to89 <span class="ot">&lt;-</span> <span class="fu">credit_card.overdue_3089</span>(T)</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>loan_amt <span class="ot">&lt;-</span>  <span class="fu">credit_card.loan_amount</span>(T)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>loan_unused <span class="ot">&lt;-</span> <span class="fu">credit_card.unused</span>(T) </span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>loan_amt_pct_change <span class="ot">&lt;-</span> loan_amt <span class="sc">|&gt;</span> <span class="fu">group_by</span>(BankName) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">pct_change =</span> value_diff<span class="sc">/</span><span class="fu">lag</span>(Value) <span class="sc">*</span><span class="dv">100</span>) </span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>loan_unused_pct_change <span class="ot">&lt;-</span> loan_unused <span class="sc">|&gt;</span> <span class="fu">group_by</span>(BankName) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">pct_change =</span> value_diff<span class="sc">/</span><span class="fu">lag</span>(Value) <span class="sc">*</span><span class="dv">100</span>) </span>
 <span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>partner_data <span class="sc">|&gt;</span> <span class="fu">pmap</span>(partnership.plot,overdue30to89, <span class="st">"value_diff"</span>)</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>partner_data <span class="sc">|&gt;</span> <span class="fu">pmap</span>(partnership.plot,selected_measures, <span class="st">"value_diff"</span>)</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>::: {#fig-3089days .panel-tabset}</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="fu">## Gap</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>partner_data <span class="ot">&lt;-</span> <span class="fu">credit_card.partnerships</span>() </span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>partner_data <span class="sc">|&gt;</span> <span class="fu">pmap</span>(partnership.plot,overdue30to89, <span class="st">"Value"</span>, <span class="st">"median"</span>)</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>partner_data <span class="sc">|&gt;</span> <span class="fu">pmap</span>(partnership.plot,overdue30to89, <span class="st">"value_diff"</span>, <span class="st">"median"</span>)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>partner_data <span class="sc">|&gt;</span> <span class="fu">pmap</span>(partnership.plot,<span class="fu">bind_rows</span>(loan_amt_pct_change,loan_unused_pct_change), <span class="st">"pct_change"</span>, <span class="st">"median"</span>)</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="al">![Changes in the target variable "30-89 days overdue as a % of total credit cards"](images/GAP_UBPRE524_partnership.png)</span>{#fig-gap}</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>::: {#fig-3089days .panel-tabset}</span>
 <span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="al">![Alternative Measures](images/GAP_UBPR3815_UBPRB538_UBPRE263_partnership.png)</span>{#fig-gap-multiple}</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="fu">## Gap</span></span>
 <span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>we can see that "source: https://cards.barclaycardus.com/banking/about-us/newsroom/gap-inc--signs-credit-card-program-agreements-with-barclays-and-/ <span class="kw">&lt;br&gt;</span> https://www.businesswire.com/news/home/20220608006113/en/Gap-Inc.-Launches-New-Credit-Card-Program-in-Partnership-with-Barclays-and-Mastercard"</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="al">![`r target_label`](images/GAP_UBPRE524_Value_median_partnership.png)</span>{#fig-gap-val}</span>
 <span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="fu">## Cosco</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="al">![`r target_label` quarterly difference](images/GAP_UBPRE524_value_diff_median_partnership.png)</span>{#fig-gap-diff}</span>
 <span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="al">![Changes in the target variable "30-89 days overdue as a % of total credit cards"](images/Cosco_UBPRE524_partnership.png)</span>{#fig-cosco}</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="al">![Magnitude Measures](images/GAP_UBPR3815_UBPRB538_pct_change_median_partnership.png)</span>{#fig-gap-mag}</span>
 <span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a><span class="al">![Alternative Measures](images/Cosco_UBPR3815_UBPRB538_UBPRE263_partnership.png)</span>{#fig-cosco-multiple}</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>source: <span class="co">[</span><span class="ot">@gap2021; and @gap2022</span><span class="co">]</span></span>
 <span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>"source: https://corporate.walmart.com/news/2018/07/26/walmart-and-capital-one-sign-credit-card-program-agreement <span class="kw">&lt;br&gt;</span></span>
-<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>                https://www.spglobal.com/marketintelligence/en/news-insights/trending/VHYZBHXtY1xdBCP2sIlmag2"</span>
-<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a><span class="fu">## Walmart</span></span>
-<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a><span class="al">![Changes in the target variable "30-89 days overdue as a % of total credit cards"](images/Walmart_UBPRE524_partnership.png)</span>{#fig-walmart}</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a><span class="fu">## Cosco</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="al">![`r target_label`](images/Cosco_UBPRE524_Value_median_partnership.png)</span>{#fig-cosco-val}</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a><span class="al">![`r target_label` quarterly difference](images/Cosco_UBPRE524_value_diff_median_partnership.png)</span>{#fig-cosco-diff}</span>
 <span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a><span class="al">![Alternative Measures](images/Walmart_UBPR3815_UBPRB538_UBPRE263_partnership.png)</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a><span class="al">![Magnitude Measures](images/Cosco_UBPR3815_UBPRB538_pct_change_median_partnership.png)</span>{#fig-cosco-mag}</span>
 <span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>"source: https://corporate.walmart.com/news/2018/07/26/walmart-and-capital-one-sign-credit-card-program-agreement <span class="kw">&lt;br&gt;</span></span>
-<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>                https://www.spglobal.com/marketintelligence/en/news-insights/trending/VHYZBHXtY1xdBCP2sIlmag2"</span>
-<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>the mean of the peer groups (Large Banks and Large Credit Card Banks) shows changes that may be due to all Banks rather than due to the partnership. </span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>source: @cosco2016</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a><span class="fu">## Walmart</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a><span class="al">![`r target_label`](images/Walmart_UBPRE524_Value_median_partnership.png)</span>{#fig-walmart-val}</span>
 <span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>##Means-adjusted model</span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a><span class="al">![`r target_label` quarterly difference](images/Walmart_UBPRE524_value_diff_median_partnership.png)</span>{#fig-cosco-diff}</span>
 <span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>Take the average of the target variable in the estimation period before the partnership event.</span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a><span class="al">![Magnitude Measures](images/Walmart_UBPR3815_UBPRB538_pct_change_median_partnership.png)</span>{#fig-walmart-mag}</span>
 <span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>In the observation period, subtract the prediction from the actual return to get the “abnormal return.” AR</span>
-<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>AR nonzero </span>
-<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a> values after the event give the effect of the event on the target variable</span>
-<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>What if you’re interested in an event that changes the time series in a long-lasting way? In that case, one good tool is an event study design implemented with regression.</span>
-<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>The basic idea is this: estimate one regression of the outcome on the time period before the event. Then estimate another time series of the outcome on the time period after the event. Then see how the two are different.</span>
-<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a><span class="fu">## Bank Fixed Effect</span></span>
-<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>###Stationarity</span>
-<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>Stationarity</span>
-<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>If the variables of interest (both dependent and independent) exhibit trends or unit roots, there's a risk of encountering spurious relationships.</span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>source: <span class="co">[</span><span class="ot">@walmart2018; and @walmart2019</span><span class="co">]</span></span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>The partnerships shown all have transitional periods. For example, Baclays's acquired GAP Inc. on May 1 2022, but it wasn't until June 20, 2022 that the old Synchrony borrowers could use their new partnership cards.</span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>Looking at the plots, the <span class="in">`r target_label`</span>  </span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>##Means-adjusted model</span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>Take the average of the target variable in the estimation period before the partnership event.</span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>In the observation period, subtract the prediction from the actual return to get the “abnormal return.” AR</span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>AR nonzero </span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a> values after the event give the effect of the event on the target variable</span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>What if you’re interested in an event that changes the time series in a long-lasting way? In that case, one good tool is an event study design implemented with regression.</span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>The basic idea is this: estimate one regression of the outcome on the time period before the event. Then estimate another time series of the outcome on the time period after the event. Then see how the two are different.</span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a><span class="fu">## Bank Fixed Effect</span></span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>###Stationarity</span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>Stationarity</span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>If the variables of interest (both dependent and independent) exhibit trends or unit roots, there's a risk of encountering spurious relationships.</span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

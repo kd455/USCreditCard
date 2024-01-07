@@ -58,9 +58,23 @@ summary_ratios <- memoise(function() {
   .read_ubpr("data/UBPR_Ratios_V.parquet") 
 })
 
-credit_card <- memoise(function() {
-  .read_ubpr("data/UBPR_CreditCard_V.parquet") 
+credit_card <- memoise(function(apply_filters = FALSE) {
+  if(apply_filters) {
+    .read_ubpr("data/UBPR_CreditCard_V.parquet") |>
+      filter(BankType %in% c("LargeBank","LargeCreditCardBank")) |>
+      tsibble::group_by_key() |>
+      filter(Value != 0) |>
+      slice(3:n()) |>
+      fill_gaps()  |> 
+      filter_index(get_regulation_cutoff() ~ .)
+  } else {
+    .read_ubpr("data/UBPR_CreditCard_V.parquet") 
+  }
 })
+
+get_regulation_cutoff <- function() {
+  "2010 Q2"
+}
 
 .measure_to_tsibble <- function(measure_data, measure_name) {
   measure_data |>
@@ -76,8 +90,8 @@ credit_card <- memoise(function() {
 #' 
 #' Credit card loans that are 30-89 days past due divided by total credit card loans.
 #' 
-credit_card.overdue_3089 <- memoise(function() {
-  credit_card() |>
+credit_card.overdue_3089 <- memoise(function(apply_filters = FALSE) {
+  credit_card(apply_filters) |>
     .measure_to_tsibble("UBPRE524")
 })
 
@@ -86,8 +100,8 @@ credit_card.overdue_3089 <- memoise(function() {
 #' The unused portions of all commitments to extend credit both to individuals for household, family, and other personal 
 #' expenditures and to other customers, including commercial or industrial enterprises, through credit cards.
 #' 
-credit_card.unused <- function() {
-  credit_card() |>
+credit_card.unused <- function(apply_filters = FALSE) {
+  credit_card(apply_filters) |>
     .measure_to_tsibble("UBPR3815")
 }
 
@@ -97,8 +111,8 @@ credit_card.unused <- function() {
 #' expenditures and to other customers, including commercial or industrial enterprises, through credit cards divided by total
 #' assets.
 #' 
-credit_card.unused_ratio <- function() {
-  credit_card() |>
+credit_card.unused_ratio <- function(apply_filters = FALSE) {
+  credit_card(apply_filters) |>
     .measure_to_tsibble("UBPRE263")
 }
 
@@ -107,13 +121,13 @@ credit_card.unused_ratio <- function() {
 #' Loans to Individuals for Household, Family, and Other Personal Expenditures 
 #' (I.E., Consumer Loans)(Includes Purchased Paper): Credit Cards
 #' 
-credit_card.loan_amount <- function() {
-  credit_card() |>
+credit_card.loan_amount <- function(apply_filters = FALSE) {
+  credit_card(apply_filters) |>
     .measure_to_tsibble("UBPRB538")
 }
 
-credit_card.loan_proportion <- function() {
-  credit_card() |>
+credit_card.loan_proportion <- function(apply_filters = FALSE) {
+  credit_card(apply_filters) |>
     .measure_to_tsibble("UBPRE425")
 }
 
@@ -320,48 +334,83 @@ features.plot_violin <-function(data, feature_name) {
                 labs(x = "", y = "")
 }
 
-outlier.plot <- function(data, outliers, value_name = "Value") {
+outlier.plot <- function(data, pca_output, P1_lower, P1_upper, P2_lower, P2_upper, value_name = "Value") {
+
+  outliers <- pca_output |>
+                filter( (.fittedPC2 < P2_lower) | 
+                        (.fittedPC2 > P2_upper) | 
+                        (.fittedPC1 < P1_lower) |
+                        (.fittedPC1 > P1_upper)) |>
+                select(IDRSSD) 
+
+  if (!purrr::is_empty(outliers))  {
     data |>
-    filter(IDRSSD %in% outliers$IDRSSD) |>
-    ggplot(aes(x = Quarter, y = !!as.name(value_name), col = BankName)) +
-    geom_line() +
-    facet_wrap(~BankName, ncol = 1) +
-    theme(legend.position = "none")  +
-    labs(y = target_label) 
+      filter(IDRSSD %in% outliers$IDRSSD) |>
+      ggplot(aes(x = Quarter, y = !!as.name(value_name), col = BankName)) +
+      geom_line() +
+      facet_wrap(~BankName, ncol = 1) +
+      theme(legend.position = "none")  +
+      labs(subtitle = glue("Outliers: {P1_lower} < PC1 < {P1_upper}, {P2_lower} < PC2 < {P2_upper}"),
+           y = paste0(credit_card.target_label(), "\n", value_name))
+  }
 }
 
-partnership.plot <- function(name, old, new, acquired, available, selected_measures,value_name, date_obs_period = 2) {
+get_stl <- function(data, value_name = "Value") {
+  get_median_trend(data, value_name) |> 
+    na.omit() |>
+    model(stl = STL(!!as.name(value_name))) |> 
+    components()
+}
+
+get_median_trend <- function(data, value_name = "Value") {
+  data |> 
+    group_by(Measure, Description)  |>
+    summarise(!!quo_name(value_name) := median(!!as.name(value_name), na.rm = TRUE)) 
+}
+
+get_mean_trend <- function(data, value_name = "Value") {
+  data |> 
+    group_by(Measure, Description)  |>
+    summarise(!!quo_name(value_name) := mean(!!as.name(value_name), na.rm = TRUE))
+}
+
+partnership.plot <- function(name, old, new, acquired, available, selected_measures,value_name, trend_calc = "median", date_obs_period = 2) {
   date_acquired <- as.Date(acquired)
   date_available <- as.Date(available)
   from_date <- year(date_acquired) -date_obs_period
   to_date <- year(date_acquired) +date_obs_period
-  y_label <- ifelse(value_name == "value_diff", "difference from prior period", value_name)
+  y_label <- case_when(
+              value_name == "value_diff" ~ "difference from prior period",
+              value_name == "pct_change" ~ "% change from prior period",
+              .default = value_name)
   group.colours <- c(old = "#1B9E77", new = "#D95F02", aggregate = "#999999")
-  agg_data <- selected_measures |>
-              filter(BankType != "OtherBank") |>
-              select(Measure, !!as.name(value_name)) |>
-              group_by(Measure, Description) |>
-                summarise(
-                  !!quo_name(value_name) := mean(!!as.name(value_name), na.rm = TRUE)) |> 
-                tibble::add_column(BankName = "aggregate")
+  trend_data <- NULL
+  if (trend_calc == "stl") 
+      trend_data <- get_stl(selected_measures, value_name) |> mutate(!!quo_name(value_name) := trend)
+  if (trend_calc == "median")
+      trend_data <- get_median_trend(selected_measures, value_name)
+  if (trend_calc == "mean")
+      trend_data <- get_mean_trend(selected_measures, value_name) 
+
+  if (!is_empty(trend_data))
+    trend_data <- trend_data |> add_column(BankName = "aggregate") |> na.omit()
+
   measures <- selected_measures |> as_tibble() |> distinct(Measure)
   measures_label <- paste0(pull(measures), collapse="_")
-  
-  
 
   selected_measures |>
-    filter(BankName %in% c(old, new)) |>
-    bind_rows(agg_data) |> 
+    filter(BankName %in% c(old, new)) |> 
+    bind_rows(trend_data) |> 
     mutate(group_column = case_when(
                               BankName == old ~ "old",
                               BankName == new ~ "new")) |> 
-    filter_index(as.character(from_date) ~ as.character(to_date)) |> 
+    filter_index(as.character(from_date) ~ as.character(to_date)) |>
     autoplot(!!as.name(value_name), aes(color = group_column)) +
     scale_color_manual(values = group.colours)+
     facet_wrap(~ Description, scales = "free", ncol=1) +
     labs(title=glue("{name} Partnership: <span style='color:#D95F02'>{old}</span> to 
                     <span style='color:#1B9E77'>{new}</span>
-                    against <span style='color:#333333'>PEER Banks</span>"),
+                    against <span style='color:#333333'>{trend_calc} PEER Banks</span>"),
         subtitle = glue("Acquired {date_acquired}. Card available {date_available}"),
         y = y_label,
         x = "Year")  +
@@ -373,6 +422,6 @@ partnership.plot <- function(name, old, new, acquired, available, selected_measu
     annotate("text", x=as.numeric(date_acquired-10), y=0, label="acquired", angle=90, hjust = 0)+
     geom_vline(xintercept = as.numeric(date_available), linetype=4) +
     annotate("text", x=as.numeric(date_available-10), y=0, label="available", angle=90, hjust = 0) 
-    ggsave(glue("images/{name}_{measures_label}_partnership.png"), width = 16, height = nrow(measures)*4, dpi = 300)
+    ggsave(glue("images/{name}_{measures_label}_{value_name}_{trend_calc}_partnership.png"), width = 16, height = nrow(measures)*4, dpi = 300)
 }
 

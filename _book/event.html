@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>US Credit Card - 4&nbsp; Event study</title>
+<title>US Credit Card - 6&nbsp; Event study</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -109,7 +109,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./event.html">Models</a></li><li class="breadcrumb-item"><a href="./event.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Event study</span></a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./event.html">Models</a></li><li class="breadcrumb-item"><a href="./event.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Event study</span></a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -163,8 +163,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./data_banks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Bank Peer Groups</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data_partners.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Bank Partnerships</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./data_fed.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">data_fed.html</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">data_fed.html</span></span></a>
   </div>
 </li>
       </ul>
@@ -181,7 +193,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./event.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Event study</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Event study</span></span></a>
   </div>
 </li>
       </ul>
@@ -196,7 +208,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#evaluation" id="toc-evaluation" class="nav-link active" data-scroll-target="#evaluation"><span class="header-section-number">4.1</span> Evaluation</a></li>
+  <li><a href="#evaluation" id="toc-evaluation" class="nav-link active" data-scroll-target="#evaluation"><span class="header-section-number">6.1</span> Evaluation</a></li>
   </ul>
 </nav>
     </div>
@@ -205,7 +217,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Event study</span></h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<div class="quarto-title-block"><div><h1 class="title"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Event study</span></h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
 </div>
 
 
@@ -222,8 +234,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <p>Event studies are a common approach in econometrics to assess the impact of an event such as earnings announcements, mergers and acquisitions, regulatory changes, or macroeconomic news.</p>
 <p>The goal is to estimate the portion of post-event change that can be attributed to the event itself, isolating it from other market and firm-specific effects. We do this by predicting what would have happened if the event had not occurred (the counterfactual) and comparing it to the actual observed data to estimate the resulting “abnormal returns”.</p>
-<section id="evaluation" class="level2" data-number="4.1">
-<h2 data-number="4.1" class="anchored" data-anchor-id="evaluation"><span class="header-section-number">4.1</span> Evaluation</h2>
+<section id="evaluation" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="evaluation"><span class="header-section-number">6.1</span> Evaluation</h2>
 <p>The joint test problem arises because we are effectively testing two things: the counterfactual model and the event impact. Consequently, we need an approach to accurately evaluate if our counterfactual model results are credible. One approach is to test using observations where we expect no effect; if there were resulting “abnormal returns” this would point to an issue with the model <span class="citation" data-cites="HuntingtonKlein">(see <a href="#ref-HuntingtonKlein" role="doc-biblioref"><strong>HuntingtonKlein?</strong></a>, chap 17.3.3)</span>.</p>
 <p><span class="math display">\[
 Outcome = \beta_0 + \beta_1t + \beta_2After + \beta_3t\times After+\varepsilon
@@ -849,7 +861,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="./data_fed.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">data_fed.html</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">data_fed.html</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

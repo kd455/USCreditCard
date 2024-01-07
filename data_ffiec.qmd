@@ -135,7 +135,7 @@ Taking the approach from @Hyndman2021 we can use Principal Components Analysis (
 ```{r}
 #| warning: false
 #| error: false
-regulation_cutoff <- "2010 Q2"
+regulation_cutoff <-get_regulation_cutoff()
 
 overdue30to89_post <- overdue30to89 |>
                     filter_index(regulation_cutoff ~ .) 
@@ -152,21 +152,13 @@ overdue30to89_lbanks <- overdue30to89_post |>
 #| fig-cap: "Outlier Detection using PCA"
 #| fig-subcap:
 #|   - "PCA for <span style='color:#1B9E77'>Large</span> and <span style='color:#D95F02'>Large Credit Card</span> Banks using features: lumpiness and stability"
-#|   - "Data series for Banks with PC1 > 2 and PC2 > 2"
+#|   - "Data series for Outlier Banks"
 #| layout-ncol: 1
 
 pca_output <- feature_data(overdue30to89_lbanks, c("lumpiness","stability")) |> feature_prcomp()
 
 pcs.plot(pca_output)
-
-pc1_threshold <- 2
-pc2_threshold <- 2
-
-outliers <- pca_output |>
-  filter( (.fittedPC2 > pc2_threshold) | (.fittedPC1 > pc1_threshold)) |>
-  select(IDRSSD) 
-  
-outlier.plot(overdue30to89_lbanks, outliers)
+outlier.plot(overdue30to89_lbanks, pca_output, -2, 2, -3, 3)
 
 ```
 
@@ -178,21 +170,13 @@ outlier.plot(overdue30to89_lbanks, outliers)
 #| fig-cap: "Outlier Detection using PCA"
 #| fig-subcap:
 #|   - "PCA for <span style='color:#1B9E77'>Large</span> and <span style='color:#D95F02'>Large Credit Card</span> Banks using features: seasonal"
-#|   - "Data series for Banks with PC1 > 4 and PC2 > 2.5"
+#|   - "Data series for Outlier Banks"
 #| layout-ncol: 1
 
 pca_output <- feature_data(overdue30to89_lbanks, "seasonal") |> feature_prcomp()
 
 pcs.plot(pca_output)
-
-pc1_threshold <- 4
-pc2_threshold <- 2.5
-
-outliers <- pca_output |>
-  filter( (.fittedPC2 > pc2_threshold) | (.fittedPC1 > pc1_threshold)) |>
-  select(IDRSSD) 
-  
-outlier.plot(overdue30to89_lbanks, outliers)
+outlier.plot(overdue30to89_lbanks, pca_output, -4, 4, -3, 3)
 
 ```
 ## ACF
@@ -203,21 +187,13 @@ outlier.plot(overdue30to89_lbanks, outliers)
 #| fig-cap: "Outlier Detection using PCA"
 #| fig-subcap:
 #|   - "PCA for <span style='color:#1B9E77'>Large</span> and <span style='color:#D95F02'>Large Credit Card</span> Banks using features: acf"
-#|   - "Data series for Banks with PC1 > 4 and PC2 > 2.5"
+#|   - "Data series for Outlier Banks"
 #| layout-ncol: 1
 
 pca_output <- feature_data(overdue30to89_lbanks, "acf") |> feature_prcomp()
 
 pcs.plot(pca_output)
-
-pc1_threshold <- 4
-pc2_threshold <- 2.5
-
-outliers <- pca_output |>
-  filter( (.fittedPC2 > pc2_threshold) | (.fittedPC1 > pc1_threshold)) |>
-  select(IDRSSD) 
-  
-outlier.plot(overdue30to89_lbanks, outliers)
+outlier.plot(overdue30to89_lbanks, pca_output, -3, 3, -3, 3)
 
 ```
 ## PACF
@@ -228,31 +204,24 @@ outlier.plot(overdue30to89_lbanks, outliers)
 #| fig-cap: "Outlier Detection using PCA"
 #| fig-subcap:
 #|   - "PCA for <span style='color:#1B9E77'>Large</span> and <span style='color:#D95F02'>Large Credit Card</span> Banks using features: pacf"
-#|   - "Data series for Banks with PC1 <-3, PC2 > 2 and PC2 < -2"
+#|   - "Data series for Outlier Banks"
 #| layout-ncol: 1
 
 pca_output <- feature_data(overdue30to89_lbanks, "pacf") |> feature_prcomp()
 
 pcs.plot(pca_output)
-
-pc1_threshold <- -3
-pc2_threshold <- 2
-pc2_2_threshold <- -2
-
-outliers <- pca_output |>
-  filter( (.fittedPC2 > pc2_threshold) | (.fittedPC2 < pc2_2_threshold) | (.fittedPC1 < pc1_threshold)) |>
-  select(IDRSSD) 
-  
-outlier.plot(overdue30to89_lbanks, outliers)
+outlier.plot(overdue30to89_lbanks, pca_output, -3, 3, -2, 2)
 
 ```
 ## Data
 ```{r}
 #| warning: false
 #| error: false
-selected_feats = c("lumpiness","stability","seasonal", "pacf", "acf")
-all_f <- feature_data(overdue30to89_lbanks,selected_feats)
-knitr::kable(all_f, format = "html")    
+selected_feats <- c("lumpiness","stability","seasonal", "pacf", "acf")
+
+feature_data(overdue30to89_lbanks,selected_feats) |>
+    select(-c(IDRSSD,Measure,Label,Description,BankType)) |> 
+        knitr::kable(format = "html")    
 ```
 ::: 
 
@@ -396,7 +365,7 @@ final_df |> na.omit() |> pull(value_diff) |> Box.test(lag = 10, type = "Ljung")
 :::
 
 
-7. @fig-lfeature-8 *Large Credit Card Banks* is not stationary. Performing a difference i.e. to get the quarterly change in UBPRE524, makes the series stationary as shown in @fig-acf. This can be confirmed by performing an augmented Dickey–Fuller (ADF) test on the differenced value. We also see that, post differencing, there are autocorrelation coefficients above the significance threshold. This is likely due to seasonality as these are at regular intervals. The decreasing magnitude of these coefficients tell us the earlier lags have a stronger influence than values further in the past.
+7. @fig-lfeature-8 *Large Credit Card Banks* is not stationary i.e. the statistical properties of the time series changes, which makes it difficult to identify trends and patterns. Performing a difference i.e. to get the quarterly change in UBPRE524, makes the series stationary as shown in @fig-acf. This can be confirmed by performing an augmented Dickey–Fuller (ADF) test on the differenced value. We also see that, post differencing, there are autocorrelation coefficients above the significance threshold. This is likely due to seasonality as these are at regular intervals. The decreasing magnitude of these coefficients tell us the earlier lags have a stronger influence than values further in the past.
 
 ```{r}
 #| warning: false
