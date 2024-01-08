@@ -2,7 +2,7 @@ project:
   type: book
   output-dir: _book
 book:
-  title: "US Credit Card"
+  title: "US Credit Card Partnerships"
   author: "Kathryn Dobinson"
   date: "18/12/2023"
   chapters:
@@ -12,11 +12,8 @@ book:
       chapters:
         - data_ffiec.qmd
         - data_banks.qmd
-        - data_partners.qmd        
-        - data_fed.qmd
-    - part: "Models"
-      chapters:
-        - event.qmd      
+        - data_partners.qmd                
+    - part: "Models"      
 bibliography: references.bib
 
 format:

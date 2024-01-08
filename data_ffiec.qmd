@@ -225,7 +225,7 @@ feature_data(overdue30to89_lbanks,selected_feats) |>
 ```
 ::: 
 
-From these plots we can see that there are a few banks that started their credit card businesses after 2010 Q2 (or started reporting our target measure). These series begin at 0 and sharply increase after the first or second quarter. Considering it takes 30+ days for credit cards to become delinquent this pattern is expected. However, for modelling we may want to drop the first few quarters to remove the impact of this initial sharp increase and reflect the ongoing state.
+From these plots we can see that there are a few banks that started their credit card businesses after 2010 Q2 (or started reporting our target measure). These series begin at 0 and sharply increase after the first or second quarter. This pattern is expected considering it takes 30+ days for credit cards to become delinquent. However, for modelling we may want to drop the first few quarters to remove the impact of this initial sharp increase and reflect the ongoing state.
 
 ```{r}
 #| warning: false

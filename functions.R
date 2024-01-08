@@ -86,6 +86,14 @@ get_regulation_cutoff <- function() {
     fill_gaps()
 }
 
+credit_card.data_types_ref <- function() {
+  tibble(
+    mtype = c("M", "P"),
+    data = list(
+      tibble(Measure = c("UBPR3815", "UBPRB538", "UBPRD659")),
+      tibble(Measure = c("UBPRE524", "UBPRE263", "UBPRE425"))
+    )) |> unnest(data)
+}
 #' Credit Card Plans-30-89 DAYS P/D %
 #' 
 #' Credit card loans that are 30-89 days past due divided by total credit card loans.
@@ -123,7 +131,7 @@ credit_card.unused_ratio <- function(apply_filters = FALSE) {
 #' 
 credit_card.loan_amount <- function(apply_filters = FALSE) {
   credit_card(apply_filters) |>
-    .measure_to_tsibble("UBPRB538")
+    .measure_to_tsibble("UBPRB538") 
 }
 
 credit_card.loan_proportion <- function(apply_filters = FALSE) {
@@ -140,61 +148,61 @@ credit_card.loan_proportion <- function(apply_filters = FALSE) {
 #'
 #' @return A tsibble with the average total assets for each quarter.
 summary_ratios.assets <- function() {
-  if (file.exists("data/UBPR_Calc_Ratios.parquet")) {
-    calculated_measures() |> filter(Measure == "UBPRD659")
-  } else {
+  # if (file.exists("data/UBPR_Calc_Ratios.parquet")) {
+  #   calculated_measures() |> filter(Measure == "UBPRD659")
+  # } else {
     summary_ratios() |> filter(Measure == "UBPRD659") |>
       .measure_to_tsibble("UBPRD659")
-  }
+  # }
 }
 
-credit_card.loan_amount_ratio_calc <- function() {
-  calculated_measures() |>
-    filter(Measure == "UBPRB538C")
-}
+# credit_card.loan_amount_ratio_calc <- function() {
+#   calculated_measures() |>
+#     filter(Measure == "UBPRB538C")
+# }
 
-credit_card.unused_ratio_calc <- function() {
-  calculated_measures() |>
-    filter(Measure == "UBPR3815C")
-}
-credit_card.unused_proportion <- function() {
-  calculated_measures() |>
-    filter(Measure == "UBPR3815CP")
-}
+# credit_card.unused_ratio_calc <- function() {
+#   calculated_measures() |>
+#     filter(Measure == "UBPR3815C")
+# }
+# credit_card.unused_proportion <- function() {
+#   calculated_measures() |>
+#     filter(Measure == "UBPR3815CP")
+# }
 
-calculate_new_measures <- function() {
-  avg_assets <- summary_ratios.assets()
-  cc_unused_r <- as_percent_avg_assets(credit_card.unused(), avg_assets)
-  cc_loans_r <- as_percent_avg_assets(credit_card.loan_amount(), avg_assets)
-  cc_loans_p <- as_percent_loans(credit_card.unused(),credit_card.loan_amount())
+# calculate_new_measures <- function() {
+#   avg_assets <- summary_ratios.assets()
+#   cc_unused_r <- as_percent_avg_assets(credit_card.unused(), avg_assets)
+#   cc_loans_r <- as_percent_avg_assets(credit_card.loan_amount(), avg_assets)
+#   cc_loans_p <- as_percent_loans(credit_card.unused(),credit_card.loan_amount())
 
-  dplyr::bind_rows(avg_assets, cc_unused_r,cc_loans_r,cc_loans_p) |>
-    arrow::write_parquet("data/UBPR_Calc_Ratios.parquet")
-}
+#   dplyr::bind_rows(avg_assets, cc_unused_r,cc_loans_r,cc_loans_p) |>
+#     arrow::write_parquet("data/UBPR_Calc_Ratios.parquet")
+# }
 
-calculated_measures <- memoise(function() {
-  arrow::read_parquet("data/UBPR_Calc_Ratios.parquet")
-})
+# calculated_measures <- memoise(function() {
+#   arrow::read_parquet("data/UBPR_Calc_Ratios.parquet")
+# })
 
-as_percent_loans <- function(numerator_df, loans_df) {
-  numerator_df |> add_column(calc_value = round((numerator_df$Value/loans_df$Value)*100,2)) |>
-              mutate(Value = calc_value,
-                      value_diff = difference(Value),
-                      Measure = paste0(Measure,"CP"),
-                      Label = paste0(Label,"_CP"),
-                      Description = paste(Description,", % Credit Card Loans")) |> 
-                      select(-calc_value)
-}
+# as_percent_loans <- function(numerator_df, loans_df) {
+#   numerator_df |> add_column(calc_value = round((numerator_df$Value/loans_df$Value)*100,2)) |>
+#               mutate(Value = calc_value,
+#                       value_diff = difference(Value),
+#                       Measure = paste0(Measure,"CP"),
+#                       Label = paste0(Label,"_CP"),
+#                       Description = paste(Description,", % Credit Card Loans")) |> 
+#                       select(-calc_value)
+# }
 
-as_percent_avg_assets <- function(numerator_df, assets_df) {  
-  numerator_df |> add_column(calc_value = round((numerator_df$Value/assets_df$Value)*100,2)) |>
-                mutate(Value = calc_value,
-                        value_diff = difference(Value),
-                        Measure = paste0(Measure,"C"),
-                        Label = paste0(Label,"_CALC"),
-                        Description = paste(Description,", % Avg Assets")) |> 
-                        select(-calc_value)
-}
+# as_percent_avg_assets <- function(numerator_df, assets_df) {  
+#   numerator_df |> add_column(calc_value = round((numerator_df$Value/assets_df$Value)*100,2)) |>
+#                 mutate(Value = calc_value,
+#                         value_diff = difference(Value),
+#                         Measure = paste0(Measure,"C"),
+#                         Label = paste0(Label,"_CALC"),
+#                         Description = paste(Description,", % Avg Assets")) |> 
+#                         select(-calc_value)
+# }
 
 us_economy <- memoise(function(freq = "M") {
   read_csv(glue("data/US_Economic_Data_{freq}.csv"), show_col_types = FALSE) |>
@@ -223,27 +231,27 @@ us_economy.confidence <- function() {
     na.omit()
 }
 
-over_30_89_days <- function(threshold_pct = 25) {
-  #select firms that have non-zero values for UBPRE524
-  all_measures <- credit.tsibble()
-  select_firms <-  all_measures |>
-    filter(Measure == "UBPRE524") |>
-    group_by(BankName) |>
-    summarise(Avg = mean(Value)) |>
-    filter(Avg != 0) |> 
-    distinct(BankName)  
+# over_30_89_days <- function(threshold_pct = 25) {
+#   #select firms that have non-zero values for UBPRE524
+#   all_measures <- credit.tsibble()
+#   select_firms <-  all_measures |>
+#     filter(Measure == "UBPRE524") |>
+#     group_by(BankName) |>
+#     summarise(Avg = mean(Value)) |>
+#     filter(Avg != 0) |> 
+#     distinct(BankName)  
   
-  #select firms that have % of their loans in credit cards
-  select_firms <- all_measures |>
-    filter(Measure == "UBPRE425", BankName %in% select_firms$BankName) |>
-    group_by(BankName) |>
-    filter(Value >= threshold_pct) |>
-    distinct(BankName) 
+#   #select firms that have % of their loans in credit cards
+#   select_firms <- all_measures |>
+#     filter(Measure == "UBPRE425", BankName %in% select_firms$BankName) |>
+#     group_by(BankName) |>
+#     filter(Value >= threshold_pct) |>
+#     distinct(BankName) 
   
-  #return 30-89 overdue  
-  all_measures |>
-    filter(Measure == "UBPRE524", BankName %in% select_firms$BankName)
-}
+#   #return 30-89 overdue  
+#   all_measures |>
+#     filter(Measure == "UBPRE524", BankName %in% select_firms$BankName)
+# }
 
 white.noise.sample <- function() {
   tsibble(Period = 1:100, Value = rnorm(100), index = Period)
@@ -374,15 +382,23 @@ get_mean_trend <- function(data, value_name = "Value") {
     summarise(!!quo_name(value_name) := mean(!!as.name(value_name), na.rm = TRUE))
 }
 
+user_friendly_label <- function(measure, value_name) {
+    mtype <- credit_card.data_types_ref() |> filter(Measure == measure) |> pull(mtype)
+    case_when(
+              value_name == "value_diff" & mtype == "M" ~ "difference from prior period ($)",
+              value_name == "value_diff" & mtype == "P" ~ "difference from prior period (%)",
+              value_name == "pct_change" ~ "% change from prior period",
+              value_name == "Value" & mtype == "M" ~ "Value ($)",
+              value_name == "Value" & mtype == "P" ~ "Value (%)",
+              .default = value_name)
+}
+
 partnership.plot <- function(name, old, new, acquired, available, selected_measures,value_name, trend_calc = "median", date_obs_period = 2) {
   date_acquired <- as.Date(acquired)
   date_available <- as.Date(available)
   from_date <- year(date_acquired) -date_obs_period
   to_date <- year(date_acquired) +date_obs_period
-  y_label <- case_when(
-              value_name == "value_diff" ~ "difference from prior period",
-              value_name == "pct_change" ~ "% change from prior period",
-              .default = value_name)
+
   group.colours <- c(old = "#1B9E77", new = "#D95F02", aggregate = "#999999")
   trend_data <- NULL
   if (trend_calc == "stl") 
@@ -397,6 +413,7 @@ partnership.plot <- function(name, old, new, acquired, available, selected_measu
 
   measures <- selected_measures |> as_tibble() |> distinct(Measure)
   measures_label <- paste0(pull(measures), collapse="_")
+  y_label <- measures$Measure |> map_chr(user_friendly_label,value_name) |> unique()
 
   selected_measures |>
     filter(BankName %in% c(old, new)) |> 
@@ -406,7 +423,7 @@ partnership.plot <- function(name, old, new, acquired, available, selected_measu
                               BankName == new ~ "new")) |> 
     filter_index(as.character(from_date) ~ as.character(to_date)) |>
     autoplot(!!as.name(value_name), aes(color = group_column)) +
-    scale_color_manual(values = group.colours)+
+    scale_color_manual(values = group.colours) +
     facet_wrap(~ Description, scales = "free", ncol=1) +
     labs(title=glue("{name} Partnership: <span style='color:#D95F02'>{old}</span> to 
                     <span style='color:#1B9E77'>{new}</span>
@@ -417,11 +434,12 @@ partnership.plot <- function(name, old, new, acquired, available, selected_measu
     theme(legend.position = "none",
           plot.title = element_markdown(),
           strip.text = element_text(size = 12))  +
+    scale_y_continuous(labels = scales::comma) +
     scale_x_yearmonth(date_breaks = "1 year", date_labels = "%Y")   +
     geom_vline(xintercept = as.numeric(date_acquired), linetype=1,colour="#00259e") +
     annotate("text", x=as.numeric(date_acquired-10), y=0, label="acquired", angle=90, hjust = 0)+
     geom_vline(xintercept = as.numeric(date_available), linetype=4) +
     annotate("text", x=as.numeric(date_available-10), y=0, label="available", angle=90, hjust = 0) 
-    ggsave(glue("images/{name}_{measures_label}_{value_name}_{trend_calc}_partnership.png"), width = 16, height = nrow(measures)*4, dpi = 300)
+    #ggsave(glue("images/{name}_{measures_label}_{value_name}_{trend_calc}_partnership.png"), width = 16, height = nrow(measures)*4, dpi = 300)
 }
 

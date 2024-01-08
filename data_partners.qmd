@@ -13,6 +13,9 @@ source('functions.R')
 target_label <- credit_card.target_label()
 ``` 
 
+Using three partnership events as case studies, we can visualise *`r target_label`* to see if we can observe any changes around the partnership event. There are two dates of interest; the official date of acquisition and the date when cards become available for use. For example, Baclays's acquisition of GAP Inc. was on May 1, 2022 but it wasn't until June 20, 2022 that the old Synchrony borrowers could use their new Barclays partnership cards.
+
+As mentioned in section @sec-intro-events we may not noticeably see the impact of a partnership event if it is not material to one or both of the Banks involved. To get a sense of the magnitude of the event we can look at the measures: *Loans to Individuals..Credit Cards* (UBPRB538) and *Unused commitments on Credit Credit Cards* (UBPR3815). These measures can tell us if borrowers utilise their partnership card; a new partnership that brings in substantial number of new borrowers may not impact delinquency if the borrowers are not using the partnership card. 
 
 ```{r}
 #| warning: false
@@ -29,6 +32,7 @@ partner_data <- credit_card.partnerships()
 
 partner_data |> pmap(partnership.plot,overdue30to89, "Value", "median")
 partner_data |> pmap(partnership.plot,overdue30to89, "value_diff", "median")
+partner_data |> pmap(partnership.plot,bind_rows(loan_amt,loan_unused), "Value", "median")
 partner_data |> pmap(partnership.plot,bind_rows(loan_amt_pct_change,loan_unused_pct_change), "pct_change", "median")
 
 ```
@@ -42,7 +46,16 @@ partner_data |> pmap(partnership.plot,bind_rows(loan_amt_pct_change,loan_unused_
 
 ![`r target_label` quarterly difference](images/GAP_UBPRE524_value_diff_median_partnership.png){#fig-gap-diff}
 
-![Magnitude Measures](images/GAP_UBPR3815_UBPRB538_pct_change_median_partnership.png){#fig-gap-mag}
+::: {#fig-magitude-gap .panel-tabset}
+
+## Magnitude Measures - Value
+
+![Magnitude Measures](images/GAP_UBPR3815_UBPRB538_Value_median_partnership.png){#fig-gap-val-mag}
+
+## Magnitude Measures - Percentage Change
+![Magnitude Measures](images/GAP_UBPR3815_UBPRB538_pct_change_median_partnership.png){#fig-gap-pct-mag}
+
+:::
 
 source: [@gap2021; and @gap2022]
 
@@ -52,46 +65,57 @@ source: [@gap2021; and @gap2022]
 
 ![`r target_label` quarterly difference](images/Cosco_UBPRE524_value_diff_median_partnership.png){#fig-cosco-diff}
 
-![Magnitude Measures](images/Cosco_UBPR3815_UBPRB538_pct_change_median_partnership.png){#fig-cosco-mag}
+::: {#fig-magitude-cosco .panel-tabset}
+
+## Magnitude Measures - Value
+
+![Magnitude Measures](images/Cosco_UBPR3815_UBPRB538_Value_median_partnership.png){#fig-cosco-val-mag}
+
+## Magnitude Measures - Percentage Change
+
+![Magnitude Measures](images/Cosco_UBPR3815_UBPRB538_pct_change_median_partnership.png){#fig-cosco-pct-mag}
+
+:::
 
 source: @cosco2016
-
 
 ## Walmart
 ![`r target_label`](images/Walmart_UBPRE524_Value_median_partnership.png){#fig-walmart-val}
 
 ![`r target_label` quarterly difference](images/Walmart_UBPRE524_value_diff_median_partnership.png){#fig-cosco-diff}
 
-![Magnitude Measures](images/Walmart_UBPR3815_UBPRB538_pct_change_median_partnership.png){#fig-walmart-mag}
+::: {#fig-magitude-walmart .panel-tabset}
 
+## Magnitude Measures - Value
 
+![Magnitude Measures](images/Walmart_UBPR3815_UBPRB538_Value_median_partnership.png){#fig-walmart-val-mag}
+
+## Magnitude Measures - Percentage Change
+
+![Magnitude Measures](images/Walmart_UBPR3815_UBPRB538_pct_change_median_partnership.png){#fig-walmart-pct-mag}
+
+:::
 source: [@walmart2018; and @walmart2019]
 :::
 
-Interestingly, for all these partnerships, the `r target_label` value appears to increase in the **old** partnership Bank. Clearly we cannot assume patterns of divergence where a Bank's credit card portfolio quality goes up in one Bank and reduces the other. Because the quality is relative to the existing or remaining portfolio.
+## Disambiguating Trend vs. Event 
 
-As mentioned in section @sec-intro-events the event 
-The changepoint can be: 
-Stable
-Both portfolios improve / degrade
-One improves the other degrades.
+Depending on the relative quality of the partnership portfolio we may see `r target_label` remain: 
 
+* Stable
+* Both portfolios improve / degrade
+* One improves the other degrades.
 
-The partnerships shown all have transitional periods. For example, Baclays's acquired GAP Inc. on May 1, 2022 but it wasn't until June 20, 2022 that the old Synchrony borrowers could use their new partnership cards.
+For the GAP and Cosco partnerships we can see that the quality degrades i.e. *`r target_label`* shows increased delinquency, in both the *old* and *new* bank during the transitional period (between acquisition and card availability). This may suggest the partnership portfolio adds riskier borrowers relative to the *new* bank's existing portfolio and removes less risky borrowers relative to the *old* bank's remaining portfolio. This assertion is questionable as the increase we are seeing may just be the trend, shown in grey (calculated as the median across all peer Banks), which also increases. 
 
-Looking at the plots, the `r target_label`  
+Another factor, as we saw in @fig-lfeature-6, was a tendency for short term reversal, or a reversion to a mean. This may be a factor of banks enacting policies to keep delinquency within their risk tolerance levels. Consequently, where we see an increase after a decrease it may be due in part to this data characteristic.
 
+In section X we will look to model the partnership impact by accounting for trend.
 
-##Means-adjusted model
+## Magnitude measures
 
-Take the average of the target variable in the estimation period before the partnership event.
+Anecdotal accounts indicate that a spike in Unused commitments before the *available* date could be due to borrowers paying down their cards, and even closing them, to mitigate concerns around the transition [@redditBarc]. The borrowers who can pay down their loans are likely low-risk, which may result in the portfolio, at the time of the partnership event, looking more risky than it really is (given *`r target_label`* is a proportion of the credit card loans). 
 
-In the observation period, subtract the prediction from the actual return to get the “abnormal return.” AR
-AR nonzero 
- values after the event give the effect of the event on the target variable
-What if you’re interested in an event that changes the time series in a long-lasting way? In that case, one good tool is an event study design implemented with regression.
+Increases in credit card loans in the *old* bank, as seen in GAP and Walmart, is unexpected. An assumption is that these banks did not want to lose borrowers and marketed 'bank branded' alternative cards.   
 
-The basic idea is this: estimate one regression of the outcome on the time period before the event. Then estimate another time series of the outcome on the time period after the event. Then see how the two are different.
-
-## Bank Fixed Effect
-
+## References
