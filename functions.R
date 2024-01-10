@@ -14,6 +14,7 @@ library(ggtext)
 #library(prophet)
 library(broom)
 library(tseries)
+library(lmtest)
 
 #set seed for reproducibility
 set.seed(42)
@@ -72,8 +73,11 @@ credit_card <- memoise(function(apply_filters = FALSE) {
   }
 })
 
-get_regulation_cutoff <- function() {
-  "2010 Q2"
+get_regulation_cutoff <- function(f = "Q") {
+  if(f=="M")
+    "2010 Mar"
+  else 
+    "2010 Q2"
 }
 
 .measure_to_tsibble <- function(measure_data, measure_name) {
@@ -208,14 +212,12 @@ us_economy <- memoise(function(freq = "M") {
   read_csv(glue("data/US_Economic_Data_{freq}.csv"), show_col_types = FALSE) |>
     mutate(Month = yearmonth(Date)) |>
     select(-Date) |> 
-    as_tsibble(index = Month)
+    as_tsibble(index = Month)    
 })
 
 us_economy.recession <- memoise(function() {
   read_csv("data/JHDUSRGDPBR_M.csv", col_names = c("Month", "Flag"), show_col_types = FALSE) |>
-    na.omit() |>
-    as_tsibble(index = Month) |>
-    fill_gaps(.full = T)
+    as_tsibble(index = Month)    
 })
 
 us_economy.psavert <- function() {

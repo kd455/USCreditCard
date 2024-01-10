@@ -365,15 +365,22 @@ final_df |> na.omit() |> pull(value_diff) |> Box.test(lag = 10, type = "Ljung")
 :::
 
 
-7. @fig-lfeature-8 *Large Credit Card Banks* is not stationary i.e. the statistical properties of the time series changes, which makes it difficult to identify trends and patterns. Performing a difference i.e. to get the quarterly change in UBPRE524, makes the series stationary as shown in @fig-acf. This can be confirmed by performing an augmented Dickey–Fuller (ADF) test on the differenced value. We also see that, post differencing, there are autocorrelation coefficients above the significance threshold. This is likely due to seasonality as these are at regular intervals. The decreasing magnitude of these coefficients tell us the earlier lags have a stronger influence than values further in the past.
+7. @fig-lfeature-8 *Large Credit Card Banks* is not stationary i.e. the statistical properties of the time series changes, which makes it difficult to identify trends and patterns. Performing a difference i.e. to get the quarterly change in UBPRE524, makes the series stationary as shown in @fig-acf-2. This can be confirmed by performing an augmented Dickey–Fuller (ADF) test on the differenced value. We also see that, post differencing, there are autocorrelation coefficients above the significance threshold. This is likely due to seasonality as these are at regular intervals. The decreasing magnitude of these coefficients tell us the earlier lags have a stronger influence than values further in the past.
+
+    Autocorrelation, the correlation between the timeseries and its own lagged values, can inform a moving average (MA) Model. If we additionally look at the partial autocorrelation, the correlation after removing the effect of any correlations due to the terms at shorter lags (see @fig-acf-3 and @fig-acf-4)
+    
+    @fig-acf indicate a Seasonal-ARMA process as both ACF and PACF are declining gradually around every 4th lag.
 
 ```{r}
 #| warning: false
 #| error: false
 #| label: fig-acf
-#| fig-cap: "ACF on original value (a) and first difference value (b)"
+#| fig-cap: "ACF and PACF"
 #| fig-subcap:
-#|   - ""
+#|   - "ACF on original value"
+#|   - "ACF on first difference value"
+#|   - "PACF on original value"
+#|   - "PACF on first difference value"
 #| layout-ncol: 2
 agg_df <- final_df |> 
             group_by(BankType)|> 
@@ -382,6 +389,9 @@ agg_df <- final_df |>
        
 agg_df |> ACF(x=mean_val,lag_max = 42) |> autoplot()
 agg_df |> ACF(x=mean_diff,lag_max = 42) |> autoplot()
+
+agg_df |> PACF(x=mean_val,lag_max = 42) |> autoplot()
+agg_df |> PACF(x=mean_diff,lag_max = 42) |> autoplot()
 
 ```
 **Dickey–Fuller (ADF) test**
@@ -410,6 +420,6 @@ In summary, based on exploration of the data we will prepare the data for modell
 
 ***Transforming:***
 
-5. Target measure to make it stationary by taking the first difference.
+5. the Target measure to make it stationary. We do this by taking the first difference. 
 
 ## References
