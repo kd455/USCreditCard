@@ -207,16 +207,15 @@ summary_ratios.assets <- function() {
 us_economy <- memoise(function(freq = "M") {
   read_csv(glue("data/US_Economic_Data_{freq}.csv"), show_col_types = FALSE) |>
     mutate(Month = yearmonth(Date)) |>
-    select(-Date) |> na.omit() |> 
-    as_tsibble(index = Month) |>
-    fill_gaps()
+    select(-Date) |> 
+    as_tsibble(index = Month)
 })
 
 us_economy.recession <- memoise(function() {
   read_csv("data/JHDUSRGDPBR_M.csv", col_names = c("Month", "Flag"), show_col_types = FALSE) |>
     na.omit() |>
     as_tsibble(index = Month) |>
-    fill_gaps()
+    fill_gaps(.full = T)
 })
 
 us_economy.psavert <- function() {
