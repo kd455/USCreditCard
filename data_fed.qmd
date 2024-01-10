@@ -15,15 +15,21 @@ source('functions.R')
 
 
 us_measures <- us_economy() |>
-                mutate(B069RC1.Pop = B069RC1/POPTHM) |>
-                mutate(B069RC1.CPI = B069RC1.Pop/PCEPI) |> na.omit()
+                mutate(B069RC1.Pop.CPI =B069RC1/POPTHM/PCEPI) |>
+                mutate(PCEDG.Pop.CPI = PCEDG/POPTHM/PCEPI) |>
+                mutate(PCE.Pop.CPI = PCE/POPTHM/PCEPI) |>
+                mutate(RRSFS.Pop = RRSFS/POPTHM) |> 
+                mutate(A229RC0.CPI = A229RC0/PCEPI) |> 
+                mutate(PSAVE.Pop.CPI = PSAVE/POPTHM/PCEPI) |>
+                select(-c(RRSFS,PSAVE,A229RC0,CPILFESL,CPIAUCSL,DSPI,DSPIC96,B069RC1,PCEDG,PCE,POPTHM,PCEPI))|>
+                na.omit()
 
 recessions <- us_economy.recession() |> 
                 filter(Flag == 1, 
                        yearmonth(Month) >= yearmonth(as.Date('1992-01-01')))
 
 
-overdue30to89 <- credit_card.overdue_3089(T) |> 
+overdue30to89 <- credit_card.overdue_3089(apply_filters = TRUE) |> 
                    summarise(target_mean = mean(Value),
                     target_median = median(Value)) |> na.omit()
 
@@ -37,9 +43,6 @@ overdue30to89.lbank <-  credit_card.overdue_3089(T) |>
                         summarise(target_mean = mean(Value),
                         target_median = median(Value)) |> na.omit()                        
 
-us_measures_scaled <- us_measures |>
-                        mutate(across(!Month, scale))
-
 us_measures_qtr <- us_measures |>
                     mutate(Quarter = yearquarter(Month)) |>
                     filter(Quarter >= yearquarter(get_regulation_cutoff())) |>
@@ -50,23 +53,16 @@ us_measures_qtr <- us_measures |>
 overdue30to89 |> pull(target_mean) |> tseries::adf.test(k=4)
 tseries::adf.test(us_measures_qtr$CSCICP03USM665S, k=4)
 
-######### % change 
-us_measures_qtr_pctchange <- us_measures_qtr |> 
-                                mutate(across(!Quarter, ~difference(.)/lag(.) *100))
+# ######### % change 
+# us_measures_qtr_pctchange <- us_measures_qtr |> 
+#                                 mutate(across(!Quarter, ~difference(.)/lag(.) *100))
 
-overdue30to89_pctchange <- overdue30to89 |> group_by(BankType) |> mutate(across(!Quarter, ~difference(.)/lag(.) *100))
+# overdue30to89_pctchange <- overdue30to89 |> group_by(BankType) |> mutate(across(!Quarter, ~difference(.)/lag(.) *100))
 
-overdue30to89_pctchange |> na.omit() |> autoplot(target_median) + facet_wrap(~BankType)
-us_measures_qtr_pctchange |> select(CSCICP03USM665S) |> autoplot()
+# overdue30to89_pctchange |> na.omit() |> autoplot(target_median) + facet_wrap(~BankType)
+# us_measures_qtr_pctchange |> select(CSCICP03USM665S) |> autoplot()
 
-######### % change 
-
-
-granger_data |> 
-    select(c("target_mean", "target_median", "CSCICP03USM665S")) |>
-    pivot_longer(cols = where(is.numeric)) |>
-    na.omit() |> 
-    autoplot(value) + facet_wrap(~BankType) 
+# ######### % change 
 
 run_granger_test <- function(data, target_variable, exog_variable, order = 4) {
     if (is.numeric(data[[exog_variable]])) {
@@ -74,43 +70,42 @@ run_granger_test <- function(data, target_variable, exog_variable, order = 4) {
     }
 }
 
-granger_data <- overdue30to89 |> left_join (us_measures_qtr,by = join_by(Quarter))
+us_measures_qtr |> names() |>
+        purrr::map(\(x) run_granger_test(overdue30to89 |> left_join (us_measures_qtr,by = join_by(Quarter)), "target_mean", x, 4)) |> list_rbind() |> arrange(`Pr(>F)`) |> filter(`Pr(>F)` <= 0.05)
 
 us_measures_qtr |> names() |>
-        purrr::map(\(x) run_granger_test(overdue30to89 |> left_join (us_measures_qtr,by = join_by(Quarter)), "target_mean", x, 4)) |> list_rbind() |> arrange(`Pr(>F)`) |> slice_head(n=10)
+        purrr::map(\(x) run_granger_test(overdue30to89.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)), "target_mean", x, 4)) |> list_rbind() |> arrange(`Pr(>F)`) |> filter(`Pr(>F)` <= 0.05)
 
 us_measures_qtr |> names() |>
-        purrr::map(\(x) run_granger_test(overdue30to89.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)), "target_mean", x, 4)) |> list_rbind() |> arrange(`Pr(>F)`) |> slice_head(n=6)
+        purrr::map(\(x) run_granger_test(overdue30to89.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)), "target_mean", x, 4)) |> list_rbind() |> arrange(`Pr(>F)`)|> filter(`Pr(>F)` <= 0.05)
 
-us_measures_qtr |> names() |>
-        purrr::map(\(x) run_granger_test(overdue30to89.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)), "target_mean", x, 4)) |> list_rbind() |> arrange(`Pr(>F)`)|> slice_head(n=5)
-        
-
-
-
-
-run_granger_test(granger_data,"target_median", "CSCICP03USM665S")  |>
-    as_tibble() |> na.omit()
 
 #https://davegiles.blogspot.com/2011/04/testing-for-granger-causality.html
 
-us_measures_scaled |> 
+us_measures |> 
+    mutate(across(!Month, scale)) |> 
     na.omit() |>
     pivot_longer(cols = !Month) |>
     autoplot(value)+ facet_wrap(~ name, scales = "free_y" , ncol = 3) +
     theme(strip.text = element_text(size = 14), legend.position = "none") +
     labs(y = "Normalised (Normal=0)") 
 
-us_measures_scaled |> 
+us_measures |> 
+    mutate(across(!Month, scale)) |> 
     na.omit() |>
-    select(PSAVERT,CSCICP03USM665S,B069RC1,B069RC1.CPI,UNRATE) |>
+    select(A229RC0.CPI,PCE.Pop.CPI, RRSFS.Pop,PSAVE.Pop.CPI, PSAVERT,CSCICP03USM665S,PCEDG.Pop.CPI,UNRATE) |>
     pivot_longer(cols = !Month) |>
-    autoplot()+ facet_wrap(~ name, scales = "free_y" , ncol = 1,labeller =  as_labeller(c(PSAVERT= "US Personal Savings Rate \n(PSAVERT)", 
-    CSCICP03USM665S = "US Composite Confidence Indicator \n(CSCICP03USM665S)",
-    B069RC1 = "US Personal interest payment \n(B069RC1)", 
-    B069RC1.CPI = "US Personal interest payment per capita CPI Adjusted \n(B069RC1/POPTHM/CPIAUCSL)",
-    UNRATE = "Unemployment Rate \n(UNRATE)"))) +
-    labs(y = "Normalised (Normal=0)")+
+    autoplot()+ facet_wrap(~ name, scales = "free_y" , ncol = 1,
+    labeller =  as_labeller(c(
+        PSAVE.Pop.CPI = "US Personal Savings: Per capita: CPI adjusted \n(PSAVE/POPTHM/PCEPI)",
+        PSAVERT= "US Personal Savings Rate \n(PSAVERT)", 
+        RRSFS.Pop = "Advance Retail and Food Services Sales Per capita: CPI adjusted \n(RSAFS/POPTHM)",
+        A229RC0.CPI = "Disposable Personal Income: Per capita: CPI adjusted \n(A229RC0/PCEPI)",
+        CSCICP03USM665S = "US Composite Confidence Indicator \n(CSCICP03USM665S)",
+        PCEDG.Pop.CPI = "Personal Consumption Expenditures: Durable Goods per capita CPI Adjusted \n(PCEDG/POPTHM/PCEPI)",
+        PCE.Pop.CPI = "Personal Consumption Expenditures \n(PCE/POPTHM/PCEPI)",
+        UNRATE = "Unemployment Rate \n(UNRATE)"))) +
+        labs(y = "Normalised (Normal=0)")+
     geom_rect(data = recessions,inherit.aes = FALSE, aes(xmin = Month, xmax = Month + 30, ymin = -Inf, ymax = Inf), fill = "lightgrey", alpha = 0.5) +
     labs(title = "Macro Economic Measures (data series id)",
         subtitle = "grey areas indicate recessions",
