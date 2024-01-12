@@ -1,47 +1,30 @@
-
+---
+title: "US Economic Data"
+format: html
+---
 ```{r}
 #| echo: false
 #| warning: false
 source('functions.R')
-```
-```{r}
-#| echo: false
-#| warning: false
-
-#inflation
-#https://aeturrell.github.io/coding-for-economists/time-series.html#adjusting-for-inflation
-#PCEPI
-
-
+                
+granger_test_permutations <- function(data, target_col_name = "target_mean", exog_names, lag_order = 4) {
+    exog_names |>
+        purrr::map(\(x) run_granger_test(data, target_col_name, x, lag_order)) |> list_rbind() |> arrange(`Pr(>F)`) |> filter(`Pr(>F)` <= 0.05)          
+}    
 
 us_measures <- us_economy() |>
-                mutate(B069RC1.Pop.CPI =B069RC1/POPTHM/PCEPI) |>
-                mutate(PCEDG.Pop.CPI = PCEDG/POPTHM/PCEPI) |>
-                mutate(PCE.Pop.CPI = PCE/POPTHM/PCEPI) |>
-                mutate(RRSFS.Pop = RRSFS/POPTHM) |> 
-                mutate(A229RC0.CPI = A229RC0/PCEPI) |> 
-                mutate(PSAVE.Pop.CPI = PSAVE/POPTHM/PCEPI) |>
-                select(-c(RRSFS,PSAVE,A229RC0,CPILFESL,CPIAUCSL,DSPI,DSPIC96,B069RC1,PCEDG,PCE,POPTHM,PCEPI))|>
-                na.omit()
+            mutate(B069RC1.Pop.CPI =B069RC1/POPTHM/PCEPI) |>
+            mutate(PCEDG.Pop.CPI = PCEDG/POPTHM/PCEPI) |>
+            mutate(PCE.Pop.CPI = PCE/POPTHM/PCEPI) |>
+            mutate(RRSFS.Pop = RRSFS/POPTHM) |> 
+            mutate(A229RC0.CPI = A229RC0/PCEPI) |> 
+            mutate(PSAVE.Pop.CPI = PSAVE/POPTHM/PCEPI) |>
+            select(-c(RRSFS,PSAVE,A229RC0,CPILFESL,CPIAUCSL,DSPI,DSPIC96,B069RC1,PCEDG,PCE,POPTHM,PCEPI))|>
+            na.omit()
 
 recessions <- us_economy.recession() |> 
                 filter(Flag == 1, 
-                       yearmonth(Month) >= yearmonth(as.Date('1992-01-01')))
-
-
-overdue30to89 <- credit_card.overdue_3089(apply_filters = TRUE) |> 
-                   summarise(target_mean = mean(Value),
-                    target_median = median(Value)) |> na.omit()
-
-overdue30to89.lcbank <-  credit_card.overdue_3089(T) |> 
-                        filter(BankType == "LargeCreditCardBank") |> 
-                        summarise(target_mean = mean(Value),
-                        target_median = median(Value)) |> na.omit()
-
-overdue30to89.lbank <-  credit_card.overdue_3089(T) |> 
-                        filter(BankType == "LargeBank") |> 
-                        summarise(target_mean = mean(Value),
-                        target_median = median(Value)) |> na.omit()                        
+                    yearmonth(Month) >= yearmonth(as.Date('1992-01-01')))
 
 us_measures_qtr <- us_measures |>
                     mutate(Quarter = yearquarter(Month)) |>
@@ -49,9 +32,12 @@ us_measures_qtr <- us_measures |>
                     index_by(Quarter) |>
                     summarise(across(!Month, mean))
 
+overdue30to89 <- credit_card.overdue30to89.agg(apply_filters = TRUE)
+overdue30to89.lcbank <- credit_card.overdue30to89.agg.lccbank(apply_filters = TRUE)
+overdue30to89.lbank <-  credit_card.overdue30to89.agg.lbank(apply_filters = TRUE)                     
 
-overdue30to89 |> pull(target_mean) |> tseries::adf.test(k=4)
-tseries::adf.test(us_measures_qtr$CSCICP03USM665S, k=4)
+# overdue30to89 |> pull(target_mean) |> tseries::adf.test(k=4)
+# tseries::adf.test(us_measures_qtr$CSCICP03USM665S, k=4)
 
 # ######### % change 
 # us_measures_qtr_pctchange <- us_measures_qtr |> 
@@ -63,25 +49,90 @@ tseries::adf.test(us_measures_qtr$CSCICP03USM665S, k=4)
 # us_measures_qtr_pctchange |> select(CSCICP03USM665S) |> autoplot()
 
 # ######### % change 
+```
+## Granger Test
 
-run_granger_test <- function(data, target_variable, exog_variable, order = 4) {
-    if (is.numeric(data[[exog_variable]])) {
-            grangertest(data[[target_variable]], data[[exog_variable]], order = order) |> as_tibble() |> na.omit() |> tibble::add_column(exog_variable)
-    }
-}
+Checks that the lagged values of X jointly improve the forecast of Y
 
-us_measures_qtr |> names() |>
-        purrr::map(\(x) run_granger_test(overdue30to89 |> left_join (us_measures_qtr,by = join_by(Quarter)), "target_mean", x, 4)) |> list_rbind() |> arrange(`Pr(>F)`) |> filter(`Pr(>F)` <= 0.05)
-
-us_measures_qtr |> names() |>
-        purrr::map(\(x) run_granger_test(overdue30to89.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)), "target_mean", x, 4)) |> list_rbind() |> arrange(`Pr(>F)`) |> filter(`Pr(>F)` <= 0.05)
-
-us_measures_qtr |> names() |>
-        purrr::map(\(x) run_granger_test(overdue30to89.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)), "target_mean", x, 4)) |> list_rbind() |> arrange(`Pr(>F)`)|> filter(`Pr(>F)` <= 0.05)
+When choosing lags, note that there is a trade-off between bias and power. With too few lags the test may be biased because of residual auto-correlation. Too many, and you risk spurious rejections of the null because of random correlations
 
 
-#https://davegiles.blogspot.com/2011/04/testing-for-granger-causality.html
+::: {#fig-granger .panel-tabset}
 
+## Target Mean
+
+```{r}
+#| warning: false
+#| error: false
+#| label: tbl-granger-mean
+#| tbl-cap: "Granger Test"
+#| layout-ncol: 4
+data_combined <- overdue30to89 |> left_join (us_measures_qtr,by = join_by(Quarter))
+
+1:4 |> purrr::map(\(x) granger_test_permutations(data = data_combined, 
+                            target_col_name = "target_mean",
+                            exog_names = names(us_measures_qtr),
+                            x)) |> knitr::kable(format = "html")  
+
+data <- overdue30to89.lbank |> left_join (us_measures_qtr,by = join_by(Quarter))
+data <- overdue30to89.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter))
+
+
+# granger_test_permutations("target_mean", plot_type = 1, lag_order = 1)  
+# granger_test_permutations("target_mean", plot_type = 2, lag_order = 1)  
+# granger_test_permutations("target_mean", plot_type = 3, lag_order = 1)  
+
+# granger_test_permutations("target_mean", plot_type = 1, lag_order = 2)  
+# granger_test_permutations("target_mean", plot_type = 2, lag_order = 2)  
+# granger_test_permutations("target_mean", plot_type = 3, lag_order = 2)  
+
+# granger_test_permutations("target_mean", plot_type = 1, lag_order = 3)  
+# granger_test_permutations("target_mean", plot_type = 2, lag_order = 3)  
+# granger_test_permutations("target_mean", plot_type = 3, lag_order = 3)  
+
+```
+## Target Median
+```{r}
+#| warning: false
+#| error: false
+#| label: tbl-granger-median
+#| tbl-cap: "Granger Test"
+#| tbl-subcap:
+#|   - "Combined"
+#|   - "Large Banks"
+#|   - "Large Credit Card Banks"
+#| layout-ncol: 1
+# granger_test_permutations("target_median", plot_type = 1)  
+# granger_test_permutations("target_median", plot_type = 2)  
+# granger_test_permutations("target_median", plot_type = 3)  
+```
+
+:::
+
+## CCF 
+```{r}
+#| warning: false
+#| error: false
+#| label: fig-ccf
+
+run_ccf_test(data = overdue30to89 |> left_join (us_measures_qtr,by = join_by(Quarter)),
+             target_variable = "target_mean",
+             exog_variable = "PCEDG.Pop.CPI",
+             do_difference = TRUE)
+
+run_ccf_test(data = overdue30to89 |> left_join (us_measures_qtr,by = join_by(Quarter)),
+             target_variable = "target_median",
+             exog_variable = "PCEDG.Pop.CPI",
+             do_difference = TRUE)             
+#us_measures_qtr |> names() |> purrr::map(\(x) run_ccf_test(overdue30to89 |> left_join (us_measures_qtr,by = join_by(Quarter)), "target_mean", x, 4))
+
+```
+
+
+```{r}
+#| warning: false
+#| error: false
+#| eval: false
 us_measures |> 
     mutate(across(!Month, scale)) |> 
     na.omit() |>
@@ -114,4 +165,3 @@ us_measures |>
     xlab("")
         
 ```
-

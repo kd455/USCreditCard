@@ -107,6 +107,26 @@ credit_card.overdue_3089 <- memoise(function(apply_filters = FALSE) {
     .measure_to_tsibble("UBPRE524")
 })
 
+credit_card.overdue30to89.agg  <- function(apply_filters = TRUE) {
+  credit_card.overdue_3089(apply_filters) |> 
+    summarise(target_mean = mean(Value),
+            target_median = median(Value)) |> na.omit()
+}
+
+credit_card.overdue30to89.agg.lbank  <- function(apply_filters = TRUE) {
+  credit_card.overdue_3089(apply_filters) |> 
+    filter(BankType == "LargeBank") |> 
+    summarise(target_mean = mean(Value),
+              target_median = median(Value)) |> na.omit()
+}
+
+credit_card.overdue30to89.agg.lccbank  <- function(apply_filters = TRUE) {
+  credit_card.overdue_3089(apply_filters) |> 
+    filter(BankType == "LargeCreditCardBank") |> 
+    summarise(target_mean = mean(Value),
+              target_median = median(Value)) |> na.omit()
+}
+
 #'Unused Commitments on Credit Cards
 #' 
 #' The unused portions of all commitments to extend credit both to individuals for household, family, and other personal 
@@ -444,3 +464,17 @@ partnership.plot <- function(name, old, new, acquired, available, selected_measu
     #ggsave(glue("images/{name}_{measures_label}_{value_name}_{trend_calc}_partnership.png"), width = 16, height = nrow(measures)*4, dpi = 300)
 }
 
+run_granger_test <- function(data, target_variable, exog_variable, order = 4) {
+    if (is.numeric(data[[exog_variable]])) {
+        grangertest(data[[target_variable]], data[[exog_variable]], order = order) |> as_tibble() |> na.omit() |> tibble::add_column(exog_variable)
+    }
+}
+
+run_ccf_test <- function(data, target_variable, exog_variable, do_difference = TRUE) {
+    if (is.numeric(data[[exog_variable]])) {
+        if(do_difference) {
+            data <- data |> mutate(across(!Quarter, ~difference(.)))                
+        }
+        feasts::CCF(y = !!as.name(target_variable), x = !!as.name(exog_variable), .data = data) |> autoplot() + labs(subtitle = {exog_variable})
+    }
+}
