@@ -369,7 +369,7 @@ final_df |> na.omit() |> pull(value_diff) |> Box.test(lag = 10, type = "Ljung")
 
     Autocorrelation, the correlation between the timeseries and its own lagged values, can inform a moving average (MA) Model. If we additionally look at the partial autocorrelation, the correlation after removing the effect of any correlations due to the terms at shorter lags (see @fig-acf-3 and @fig-acf-4)
     
-    @fig-acf indicate a Seasonal-ARMA process as both ACF and PACF are declining gradually around every 4th lag.
+    @fig-acf for *Large Credit Card Banks* we see a Seasonal-ARMA process as both ACF and PACF are declining gradually around every 4th lag. This confirms what we saw in @fig-lfeature-3.
 
 ```{r}
 #| warning: false

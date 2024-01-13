@@ -1,0 +1,10 @@
+Name,Desc,Formula,Category
+UNRATE,Unemployment Rate,UNRATE,Income & Savings
+PSAVERT,US Personal Savings Rate,PSAVERT,Income & Savings
+CSCICP03USM665S,US Composite Confidence Indicator,CSCICP03USM665S,Payments & Expenditures
+B069RC1.Pop.CPI,Personal interest payments Per capita: CPI adjusted,B069RC1/POPTHM/PCEPI,Payments & Expenditures
+PCEDG.Pop.CPI,Personal Consumption Expenditures: Durable Goods per capita CPI Adjusted,PCEDG/POPTHM/PCEPI,Payments & Expenditures
+PCE.Pop.CPI,Personal Consumption Expenditures Per capita: CPI adjusted,PCE/POPTHM/PCEPI,Payments & Expenditures
+RRSFS.Pop,Advance Retail and Food Services Sales Per capita: CPI adjusted,RSAFS/POPTHM,Payments & Expenditures
+A229RC0.CPI,Disposable Personal Income: Per capita: CPI adjusted,A229RC0/PCEPI,Income & Savings
+PSAVE.Pop.CPI,US Personal Savings: Per capita: CPI adjusted,PSAVE/POPTHM/PCEPI,Income & Savings

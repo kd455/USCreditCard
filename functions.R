@@ -59,18 +59,21 @@ summary_ratios <- memoise(function() {
   .read_ubpr("data/UBPR_Ratios_V.parquet") 
 })
 
-credit_card <- memoise(function(apply_filters = FALSE) {
-  if(apply_filters) {
-    .read_ubpr("data/UBPR_CreditCard_V.parquet") |>
-      filter(BankType %in% c("LargeBank","LargeCreditCardBank")) |>
-      tsibble::group_by_key() |>
-      filter(Value != 0) |>
-      slice(3:n()) |>
-      fill_gaps()  |> 
-      filter_index(get_regulation_cutoff() ~ .)
+credit_card <- memoise(function(apply_bank_filters = FALSE, post_regulation = FALSE) {
+  if(apply_bank_filters) {
+    data <- .read_ubpr("data/UBPR_CreditCard_V.parquet") |>
+              filter(BankType %in% c("LargeBank","LargeCreditCardBank")) |>
+              tsibble::group_by_key() |>
+              filter(Value != 0) |>
+              slice(3:n()) |>
+              fill_gaps() 
   } else {
-    .read_ubpr("data/UBPR_CreditCard_V.parquet") 
+    data <- .read_ubpr("data/UBPR_CreditCard_V.parquet") 
   }
+  if (post_regulation) {
+    data <- data |> filter_index(get_regulation_cutoff() ~ .)
+  }
+  data
 })
 
 get_regulation_cutoff <- function(f = "Q") {
@@ -102,29 +105,29 @@ credit_card.data_types_ref <- function() {
 #' 
 #' Credit card loans that are 30-89 days past due divided by total credit card loans.
 #' 
-credit_card.overdue_3089 <- memoise(function(apply_filters = FALSE) {
-  credit_card(apply_filters) |>
+credit_card.overdue_3089 <- memoise(function(apply_bank_filters = FALSE, post_regulation = FALSE) {
+  credit_card(apply_bank_filters, post_regulation) |>
     .measure_to_tsibble("UBPRE524")
 })
 
-credit_card.overdue30to89.agg  <- function(apply_filters = TRUE) {
-  credit_card.overdue_3089(apply_filters) |> 
-    summarise(target_mean = mean(Value),
-            target_median = median(Value)) |> na.omit()
+credit_card.overdue30to89.agg  <- function(apply_bank_filters = FALSE, post_regulation = FALSE) {
+  credit_card.overdue_3089(apply_bank_filters, post_regulation) |> 
+    summarise(target_mean = mean(Value, na.rm = TRUE),
+            target_median = median(Value, na.rm = TRUE)) 
 }
 
-credit_card.overdue30to89.agg.lbank  <- function(apply_filters = TRUE) {
-  credit_card.overdue_3089(apply_filters) |> 
+credit_card.overdue30to89.agg.lbank  <- function(apply_bank_filters = FALSE, post_regulation = FALSE) {
+  credit_card.overdue_3089(apply_bank_filters, post_regulation) |> 
     filter(BankType == "LargeBank") |> 
-    summarise(target_mean = mean(Value),
-              target_median = median(Value)) |> na.omit()
+    summarise(target_mean = mean(Value, na.rm = TRUE),
+              target_median = median(Value, na.rm = TRUE))
 }
 
-credit_card.overdue30to89.agg.lccbank  <- function(apply_filters = TRUE) {
-  credit_card.overdue_3089(apply_filters) |> 
+credit_card.overdue30to89.agg.lccbank  <- function(apply_bank_filters = FALSE, post_regulation = FALSE) {
+  credit_card.overdue_3089(apply_bank_filters, post_regulation) |> 
     filter(BankType == "LargeCreditCardBank") |> 
-    summarise(target_mean = mean(Value),
-              target_median = median(Value)) |> na.omit()
+    summarise(target_mean = mean(Value, na.rm = TRUE),
+              target_median = median(Value, na.rm = TRUE))
 }
 
 #'Unused Commitments on Credit Cards
@@ -132,8 +135,8 @@ credit_card.overdue30to89.agg.lccbank  <- function(apply_filters = TRUE) {
 #' The unused portions of all commitments to extend credit both to individuals for household, family, and other personal 
 #' expenditures and to other customers, including commercial or industrial enterprises, through credit cards.
 #' 
-credit_card.unused <- function(apply_filters = FALSE) {
-  credit_card(apply_filters) |>
+credit_card.unused <- function(apply_bank_filters = FALSE, post_regulation = FALSE) {
+  credit_card(apply_bank_filters,post_regulation) |>
     .measure_to_tsibble("UBPR3815")
 }
 
@@ -143,8 +146,8 @@ credit_card.unused <- function(apply_filters = FALSE) {
 #' expenditures and to other customers, including commercial or industrial enterprises, through credit cards divided by total
 #' assets.
 #' 
-credit_card.unused_ratio <- function(apply_filters = FALSE) {
-  credit_card(apply_filters) |>
+credit_card.unused_ratio <- function(apply_bank_filters = FALSE, post_regulation = FALSE) {
+  credit_card(apply_bank_filters,post_regulation) |>
     .measure_to_tsibble("UBPRE263")
 }
 
@@ -153,13 +156,13 @@ credit_card.unused_ratio <- function(apply_filters = FALSE) {
 #' Loans to Individuals for Household, Family, and Other Personal Expenditures 
 #' (I.E., Consumer Loans)(Includes Purchased Paper): Credit Cards
 #' 
-credit_card.loan_amount <- function(apply_filters = FALSE) {
-  credit_card(apply_filters) |>
+credit_card.loan_amount <- function(apply_bank_filters = FALSE, post_regulation = FALSE) {
+  credit_card(apply_bank_filters,post_regulation) |>
     .measure_to_tsibble("UBPRB538") 
 }
 
-credit_card.loan_proportion <- function(apply_filters = FALSE) {
-  credit_card(apply_filters) |>
+credit_card.loan_proportion <- function(apply_bank_filters = FALSE, post_regulation = FALSE) {
+  credit_card(apply_bank_filters,post_regulation) |>
     .measure_to_tsibble("UBPRE425")
 }
 
@@ -466,7 +469,7 @@ partnership.plot <- function(name, old, new, acquired, available, selected_measu
 
 run_granger_test <- function(data, target_variable, exog_variable, order = 4) {
     if (is.numeric(data[[exog_variable]])) {
-        grangertest(data[[target_variable]], data[[exog_variable]], order = order) |> as_tibble() |> na.omit() |> tibble::add_column(exog_variable)
+        lmtest::grangertest(data[[target_variable]], data[[exog_variable]], order = order) |> as_tibble() |> na.omit() |> tibble::add_column(exog_variable)
     }
 }
 
@@ -478,3 +481,36 @@ run_ccf_test <- function(data, target_variable, exog_variable, do_difference = T
         feasts::CCF(y = !!as.name(target_variable), x = !!as.name(exog_variable), .data = data) |> autoplot() + labs(subtitle = {exog_variable})
     }
 }
+
+us_economy.labels <- function() {
+    read_csv("data/us_economy_labels.csv", show_col_types = FALSE)
+}
+
+plot_us_category <- function(category, us_measures, target_data, target_measure = "target_median") {
+    target_label <-credit_card.target_label()
+    index_var <- index_var(us_measures)
+    recessions <- us_economy.recession() |> 
+                    filter(Flag == 1, 
+                           Month >= ym("1989-10"))                          
+    
+    us_measures |> na.omit() |>
+        mutate(across(!as.name(index_var), scale)) |> 
+        pivot_longer(cols = !Quarter) |>
+        left_join(us_economy.labels(), by = join_by(name==Name)) |>
+        filter(Category == category) |>
+        mutate(comb_label = paste(name, "-", Desc, "(", Formula, ")")) |>
+        ggplot(aes(x = Quarter, y = value, color = comb_label)) + 
+        geom_line() +
+        theme(legend.direction = "vertical",legend.position = "top", legend.title=element_blank(),
+            plot.title = element_markdown(size=11)) +
+        labs(y = "Normalised (Normal=0)",
+            title = glue("{category} measures against <span style='color:darkslategrey'>**{target_label}**</span>"),
+            subtitle = "Recessions shown in boxed area") +     
+        geom_rect(data = recessions,inherit.aes = FALSE, 
+                  aes(xmin = Month, xmax = Month + 30, ymin = -Inf, ymax = Inf), fill = "lightgrey", alpha = 0.5) +
+        geom_line(mapping = aes(y = !!as.name(target_measure)), data = target_data,
+                  colour = 'darkslategrey') +
+        geom_vline(xintercept = as.numeric(yq(get_regulation_cutoff())), linetype=1,colour="darkred") +
+        annotate("text", x=as.numeric(yq(get_regulation_cutoff())), y=2.75, size = 8/.pt, label="Credit Card Regulations",hjust = 1, color = "darkred")             
+}
+

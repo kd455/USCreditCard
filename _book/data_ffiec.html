@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>US Credit Card - 2&nbsp; Bank Data</title>
+<title>US Credit Card Partnerships - 2&nbsp; Bank Data</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -142,7 +142,7 @@ div.csl-indent {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">US Credit Card</a> 
+      <a href="./">US Credit Card Partnerships</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -194,27 +194,14 @@ div.csl-indent {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./data_fed.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">data_fed.html</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">US Economic Data</span></span></a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
- <span class="menu-text">Models</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./event.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Event study</span></span></a>
-  </div>
-</li>
-      </ul>
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Models</span></span>
   </li>
     </ul>
     </div>
@@ -1460,7 +1447,7 @@ Note
 </div>
 </div>
 </div>
-<p>From these plots we can see that there are a few banks that started their credit card businesses after 2010 Q2 (or started reporting our target measure). These series begin at 0 and sharply increase after the first or second quarter. Considering it takes 30+ days for credit cards to become delinquent this pattern is expected. However, for modelling we may want to drop the first few quarters to remove the impact of this initial sharp increase and reflect the ongoing state.</p>
+<p>From these plots we can see that there are a few banks that started their credit card businesses after 2010 Q2 (or started reporting our target measure). These series begin at 0 and sharply increase after the first or second quarter. This pattern is expected considering it takes 30+ days for credit cards to become delinquent. However, for modelling we may want to drop the first few quarters to remove the impact of this initial sharp increase and reflect the ongoing state.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -1949,7 +1936,9 @@ X-squared = 380.41, df = 10, p-value &lt; 2.2e-16</code></pre>
 </div>
 </div>
 <ol start="7" type="1">
-<li><a href="#fig-lfeature-8">Figure&nbsp;<span>2.7 (h)</span></a> <em>Large Credit Card Banks</em> is not stationary i.e.&nbsp;the statistical properties of the time series changes, which makes it difficult to identify trends and patterns. Performing a difference i.e.&nbsp;to get the quarterly change in UBPRE524, makes the series stationary as shown in <a href="#fig-acf">Figure&nbsp;<span>2.9</span></a>. This can be confirmed by performing an augmented Dickey–Fuller (ADF) test on the differenced value. We also see that, post differencing, there are autocorrelation coefficients above the significance threshold. This is likely due to seasonality as these are at regular intervals. The decreasing magnitude of these coefficients tell us the earlier lags have a stronger influence than values further in the past.</li>
+<li><p><a href="#fig-lfeature-8">Figure&nbsp;<span>2.7 (h)</span></a> <em>Large Credit Card Banks</em> is not stationary i.e.&nbsp;the statistical properties of the time series changes, which makes it difficult to identify trends and patterns. Performing a difference i.e.&nbsp;to get the quarterly change in UBPRE524, makes the series stationary as shown in <a href="#fig-acf-2">Figure&nbsp;<span>2.9 (b)</span></a>. This can be confirmed by performing an augmented Dickey–Fuller (ADF) test on the differenced value. We also see that, post differencing, there are autocorrelation coefficients above the significance threshold. This is likely due to seasonality as these are at regular intervals. The decreasing magnitude of these coefficients tell us the earlier lags have a stronger influence than values further in the past.</p>
+<p>Autocorrelation, the correlation between the timeseries and its own lagged values, can inform a moving average (MA) Model. If we additionally look at the partial autocorrelation, the correlation after removing the effect of any correlations due to the terms at shorter lags (see <a href="#fig-acf-3">Figure&nbsp;<span>2.9 (c)</span></a> and <a href="#fig-acf-4">Figure&nbsp;<span>2.9 (d)</span></a>)</p>
+<p><a href="#fig-acf">Figure&nbsp;<span>2.9</span></a> for <em>Large Credit Card Banks</em> we see a Seasonal-ARMA process as both ACF and PACF are declining gradually around every 4th lag. This confirms what we saw in <a href="#fig-lfeature-3">Figure&nbsp;<span>2.7 (c)</span></a>.</p></li>
 </ol>
 <div>
 <details>
@@ -1960,7 +1949,10 @@ X-squared = 380.41, df = 10, p-value &lt; 2.2e-16</code></pre>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">mean_diff =</span> <span class="fu">mean</span>(value_diff, <span class="at">na.rm=</span>T)) </span>
 <span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>       </span>
 <span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">ACF</span>(<span class="at">x=</span>mean_val,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">ACF</span>(<span class="at">x=</span>mean_diff,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">ACF</span>(<span class="at">x=</span>mean_diff,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">PACF</span>(<span class="at">x=</span>mean_val,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">PACF</span>(<span class="at">x=</span>mean_diff,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div id="fig-acf" class="cell quarto-layout-panel">
 <figure class="figure">
@@ -1969,7 +1961,7 @@ X-squared = 380.41, df = 10, p-value &lt; 2.2e-16</code></pre>
 <div id="fig-acf-1" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="data_ffiec_files/figure-html/fig-acf-1.png" class="img-fluid figure-img" data-ref-parent="fig-acf" width="672"></p>
-<figcaption class="figure-caption">(a)</figcaption>
+<figcaption class="figure-caption">(a) ACF on original value</figcaption>
 </figure>
 </div>
 </div>
@@ -1977,12 +1969,30 @@ X-squared = 380.41, df = 10, p-value &lt; 2.2e-16</code></pre>
 <div id="fig-acf-2" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="data_ffiec_files/figure-html/fig-acf-2.png" class="img-fluid figure-img" data-ref-parent="fig-acf" width="672"></p>
-<figcaption class="figure-caption">(b)</figcaption>
+<figcaption class="figure-caption">(b) ACF on first difference value</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p></p><figcaption class="figure-caption">Figure&nbsp;2.9: ACF on original value (a) and first difference value (b)</figcaption><p></p>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell quarto-layout-cell-subref" style="flex-basis: 50.0%;justify-content: center;">
+<div id="fig-acf-3" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="data_ffiec_files/figure-html/fig-acf-3.png" class="img-fluid figure-img" data-ref-parent="fig-acf" width="672"></p>
+<figcaption class="figure-caption">(c) PACF on original value</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display quarto-layout-cell quarto-layout-cell-subref" style="flex-basis: 50.0%;justify-content: center;">
+<div id="fig-acf-4" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="data_ffiec_files/figure-html/fig-acf-4.png" class="img-fluid figure-img" data-ref-parent="fig-acf" width="672"></p>
+<figcaption class="figure-caption">(d) PACF on first difference value</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p></p><figcaption class="figure-caption">Figure&nbsp;2.9: ACF and PACF</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -2019,7 +2029,7 @@ alternative hypothesis: stationary</code></pre>
 </ol>
 <p><strong><em>Transforming:</em></strong></p>
 <ol start="5" type="1">
-<li>Target measure to make it stationary by taking the first difference.</li>
+<li>the Target measure to make it stationary. We do this by taking the first difference.</li>
 </ol>
 </section>
 <section id="references" class="level2" data-number="2.7">
@@ -2577,7 +2587,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb20-243"><a href="#cb20-243" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb20-244"><a href="#cb20-244" aria-hidden="true" tabindex="-1"></a>::: </span>
 <span id="cb20-245"><a href="#cb20-245" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-246"><a href="#cb20-246" aria-hidden="true" tabindex="-1"></a>From these plots we can see that there are a few banks that started their credit card businesses after 2010 Q2 (or started reporting our target measure). These series begin at 0 and sharply increase after the first or second quarter. Considering it takes 30+ days for credit cards to become delinquent this pattern is expected. However, for modelling we may want to drop the first few quarters to remove the impact of this initial sharp increase and reflect the ongoing state.</span>
+<span id="cb20-246"><a href="#cb20-246" aria-hidden="true" tabindex="-1"></a>From these plots we can see that there are a few banks that started their credit card businesses after 2010 Q2 (or started reporting our target measure). These series begin at 0 and sharply increase after the first or second quarter. This pattern is expected considering it takes 30+ days for credit cards to become delinquent. However, for modelling we may want to drop the first few quarters to remove the impact of this initial sharp increase and reflect the ongoing state.</span>
 <span id="cb20-247"><a href="#cb20-247" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-250"><a href="#cb20-250" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb20-251"><a href="#cb20-251" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
@@ -2717,54 +2727,64 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb20-397"><a href="#cb20-397" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb20-398"><a href="#cb20-398" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-399"><a href="#cb20-399" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-400"><a href="#cb20-400" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>@fig-lfeature-8 *Large Credit Card Banks* is not stationary i.e. the statistical properties of the time series changes, which makes it difficult to identify trends and patterns. Performing a difference i.e. to get the quarterly change in UBPRE524, makes the series stationary as shown in @fig-acf. This can be confirmed by performing an augmented Dickey–Fuller (ADF) test on the differenced value. We also see that, post differencing, there are autocorrelation coefficients above the significance threshold. This is likely due to seasonality as these are at regular intervals. The decreasing magnitude of these coefficients tell us the earlier lags have a stronger influence than values further in the past.</span>
+<span id="cb20-400"><a href="#cb20-400" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>@fig-lfeature-8 *Large Credit Card Banks* is not stationary i.e. the statistical properties of the time series changes, which makes it difficult to identify trends and patterns. Performing a difference i.e. to get the quarterly change in UBPRE524, makes the series stationary as shown in @fig-acf-2. This can be confirmed by performing an augmented Dickey–Fuller (ADF) test on the differenced value. We also see that, post differencing, there are autocorrelation coefficients above the significance threshold. This is likely due to seasonality as these are at regular intervals. The decreasing magnitude of these coefficients tell us the earlier lags have a stronger influence than values further in the past.</span>
 <span id="cb20-401"><a href="#cb20-401" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-404"><a href="#cb20-404" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-405"><a href="#cb20-405" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb20-406"><a href="#cb20-406" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
-<span id="cb20-407"><a href="#cb20-407" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-acf</span></span>
-<span id="cb20-408"><a href="#cb20-408" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "ACF on original value (a) and first difference value (b)"</span></span>
-<span id="cb20-409"><a href="#cb20-409" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap:</span></span>
-<span id="cb20-410"><a href="#cb20-410" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - ""</span></span>
-<span id="cb20-411"><a href="#cb20-411" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 2</span></span>
-<span id="cb20-412"><a href="#cb20-412" aria-hidden="true" tabindex="-1"></a>agg_df <span class="ot">&lt;-</span> final_df <span class="sc">|&gt;</span> </span>
-<span id="cb20-413"><a href="#cb20-413" aria-hidden="true" tabindex="-1"></a>            <span class="fu">group_by</span>(BankType)<span class="sc">|&gt;</span> </span>
-<span id="cb20-414"><a href="#cb20-414" aria-hidden="true" tabindex="-1"></a>            <span class="fu">summarise</span>(<span class="at">mean_val =</span> <span class="fu">mean</span>(Value, <span class="at">na.rm=</span>T),</span>
-<span id="cb20-415"><a href="#cb20-415" aria-hidden="true" tabindex="-1"></a>                      <span class="at">mean_diff =</span> <span class="fu">mean</span>(value_diff, <span class="at">na.rm=</span>T)) </span>
-<span id="cb20-416"><a href="#cb20-416" aria-hidden="true" tabindex="-1"></a>       </span>
-<span id="cb20-417"><a href="#cb20-417" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">ACF</span>(<span class="at">x=</span>mean_val,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
-<span id="cb20-418"><a href="#cb20-418" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">ACF</span>(<span class="at">x=</span>mean_diff,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
-<span id="cb20-419"><a href="#cb20-419" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-420"><a href="#cb20-420" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-421"><a href="#cb20-421" aria-hidden="true" tabindex="-1"></a>**Dickey–Fuller (ADF) test**</span>
-<span id="cb20-422"><a href="#cb20-422" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-423"><a href="#cb20-423" aria-hidden="true" tabindex="-1"></a>::: {.border}</span>
-<span id="cb20-426"><a href="#cb20-426" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-427"><a href="#cb20-427" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb20-428"><a href="#cb20-428" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-429"><a href="#cb20-429" aria-hidden="true" tabindex="-1"></a>final_df <span class="sc">|&gt;</span> <span class="fu">na.omit</span>() <span class="sc">|&gt;</span> <span class="fu">pull</span>(value_diff) <span class="sc">|&gt;</span> tseries<span class="sc">::</span><span class="fu">adf.test</span>()</span>
+<span id="cb20-402"><a href="#cb20-402" aria-hidden="true" tabindex="-1"></a>    Autocorrelation, the correlation between the timeseries and its own lagged values, can inform a moving average (MA) Model. If we additionally look at the partial autocorrelation, the correlation after removing the effect of any correlations due to the terms at shorter lags (see @fig-acf-3 and @fig-acf-4)</span>
+<span id="cb20-403"><a href="#cb20-403" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-404"><a href="#cb20-404" aria-hidden="true" tabindex="-1"></a>    @fig-acf for *Large Credit Card Banks* we see a Seasonal-ARMA process as both ACF and PACF are declining gradually around every 4th lag. This confirms what we saw in @fig-lfeature-3.</span>
+<span id="cb20-405"><a href="#cb20-405" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-408"><a href="#cb20-408" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb20-409"><a href="#cb20-409" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb20-410"><a href="#cb20-410" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
+<span id="cb20-411"><a href="#cb20-411" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-acf</span></span>
+<span id="cb20-412"><a href="#cb20-412" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "ACF and PACF"</span></span>
+<span id="cb20-413"><a href="#cb20-413" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap:</span></span>
+<span id="cb20-414"><a href="#cb20-414" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "ACF on original value"</span></span>
+<span id="cb20-415"><a href="#cb20-415" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "ACF on first difference value"</span></span>
+<span id="cb20-416"><a href="#cb20-416" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "PACF on original value"</span></span>
+<span id="cb20-417"><a href="#cb20-417" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "PACF on first difference value"</span></span>
+<span id="cb20-418"><a href="#cb20-418" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 2</span></span>
+<span id="cb20-419"><a href="#cb20-419" aria-hidden="true" tabindex="-1"></a>agg_df <span class="ot">&lt;-</span> final_df <span class="sc">|&gt;</span> </span>
+<span id="cb20-420"><a href="#cb20-420" aria-hidden="true" tabindex="-1"></a>            <span class="fu">group_by</span>(BankType)<span class="sc">|&gt;</span> </span>
+<span id="cb20-421"><a href="#cb20-421" aria-hidden="true" tabindex="-1"></a>            <span class="fu">summarise</span>(<span class="at">mean_val =</span> <span class="fu">mean</span>(Value, <span class="at">na.rm=</span>T),</span>
+<span id="cb20-422"><a href="#cb20-422" aria-hidden="true" tabindex="-1"></a>                      <span class="at">mean_diff =</span> <span class="fu">mean</span>(value_diff, <span class="at">na.rm=</span>T)) </span>
+<span id="cb20-423"><a href="#cb20-423" aria-hidden="true" tabindex="-1"></a>       </span>
+<span id="cb20-424"><a href="#cb20-424" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">ACF</span>(<span class="at">x=</span>mean_val,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
+<span id="cb20-425"><a href="#cb20-425" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">ACF</span>(<span class="at">x=</span>mean_diff,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
+<span id="cb20-426"><a href="#cb20-426" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-427"><a href="#cb20-427" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">PACF</span>(<span class="at">x=</span>mean_val,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
+<span id="cb20-428"><a href="#cb20-428" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">PACF</span>(<span class="at">x=</span>mean_diff,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
+<span id="cb20-429"><a href="#cb20-429" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-430"><a href="#cb20-430" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-431"><a href="#cb20-431" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb20-431"><a href="#cb20-431" aria-hidden="true" tabindex="-1"></a>**Dickey–Fuller (ADF) test**</span>
 <span id="cb20-432"><a href="#cb20-432" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-433"><a href="#cb20-433" aria-hidden="true" tabindex="-1"></a><span class="fu">## Summary</span></span>
-<span id="cb20-434"><a href="#cb20-434" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-435"><a href="#cb20-435" aria-hidden="true" tabindex="-1"></a>In summary, based on exploration of the data we will prepare the data for modelling by:</span>
-<span id="cb20-436"><a href="#cb20-436" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-437"><a href="#cb20-437" aria-hidden="true" tabindex="-1"></a>***Selecting:***</span>
+<span id="cb20-433"><a href="#cb20-433" aria-hidden="true" tabindex="-1"></a>::: {.border}</span>
+<span id="cb20-436"><a href="#cb20-436" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb20-437"><a href="#cb20-437" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
 <span id="cb20-438"><a href="#cb20-438" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-439"><a href="#cb20-439" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Target measure: *`r target_label`* (UBPRE524).</span>
-<span id="cb20-440"><a href="#cb20-440" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Banks: *Large Banks* and *Large Credit Card* Banks.</span>
-<span id="cb20-441"><a href="#cb20-441" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Date Period: from 2010 Q2.</span>
+<span id="cb20-439"><a href="#cb20-439" aria-hidden="true" tabindex="-1"></a>final_df <span class="sc">|&gt;</span> <span class="fu">na.omit</span>() <span class="sc">|&gt;</span> <span class="fu">pull</span>(value_diff) <span class="sc">|&gt;</span> tseries<span class="sc">::</span><span class="fu">adf.test</span>()</span>
+<span id="cb20-440"><a href="#cb20-440" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb20-441"><a href="#cb20-441" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb20-442"><a href="#cb20-442" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-443"><a href="#cb20-443" aria-hidden="true" tabindex="-1"></a>***Removing:***</span>
+<span id="cb20-443"><a href="#cb20-443" aria-hidden="true" tabindex="-1"></a><span class="fu">## Summary</span></span>
 <span id="cb20-444"><a href="#cb20-444" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-445"><a href="#cb20-445" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Outlier data points: first 2 quarters.</span>
+<span id="cb20-445"><a href="#cb20-445" aria-hidden="true" tabindex="-1"></a>In summary, based on exploration of the data we will prepare the data for modelling by:</span>
 <span id="cb20-446"><a href="#cb20-446" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-447"><a href="#cb20-447" aria-hidden="true" tabindex="-1"></a>***Transforming:***</span>
+<span id="cb20-447"><a href="#cb20-447" aria-hidden="true" tabindex="-1"></a>***Selecting:***</span>
 <span id="cb20-448"><a href="#cb20-448" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-449"><a href="#cb20-449" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>Target measure to make it stationary by taking the first difference.</span>
-<span id="cb20-450"><a href="#cb20-450" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-451"><a href="#cb20-451" aria-hidden="true" tabindex="-1"></a><span class="fu">## References</span></span>
+<span id="cb20-449"><a href="#cb20-449" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Target measure: *`r target_label`* (UBPRE524).</span>
+<span id="cb20-450"><a href="#cb20-450" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Banks: *Large Banks* and *Large Credit Card* Banks.</span>
+<span id="cb20-451"><a href="#cb20-451" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Date Period: from 2010 Q2.</span>
+<span id="cb20-452"><a href="#cb20-452" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-453"><a href="#cb20-453" aria-hidden="true" tabindex="-1"></a>***Removing:***</span>
+<span id="cb20-454"><a href="#cb20-454" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-455"><a href="#cb20-455" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Outlier data points: first 2 quarters.</span>
+<span id="cb20-456"><a href="#cb20-456" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-457"><a href="#cb20-457" aria-hidden="true" tabindex="-1"></a>***Transforming:***</span>
+<span id="cb20-458"><a href="#cb20-458" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-459"><a href="#cb20-459" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>the Target measure to make it stationary. We do this by taking the first difference. </span>
+<span id="cb20-460"><a href="#cb20-460" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-461"><a href="#cb20-461" aria-hidden="true" tabindex="-1"></a><span class="fu">## References</span></span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

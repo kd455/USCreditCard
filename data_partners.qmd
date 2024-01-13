@@ -22,9 +22,12 @@ As mentioned in section @sec-intro-events we may not noticeably see the impact o
 #| output: false
 #| eval: false
 
-overdue30to89 <- credit_card.overdue_3089(T)
-loan_amt <-  credit_card.loan_amount(T)
-loan_unused <- credit_card.unused(T) 
+apply_bank_filters = TRUE
+apply_reg_filter = TRUE
+
+overdue30to89 <- credit_card.overdue_3089(apply_bank_filters, apply_reg_filter)
+loan_amt <-  credit_card.loan_amount(apply_bank_filters, apply_reg_filter)
+loan_unused <- credit_card.unused(apply_bank_filters, apply_reg_filter)
 loan_amt_pct_change <- loan_amt |> group_by(BankName) |> mutate(pct_change = value_diff/lag(Value) *100) 
 loan_unused_pct_change <- loan_unused |> group_by(BankName) |> mutate(pct_change = value_diff/lag(Value) *100) 
 

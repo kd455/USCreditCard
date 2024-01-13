@@ -1,15 +1,21 @@
 ---
 title: "US Economic Data"
-format: html
+format: 
+   html:
+     df-print: paged
 ---
 ```{r}
 #| echo: false
 #| warning: false
 source('functions.R')
                 
-granger_test_permutations <- function(data, target_col_name = "target_mean", exog_names, lag_order = 4) {
-    exog_names |>
-        purrr::map(\(x) run_granger_test(data, target_col_name, x, lag_order)) |> list_rbind() |> arrange(`Pr(>F)`) |> filter(`Pr(>F)` <= 0.05)          
+granger_test_permutations <- function(data, target_col_name = "target_mean", exog_names, max_lag = 4) {
+    results <- list()
+    for (lag in 1:max_lag) {
+        results[[lag]] <- exog_names |>
+                            purrr::map(\(x) run_granger_test(data, target_col_name, x, lag)) |> list_rbind() |> arrange(`Pr(>F)`) |> filter(`Pr(>F)` <= 0.05) |> mutate(across(F:`Pr(>F)`, ~ round(.,3))) |> select(-Res.Df)       
+    } 
+    results 
 }    
 
 us_measures <- us_economy() |>
@@ -18,37 +24,21 @@ us_measures <- us_economy() |>
             mutate(PCE.Pop.CPI = PCE/POPTHM/PCEPI) |>
             mutate(RRSFS.Pop = RRSFS/POPTHM) |> 
             mutate(A229RC0.CPI = A229RC0/PCEPI) |> 
-            mutate(PSAVE.Pop.CPI = PSAVE/POPTHM/PCEPI) |>
-            select(-c(RRSFS,PSAVE,A229RC0,CPILFESL,CPIAUCSL,DSPI,DSPIC96,B069RC1,PCEDG,PCE,POPTHM,PCEPI))|>
-            na.omit()
-
-recessions <- us_economy.recession() |> 
-                filter(Flag == 1, 
-                    yearmonth(Month) >= yearmonth(as.Date('1992-01-01')))
+            #mutate(PSAVE.Pop.CPI = PSAVE/POPTHM/PCEPI) |>
+            select(-c(RRSFS,PSAVE,A229RC0,CPILFESL,CPIAUCSL,DSPI,DSPIC96,B069RC1,PCEDG,PCE,POPTHM,PCEPI))
 
 us_measures_qtr <- us_measures |>
                     mutate(Quarter = yearquarter(Month)) |>
-                    filter(Quarter >= yearquarter(get_regulation_cutoff())) |>
                     index_by(Quarter) |>
                     summarise(across(!Month, mean))
+                    #filter(Quarter >= yearquarter(get_regulation_cutoff())) 
+                    
+apply_bank_filters = TRUE
+apply_reg_filter = FALSE
+overdue30to89 <- credit_card.overdue30to89.agg(apply_bank_filters, apply_reg_filter) 
+overdue30to89.lcbank <- credit_card.overdue30to89.agg.lccbank(apply_bank_filters, apply_reg_filter)
+overdue30to89.lbank <-  credit_card.overdue30to89.agg.lbank(apply_bank_filters, apply_reg_filter)                     
 
-overdue30to89 <- credit_card.overdue30to89.agg(apply_filters = TRUE)
-overdue30to89.lcbank <- credit_card.overdue30to89.agg.lccbank(apply_filters = TRUE)
-overdue30to89.lbank <-  credit_card.overdue30to89.agg.lbank(apply_filters = TRUE)                     
-
-# overdue30to89 |> pull(target_mean) |> tseries::adf.test(k=4)
-# tseries::adf.test(us_measures_qtr$CSCICP03USM665S, k=4)
-
-# ######### % change 
-# us_measures_qtr_pctchange <- us_measures_qtr |> 
-#                                 mutate(across(!Quarter, ~difference(.)/lag(.) *100))
-
-# overdue30to89_pctchange <- overdue30to89 |> group_by(BankType) |> mutate(across(!Quarter, ~difference(.)/lag(.) *100))
-
-# overdue30to89_pctchange |> na.omit() |> autoplot(target_median) + facet_wrap(~BankType)
-# us_measures_qtr_pctchange |> select(CSCICP03USM665S) |> autoplot()
-
-# ######### % change 
 ```
 ## Granger Test
 
@@ -57,57 +47,34 @@ Checks that the lagged values of X jointly improve the forecast of Y
 When choosing lags, note that there is a trade-off between bias and power. With too few lags the test may be biased because of residual auto-correlation. Too many, and you risk spurious rejections of the null because of random correlations
 
 
-::: {#fig-granger .panel-tabset}
-
-## Target Mean
-
-```{r}
-#| warning: false
-#| error: false
-#| label: tbl-granger-mean
-#| tbl-cap: "Granger Test"
-#| layout-ncol: 4
-data_combined <- overdue30to89 |> left_join (us_measures_qtr,by = join_by(Quarter))
-
-1:4 |> purrr::map(\(x) granger_test_permutations(data = data_combined, 
-                            target_col_name = "target_mean",
-                            exog_names = names(us_measures_qtr),
-                            x)) |> knitr::kable(format = "html")  
-
-data <- overdue30to89.lbank |> left_join (us_measures_qtr,by = join_by(Quarter))
-data <- overdue30to89.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter))
-
-
-# granger_test_permutations("target_mean", plot_type = 1, lag_order = 1)  
-# granger_test_permutations("target_mean", plot_type = 2, lag_order = 1)  
-# granger_test_permutations("target_mean", plot_type = 3, lag_order = 1)  
-
-# granger_test_permutations("target_mean", plot_type = 1, lag_order = 2)  
-# granger_test_permutations("target_mean", plot_type = 2, lag_order = 2)  
-# granger_test_permutations("target_mean", plot_type = 3, lag_order = 2)  
-
-# granger_test_permutations("target_mean", plot_type = 1, lag_order = 3)  
-# granger_test_permutations("target_mean", plot_type = 2, lag_order = 3)  
-# granger_test_permutations("target_mean", plot_type = 3, lag_order = 3)  
-
-```
-## Target Median
 ```{r}
 #| warning: false
 #| error: false
 #| label: tbl-granger-median
-#| tbl-cap: "Granger Test"
+#| tbl-cap: "Granger Test at Lags 1 to 4"
 #| tbl-subcap:
-#|   - "Combined"
-#|   - "Large Banks"
-#|   - "Large Credit Card Banks"
+#|   - "Large Bank and Large Credit Card Bank"
+#|   - "Large Bank"
+#|   - "Large Credit Card Bank"
 #| layout-ncol: 1
-# granger_test_permutations("target_median", plot_type = 1)  
-# granger_test_permutations("target_median", plot_type = 2)  
-# granger_test_permutations("target_median", plot_type = 3)  
+
+granger_test_permutations(data = overdue30to89 |> left_join (us_measures_qtr,by = join_by(Quarter)), 
+                            target_col_name = "target_median",
+                            exog_names = names(us_measures_qtr),
+                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
+
+granger_test_permutations(data = overdue30to89.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
+                            target_col_name = "target_median",
+                            exog_names = names(us_measures_qtr),
+                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
+
+granger_test_permutations(data = overdue30to89.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
+                            target_col_name = "target_median",
+                            exog_names = names(us_measures_qtr),
+                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category)) 
+
 ```
 
-:::
 
 ## CCF 
 ```{r}
@@ -115,53 +82,49 @@ data <- overdue30to89.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)
 #| error: false
 #| label: fig-ccf
 
-run_ccf_test(data = overdue30to89 |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "target_mean",
-             exog_variable = "PCEDG.Pop.CPI",
+run_ccf_test(data = overdue30to89.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
+             target_variable = "target_median",
+             exog_variable = "RRSFS.Pop",
              do_difference = TRUE)
 
-run_ccf_test(data = overdue30to89 |> left_join (us_measures_qtr,by = join_by(Quarter)),
+run_ccf_test(data = overdue30to89.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
              target_variable = "target_median",
-             exog_variable = "PCEDG.Pop.CPI",
+             exog_variable = "A229RC0.CPI",
              do_difference = TRUE)             
 #us_measures_qtr |> names() |> purrr::map(\(x) run_ccf_test(overdue30to89 |> left_join (us_measures_qtr,by = join_by(Quarter)), "target_mean", x, 4))
 
 ```
 
+## US Economic Measures
 
+::: {#fig-usmeasures .panel-tabset}
+
+## Combined
 ```{r}
 #| warning: false
 #| error: false
-#| eval: false
-us_measures |> 
-    mutate(across(!Month, scale)) |> 
-    na.omit() |>
-    pivot_longer(cols = !Month) |>
-    autoplot(value)+ facet_wrap(~ name, scales = "free_y" , ncol = 3) +
-    theme(strip.text = element_text(size = 14), legend.position = "none") +
-    labs(y = "Normalised (Normal=0)") 
 
-us_measures |> 
-    mutate(across(!Month, scale)) |> 
-    na.omit() |>
-    select(A229RC0.CPI,PCE.Pop.CPI, RRSFS.Pop,PSAVE.Pop.CPI, PSAVERT,CSCICP03USM665S,PCEDG.Pop.CPI,UNRATE) |>
-    pivot_longer(cols = !Month) |>
-    autoplot()+ facet_wrap(~ name, scales = "free_y" , ncol = 1,
-    labeller =  as_labeller(c(
-        PSAVE.Pop.CPI = "US Personal Savings: Per capita: CPI adjusted \n(PSAVE/POPTHM/PCEPI)",
-        PSAVERT= "US Personal Savings Rate \n(PSAVERT)", 
-        RRSFS.Pop = "Advance Retail and Food Services Sales Per capita: CPI adjusted \n(RSAFS/POPTHM)",
-        A229RC0.CPI = "Disposable Personal Income: Per capita: CPI adjusted \n(A229RC0/PCEPI)",
-        CSCICP03USM665S = "US Composite Confidence Indicator \n(CSCICP03USM665S)",
-        PCEDG.Pop.CPI = "Personal Consumption Expenditures: Durable Goods per capita CPI Adjusted \n(PCEDG/POPTHM/PCEPI)",
-        PCE.Pop.CPI = "Personal Consumption Expenditures \n(PCE/POPTHM/PCEPI)",
-        UNRATE = "Unemployment Rate \n(UNRATE)"))) +
-        labs(y = "Normalised (Normal=0)")+
-    geom_rect(data = recessions,inherit.aes = FALSE, aes(xmin = Month, xmax = Month + 30, ymin = -Inf, ymax = Inf), fill = "lightgrey", alpha = 0.5) +
-    labs(title = "Macro Economic Measures (data series id)",
-        subtitle = "grey areas indicate recessions",
-        ) +
-    theme(legend.position = 'none',strip.text = element_text(size = 14)) +
-    xlab("")
-        
+plot_us_category("Payments & Expenditures",us_measures_qtr, overdue30to89)
+plot_us_category("Income & Savings",us_measures_qtr, overdue30to89)
 ```
+
+
+
+## Large Bank
+```{r}
+#| warning: false
+#| error: false
+
+plot_us_category("Payments & Expenditures", us_measures_qtr, overdue30to89.lbank)
+plot_us_category("Income & Savings", us_measures_qtr, overdue30to89.lbank)
+```
+
+## Large Credit Card Bank
+```{r}
+#| warning: false
+#| error: false
+
+plot_us_category("Payments & Expenditures", us_measures_qtr, overdue30to89.lcbank)
+plot_us_category("Income & Savings", us_measures_qtr, overdue30to89.lcbank)
+```
+:::
