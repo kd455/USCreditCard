@@ -14,10 +14,14 @@ The model essentially compares each entity to itself over time, examining how ch
 $$
 Y_{it} = \alpha + \beta X_{it} + \gamma D_{it} + \mu_i + \epsilon_{it}
 $$
+
+$$
+Y_{it} = \alpha + \beta X_{it} + \gamma D_{it} + \mu_i + \epsilon_{it}
+$$
 In this representation:
 
-$Y_{it}$ is the dependent variable for entity $i$ at time $t$.
-$X_{it}$ represents the independent variable(s) for entity $i$ at time $t$.
+$Y_{it}$ is the dependent variable for an individual bank $i$ at time $t$.
+$X_{it}$ represents the independent variable(s) for $i$ at time $t$.
 $D_{it}$ is the dummy variable for the event (1 after the event, 0 before).
 $\alpha$ is the constant term.
 $\beta$ is the coefficient for the independent variable(s).

@@ -46,9 +46,14 @@ us_measures_qtr <- us_measures |>
                     
 apply_bank_filters = TRUE
 apply_reg_filter = FALSE
-overdue30to89 <- credit_card.overdue30to89.agg(apply_bank_filters, apply_reg_filter) 
-overdue30to89.lcbank <- credit_card.overdue30to89.agg.lccbank(apply_bank_filters, apply_reg_filter)
-overdue30to89.lbank <-  credit_card.overdue30to89.agg.lbank(apply_bank_filters, apply_reg_filter)                     
+overdue30to89.all <- credit_card.overdue30to89.agg(apply_bank_filters, apply_reg_filter) 
+overdue30to89.all.lcbank <- credit_card.overdue30to89.agg.lccbank(apply_bank_filters, apply_reg_filter)
+overdue30to89.all.lbank <-  credit_card.overdue30to89.agg.lbank(apply_bank_filters, apply_reg_filter)
+
+apply_reg_filter = TRUE  
+overdue30to89.post <- credit_card.overdue30to89.agg(apply_bank_filters, apply_reg_filter)       
+overdue30to89.post.lcbank <- credit_card.overdue30to89.agg.lccbank(apply_bank_filters, apply_reg_filter)
+overdue30to89.post.lbank <-  credit_card.overdue30to89.agg.lbank(apply_bank_filters, apply_reg_filter)             
 
 ```
 ## Granger Test
@@ -57,35 +62,84 @@ Checks that the lagged values of X jointly improve the forecast of Y
 
 When choosing lags, note that there is a trade-off between bias and power. With too few lags the test may be biased because of residual auto-correlation. Too many, and you risk spurious rejections of the null because of random correlations
 
+::: {#fig-granger .panel-tabset}
+
+## Combined
 
 ```{r}
 #| warning: false
 #| error: false
-#| label: tbl-granger-median
+#| label: tbl-granger-comb
 #| tbl-cap: "Granger Test at Lags 1 to 4"
 #| tbl-subcap:
-#|   - "Large Bank and Large Credit Card Bank"
-#|   - "Large Bank"
-#|   - "Large Credit Card Bank"
+#|   - "All Series from 2002 Q4"
+#|   - "Post Regulatory Changes 2010 Q2"
 #| layout-ncol: 1
 
-granger_test_permutations(data = overdue30to89 |> left_join (us_measures_qtr,by = join_by(Quarter)), 
+granger_test_permutations(data = overdue30to89.all |> left_join (us_measures_qtr,by = join_by(Quarter)), 
                             target_col_name = "target_median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
-granger_test_permutations(data = overdue30to89.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
+granger_test_permutations(data = overdue30to89.post |> left_join (us_measures_qtr,by = join_by(Quarter)), 
+                            target_col_name = "target_median",
+                            exog_names = names(us_measures_qtr),
+                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
+```
+
+
+## Large Bank
+
+```{r}
+#| warning: false
+#| error: false
+#| label: tbl-granger-lb
+#| tbl-cap: "Granger Test at Lags 1 to 4"
+#| tbl-subcap:
+#|   - "All Series from 2002 Q4"
+#|   - "Post Regulatory Changes 2010 Q2"
+#| layout-ncol: 1
+
+ 
+granger_test_permutations(data = overdue30to89.all.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
                             target_col_name = "target_median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
-granger_test_permutations(data = overdue30to89.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
+granger_test_permutations(data = overdue30to89.post.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
                             target_col_name = "target_median",
                             exog_names = names(us_measures_qtr),
-                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category)) 
+                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
+
+
+```
+## Large Credit Card Bank
+
+```{r}
+#| warning: false
+#| error: false
+#| label: tbl-granger-lcb
+#| tbl-cap: "Granger Test at Lags 1 to 4"
+#| tbl-subcap:
+#|   - "All Series from 2002 Q4"
+#|   - "Post Regulatory Changes 2010 Q2"
+#| layout-ncol: 1
+
+ 
+granger_test_permutations(data = overdue30to89.all.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
+                            target_col_name = "target_median",
+                            exog_names = names(us_measures_qtr),
+                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
+
+granger_test_permutations(data = overdue30to89.post.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
+                            target_col_name = "target_median",
+                            exog_names = names(us_measures_qtr),
+                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
+
 
 ```
 
+:::
 
 ## CCF 
 ```{r}
@@ -93,12 +147,12 @@ granger_test_permutations(data = overdue30to89.lcbank |> left_join (us_measures_
 #| error: false
 #| label: fig-ccf
 
-run_ccf_test(data = overdue30to89.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
+run_ccf_test(data = overdue30to89.all |> left_join (us_measures_qtr,by = join_by(Quarter)),
              target_variable = "target_median",
              exog_variable = "RRSFS.Pop",
              do_difference = TRUE)
 
-run_ccf_test(data = overdue30to89.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
+run_ccf_test(data = overdue30to89.post |> left_join (us_measures_qtr,by = join_by(Quarter)),
              target_variable = "target_median",
              exog_variable = "A229RC0.CPI",
              do_difference = TRUE)             
@@ -115,9 +169,9 @@ run_ccf_test(data = overdue30to89.lcbank |> left_join (us_measures_qtr,by = join
 #| warning: false
 #| error: false
 
-plot_us_category("Expenditures",us_measures_qtr, overdue30to89)
-plot_us_category("Income & Savings",us_measures_qtr, overdue30to89)
-plot_us_category("Other",us_measures_qtr, overdue30to89)
+plot_us_category("Expenditures",us_measures_qtr, overdue30to89.all)
+plot_us_category("Income & Savings",us_measures_qtr, overdue30to89.all)
+plot_us_category("Other",us_measures_qtr, overdue30to89.all)
 ```
 
 
@@ -127,9 +181,9 @@ plot_us_category("Other",us_measures_qtr, overdue30to89)
 #| warning: false
 #| error: false
 
-plot_us_category("Expenditures", us_measures_qtr, overdue30to89.lbank)
-plot_us_category("Income & Savings", us_measures_qtr, overdue30to89.lbank)
-plot_us_category("Other", us_measures_qtr, overdue30to89.lbank)
+plot_us_category("Expenditures", us_measures_qtr, overdue30to89.all.lbank)
+plot_us_category("Income & Savings", us_measures_qtr, overdue30to89.all.lbank)
+plot_us_category("Other", us_measures_qtr, overdue30to89.all.lbank)
 ```
 
 ## Large Credit Card Bank
@@ -137,8 +191,9 @@ plot_us_category("Other", us_measures_qtr, overdue30to89.lbank)
 #| warning: false
 #| error: false
 
-plot_us_category("Expenditures", us_measures_qtr, overdue30to89.lcbank)
-plot_us_category("Income & Savings", us_measures_qtr, overdue30to89.lcbank)
-plot_us_category("Other", us_measures_qtr, overdue30to89.lcbank)
+plot_us_category("Expenditures", us_measures_qtr, overdue30to89.all.lcbank)
+plot_us_category("Income & Savings", us_measures_qtr, overdue30to89.all.lcbank)
+plot_us_category("Other", us_measures_qtr, overdue30to89.all.lcbank)
 ```
+
 :::

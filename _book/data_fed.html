@@ -248,53 +248,144 @@ div.csl-indent {
 <h2 data-number="5.1" class="anchored" data-anchor-id="granger-test"><span class="header-section-number">5.1</span> Granger Test</h2>
 <p>Checks that the lagged values of X jointly improve the forecast of Y</p>
 <p>When choosing lags, note that there is a trade-off between bias and power. With too few lags the test may be biased because of residual auto-correlation. Too many, and you risk spurious rejections of the null because of random correlations</p>
+<div class="tabset-margin-container"></div><div id="fig-granger" class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" aria-current="page">Combined</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Large Bank</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Large Credit Card Bank</a></li></ul>
+<div id="fig-granger" class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <div>
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">granger_test_permutations</span>(<span class="at">data =</span> overdue30to89 <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)), </span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">granger_test_permutations</span>(<span class="at">data =</span> overdue30to89.all <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)), </span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">target_col_name =</span> <span class="st">"target_median"</span>,</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">exog_names =</span> <span class="fu">names</span>(us_measures_qtr),</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">max_lag =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span> <span class="fu">left_join</span>(<span class="fu">us_economy.labels</span>(), <span class="fu">join_by</span>(exog_variable<span class="sc">==</span>Name)) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(Formula, Category))  </span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">granger_test_permutations</span>(<span class="at">data =</span> overdue30to89.lbank <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)), </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">granger_test_permutations</span>(<span class="at">data =</span> overdue30to89.post <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)), </span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>                            <span class="at">target_col_name =</span> <span class="st">"target_median"</span>,</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>                            <span class="at">exog_names =</span> <span class="fu">names</span>(us_measures_qtr),</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>                            <span class="at">max_lag =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span> <span class="fu">left_join</span>(<span class="fu">us_economy.labels</span>(), <span class="fu">join_by</span>(exog_variable<span class="sc">==</span>Name)) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(Formula, Category))  </span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">granger_test_permutations</span>(<span class="at">data =</span> overdue30to89.lcbank <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)), </span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                            <span class="at">target_col_name =</span> <span class="st">"target_median"</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>                            <span class="at">exog_names =</span> <span class="fu">names</span>(us_measures_qtr),</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>                            <span class="at">max_lag =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span> <span class="fu">left_join</span>(<span class="fu">us_economy.labels</span>(), <span class="fu">join_by</span>(exog_variable<span class="sc">==</span>Name)) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(Formula, Category)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>                            <span class="at">max_lag =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span> <span class="fu">left_join</span>(<span class="fu">us_economy.labels</span>(), <span class="fu">join_by</span>(exog_variable<span class="sc">==</span>Name)) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(Formula, Category))  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div id="tbl-granger-median" class="cell tbl-parent quarto-layout-panel anchored">
+<div id="tbl-granger-comb" class="cell tbl-parent quarto-layout-panel anchored">
 <div class="panel-caption table-caption">
 <p>Table&nbsp;5.1: Granger Test at Lags 1 to 4</p>
 </div>
 <div class="quarto-layout-row quarto-layout-valign-top">
-<div id="tbl-granger-median-1" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-granger-median" style="flex-basis: 100.0%;justify-content: center;">
+<div id="tbl-granger-comb-1" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-granger-comb" style="flex-basis: 100.0%;justify-content: center;">
+<div id="tbl-granger-comb-1" data-ref-parent="tbl-granger-comb" class="anchored">
 
-<div data-pagedtable="false"> <div class="table-caption">(a) <p>Large Bank and Large Credit Card Bank</p> </div>
+<div data-pagedtable="false"> <div class="table-caption">(a) <p>All Series from 2002 Q4</p> </div>
   <script data-pagedtable-source="" type="application/json">
 {"columns":[{"label":["Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["F"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Pr(>F)"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["exog_variable"],"name":[4],"type":["chr"],"align":["left"]},{"label":["Desc"],"name":[5],"type":["chr"],"align":["left"]}],"data":[{"1":"-1","2":"7.689","3":"0.007","4":"RRSFS.Pop","5":"Real Advance Retail and Food Services Sales per capita"},{"1":"-1","2":"7.326","3":"0.008","4":"UNRATE","5":"Unemployment Rate"},{"1":"-1","2":"6.216","3":"0.015","4":"PCEDG.Pop.CPI","5":"Real Personal Consumption Expenditures: Durable Goods per capita"},{"1":"-1","2":"5.546","3":"0.021","4":"PCE.Pop.CPI","5":"Real Personal Consumption Expenditures per capita"},{"1":"-1","2":"5.119","3":"0.026","4":"B069RC1.Pop.CPI","5":"Real Personal interest payments per capita"},{"1":"-2","2":"5.733","3":"0.005","4":"RRSFS.Pop","5":"Real Advance Retail and Food Services Sales per capita"},{"1":"-2","2":"4.172","3":"0.019","4":"PCEDG.Pop.CPI","5":"Real Personal Consumption Expenditures: Durable Goods per capita"},{"1":"-2","2":"3.685","3":"0.030","4":"UNRATE","5":"Unemployment Rate"},{"1":"-3","2":"3.707","3":"0.015","4":"RRSFS.Pop","5":"Real Advance Retail and Food Services Sales per capita"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
+<p><strong>?(caption)</strong></p>
+</div>
 </div>
 <div class="quarto-layout-row quarto-layout-valign-top">
-<div id="tbl-granger-median-2" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-granger-median" style="flex-basis: 100.0%;justify-content: center;">
+<div id="tbl-granger-comb-2" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-granger-comb" style="flex-basis: 100.0%;justify-content: center;">
+<div id="tbl-granger-comb-2" data-ref-parent="tbl-granger-comb" class="anchored">
 
-<div data-pagedtable="false"> <div class="table-caption">(b) <p>Large Bank</p> </div>
+<div data-pagedtable="false"> <div class="table-caption">(b) <p>Post Regulatory Changes 2010 Q2</p> </div>
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["F"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Pr(>F)"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["exog_variable"],"name":[4],"type":["chr"],"align":["left"]},{"label":["Desc"],"name":[5],"type":["chr"],"align":["left"]}],"data":[{"1":"-1","2":"7.197","3":"0.010","4":"UNRATE","5":"Unemployment Rate"},{"1":"-2","2":"3.576","3":"0.036","4":"RRSFS.Pop","5":"Real Advance Retail and Food Services Sales per capita"},{"1":"-2","2":"3.374","3":"0.043","4":"UNRATE","5":"Unemployment Rate"},{"1":"-3","2":"3.054","3":"0.038","4":"RRSFS.Pop","5":"Real Advance Retail and Food Services Sales per capita"},{"1":"-4","2":"4.637","3":"0.004","4":"RRSFS.Pop","5":"Real Advance Retail and Food Services Sales per capita"},{"1":"-4","2":"4.123","3":"0.007","4":"PCE.Pop.CPI","5":"Real Personal Consumption Expenditures per capita"},{"1":"-4","2":"2.969","3":"0.031","4":"PCEDG.Pop.CPI","5":"Real Personal Consumption Expenditures: Durable Goods per capita"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<p><strong>?(caption)</strong></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">granger_test_permutations</span>(<span class="at">data =</span> overdue30to89.all.lbank <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)), </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">target_col_name =</span> <span class="st">"target_median"</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">exog_names =</span> <span class="fu">names</span>(us_measures_qtr),</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">max_lag =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span> <span class="fu">left_join</span>(<span class="fu">us_economy.labels</span>(), <span class="fu">join_by</span>(exog_variable<span class="sc">==</span>Name)) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(Formula, Category))  </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">granger_test_permutations</span>(<span class="at">data =</span> overdue30to89.post.lbank <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)), </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                            <span class="at">target_col_name =</span> <span class="st">"target_median"</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>                            <span class="at">exog_names =</span> <span class="fu">names</span>(us_measures_qtr),</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>                            <span class="at">max_lag =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span> <span class="fu">left_join</span>(<span class="fu">us_economy.labels</span>(), <span class="fu">join_by</span>(exog_variable<span class="sc">==</span>Name)) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(Formula, Category))  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div id="tbl-granger-lb" class="cell tbl-parent quarto-layout-panel anchored">
+<div class="panel-caption table-caption">
+<p>Table&nbsp;5.2: Granger Test at Lags 1 to 4</p>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div id="tbl-granger-lb-1" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-granger-lb" style="flex-basis: 100.0%;justify-content: center;">
+<div id="tbl-granger-lb-1" data-ref-parent="tbl-granger-lb" class="anchored">
+
+<div data-pagedtable="false"> <div class="table-caption">(a) <p>All Series from 2002 Q4</p> </div>
   <script data-pagedtable-source="" type="application/json">
 {"columns":[{"label":["Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["F"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Pr(>F)"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["exog_variable"],"name":[4],"type":["chr"],"align":["left"]},{"label":["Desc"],"name":[5],"type":["chr"],"align":["left"]}],"data":[{"1":"-1","2":"9.495","3":"0.003","4":"RRSFS.Pop","5":"Real Advance Retail and Food Services Sales per capita"},{"1":"-1","2":"7.764","3":"0.007","4":"UNRATE","5":"Unemployment Rate"},{"1":"-1","2":"7.382","3":"0.008","4":"PCEDG.Pop.CPI","5":"Real Personal Consumption Expenditures: Durable Goods per capita"},{"1":"-1","2":"6.674","3":"0.012","4":"PCE.Pop.CPI","5":"Real Personal Consumption Expenditures per capita"},{"1":"-1","2":"5.586","3":"0.021","4":"B069RC1.Pop.CPI","5":"Real Personal interest payments per capita"},{"1":"-2","2":"7.416","3":"0.001","4":"RRSFS.Pop","5":"Real Advance Retail and Food Services Sales per capita"},{"1":"-2","2":"5.998","3":"0.004","4":"PCEDG.Pop.CPI","5":"Real Personal Consumption Expenditures: Durable Goods per capita"},{"1":"-2","2":"3.978","3":"0.023","4":"UNRATE","5":"Unemployment Rate"},{"1":"-2","2":"3.912","3":"0.024","4":"PCE.Pop.CPI","5":"Real Personal Consumption Expenditures per capita"},{"1":"-3","2":"4.711","3":"0.005","4":"RRSFS.Pop","5":"Real Advance Retail and Food Services Sales per capita"},{"1":"-3","2":"3.859","3":"0.013","4":"PCEDG.Pop.CPI","5":"Real Personal Consumption Expenditures: Durable Goods per capita"},{"1":"-3","2":"2.799","3":"0.046","4":"UNRATE","5":"Unemployment Rate"},{"1":"-4","2":"3.435","3":"0.013","4":"RRSFS.Pop","5":"Real Advance Retail and Food Services Sales per capita"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
+<p><strong>?(caption)</strong></p>
+</div>
 </div>
 <div class="quarto-layout-row quarto-layout-valign-top">
-<div id="tbl-granger-median-3" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-granger-median" style="flex-basis: 100.0%;justify-content: center;">
+<div id="tbl-granger-lb-2" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-granger-lb" style="flex-basis: 100.0%;justify-content: center;">
+<div id="tbl-granger-lb-2" data-ref-parent="tbl-granger-lb" class="anchored">
 
-<div data-pagedtable="false"> <div class="table-caption">(c) <p>Large Credit Card Bank</p> </div>
+<div data-pagedtable="false"> <div class="table-caption">(b) <p>Post Regulatory Changes 2010 Q2</p> </div>
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["F"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Pr(>F)"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["exog_variable"],"name":[4],"type":["chr"],"align":["left"]},{"label":["Desc"],"name":[5],"type":["chr"],"align":["left"]}],"data":[{"1":"-1","2":"7.917","3":"0.007","4":"UNRATE","5":"Unemployment Rate"},{"1":"-1","2":"4.923","3":"0.031","4":"PCE.Pop.CPI","5":"Real Personal Consumption Expenditures per capita"},{"1":"-2","2":"3.797","3":"0.030","4":"UNRATE","5":"Unemployment Rate"},{"1":"-2","2":"3.772","3":"0.030","4":"PCE.Pop.CPI","5":"Real Personal Consumption Expenditures per capita"},{"1":"-2","2":"3.459","3":"0.040","4":"RRSFS.Pop","5":"Real Advance Retail and Food Services Sales per capita"},{"1":"-3","2":"2.970","3":"0.042","4":"PCE.Pop.CPI","5":"Real Personal Consumption Expenditures per capita"},{"1":"-3","2":"2.858","3":"0.048","4":"RRSFS.Pop","5":"Real Advance Retail and Food Services Sales per capita"},{"1":"-4","2":"5.253","3":"0.002","4":"RRSFS.Pop","5":"Real Advance Retail and Food Services Sales per capita"},{"1":"-4","2":"4.899","3":"0.003","4":"PCE.Pop.CPI","5":"Real Personal Consumption Expenditures per capita"},{"1":"-4","2":"3.704","3":"0.012","4":"PCEDG.Pop.CPI","5":"Real Personal Consumption Expenditures: Durable Goods per capita"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<p><strong>?(caption)</strong></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">granger_test_permutations</span>(<span class="at">data =</span> overdue30to89.all.lcbank <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)), </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">target_col_name =</span> <span class="st">"target_median"</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">exog_names =</span> <span class="fu">names</span>(us_measures_qtr),</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">max_lag =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span> <span class="fu">left_join</span>(<span class="fu">us_economy.labels</span>(), <span class="fu">join_by</span>(exog_variable<span class="sc">==</span>Name)) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(Formula, Category))  </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">granger_test_permutations</span>(<span class="at">data =</span> overdue30to89.post.lcbank <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)), </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                            <span class="at">target_col_name =</span> <span class="st">"target_median"</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                            <span class="at">exog_names =</span> <span class="fu">names</span>(us_measures_qtr),</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>                            <span class="at">max_lag =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span> <span class="fu">left_join</span>(<span class="fu">us_economy.labels</span>(), <span class="fu">join_by</span>(exog_variable<span class="sc">==</span>Name)) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(Formula, Category))  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div id="tbl-granger-lcb" class="cell tbl-parent quarto-layout-panel anchored">
+<div class="panel-caption table-caption">
+<p>Table&nbsp;5.3: Granger Test at Lags 1 to 4</p>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div id="tbl-granger-lcb-1" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-granger-lcb" style="flex-basis: 100.0%;justify-content: center;">
+<div id="tbl-granger-lcb-1" data-ref-parent="tbl-granger-lcb" class="anchored">
+
+<div data-pagedtable="false"> <div class="table-caption">(a) <p>All Series from 2002 Q4</p> </div>
   <script data-pagedtable-source="" type="application/json">
 {"columns":[{"label":["Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["F"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Pr(>F)"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["exog_variable"],"name":[4],"type":["chr"],"align":["left"]},{"label":["Desc"],"name":[5],"type":["chr"],"align":["left"]}],"data":[{"1":"-1","2":"10.325","3":"0.002","4":"RRSFS.Pop","5":"Real Advance Retail and Food Services Sales per capita"},{"1":"-1","2":"7.613","3":"0.007","4":"PCE.Pop.CPI","5":"Real Personal Consumption Expenditures per capita"},{"1":"-1","2":"6.638","3":"0.012","4":"UNRATE","5":"Unemployment Rate"},{"1":"-1","2":"6.623","3":"0.012","4":"PCEDG.Pop.CPI","5":"Real Personal Consumption Expenditures: Durable Goods per capita"},{"1":"-2","2":"5.470","3":"0.006","4":"RRSFS.Pop","5":"Real Advance Retail and Food Services Sales per capita"},{"1":"-2","2":"4.144","3":"0.020","4":"PCE.Pop.CPI","5":"Real Personal Consumption Expenditures per capita"},{"1":"-2","2":"3.629","3":"0.031","4":"UNRATE","5":"Unemployment Rate"},{"1":"-2","2":"3.602","3":"0.032","4":"PCEDG.Pop.CPI","5":"Real Personal Consumption Expenditures: Durable Goods per capita"},{"1":"-3","2":"4.185","3":"0.009","4":"RRSFS.Pop","5":"Real Advance Retail and Food Services Sales per capita"},{"1":"-3","2":"3.135","3":"0.031","4":"UNRATE","5":"Unemployment Rate"},{"1":"-3","2":"3.071","3":"0.033","4":"PCE.Pop.CPI","5":"Real Personal Consumption Expenditures per capita"},{"1":"-4","2":"3.246","3":"0.017","4":"RRSFS.Pop","5":"Real Advance Retail and Food Services Sales per capita"},{"1":"-4","2":"2.888","3":"0.029","4":"PCE.Pop.CPI","5":"Real Personal Consumption Expenditures per capita"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
+</div>
+</div>
+<p><strong>?(caption)</strong></p>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div id="tbl-granger-lcb-2" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-granger-lcb" style="flex-basis: 100.0%;justify-content: center;">
+<div id="tbl-granger-lcb-2" data-ref-parent="tbl-granger-lcb" class="anchored">
+
+<div data-pagedtable="false"> <div class="table-caption">(b) <p>Post Regulatory Changes 2010 Q2</p> </div>
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["F"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Pr(>F)"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["exog_variable"],"name":[4],"type":["chr"],"align":["left"]},{"label":["Desc"],"name":[5],"type":["chr"],"align":["left"]}],"data":[{"1":"-1","2":"11.272","3":"0.002","4":"RRSFS.Pop","5":"Real Advance Retail and Food Services Sales per capita"},{"1":"-1","2":"7.146","3":"0.010","4":"PCE.Pop.CPI","5":"Real Personal Consumption Expenditures per capita"},{"1":"-1","2":"6.366","3":"0.015","4":"PCEDG.Pop.CPI","5":"Real Personal Consumption Expenditures: Durable Goods per capita"},{"1":"-1","2":"4.522","3":"0.039","4":"CSCICP03USM665S","5":"US Composite Confidence Indicator"},{"1":"-2","2":"6.671","3":"0.003","4":"RRSFS.Pop","5":"Real Advance Retail and Food Services Sales per capita"},{"1":"-2","2":"3.926","3":"0.027","4":"PCEDG.Pop.CPI","5":"Real Personal Consumption Expenditures: Durable Goods per capita"},{"1":"-2","2":"3.526","3":"0.038","4":"PCE.Pop.CPI","5":"Real Personal Consumption Expenditures per capita"},{"1":"-3","2":"5.638","3":"0.002","4":"RRSFS.Pop","5":"Real Advance Retail and Food Services Sales per capita"},{"1":"-3","2":"3.069","3":"0.038","4":"PCEDG.Pop.CPI","5":"Real Personal Consumption Expenditures: Durable Goods per capita"},{"1":"-4","2":"8.323","3":"0.000","4":"RRSFS.Pop","5":"Real Advance Retail and Food Services Sales per capita"},{"1":"-4","2":"7.346","3":"0.000","4":"PCEDG.Pop.CPI","5":"Real Personal Consumption Expenditures: Durable Goods per capita"},{"1":"-4","2":"3.535","3":"0.015","4":"PCE.Pop.CPI","5":"Real Personal Consumption Expenditures per capita"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<p><strong>?(caption)</strong></p>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -306,16 +397,16 @@ div.csl-indent {
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">run_ccf_test</span>(<span class="at">data =</span> overdue30to89.lcbank <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)),</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">target_variable =</span> <span class="st">"target_median"</span>,</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">exog_variable =</span> <span class="st">"RRSFS.Pop"</span>,</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">do_difference =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">run_ccf_test</span>(<span class="at">data =</span> overdue30to89.lcbank <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)),</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">target_variable =</span> <span class="st">"target_median"</span>,</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">exog_variable =</span> <span class="st">"A229RC0.CPI"</span>,</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">do_difference =</span> <span class="cn">TRUE</span>)             </span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#us_measures_qtr |&gt; names() |&gt; purrr::map(\(x) run_ccf_test(overdue30to89 |&gt; left_join (us_measures_qtr,by = join_by(Quarter)), "target_mean", x, 4))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">run_ccf_test</span>(<span class="at">data =</span> overdue30to89.all <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)),</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">target_variable =</span> <span class="st">"target_median"</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">exog_variable =</span> <span class="st">"RRSFS.Pop"</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">do_difference =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">run_ccf_test</span>(<span class="at">data =</span> overdue30to89.post <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)),</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">target_variable =</span> <span class="st">"target_median"</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">exog_variable =</span> <span class="st">"A229RC0.CPI"</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">do_difference =</span> <span class="cn">TRUE</span>)             </span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">#us_measures_qtr |&gt; names() |&gt; purrr::map(\(x) run_ccf_test(overdue30to89 |&gt; left_join (us_measures_qtr,by = join_by(Quarter)), "target_mean", x, 4))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-ccf-1" class="quarto-figure quarto-figure-center anchored">
@@ -338,80 +429,80 @@ div.csl-indent {
 <section id="us-economic-measures" class="level2" data-number="5.3">
 <h2 data-number="5.3" class="anchored" data-anchor-id="us-economic-measures"><span class="header-section-number">5.3</span> US Economic Measures</h2>
 <div class="tabset-margin-container"></div><div id="fig-usmeasures" class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" aria-current="page">Combined</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Large Bank</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Large Credit Card Bank</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Combined</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Large Bank</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false">Large Credit Card Bank</a></li></ul>
 <div id="fig-usmeasures" class="tab-content">
-<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Expenditures"</span>,us_measures_qtr, overdue30to89)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<p><img src="data_fed_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
-</div>
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Income &amp; Savings"</span>,us_measures_qtr, overdue30to89)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<p><img src="data_fed_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid" width="672"></p>
-</div>
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Other"</span>,us_measures_qtr, overdue30to89)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<p><img src="data_fed_files/figure-html/unnamed-chunk-4-3.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-</div>
-<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
-<div class="cell">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Expenditures"</span>, us_measures_qtr, overdue30to89.lbank)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<p><img src="data_fed_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
-</div>
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Income &amp; Savings"</span>, us_measures_qtr, overdue30to89.lbank)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<p><img src="data_fed_files/figure-html/unnamed-chunk-5-2.png" class="img-fluid" width="672"></p>
-</div>
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Other"</span>, us_measures_qtr, overdue30to89.lbank)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<p><img src="data_fed_files/figure-html/unnamed-chunk-5-3.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-</div>
-<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
-<div class="cell">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Expenditures"</span>, us_measures_qtr, overdue30to89.lcbank)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Expenditures"</span>,us_measures_qtr, overdue30to89.all)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="data_fed_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
 </div>
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Income &amp; Savings"</span>, us_measures_qtr, overdue30to89.lcbank)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Income &amp; Savings"</span>,us_measures_qtr, overdue30to89.all)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="data_fed_files/figure-html/unnamed-chunk-6-2.png" class="img-fluid" width="672"></p>
 </div>
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Other"</span>, us_measures_qtr, overdue30to89.lcbank)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Other"</span>,us_measures_qtr, overdue30to89.all)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="data_fed_files/figure-html/unnamed-chunk-6-3.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Expenditures"</span>, us_measures_qtr, overdue30to89.all.lbank)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="data_fed_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Income &amp; Savings"</span>, us_measures_qtr, overdue30to89.all.lbank)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="data_fed_files/figure-html/unnamed-chunk-7-2.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Other"</span>, us_measures_qtr, overdue30to89.all.lbank)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="data_fed_files/figure-html/unnamed-chunk-7-3.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Expenditures"</span>, us_measures_qtr, overdue30to89.all.lcbank)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="data_fed_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Income &amp; Savings"</span>, us_measures_qtr, overdue30to89.all.lcbank)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="data_fed_files/figure-html/unnamed-chunk-8-2.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Other"</span>, us_measures_qtr, overdue30to89.all.lcbank)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="data_fed_files/figure-html/unnamed-chunk-8-3.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
@@ -725,150 +816,205 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   <div class="nav-page nav-page-next">
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb12" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "US Economic Data"</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> </span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">   html:</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">     df-print: paged</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>US Federal Reserve Economic Data <span class="co">[</span><span class="ot">@fred</span><span class="co">]</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>Yearly/Quarterly/Monthly data series covering various categories. For this project we are interested in data series that tell us about the financial health of households:</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>Employment rate</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>Personal Savings Rate</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>Disposable Income</span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>@taghiyeh2021</span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">'functions.R'</span>)</span>
-<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>                </span>
-<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>granger_test_permutations <span class="ot">&lt;-</span> <span class="cf">function</span>(data, <span class="at">target_col_name =</span> <span class="st">"target_mean"</span>, exog_names, <span class="at">max_lag =</span> <span class="dv">4</span>) {</span>
-<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>    results <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (lag <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>max_lag) {</span>
-<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>        results[[lag]] <span class="ot">&lt;-</span> exog_names <span class="sc">|&gt;</span></span>
-<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>                            purrr<span class="sc">::</span><span class="fu">map</span>(\(x) <span class="fu">run_granger_test</span>(data, target_col_name, x, lag)) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span> <span class="fu">arrange</span>(<span class="st">`</span><span class="at">Pr(&gt;F)</span><span class="st">`</span>) <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">Pr(&gt;F)</span><span class="st">`</span> <span class="sc">&lt;=</span> <span class="fl">0.05</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="fu">across</span>(F<span class="sc">:</span><span class="st">`</span><span class="at">Pr(&gt;F)</span><span class="st">`</span>, <span class="sc">~</span> <span class="fu">round</span>(.,<span class="dv">3</span>))) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span>Res.Df)       </span>
-<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>    } </span>
-<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>    results </span>
-<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>}    </span>
-<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>us_measures <span class="ot">&lt;-</span> <span class="fu">us_economy</span>() <span class="sc">|&gt;</span></span>
-<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(<span class="at">B069RC1.Pop.CPI =</span>B069RC1<span class="sc">/</span>POPTHM<span class="sc">/</span>PCEPI) <span class="sc">|&gt;</span></span>
-<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(<span class="at">PCEDG.Pop.CPI =</span> PCEDG<span class="sc">/</span>POPTHM<span class="sc">/</span>PCEPI) <span class="sc">|&gt;</span></span>
-<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(<span class="at">PCE.Pop.CPI =</span> PCE<span class="sc">/</span>POPTHM<span class="sc">/</span>PCEPI) <span class="sc">|&gt;</span></span>
-<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(<span class="at">RRSFS.Pop =</span> RRSFS<span class="sc">/</span>POPTHM) <span class="sc">|&gt;</span> </span>
-<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(<span class="at">A229RC0.CPI =</span> A229RC0<span class="sc">/</span>PCEPI) <span class="sc">|&gt;</span> </span>
-<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>            <span class="co">#mutate(PSAVE.Pop.CPI = PSAVE/POPTHM/PCEPI) |&gt;</span></span>
-<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>            <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(RRSFS,PSAVE,A229RC0,CPILFESL,CPIAUCSL,DSPI,DSPIC96,B069RC1,PCEDG,PCE,POPTHM,PCEPI))</span>
-<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a>us_measures_qtr <span class="ot">&lt;-</span> us_measures <span class="sc">|&gt;</span></span>
-<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">mutate</span>(<span class="at">Quarter =</span> <span class="fu">yearquarter</span>(Month)) <span class="sc">|&gt;</span></span>
-<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">index_by</span>(Quarter) <span class="sc">|&gt;</span></span>
-<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="sc">!</span>Month, mean))</span>
-<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a>                    <span class="co">#filter(Quarter &gt;= yearquarter(get_regulation_cutoff())) </span></span>
-<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a>                    </span>
-<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a>apply_bank_filters <span class="ot">=</span> <span class="cn">TRUE</span></span>
-<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a>apply_reg_filter <span class="ot">=</span> <span class="cn">FALSE</span></span>
-<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a>overdue30to89 <span class="ot">&lt;-</span> <span class="fu">credit_card.overdue30to89.agg</span>(apply_bank_filters, apply_reg_filter) </span>
-<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a>overdue30to89.lcbank <span class="ot">&lt;-</span> <span class="fu">credit_card.overdue30to89.agg.lccbank</span>(apply_bank_filters, apply_reg_filter)</span>
-<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a>overdue30to89.lbank <span class="ot">&lt;-</span>  <span class="fu">credit_card.overdue30to89.agg.lbank</span>(apply_bank_filters, apply_reg_filter)                     </span>
-<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a><span class="fu">## Granger Test</span></span>
-<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a>Checks that the lagged values of X jointly improve the forecast of Y</span>
-<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a>When choosing lags, note that there is a trade-off between bias and power. With too few lags the test may be biased because of residual auto-correlation. Too many, and you risk spurious rejections of the null because of random correlations</span>
-<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb12-66"><a href="#cb12-66" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb12-67"><a href="#cb12-67" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
-<span id="cb12-68"><a href="#cb12-68" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-granger-median</span></span>
-<span id="cb12-69"><a href="#cb12-69" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: "Granger Test at Lags 1 to 4"</span></span>
-<span id="cb12-70"><a href="#cb12-70" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-subcap:</span></span>
-<span id="cb12-71"><a href="#cb12-71" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Large Bank and Large Credit Card Bank"</span></span>
-<span id="cb12-72"><a href="#cb12-72" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Large Bank"</span></span>
-<span id="cb12-73"><a href="#cb12-73" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Large Credit Card Bank"</span></span>
-<span id="cb12-74"><a href="#cb12-74" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 1</span></span>
-<span id="cb12-75"><a href="#cb12-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-76"><a href="#cb12-76" aria-hidden="true" tabindex="-1"></a><span class="fu">granger_test_permutations</span>(<span class="at">data =</span> overdue30to89 <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)), </span>
-<span id="cb12-77"><a href="#cb12-77" aria-hidden="true" tabindex="-1"></a>                            <span class="at">target_col_name =</span> <span class="st">"target_median"</span>,</span>
-<span id="cb12-78"><a href="#cb12-78" aria-hidden="true" tabindex="-1"></a>                            <span class="at">exog_names =</span> <span class="fu">names</span>(us_measures_qtr),</span>
-<span id="cb12-79"><a href="#cb12-79" aria-hidden="true" tabindex="-1"></a>                            <span class="at">max_lag =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span> <span class="fu">left_join</span>(<span class="fu">us_economy.labels</span>(), <span class="fu">join_by</span>(exog_variable<span class="sc">==</span>Name)) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(Formula, Category))  </span>
-<span id="cb12-80"><a href="#cb12-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-81"><a href="#cb12-81" aria-hidden="true" tabindex="-1"></a><span class="fu">granger_test_permutations</span>(<span class="at">data =</span> overdue30to89.lbank <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)), </span>
-<span id="cb12-82"><a href="#cb12-82" aria-hidden="true" tabindex="-1"></a>                            <span class="at">target_col_name =</span> <span class="st">"target_median"</span>,</span>
-<span id="cb12-83"><a href="#cb12-83" aria-hidden="true" tabindex="-1"></a>                            <span class="at">exog_names =</span> <span class="fu">names</span>(us_measures_qtr),</span>
-<span id="cb12-84"><a href="#cb12-84" aria-hidden="true" tabindex="-1"></a>                            <span class="at">max_lag =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span> <span class="fu">left_join</span>(<span class="fu">us_economy.labels</span>(), <span class="fu">join_by</span>(exog_variable<span class="sc">==</span>Name)) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(Formula, Category))  </span>
-<span id="cb12-85"><a href="#cb12-85" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-86"><a href="#cb12-86" aria-hidden="true" tabindex="-1"></a><span class="fu">granger_test_permutations</span>(<span class="at">data =</span> overdue30to89.lcbank <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)), </span>
-<span id="cb12-87"><a href="#cb12-87" aria-hidden="true" tabindex="-1"></a>                            <span class="at">target_col_name =</span> <span class="st">"target_median"</span>,</span>
-<span id="cb12-88"><a href="#cb12-88" aria-hidden="true" tabindex="-1"></a>                            <span class="at">exog_names =</span> <span class="fu">names</span>(us_measures_qtr),</span>
-<span id="cb12-89"><a href="#cb12-89" aria-hidden="true" tabindex="-1"></a>                            <span class="at">max_lag =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span> <span class="fu">left_join</span>(<span class="fu">us_economy.labels</span>(), <span class="fu">join_by</span>(exog_variable<span class="sc">==</span>Name)) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(Formula, Category)) </span>
-<span id="cb12-90"><a href="#cb12-90" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-91"><a href="#cb12-91" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb12-92"><a href="#cb12-92" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-93"><a href="#cb12-93" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-94"><a href="#cb12-94" aria-hidden="true" tabindex="-1"></a><span class="fu">## CCF </span></span>
-<span id="cb12-97"><a href="#cb12-97" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb12-98"><a href="#cb12-98" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb12-99"><a href="#cb12-99" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
-<span id="cb12-100"><a href="#cb12-100" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-ccf</span></span>
-<span id="cb12-101"><a href="#cb12-101" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-102"><a href="#cb12-102" aria-hidden="true" tabindex="-1"></a><span class="fu">run_ccf_test</span>(<span class="at">data =</span> overdue30to89.lcbank <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)),</span>
-<span id="cb12-103"><a href="#cb12-103" aria-hidden="true" tabindex="-1"></a>             <span class="at">target_variable =</span> <span class="st">"target_median"</span>,</span>
-<span id="cb12-104"><a href="#cb12-104" aria-hidden="true" tabindex="-1"></a>             <span class="at">exog_variable =</span> <span class="st">"RRSFS.Pop"</span>,</span>
-<span id="cb12-105"><a href="#cb12-105" aria-hidden="true" tabindex="-1"></a>             <span class="at">do_difference =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb12-106"><a href="#cb12-106" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-107"><a href="#cb12-107" aria-hidden="true" tabindex="-1"></a><span class="fu">run_ccf_test</span>(<span class="at">data =</span> overdue30to89.lcbank <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)),</span>
-<span id="cb12-108"><a href="#cb12-108" aria-hidden="true" tabindex="-1"></a>             <span class="at">target_variable =</span> <span class="st">"target_median"</span>,</span>
-<span id="cb12-109"><a href="#cb12-109" aria-hidden="true" tabindex="-1"></a>             <span class="at">exog_variable =</span> <span class="st">"A229RC0.CPI"</span>,</span>
-<span id="cb12-110"><a href="#cb12-110" aria-hidden="true" tabindex="-1"></a>             <span class="at">do_difference =</span> <span class="cn">TRUE</span>)             </span>
-<span id="cb12-111"><a href="#cb12-111" aria-hidden="true" tabindex="-1"></a><span class="co">#us_measures_qtr |&gt; names() |&gt; purrr::map(\(x) run_ccf_test(overdue30to89 |&gt; left_join (us_measures_qtr,by = join_by(Quarter)), "target_mean", x, 4))</span></span>
-<span id="cb12-112"><a href="#cb12-112" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-113"><a href="#cb12-113" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb12-114"><a href="#cb12-114" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-115"><a href="#cb12-115" aria-hidden="true" tabindex="-1"></a><span class="fu">## US Economic Measures</span></span>
-<span id="cb12-116"><a href="#cb12-116" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-117"><a href="#cb12-117" aria-hidden="true" tabindex="-1"></a>::: {#fig-usmeasures .panel-tabset}</span>
-<span id="cb12-118"><a href="#cb12-118" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-119"><a href="#cb12-119" aria-hidden="true" tabindex="-1"></a><span class="fu">## Combined</span></span>
-<span id="cb12-122"><a href="#cb12-122" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb12-123"><a href="#cb12-123" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb12-124"><a href="#cb12-124" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
-<span id="cb12-125"><a href="#cb12-125" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-126"><a href="#cb12-126" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Expenditures"</span>,us_measures_qtr, overdue30to89)</span>
-<span id="cb12-127"><a href="#cb12-127" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Income &amp; Savings"</span>,us_measures_qtr, overdue30to89)</span>
-<span id="cb12-128"><a href="#cb12-128" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Other"</span>,us_measures_qtr, overdue30to89)</span>
-<span id="cb12-129"><a href="#cb12-129" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb12-130"><a href="#cb12-130" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-131"><a href="#cb12-131" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-132"><a href="#cb12-132" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-133"><a href="#cb12-133" aria-hidden="true" tabindex="-1"></a><span class="fu">## Large Bank</span></span>
-<span id="cb12-136"><a href="#cb12-136" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb12-137"><a href="#cb12-137" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb12-138"><a href="#cb12-138" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
-<span id="cb12-139"><a href="#cb12-139" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-140"><a href="#cb12-140" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Expenditures"</span>, us_measures_qtr, overdue30to89.lbank)</span>
-<span id="cb12-141"><a href="#cb12-141" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Income &amp; Savings"</span>, us_measures_qtr, overdue30to89.lbank)</span>
-<span id="cb12-142"><a href="#cb12-142" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Other"</span>, us_measures_qtr, overdue30to89.lbank)</span>
-<span id="cb12-143"><a href="#cb12-143" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb12-144"><a href="#cb12-144" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-145"><a href="#cb12-145" aria-hidden="true" tabindex="-1"></a><span class="fu">## Large Credit Card Bank</span></span>
-<span id="cb12-148"><a href="#cb12-148" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb12-149"><a href="#cb12-149" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb12-150"><a href="#cb12-150" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
-<span id="cb12-151"><a href="#cb12-151" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-152"><a href="#cb12-152" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Expenditures"</span>, us_measures_qtr, overdue30to89.lcbank)</span>
-<span id="cb12-153"><a href="#cb12-153" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Income &amp; Savings"</span>, us_measures_qtr, overdue30to89.lcbank)</span>
-<span id="cb12-154"><a href="#cb12-154" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Other"</span>, us_measures_qtr, overdue30to89.lcbank)</span>
-<span id="cb12-155"><a href="#cb12-155" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb12-156"><a href="#cb12-156" aria-hidden="true" tabindex="-1"></a>:::</span>
+<div class="sourceCode" id="cb14" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "US Economic Data"</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> </span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">   html:</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">     df-print: paged</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>US Federal Reserve Economic Data <span class="co">[</span><span class="ot">@fred</span><span class="co">]</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>Yearly/Quarterly/Monthly data series covering various categories. For this project we are interested in data series that tell us about the financial health of households:</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>Employment rate</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>Personal Savings Rate</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>Disposable Income</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>@taghiyeh2021</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">'functions.R'</span>)</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>granger_test_permutations <span class="ot">&lt;-</span> <span class="cf">function</span>(data, <span class="at">target_col_name =</span> <span class="st">"target_mean"</span>, exog_names, <span class="at">max_lag =</span> <span class="dv">4</span>) {</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>    results <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (lag <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>max_lag) {</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>        results[[lag]] <span class="ot">&lt;-</span> exog_names <span class="sc">|&gt;</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>                            purrr<span class="sc">::</span><span class="fu">map</span>(\(x) <span class="fu">run_granger_test</span>(data, target_col_name, x, lag)) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span> <span class="fu">arrange</span>(<span class="st">`</span><span class="at">Pr(&gt;F)</span><span class="st">`</span>) <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">Pr(&gt;F)</span><span class="st">`</span> <span class="sc">&lt;=</span> <span class="fl">0.05</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="fu">across</span>(F<span class="sc">:</span><span class="st">`</span><span class="at">Pr(&gt;F)</span><span class="st">`</span>, <span class="sc">~</span> <span class="fu">round</span>(.,<span class="dv">3</span>))) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span>Res.Df)       </span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>    } </span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>    results </span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>}    </span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>us_measures <span class="ot">&lt;-</span> <span class="fu">us_economy</span>() <span class="sc">|&gt;</span></span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(<span class="at">B069RC1.Pop.CPI =</span>B069RC1<span class="sc">/</span>POPTHM<span class="sc">/</span>PCEPI) <span class="sc">|&gt;</span></span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(<span class="at">PCEDG.Pop.CPI =</span> PCEDG<span class="sc">/</span>POPTHM<span class="sc">/</span>PCEPI) <span class="sc">|&gt;</span></span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(<span class="at">PCE.Pop.CPI =</span> PCE<span class="sc">/</span>POPTHM<span class="sc">/</span>PCEPI) <span class="sc">|&gt;</span></span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(<span class="at">RRSFS.Pop =</span> RRSFS<span class="sc">/</span>POPTHM) <span class="sc">|&gt;</span> </span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(<span class="at">A229RC0.CPI =</span> A229RC0<span class="sc">/</span>PCEPI) <span class="sc">|&gt;</span> </span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a>            <span class="co">#mutate(PSAVE.Pop.CPI = PSAVE/POPTHM/PCEPI) |&gt;</span></span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a>            <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(RRSFS,PSAVE,A229RC0,CPILFESL,CPIAUCSL,DSPI,DSPIC96,B069RC1,PCEDG,PCE,POPTHM,PCEPI))</span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a>us_measures_qtr <span class="ot">&lt;-</span> us_measures <span class="sc">|&gt;</span></span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">mutate</span>(<span class="at">Quarter =</span> <span class="fu">yearquarter</span>(Month)) <span class="sc">|&gt;</span></span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">index_by</span>(Quarter) <span class="sc">|&gt;</span></span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="sc">!</span>Month, mean))</span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a>                    <span class="co">#filter(Quarter &gt;= yearquarter(get_regulation_cutoff())) </span></span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a>                    </span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a>apply_bank_filters <span class="ot">=</span> <span class="cn">TRUE</span></span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a>apply_reg_filter <span class="ot">=</span> <span class="cn">FALSE</span></span>
+<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a>overdue30to89.all <span class="ot">&lt;-</span> <span class="fu">credit_card.overdue30to89.agg</span>(apply_bank_filters, apply_reg_filter) </span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a>overdue30to89.all.lcbank <span class="ot">&lt;-</span> <span class="fu">credit_card.overdue30to89.agg.lccbank</span>(apply_bank_filters, apply_reg_filter)</span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a>overdue30to89.all.lbank <span class="ot">&lt;-</span>  <span class="fu">credit_card.overdue30to89.agg.lbank</span>(apply_bank_filters, apply_reg_filter)</span>
+<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a>apply_reg_filter <span class="ot">=</span> <span class="cn">TRUE</span>  </span>
+<span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a>overdue30to89.post <span class="ot">&lt;-</span> <span class="fu">credit_card.overdue30to89.agg</span>(apply_bank_filters, apply_reg_filter)       </span>
+<span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a>overdue30to89.post.lcbank <span class="ot">&lt;-</span> <span class="fu">credit_card.overdue30to89.agg.lccbank</span>(apply_bank_filters, apply_reg_filter)</span>
+<span id="cb14-58"><a href="#cb14-58" aria-hidden="true" tabindex="-1"></a>overdue30to89.post.lbank <span class="ot">&lt;-</span>  <span class="fu">credit_card.overdue30to89.agg.lbank</span>(apply_bank_filters, apply_reg_filter)             </span>
+<span id="cb14-59"><a href="#cb14-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-60"><a href="#cb14-60" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-61"><a href="#cb14-61" aria-hidden="true" tabindex="-1"></a><span class="fu">## Granger Test</span></span>
+<span id="cb14-62"><a href="#cb14-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-63"><a href="#cb14-63" aria-hidden="true" tabindex="-1"></a>Checks that the lagged values of X jointly improve the forecast of Y</span>
+<span id="cb14-64"><a href="#cb14-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-65"><a href="#cb14-65" aria-hidden="true" tabindex="-1"></a>When choosing lags, note that there is a trade-off between bias and power. With too few lags the test may be biased because of residual auto-correlation. Too many, and you risk spurious rejections of the null because of random correlations</span>
+<span id="cb14-66"><a href="#cb14-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-67"><a href="#cb14-67" aria-hidden="true" tabindex="-1"></a>::: {#fig-granger .panel-tabset}</span>
+<span id="cb14-68"><a href="#cb14-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-69"><a href="#cb14-69" aria-hidden="true" tabindex="-1"></a><span class="fu">## Combined</span></span>
+<span id="cb14-70"><a href="#cb14-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-73"><a href="#cb14-73" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-74"><a href="#cb14-74" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-75"><a href="#cb14-75" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
+<span id="cb14-76"><a href="#cb14-76" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-granger-comb</span></span>
+<span id="cb14-77"><a href="#cb14-77" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: "Granger Test at Lags 1 to 4"</span></span>
+<span id="cb14-78"><a href="#cb14-78" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-subcap:</span></span>
+<span id="cb14-79"><a href="#cb14-79" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "All Series from 2002 Q4"</span></span>
+<span id="cb14-80"><a href="#cb14-80" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Post Regulatory Changes 2010 Q2"</span></span>
+<span id="cb14-81"><a href="#cb14-81" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 1</span></span>
+<span id="cb14-82"><a href="#cb14-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-83"><a href="#cb14-83" aria-hidden="true" tabindex="-1"></a><span class="fu">granger_test_permutations</span>(<span class="at">data =</span> overdue30to89.all <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)), </span>
+<span id="cb14-84"><a href="#cb14-84" aria-hidden="true" tabindex="-1"></a>                            <span class="at">target_col_name =</span> <span class="st">"target_median"</span>,</span>
+<span id="cb14-85"><a href="#cb14-85" aria-hidden="true" tabindex="-1"></a>                            <span class="at">exog_names =</span> <span class="fu">names</span>(us_measures_qtr),</span>
+<span id="cb14-86"><a href="#cb14-86" aria-hidden="true" tabindex="-1"></a>                            <span class="at">max_lag =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span> <span class="fu">left_join</span>(<span class="fu">us_economy.labels</span>(), <span class="fu">join_by</span>(exog_variable<span class="sc">==</span>Name)) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(Formula, Category))  </span>
+<span id="cb14-87"><a href="#cb14-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-88"><a href="#cb14-88" aria-hidden="true" tabindex="-1"></a><span class="fu">granger_test_permutations</span>(<span class="at">data =</span> overdue30to89.post <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)), </span>
+<span id="cb14-89"><a href="#cb14-89" aria-hidden="true" tabindex="-1"></a>                            <span class="at">target_col_name =</span> <span class="st">"target_median"</span>,</span>
+<span id="cb14-90"><a href="#cb14-90" aria-hidden="true" tabindex="-1"></a>                            <span class="at">exog_names =</span> <span class="fu">names</span>(us_measures_qtr),</span>
+<span id="cb14-91"><a href="#cb14-91" aria-hidden="true" tabindex="-1"></a>                            <span class="at">max_lag =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span> <span class="fu">left_join</span>(<span class="fu">us_economy.labels</span>(), <span class="fu">join_by</span>(exog_variable<span class="sc">==</span>Name)) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(Formula, Category))  </span>
+<span id="cb14-92"><a href="#cb14-92" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-93"><a href="#cb14-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-94"><a href="#cb14-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-95"><a href="#cb14-95" aria-hidden="true" tabindex="-1"></a><span class="fu">## Large Bank</span></span>
+<span id="cb14-96"><a href="#cb14-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-99"><a href="#cb14-99" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-100"><a href="#cb14-100" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-101"><a href="#cb14-101" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
+<span id="cb14-102"><a href="#cb14-102" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-granger-lb</span></span>
+<span id="cb14-103"><a href="#cb14-103" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: "Granger Test at Lags 1 to 4"</span></span>
+<span id="cb14-104"><a href="#cb14-104" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-subcap:</span></span>
+<span id="cb14-105"><a href="#cb14-105" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "All Series from 2002 Q4"</span></span>
+<span id="cb14-106"><a href="#cb14-106" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Post Regulatory Changes 2010 Q2"</span></span>
+<span id="cb14-107"><a href="#cb14-107" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 1</span></span>
+<span id="cb14-108"><a href="#cb14-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-109"><a href="#cb14-109" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb14-110"><a href="#cb14-110" aria-hidden="true" tabindex="-1"></a><span class="fu">granger_test_permutations</span>(<span class="at">data =</span> overdue30to89.all.lbank <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)), </span>
+<span id="cb14-111"><a href="#cb14-111" aria-hidden="true" tabindex="-1"></a>                            <span class="at">target_col_name =</span> <span class="st">"target_median"</span>,</span>
+<span id="cb14-112"><a href="#cb14-112" aria-hidden="true" tabindex="-1"></a>                            <span class="at">exog_names =</span> <span class="fu">names</span>(us_measures_qtr),</span>
+<span id="cb14-113"><a href="#cb14-113" aria-hidden="true" tabindex="-1"></a>                            <span class="at">max_lag =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span> <span class="fu">left_join</span>(<span class="fu">us_economy.labels</span>(), <span class="fu">join_by</span>(exog_variable<span class="sc">==</span>Name)) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(Formula, Category))  </span>
+<span id="cb14-114"><a href="#cb14-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-115"><a href="#cb14-115" aria-hidden="true" tabindex="-1"></a><span class="fu">granger_test_permutations</span>(<span class="at">data =</span> overdue30to89.post.lbank <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)), </span>
+<span id="cb14-116"><a href="#cb14-116" aria-hidden="true" tabindex="-1"></a>                            <span class="at">target_col_name =</span> <span class="st">"target_median"</span>,</span>
+<span id="cb14-117"><a href="#cb14-117" aria-hidden="true" tabindex="-1"></a>                            <span class="at">exog_names =</span> <span class="fu">names</span>(us_measures_qtr),</span>
+<span id="cb14-118"><a href="#cb14-118" aria-hidden="true" tabindex="-1"></a>                            <span class="at">max_lag =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span> <span class="fu">left_join</span>(<span class="fu">us_economy.labels</span>(), <span class="fu">join_by</span>(exog_variable<span class="sc">==</span>Name)) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(Formula, Category))  </span>
+<span id="cb14-119"><a href="#cb14-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-120"><a href="#cb14-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-121"><a href="#cb14-121" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-122"><a href="#cb14-122" aria-hidden="true" tabindex="-1"></a><span class="fu">## Large Credit Card Bank</span></span>
+<span id="cb14-123"><a href="#cb14-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-126"><a href="#cb14-126" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-127"><a href="#cb14-127" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-128"><a href="#cb14-128" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
+<span id="cb14-129"><a href="#cb14-129" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-granger-lcb</span></span>
+<span id="cb14-130"><a href="#cb14-130" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: "Granger Test at Lags 1 to 4"</span></span>
+<span id="cb14-131"><a href="#cb14-131" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-subcap:</span></span>
+<span id="cb14-132"><a href="#cb14-132" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "All Series from 2002 Q4"</span></span>
+<span id="cb14-133"><a href="#cb14-133" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Post Regulatory Changes 2010 Q2"</span></span>
+<span id="cb14-134"><a href="#cb14-134" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 1</span></span>
+<span id="cb14-135"><a href="#cb14-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-136"><a href="#cb14-136" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb14-137"><a href="#cb14-137" aria-hidden="true" tabindex="-1"></a><span class="fu">granger_test_permutations</span>(<span class="at">data =</span> overdue30to89.all.lcbank <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)), </span>
+<span id="cb14-138"><a href="#cb14-138" aria-hidden="true" tabindex="-1"></a>                            <span class="at">target_col_name =</span> <span class="st">"target_median"</span>,</span>
+<span id="cb14-139"><a href="#cb14-139" aria-hidden="true" tabindex="-1"></a>                            <span class="at">exog_names =</span> <span class="fu">names</span>(us_measures_qtr),</span>
+<span id="cb14-140"><a href="#cb14-140" aria-hidden="true" tabindex="-1"></a>                            <span class="at">max_lag =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span> <span class="fu">left_join</span>(<span class="fu">us_economy.labels</span>(), <span class="fu">join_by</span>(exog_variable<span class="sc">==</span>Name)) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(Formula, Category))  </span>
+<span id="cb14-141"><a href="#cb14-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-142"><a href="#cb14-142" aria-hidden="true" tabindex="-1"></a><span class="fu">granger_test_permutations</span>(<span class="at">data =</span> overdue30to89.post.lcbank <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)), </span>
+<span id="cb14-143"><a href="#cb14-143" aria-hidden="true" tabindex="-1"></a>                            <span class="at">target_col_name =</span> <span class="st">"target_median"</span>,</span>
+<span id="cb14-144"><a href="#cb14-144" aria-hidden="true" tabindex="-1"></a>                            <span class="at">exog_names =</span> <span class="fu">names</span>(us_measures_qtr),</span>
+<span id="cb14-145"><a href="#cb14-145" aria-hidden="true" tabindex="-1"></a>                            <span class="at">max_lag =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span> <span class="fu">left_join</span>(<span class="fu">us_economy.labels</span>(), <span class="fu">join_by</span>(exog_variable<span class="sc">==</span>Name)) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(Formula, Category))  </span>
+<span id="cb14-146"><a href="#cb14-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-147"><a href="#cb14-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-148"><a href="#cb14-148" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-149"><a href="#cb14-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-150"><a href="#cb14-150" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb14-151"><a href="#cb14-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-152"><a href="#cb14-152" aria-hidden="true" tabindex="-1"></a><span class="fu">## CCF </span></span>
+<span id="cb14-155"><a href="#cb14-155" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-156"><a href="#cb14-156" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-157"><a href="#cb14-157" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
+<span id="cb14-158"><a href="#cb14-158" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-ccf</span></span>
+<span id="cb14-159"><a href="#cb14-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-160"><a href="#cb14-160" aria-hidden="true" tabindex="-1"></a><span class="fu">run_ccf_test</span>(<span class="at">data =</span> overdue30to89.all <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)),</span>
+<span id="cb14-161"><a href="#cb14-161" aria-hidden="true" tabindex="-1"></a>             <span class="at">target_variable =</span> <span class="st">"target_median"</span>,</span>
+<span id="cb14-162"><a href="#cb14-162" aria-hidden="true" tabindex="-1"></a>             <span class="at">exog_variable =</span> <span class="st">"RRSFS.Pop"</span>,</span>
+<span id="cb14-163"><a href="#cb14-163" aria-hidden="true" tabindex="-1"></a>             <span class="at">do_difference =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb14-164"><a href="#cb14-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-165"><a href="#cb14-165" aria-hidden="true" tabindex="-1"></a><span class="fu">run_ccf_test</span>(<span class="at">data =</span> overdue30to89.post <span class="sc">|&gt;</span> <span class="fu">left_join</span> (us_measures_qtr,<span class="at">by =</span> <span class="fu">join_by</span>(Quarter)),</span>
+<span id="cb14-166"><a href="#cb14-166" aria-hidden="true" tabindex="-1"></a>             <span class="at">target_variable =</span> <span class="st">"target_median"</span>,</span>
+<span id="cb14-167"><a href="#cb14-167" aria-hidden="true" tabindex="-1"></a>             <span class="at">exog_variable =</span> <span class="st">"A229RC0.CPI"</span>,</span>
+<span id="cb14-168"><a href="#cb14-168" aria-hidden="true" tabindex="-1"></a>             <span class="at">do_difference =</span> <span class="cn">TRUE</span>)             </span>
+<span id="cb14-169"><a href="#cb14-169" aria-hidden="true" tabindex="-1"></a><span class="co">#us_measures_qtr |&gt; names() |&gt; purrr::map(\(x) run_ccf_test(overdue30to89 |&gt; left_join (us_measures_qtr,by = join_by(Quarter)), "target_mean", x, 4))</span></span>
+<span id="cb14-170"><a href="#cb14-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-171"><a href="#cb14-171" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-172"><a href="#cb14-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-173"><a href="#cb14-173" aria-hidden="true" tabindex="-1"></a><span class="fu">## US Economic Measures</span></span>
+<span id="cb14-174"><a href="#cb14-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-175"><a href="#cb14-175" aria-hidden="true" tabindex="-1"></a>::: {#fig-usmeasures .panel-tabset}</span>
+<span id="cb14-176"><a href="#cb14-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-177"><a href="#cb14-177" aria-hidden="true" tabindex="-1"></a><span class="fu">## Combined</span></span>
+<span id="cb14-180"><a href="#cb14-180" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-181"><a href="#cb14-181" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-182"><a href="#cb14-182" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
+<span id="cb14-183"><a href="#cb14-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-184"><a href="#cb14-184" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Expenditures"</span>,us_measures_qtr, overdue30to89.all)</span>
+<span id="cb14-185"><a href="#cb14-185" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Income &amp; Savings"</span>,us_measures_qtr, overdue30to89.all)</span>
+<span id="cb14-186"><a href="#cb14-186" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Other"</span>,us_measures_qtr, overdue30to89.all)</span>
+<span id="cb14-187"><a href="#cb14-187" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-188"><a href="#cb14-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-189"><a href="#cb14-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-190"><a href="#cb14-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-191"><a href="#cb14-191" aria-hidden="true" tabindex="-1"></a><span class="fu">## Large Bank</span></span>
+<span id="cb14-194"><a href="#cb14-194" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-195"><a href="#cb14-195" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-196"><a href="#cb14-196" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
+<span id="cb14-197"><a href="#cb14-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-198"><a href="#cb14-198" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Expenditures"</span>, us_measures_qtr, overdue30to89.all.lbank)</span>
+<span id="cb14-199"><a href="#cb14-199" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Income &amp; Savings"</span>, us_measures_qtr, overdue30to89.all.lbank)</span>
+<span id="cb14-200"><a href="#cb14-200" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Other"</span>, us_measures_qtr, overdue30to89.all.lbank)</span>
+<span id="cb14-201"><a href="#cb14-201" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-202"><a href="#cb14-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-203"><a href="#cb14-203" aria-hidden="true" tabindex="-1"></a><span class="fu">## Large Credit Card Bank</span></span>
+<span id="cb14-206"><a href="#cb14-206" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-207"><a href="#cb14-207" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-208"><a href="#cb14-208" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
+<span id="cb14-209"><a href="#cb14-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-210"><a href="#cb14-210" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Expenditures"</span>, us_measures_qtr, overdue30to89.all.lcbank)</span>
+<span id="cb14-211"><a href="#cb14-211" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Income &amp; Savings"</span>, us_measures_qtr, overdue30to89.all.lcbank)</span>
+<span id="cb14-212"><a href="#cb14-212" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_us_category</span>(<span class="st">"Other"</span>, us_measures_qtr, overdue30to89.all.lcbank)</span>
+<span id="cb14-213"><a href="#cb14-213" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-214"><a href="#cb14-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-215"><a href="#cb14-215" aria-hidden="true" tabindex="-1"></a>:::</span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
