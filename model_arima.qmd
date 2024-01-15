@@ -1,0 +1,155 @@
+---
+title: "ARIMA"
+format: html
+---
+```{r}
+#https://cran.r-project.org/web/packages/fable/vignettes/fable.html
+source('functions.R')
+
+na_post_partner_data <- function(bank_data, event_start, event_end) {
+    bank_data |> select(Quarter ~)
+}
+
+new_partners <- credit_card.partnerships() |> select(new,acquired,available)
+
+all_data <- credit_card.overdue_3089(TRUE, TRUE) |> 
+                    right_join(new_partners, join_by(BankName==new))|> 
+                    na.omit() |>
+                    as_tibble() |> 
+                    mutate(Event = ifelse(Quarter >= yearquarter(as.Date(acquired)) & 
+                                           Quarter <= yearquarter(as.Date(available))+1, TRUE, FALSE)) |> 
+                        as_tsibble(index = Quarter, key = c(BankType,BankName))
+
+
+training_data <- all_data |>
+                    filter(Event == FALSE) |>
+                    fill_gaps()
+
+training_data |>                    
+    autoplot(value_diff) + 
+        theme(legend.position = "top") + facet_wrap(~BankName+BankType, ncol=1)          
+
+fit <- training_data |> 
+        model(
+            arima = ARIMA(value_diff)
+        )
+
+fit
+
+fit |>
+  glance()
+
+fit |>
+  select(BankType, BankName, arima) |>
+  coef() |> View()
+
+fit |>
+  filter(BankName == "BARCLAYS BANK DELAWARE (2980209)") |>
+  select(arima) |>
+  report() 
+  #gg_tsresiduals() 
+
+aug <- fit |> augment() 
+
+aug|>
+  ggplot(aes(x = .innov)) +
+  geom_histogram() +
+  labs(title = "Histogram of residuals")
+
+aug |>
+  ACF(.innov) |>
+  autoplot() +
+  labs(title = "ACF Residuals")
+
+fit |> 
+  accuracy() |> 
+  arrange(MASE) |> View()
+
+filled_data <- fit |>
+                interpolate(training_data) 
+
+#############
+sim <- fit |> generate(h = 4, times = 5, bootstrap = TRUE, times = 5000) |> na.omit()         
+sim |> View()
+
+
+all_data |>
+  ggplot(aes(x = Quarter)) +
+  geom_line(aes(y = value_diff)) +
+  geom_line(aes(y = .sim, colour = as.factor(.rep)),
+    data = sim)+facet_wrap(~BankName+BankType, ncol=1)+guides(colour = "none")
+
+fc <- fit |> forecast(h = 4, bootstrap = TRUE)
+autoplot(fc, all_data)
+############
+
+only_filled_data <- filled_data |> left_join(all_data |> filter(Event == TRUE))
+
+all_data |>
+autoplot(value_diff)+
+autolayer(only_filled_data,value_diff, colour="darkslategrey")+ theme(legend.position = "none") + facet_wrap(~BankName+BankType, ncol=1)
+
+
+
+
+ geom_line(mapping = aes(y = !!as.name(target_measure)), data = target_data,
+                  colour = 'darkslategrey') +
+
+# Forecast for the event period and beyond
+forecast_period <- training_data |> filter(is.na(value_diff))
+fit_test <- refit(fit, tail(us_accidental_deaths, 24), reestimate = FALSE)
+accuracy(fit_test)
+fc <- fit |> 
+  forecast(new_data = forecast_period)
+fc
+
+fc |> 
+  hilo(level = c(80, 95))
+
+fc |> 
+  autoplot(bank_data)
+```
+
+```{r}
+library(fable)
+library(tsibble)
+library(dplyr)
+
+# Sample data (replace this with your actual time series data)
+# Assuming a time series with monthly data
+set.seed(123)  # For reproducibility
+dates <- seq(as.Date("2020-01-01"), by = "month", length.out = 36)
+values <- rnorm(36, 100, 10)
+your_data <- tibble(date = dates, value = values) %>% as_tsibble(index = date)
+
+# Walk-forward validation
+# Setting the initial training size and the forecast horizon
+initial_train_size <- 24  # For example, first 24 months
+forecast_horizon <- 1     # Forecast 1 month ahead
+
+results <- vector("list", length = length(your_data) - initial_train_size)
+
+for(i in seq_len(length(results))) {
+  # Train-test split
+  train_data <- your_data %>% slice(1:(initial_train_size + i - 1))
+  test_data <- your_data %>% slice((initial_train_size + i):(initial_train_size + i + forecast_horizon - 1))
+  
+  # Fit the model
+  fit <- train_data %>% model(ARIMA(value))
+  
+  # Forecast
+  forecast_result <- forecast(fit, new_data = test_data)
+  
+  # Store results
+  results[[i]] <- forecast_result
+}
+
+# Combine results
+combined_results <- bind_rows(results)
+
+# Evaluate performance, e.g., using MAE (Mean Absolute Error)
+accuracy_metrics <- combined_results %>% accuracy(your_data)
+mae <- accuracy_metrics$MAE
+
+print(mae)
+```

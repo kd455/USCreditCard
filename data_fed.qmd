@@ -4,6 +4,17 @@ format:
    html:
      df-print: paged
 ---
+
+US Federal Reserve Economic Data [@fred]
+
+Yearly/Quarterly/Monthly data series covering various categories. For this project we are interested in data series that tell us about the financial health of households:
+Employment rate
+Personal Savings Rate
+Disposable Income
+
+@taghiyeh2021
+
+
 ```{r}
 #| echo: false
 #| warning: false
@@ -104,8 +115,9 @@ run_ccf_test(data = overdue30to89.lcbank |> left_join (us_measures_qtr,by = join
 #| warning: false
 #| error: false
 
-plot_us_category("Payments & Expenditures",us_measures_qtr, overdue30to89)
+plot_us_category("Expenditures",us_measures_qtr, overdue30to89)
 plot_us_category("Income & Savings",us_measures_qtr, overdue30to89)
+plot_us_category("Other",us_measures_qtr, overdue30to89)
 ```
 
 
@@ -115,8 +127,9 @@ plot_us_category("Income & Savings",us_measures_qtr, overdue30to89)
 #| warning: false
 #| error: false
 
-plot_us_category("Payments & Expenditures", us_measures_qtr, overdue30to89.lbank)
+plot_us_category("Expenditures", us_measures_qtr, overdue30to89.lbank)
 plot_us_category("Income & Savings", us_measures_qtr, overdue30to89.lbank)
+plot_us_category("Other", us_measures_qtr, overdue30to89.lbank)
 ```
 
 ## Large Credit Card Bank
@@ -124,7 +137,8 @@ plot_us_category("Income & Savings", us_measures_qtr, overdue30to89.lbank)
 #| warning: false
 #| error: false
 
-plot_us_category("Payments & Expenditures", us_measures_qtr, overdue30to89.lcbank)
+plot_us_category("Expenditures", us_measures_qtr, overdue30to89.lcbank)
 plot_us_category("Income & Savings", us_measures_qtr, overdue30to89.lcbank)
+plot_us_category("Other", us_measures_qtr, overdue30to89.lcbank)
 ```
 :::

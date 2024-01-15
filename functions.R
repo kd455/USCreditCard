@@ -26,7 +26,7 @@ get_features <- function(data, ftags, value_name = "Value") {
     #find columns that are zero or constant
     zero_const <- stat_features |> 
                     select(-key_vars(data)) |>
-                    summarise_all(sd) |>   #calcuate standard deviation of each column
+                    summarise(across(everything(), sd)) |>   #calcuate standard deviation of each column
                     select_if(~.x == 0 | is.na(.)) |> names() #select columns that are zero or NA
       
     stat_features |>
@@ -354,7 +354,7 @@ pcs.plot <- function(pcs) {
         labs(subtitle = "US Credit Cards 30-89 days",
             x = "PC1",
             y = "PC2")+ theme(legend.position="none")   + 
-        scale_color_manual(values = bank_type.colours())
+        scale_colour_manual(values = bank_type.colours())
 }
 
 features.plot_violin <-function(data, feature_name) {
@@ -446,12 +446,12 @@ partnership.plot <- function(name, old, new, acquired, available, selected_measu
                               BankName == old ~ "old",
                               BankName == new ~ "new")) |> 
     filter_index(as.character(from_date) ~ as.character(to_date)) |>
-    autoplot(!!as.name(value_name), aes(color = group_column)) +
-    scale_color_manual(values = group.colours) +
+    autoplot(!!as.name(value_name), aes(colour = group_column)) +
+    scale_colour_manual(values = group.colours) +
     facet_wrap(~ Description, scales = "free", ncol=1) +
-    labs(title=glue("{name} Partnership: <span style='color:#D95F02'>{old}</span> to 
-                    <span style='color:#1B9E77'>{new}</span>
-                    against <span style='color:#333333'>{trend_calc} PEER Banks</span>"),
+    labs(title=glue("{name} Partnership: <span style='colour:#D95F02'>{old}</span> to 
+                    <span style='colour:#1B9E77'>{new}</span>
+                    against <span style='colour:#333333'>{trend_calc} PEER Banks</span>"),
         subtitle = glue("Acquired {date_acquired}. Card available {date_available}"),
         y = y_label,
         x = "Year")  +
@@ -486,12 +486,25 @@ us_economy.labels <- function() {
     read_csv("data/us_economy_labels.csv", show_col_types = FALSE)
 }
 
+min_tstibble <- function(data) {
+    data |> 
+        as_tibble()  |>
+        summarise(across(where(is.numeric), \(x) min(x, na.rm = TRUE))) |> min()
+}
+
+max_tstibble <- function(data) {
+    data |> 
+        as_tibble()  |>
+        summarise(across(where(is.numeric), \(x) max(x, na.rm = TRUE))) |> max()
+}
+
 plot_us_category <- function(category, us_measures, target_data, target_measure = "target_median") {
     target_label <-credit_card.target_label()
     index_var <- index_var(us_measures)
     recessions <- us_economy.recession() |> 
                     filter(Flag == 1, 
-                           Month >= ym("1989-10"))                          
+                           Month >= ym("1989-10"))
+    max_y <- max_tstibble(us_measures)                           
     
     us_measures |> na.omit() |>
         mutate(across(!as.name(index_var), scale)) |> 
@@ -499,18 +512,19 @@ plot_us_category <- function(category, us_measures, target_data, target_measure 
         left_join(us_economy.labels(), by = join_by(name==Name)) |>
         filter(Category == category) |>
         mutate(comb_label = paste(name, "-", Desc, "(", Formula, ")")) |>
-        ggplot(aes(x = Quarter, y = value, color = comb_label)) + 
+        ggplot(aes(x = Quarter, y = value, colour = comb_label)) + 
         geom_line() +
         theme(legend.direction = "vertical",legend.position = "top", legend.title=element_blank(),
-            plot.title = element_markdown(size=11)) +
+              plot.title = element_markdown(size = 12),
+              plot.subtitle = element_text(size = 9)) +
         labs(y = "Normalised (Normal=0)",
-            title = glue("{category} measures against <span style='color:darkslategrey'>**{target_label}**</span>"),
+            title = glue("{category} measures against <span style='colour:darkslategrey'>**{target_label}**</span>"),
             subtitle = "Recessions shown in boxed area") +     
         geom_rect(data = recessions,inherit.aes = FALSE, 
                   aes(xmin = Month, xmax = Month + 30, ymin = -Inf, ymax = Inf), fill = "lightgrey", alpha = 0.5) +
         geom_line(mapping = aes(y = !!as.name(target_measure)), data = target_data,
                   colour = 'darkslategrey') +
         geom_vline(xintercept = as.numeric(yq(get_regulation_cutoff())), linetype=1,colour="darkred") +
-        annotate("text", x=as.numeric(yq(get_regulation_cutoff())), y=2.75, size = 8/.pt, label="Credit Card Regulations",hjust = 1, color = "darkred")             
+        annotate("text", x=as.numeric(yq(get_regulation_cutoff())), y=max_y-1, size = 8/.pt, label="Credit Card Regulations",vjust = -0.5, colour = "darkred")             
 }
 
