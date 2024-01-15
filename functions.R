@@ -487,14 +487,18 @@ us_economy.labels <- function() {
 }
 
 min_tstibble <- function(data) {
+    ts_index <- data |> index_var()
     data |> 
         as_tibble()  |>
+        select(-all_of(ts_index)) |>
         summarise(across(where(is.numeric), \(x) min(x, na.rm = TRUE))) |> min()
 }
 
 max_tstibble <- function(data) {
+    ts_index <- data |> index_var()
     data |> 
         as_tibble()  |>
+        select(-all_of(ts_index)) |>
         summarise(across(where(is.numeric), \(x) max(x, na.rm = TRUE))) |> max()
 }
 
@@ -504,10 +508,11 @@ plot_us_category <- function(category, us_measures, target_data, target_measure 
     recessions <- us_economy.recession() |> 
                     filter(Flag == 1, 
                            Month >= ym("1989-10"))
-    max_y <- max_tstibble(us_measures)                           
-    
-    us_measures |> na.omit() |>
-        mutate(across(!as.name(index_var), scale)) |> 
+    data <- us_measures |> na.omit() |>
+              mutate(across(!as.name(index_var), scale))
+    max_y <- max_tstibble(data)     
+
+    data |>        
         pivot_longer(cols = !Quarter) |>
         left_join(us_economy.labels(), by = join_by(name==Name)) |>
         filter(Category == category) |>
