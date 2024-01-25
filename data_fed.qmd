@@ -148,14 +148,19 @@ granger_test_permutations(data = overdue30to89.post.lcbank |> left_join (us_meas
 #| label: fig-ccf
 
 run_ccf_test(data = overdue30to89.all |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "target_median",
+             target_variable = "target_mean",
              exog_variable = "RRSFS.Pop",
              do_difference = TRUE)
 
 run_ccf_test(data = overdue30to89.post |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "target_median",
+             target_variable = "target_mean",
              exog_variable = "A229RC0.CPI",
-             do_difference = TRUE)             
+             do_difference = TRUE)    
+
+run_ccf_test(data = overdue30to89.post |> left_join (us_measures_qtr,by = join_by(Quarter)),
+             target_variable = "target_mean",
+             exog_variable = "UNRATE",
+             do_difference = TRUE)                          
 #us_measures_qtr |> names() |> purrr::map(\(x) run_ccf_test(overdue30to89 |> left_join (us_measures_qtr,by = join_by(Quarter)), "target_mean", x, 4))
 
 ```

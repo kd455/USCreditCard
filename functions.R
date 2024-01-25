@@ -60,27 +60,27 @@ summary_ratios <- memoise(function() {
 })
 
 credit_card <- memoise(function(apply_bank_filters = FALSE, post_regulation = FALSE) {
+  data <- .read_ubpr("data/UBPR_CreditCard_V.parquet") 
+  
   if(apply_bank_filters) {
-    data <- .read_ubpr("data/UBPR_CreditCard_V.parquet") |>
-              filter(BankType %in% c("LargeBank","LargeCreditCardBank")) |>
+    data <- data |>
+              filter(BankType %in% c("LargeBank", "LargeCreditCardBank")) |>
               tsibble::group_by_key() |>
               filter(Value != 0) |>
-              slice(3:n()) |>
-              fill_gaps() 
-  } else {
-    data <- .read_ubpr("data/UBPR_CreditCard_V.parquet") 
+              slice(3:n())
   }
+
   if (post_regulation) {
     data <- data |> filter_index(get_regulation_cutoff() ~ .)
   }
-  data
+  data 
 })
 
 get_regulation_cutoff <- function(f = "Q") {
   if(f=="M")
     "2010 Mar"
   else 
-    "2010 Q2"
+    "2010 Q1"
 }
 
 .measure_to_tsibble <- function(measure_data, measure_name) {
@@ -88,9 +88,9 @@ get_regulation_cutoff <- function(f = "Q") {
   filter(Measure == measure_name) |>
   as_tsibble(index = Quarter, key = (-c(Quarter,Value))) |>
     group_by_key() |>
+    fill_gaps() |>
     mutate(value_diff = difference(Value)) |>
-    ungroup() |>
-    fill_gaps()
+    ungroup()
 }
 
 credit_card.data_types_ref <- function() {
