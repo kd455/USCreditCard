@@ -234,8 +234,8 @@ summary_ratios.assets <- function() {
 us_economy <- memoise(function(freq = "M") {
   read_csv(glue("data/US_Economic_Data_{freq}.csv"), show_col_types = FALSE) |>
     mutate(Month = yearmonth(Date)) |>
-    select(-Date) |> 
-    as_tsibble(index = Month)    
+    dplyr::select(-Date)|>
+    as_tsibble(index = Month)
 })
 
 us_economy.recession <- memoise(function() {

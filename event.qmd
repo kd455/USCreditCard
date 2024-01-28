@@ -7,10 +7,9 @@ Event studies are a common approach in econometrics to assess the impact of an e
 
 The goal is to estimate the portion of post-event change that can be attributed to the event itself, isolating it from other market and firm-specific effects. We do this by predicting what would have happened if the event had not occurred (the counterfactual) and comparing it to the actual observed data to estimate the resulting "abnormal returns".
 
-## Evaluation
+## Joint Test Problem
 
 The joint test problem arises because we are effectively testing two things: the counterfactual model and the event impact. Consequently, we need an approach to accurately evaluate if our counterfactual model results are credible. One approach is to test using observations where we expect no effect; if there were resulting "abnormal returns" this would point to an issue with the model [see @HuntingtonKlein, chap 17.3.3]. 
-
 
 $$
 Outcome = \beta_0 + \beta_1t + \beta_2After + \beta_3t\times After+\varepsilon
@@ -18,34 +17,228 @@ $$
 where $t$ is the time period and $After$ is a binary variable equal to 1 in any time after the event
 
 ```{r}
+library(lme4)
+library(Metrics)  # For evaluation metrics
+install.packages("caret")
+install.packages("Metrics")
+library(caret)
+library(Metrics)
+
+
+
+run_kfold_validation <- function(data, formula_string) {
+    set.seed(123)  # For reproducibility
+    folds <- createFolds(data$IDRSSD, k = 5)
+    results <- data.frame()  # Data frame to store results
+    formula <- as.formula(formula_string)
+
+    for(i in 1:length(folds)) {
+        # Split the data into training and validation sets
+        training_set <- data[-folds[[i]], ]
+        validation_set <- data[folds[[i]], ]
+        
+        model <- lmer(formula, data = training_set)
+        # Predict on the validation set
+        validation_preds <- predict(model, newdata = validation_set)
+
+        # Evaluate the model (using an appropriate metric like RMSE)
+        rmse_value <- Metrics::rmse(validation_set$value_diff, validation_preds)
+
+        # Store the results
+        results <- rbind(results, data.frame(Fold = i, RMSE = rmse_value))
+    }
+
+    # Calculate the average performance across all folds
+    average_performance <- mean(results$RMSE)
+}
+
+run_kfold_validation_arima <- function(data, formula_string) {
+    set.seed(123)  # For reproducibility
+    folds <- createFolds(data$IDRSSD, k = 5)
+    results <- data.frame()  # Data frame to store results
+    formula <- as.formula(formula_string)
+
+    for(i in 1:length(folds)) {
+        # Split the data into training and validation sets
+        training_set <- data[-folds[[i]], ]
+        validation_set <- data[folds[[i]], ]
+        
+        model <- ARIMA(formula, data = training_set)
+        # Predict on the validation set
+        validation_preds <- predict(model, newdata = validation_set)
+
+        # Evaluate the model (using an appropriate metric like RMSE)
+        rmse_value <- Metrics::rmse(validation_set$value_diff, validation_preds)
+
+        # Store the results
+        results <- rbind(results, data.frame(Fold = i, RMSE = rmse_value))
+    }
+
+    # Calculate the average performance across all folds
+    average_performance <- mean(results$RMSE)
+}
+
+
+
+
 source('functions.R')
 library(tidymodels) 
 partner_data <- credit_card.partnerships()
-overdue30to89 <- credit_card.overdue_3089()
-loan_amt <-  credit_card.loan_amount()
-loan_unused <- credit_card.unused()
-loan_unused_ratio <- credit_card.unused_ratio()
-partner_data <- credit_card.partnerships() 
+overdue30to89 <- credit_card.overdue_3089(TRUE, TRUE)
+# loan_amt <-  credit_card.loan_amount()
+# loan_unused <- credit_card.unused()
+# loan_unused_ratio <- credit_card.unused_ratio()
+# partner_data <- credit_card.partnerships() 
 
-selected_measure <- overdue30to89
+exog_us_economic_qtr <- us_economy() |>
+                        mutate(RRSFS.Pop = RRSFS/POPTHM,                      
+                               Quarter = yearquarter(Month)) |>
+                        index_by(Quarter) |>
+                        dplyr::select(RRSFS.Pop, UNRATE) |>
+                        summarise(across(-Month, mean)) |>
+                        mutate(across(-Quarter, ~difference(.))) |>
+                        mutate(RRSFS.Pop.lag1 = lag(RRSFS.Pop),
+                               UNRATE.lag1  = lag(UNRATE)) |>
+                        filter_index(get_regulation_cutoff() ~ .)   
+                        
+overdue30to89.agg <- overdue30to89 |> 
+                        group_by(BankType) |> 
+                        summarise(value_diff.mean = mean(value_diff, na.rm=TRUE))
 
 partners <- partner_data |> 
-                    select(-caption) |>
-                    pivot_longer(cols = c('old','new'), names_to = "partnership", values_to = "BankName") |> 
-                    filter(partnership %in% c('new','old')) |>
-                    mutate(across(c("acquired", "available"), lubridate::ymd))
-
-agg_data <- aggregate_by_index(selected_measure, "value_diff") |> 
-                rename(value_diff.Agg = value_diff) 
+                pivot_longer(cols = c('old','new'), names_to = "partnership", values_to = "BankName") |> 
+                filter(partnership %in% c('new','old')) |>
+                mutate(across(c("acquired", "available"), lubridate::ymd)) 
 
 bank_data <- partners |> 
-                left_join(selected_measure, relationship = "many-to-many") |>
-                rename(value_diff.Bank = value_diff) |>
-                left_join(agg_data) |>
-                mutate(Period = Quarter - yearquarter(acquired)) 
- 
-# Estimate a model 
-#m <- lm(value_diff.Bank  ~ value_diff.Agg + partnership, data = est_data)
+                left_join(overdue30to89, relationship = "many-to-many", by = join_by(BankName)) |>
+                mutate(#acquired = yearquarter(acquired) - 4,
+                       Period = Quarter - yearquarter(acquired),
+                       EventPeriod = (Period >= 0),
+                       EstimationPeriod = (Period < 0)) |> 
+                filter(Period <= 1, #only interested in 2 period after event
+                       Period >= -8 ) |> #only interested in 8 periods before event
+                drop_na(value_diff)
+
+bank_data <- bank_data |> add_row(overdue30to89 |> filter(!BankName %in% partners$BankName)) |> 
+                left_join(overdue30to89.agg, by = join_by(BankType, Quarter))|>
+                mutate(value_diff.detrend = value_diff - value_diff.mean,
+                       partner_event = !is.na(name),
+                       EventPeriod = if_else(is.na(name),FALSE,EventPeriod),
+                       Qtr = quarter(Quarter),
+                       Year = year(Quarter)) |> 
+                drop_na(value_diff)     |> 
+                left_join(exog_us_economic_qtr, by = join_by(Quarter))       
+
+data <- bank_data |> filter(is.na(name))
+
+non_partership_banks <- bank_data |> filter(is.na(name))
+partership_banks <- bank_data |> filter(!is.na(name))
+
+results <- tibble(model = character(),
+                    rsme = numeric())
+
+lmer1_formula <- "value_diff  ~ Qtr + RRSFS.Pop + RRSFS.Pop.lag1 + (1 | IDRSSD)"
+lmer2_formula <- "value_diff  ~ Qtr + RRSFS.Pop + RRSFS.Pop.lag1 + UNRATE + UNRATE.lag1 + (1 | IDRSSD)"
+lmer3_formula <- "value_diff  ~ Qtr + RRSFS.Pop + RRSFS.Pop.lag1 + UNRATE + UNRATE.lag1 + (1 | BankType/IDRSSD)"
+lmer4_formula <- "value_diff  ~ Qtr + (1 | BankType/IDRSSD) + BankType"
+lmer5_formula <- "value_diff  ~ Qtr + value_diff.mean + (1 | IDRSSD)"
+lmer6_formula <- "value_diff  ~ Qtr + value_diff.mean + (1 | BankType)"
+lmer7_formula <- "value_diff  ~ Qtr + value_diff.mean + (1 | IDRSSD) + RRSFS.Pop + RRSFS.Pop.lag1"
+lmer8_formula <- "value_diff.detrend  ~ RRSFS.Pop + RRSFS.Pop.lag1 + UNRATE + UNRATE.lag1 + (1 | IDRSSD)"
+
+arima1_formula <- "value_diff.mean ~ 1 + RRSFS.Pop.mean + RRSFS.Pop.lag1.mean + UNRATE.mean + UNRATE.lag1.mean"
+
+results |>
+add_row(model="LMER1", rsme =run_kfold_validation(non_partership_banks, lmer1_formula)) |>
+add_row(model="LMER2", rsme =run_kfold_validation(non_partership_banks, lmer2_formula)) |> 
+add_row(model="LMER3", rsme =run_kfold_validation(non_partership_banks, lmer3_formula)) |>
+add_row(model="LMER4", rsme =run_kfold_validation(non_partership_banks, lmer4_formula)) |>
+add_row(model="LMER5", rsme =run_kfold_validation(non_partership_banks, lmer5_formula)) |>
+add_row(model="LMER6", rsme =run_kfold_validation(non_partership_banks, lmer6_formula)) |>
+add_row(model="LMER7", rsme =run_kfold_validation(non_partership_banks, lmer7_formula)) |>
+add_row(model="LMER7", rsme =run_kfold_validation(non_partership_banks, lmer8_formula))
+add_row(model="ARIMA7", rsme =run_kfold_validation_arima(non_partership_banks, arima1_formula))
+
+
+best_model <- lmer(as.formula(lmer6_formula), data = non_partership_banks)
+partership_banks$preds <- predict(best_model, newdata = partership_banks)
+partership_banks$residuals <- partership_banks$value_diff - partership_banks$preds
+# If you know the actual outcomes for the test data
+test_rmse <- Metrics::rmse(partership_banks$value_diff, partership_banks$preds)
+
+partership_banks |> 
+    ggplot(aes(x = Quarter, y = value_diff, colour = EventPeriod)) +
+    geom_line(aes(y = preds))+ #, color = "blue") +  # Predicted fit
+    geom_point(aes(y = value_diff), color = "red", alpha = 0.5) +  # Observed data
+    facet_wrap(~ partnership+name+BankName, scales = "free_x") +  # Separate plot for each firm
+    labs(title = "Fitted Model for Each Firm", 
+        x = "Date", 
+        y = "value_diff")
+
+ggplot(acs(x))
+
+plot(test_preds, residuals, main="Residuals vs Predicted", xlab="Predicted Values", ylab="Residuals")
+abline(h=0, col="red")
+
+#create Q-Q plot for residuals
+qqnorm(residuals)
+#add a straight diagonal line to the plot
+qqline(residuals) 
+plot(density(partership_banks$residuals))
+plot(density(partership_banks |> filter(EventPeriod == FALSE) |> pull(residuals)))
+plot(density(partership_banks |> filter(EventPeriod == TRUE) |> pull(residuals)))
+
+
+
+
+bank_data |> View() 
+library(lme4)
+library(splines)
+
+quarter(yearquarter("2010 Q2"))
+
+m <- lmer(value_diff.detrend  ~ Qtr + (1 | BankType/IDRSSD) + BankType+ EventPeriod + (EventPeriod | IDRSSD), data = bank_data)
+
+m <- lmer(value_diff  ~ Qtr + value_diff.mean +  (EventPeriod | IDRSSD), data = bank_data)
+
+m <- lmer(value_diff  ~ Qtr + RRSFS.Pop+RRSFS.Pop.lag1 + UNRATE + UNRATE.lag1 + (EventPeriod | IDRSSD), data = bank_data)
+
+fit_consMR <- bank_data |> as_tsibble(key=c(BankName,name, partnership), index=Quarter) |>
+                fabletools::model(tslm = TSLM(value_diff  ~ Qtr + (1 | IDRSSD) + value_diff.mean+ RRSFS.Pop+RRSFS.Pop.lag1 + UNRATE + UNRATE.lag1 + (EventPeriod | IDRSSD)))
+
+
+augmented_data <- fit_consMR |>filter(!is.na(name)) |>
+                     augment()
+
+augmented_data |>
+  ggplot(aes(x = Quarter)) +
+  geom_line(aes(y = value_diff, colour = "Data")) +
+  geom_line(aes(y = .fitted, colour = "Fitted")) +
+  facet_wrap(~ partnership+name+BankName, scales = "free_x") +
+  labs(y = NULL,
+    title = "Percent change in US consumption expenditure"
+  ) +
+  scale_colour_manual(values=c(Data="black",Fitted="#D55E00")) +
+  guides(colour = guide_legend(title = NULL)) 
+
+summary(m)
+bank_data$yhat <- predict(m, re.form = NULL)  # re.form = NULL to include random effects
+
+subset(bank_data, partner_event == 1) |>
+    ggplot(aes(x = Quarter, y = value_diff, colour = EventPeriod)) +
+    geom_line(aes(y = yhat))+ #, color = "blue") +  # Predicted fit
+    geom_point(aes(y = value_diff), color = "red", alpha = 0.5) +  # Observed data
+    facet_wrap(~ partnership+name+BankName, scales = "free_x") +  # Separate plot for each firm
+    labs(title = "Fitted Model for Each Firm", 
+        x = "Date", 
+        y = "Return")
+
+
+    
+        
+
+
 # Estimate And observation data
 est_data <- bank_data |> filter(between(Period, -6, -1))
 obs_data <- bank_data |> filter(between(Period, 0, 5)) 
@@ -102,7 +295,7 @@ pivot_longer(cols=c(Actual,Predicted), names_to = "Values") |>
 ```
 
 ##Evaluating the model
-https://theeffectbook.net/ch-EventStudies.html
+   
 The idea is this: when there’s supposed to be an effect, and we test for an effect, we can’t tease apart what part of our findings is the effect, and what part is the counterfactual model being wrong. But what if we knew there were no effect? Then, anything we estimated could only be the counterfactual model being wrong. So if we got an effect under those conditions, we’d know our model was fishy and would have to try something else.
 
 So, get a bunch of different time series to test, especially those unaffected by the event. In the context of stock returns, for example, don’t just include the firm with the great announcement on a certain day, also include stocks for a bunch of other firms that had no announcement.

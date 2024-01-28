@@ -3,21 +3,16 @@ title: "ARIMA"
 format: html
 ---
 
+to 
+Our target data is the *`r credit_card.target_label()`* crucial because trends and seasonal patterns can obscure the true impact of the event
 For an observation we start with the assumption that it is a constitutent of: Trend + Seasonality + Portfolio 
 
-Portfolio is used to explain the Bank specific credit card business decisions. 
+Portfolio is used to explain the individual Bank level credit card business decisions. 
 
 
-Below approaches to filter out the Trend and Seasonality; the residuals will be Portfolio constitutent.
-1. Take the mean / median of the BankType
-2. STL at the BankType group level
-3. STL at the Bank Individual level
-4. ARIMA at the BankType group level
-5. ARIMA at the Bank Individual level
-
-Try with US economic exog variables
-
-
+Below approaches to filter out the Trend and Seasonality
+1. Use the BankType group mean or median
+2. "bottom-up" approach. Determining the Trend and Seasonality at a Bank individual level, and then summing these to the group.
 
 
 ```{r}
@@ -38,17 +33,75 @@ exog_us_economic_qtr <- us_economy() |>
 deliquent_data <- credit_card.overdue_3089(apply_bank_filters = TRUE, post_regulation = TRUE) |> left_join(exog_us_economic_qtr, by = join_by(Quarter)) |> na.omit(value_diff)
 
 deliquent_data_agg <- deliquent_data |> 
-            group_by(BankType) |>
+            aggregate_key(BankType, value_diff.mean = mean(value_diff, na.rm = TRUE)) |>
             summarise(value_diff.mean = mean(value_diff, na.rm = TRUE),
-                      value_diff.median = median(value_diff, na.rm = TRUE),
-                      RRSFS.Pop.mean = mean(RRSFS.Pop),
-                      RRSFS.Pop.lag1.mean = mean(RRSFS.Pop.lag1),
-                      UNRATE.mean = mean(UNRATE),
-                      UNRATE.lag1.mean = mean(UNRATE.lag1),
-                    ) |> na.omit(value_diff.mean)
+                      value_diff.median = median(value_diff, na.rm = TRUE)
+                      ) |> na.omit(value_diff.mean)
+
+fit <- deliquent_data |> 
+            aggregate_key(BankType, value_diff.mean = mean(value_diff, na.rm = TRUE)) |>
+            model(arima_rrsfs_unrate = ARIMA(value_diff.mean ~ 1 + RRSFS.Pop.mean + RRSFS.Pop.lag1.mean + UNRATE.mean + UNRATE.lag1.mean)) |>
+              reconcile(bu = bottom_up(arima_rrsfs_unrate))
+
+  
 
 
+augmented_data <- fit |>
+                    augment()
 
+augmented_data |> select(value_diff.mean, .fitted) |> pivot_longer(cols = c(value_diff.mean, .fitted)) |> autoplot(value,aes(colour = name)) + facet_wrap(~BankType, ncol = 1, scales = "free_y") 
+
+data |> aggregate_key() |> model() |>
+  reconcile() |> forecast()
+
+#each group has Trend + Seasonality
+deliquent_data_agg |> 
+  select(value_diff.mean, value_diff.median) |> 
+    pivot_longer(cols = !c(BankType,Quarter)) |> autoplot(value,aes(colour = name)) + facet_wrap(~BankType, ncol = 1, scales = "free_y") + theme(legend.position = "top", legend.title = element_blank())
+
+portfolio_data <- deliquent_data |> 
+                    left_join(deliquent_data_agg, by = join_by(BankType, Quarter)) |> 
+                      mutate(value_diff_portfolio.mean = value_diff - value_diff.mean,
+                             value_diff_portfolio.median =  value_diff - value_diff.median)
+
+portfolio_data |> filter(BankName == "BARCLAYS BANK DELAWARE (2980209)") |> 
+  select(BankType,value_diff,value_diff.mean, value_diff_portfolio.mean ) |>
+  pivot_longer(cols = !c(BankType,Quarter)) |> autoplot(value,aes(colour = name)) + facet_wrap(~BankType, ncol = 1, scales = "free_y") + theme(legend.position = "top", legend.title = element_blank())
+
+portfolio_data |> filter(BankName == "BARCLAYS BANK DELAWARE (2980209)") |> 
+  ggplot(aes(x = Quarter, y = value_diff_portfolio.median)) +
+  geom_point() +  # Add points
+  geom_smooth(method = "loess", color = "red")
+
+first_value <-portfolio_data |> filter(BankName == "BARCLAYS BANK DELAWARE (2980209)") |> pluck(value_diff_portfolio.median)
+
+barclays_series_diff <- portfolio_data |> filter(BankName == "BARCLAYS BANK DELAWARE (2980209)") 
+# Reverse the differencing
+reconstructed_series <- barclays_series_diff$value_diff_portfolio.median[1] + cumsum(barclays_series_diff$value_diff_portfolio.median)
+
+barclays_series_diff <- barclays_series_diff |> add_column(reconstruct_val = reconstructed_series)
+barclays_series_diff |> autoplot(reconstruct_val)
+
+value_col <- "value_diff_portfolio.median"
+value_col <- "reconstruct_val"
+threshold <- 0.5
+prophet_model <- barclays_series_diff |> 
+                  select(ds = Quarter,y = !!value_col) |> as_tibble() |> mutate(ds = yq(ds+1)-1) |>  prophet::prophet(changepoint.range = 0.99,changepoint.prior.scale = threshold)
+
+future <- prophet::make_future_dataframe(prophet_model, periods = 1)
+fcst <- predict(prophet_model, future)
+
+date_acquired <- credit_card.partnerships() |> filter(new =="BARCLAYS BANK DELAWARE (2980209)") |> pull(acquired)
+
+plot(prophet_model, fcst) + prophet::add_changepoints_to_plot(prophet_model) 
+
+prophet_model$changepoints[abs(prophet_model$params$delta) >= 0.01]
+
+barclays_plot$layers <- append(barclays_plot$layers,geom_vline(xintercept = integer(as.Date(date_acquired)), linetype=1,colour="black"))
+
+barclays_plot$layers        
+barclays_plot
+ 
 fit_agg <- deliquent_data_agg |> 
               model(
                   stl = STL(value_diff.mean),
