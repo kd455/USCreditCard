@@ -144,10 +144,11 @@ lmer3_formula <- "value_diff  ~ Qtr + RRSFS.Pop + RRSFS.Pop.lag1 + UNRATE + UNRA
 lmer4_formula <- "value_diff  ~ Qtr + (1 | BankType/IDRSSD) + BankType"
 lmer5_formula <- "value_diff  ~ Qtr + value_diff.mean + (1 | IDRSSD)"
 lmer6_formula <- "value_diff  ~ Qtr + value_diff.mean + (1 | BankType)"
-lmer7_formula <- "value_diff  ~ Qtr + value_diff.mean + (1 | IDRSSD) + RRSFS.Pop + RRSFS.Pop.lag1"
-lmer8_formula <- "value_diff.detrend  ~ RRSFS.Pop + RRSFS.Pop.lag1 + UNRATE + UNRATE.lag1 + (1 | IDRSSD)"
+lmer7_formula <- "value_diff  ~ Qtr + value_diff.median + (1 | BankType)"
+lmer8_formula <- "value_diff  ~ Qtr + value_diff.mean + (1 | IDRSSD) + RRSFS.Pop + RRSFS.Pop.lag1"
+lmer9_formula <- "value_diff.detrend  ~ RRSFS.Pop + RRSFS.Pop.lag1 + UNRATE + UNRATE.lag1 + (1 | IDRSSD)"
 
-arima1_formula <- "value_diff.mean ~ 1 + RRSFS.Pop.mean + RRSFS.Pop.lag1.mean + UNRATE.mean + UNRATE.lag1.mean"
+arima1_formula <- "value_diff ~ 1 + RRSFS.Pop.mean + RRSFS.Pop.lag1.mean + UNRATE.mean + UNRATE.lag1.mean"
 
 results |>
 add_row(model="LMER1", rsme =run_kfold_validation(non_partership_banks, lmer1_formula)) |>
@@ -157,7 +158,8 @@ add_row(model="LMER4", rsme =run_kfold_validation(non_partership_banks, lmer4_fo
 add_row(model="LMER5", rsme =run_kfold_validation(non_partership_banks, lmer5_formula)) |>
 add_row(model="LMER6", rsme =run_kfold_validation(non_partership_banks, lmer6_formula)) |>
 add_row(model="LMER7", rsme =run_kfold_validation(non_partership_banks, lmer7_formula)) |>
-add_row(model="LMER7", rsme =run_kfold_validation(non_partership_banks, lmer8_formula))
+add_row(model="LMER7", rsme =run_kfold_validation(non_partership_banks, lmer8_formula))|>
+add_row(model="LMER7", rsme =run_kfold_validation(non_partership_banks, lmer9_formula))
 add_row(model="ARIMA7", rsme =run_kfold_validation_arima(non_partership_banks, arima1_formula))
 
 
