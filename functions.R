@@ -15,9 +15,17 @@ library(ggtext)
 library(broom)
 library(tseries)
 library(lmtest)
-
+library(ggthemes)
 #set seed for reproducibility
 set.seed(42)
+
+scale_fill_colorblind7 = function(.ColorList = 2L:8L, ...){
+    scale_fill_discrete(..., type = colorblind_pal()(8)[.ColorList])
+}
+
+scale_color_colorblind7 = function(.ColorList = 2L:8L, ...){
+    scale_color_discrete(..., type = colorblind_pal()(8)[.ColorList])
+}
 
 get_features <- function(data, ftags, value_name = "Value") {
     stat_features <- data |>
@@ -183,60 +191,13 @@ summary_ratios.assets <- function() {
   # }
 }
 
-# credit_card.loan_amount_ratio_calc <- function() {
-#   calculated_measures() |>
-#     filter(Measure == "UBPRB538C")
-# }
-
-# credit_card.unused_ratio_calc <- function() {
-#   calculated_measures() |>
-#     filter(Measure == "UBPR3815C")
-# }
-# credit_card.unused_proportion <- function() {
-#   calculated_measures() |>
-#     filter(Measure == "UBPR3815CP")
-# }
-
-# calculate_new_measures <- function() {
-#   avg_assets <- summary_ratios.assets()
-#   cc_unused_r <- as_percent_avg_assets(credit_card.unused(), avg_assets)
-#   cc_loans_r <- as_percent_avg_assets(credit_card.loan_amount(), avg_assets)
-#   cc_loans_p <- as_percent_loans(credit_card.unused(),credit_card.loan_amount())
-
-#   dplyr::bind_rows(avg_assets, cc_unused_r,cc_loans_r,cc_loans_p) |>
-#     arrow::write_parquet("data/UBPR_Calc_Ratios.parquet")
-# }
-
-# calculated_measures <- memoise(function() {
-#   arrow::read_parquet("data/UBPR_Calc_Ratios.parquet")
-# })
-
-# as_percent_loans <- function(numerator_df, loans_df) {
-#   numerator_df |> add_column(calc_value = round((numerator_df$Value/loans_df$Value)*100,2)) |>
-#               mutate(Value = calc_value,
-#                       value_diff = difference(Value),
-#                       Measure = paste0(Measure,"CP"),
-#                       Label = paste0(Label,"_CP"),
-#                       Description = paste(Description,", % Credit Card Loans")) |> 
-#                       select(-calc_value)
-# }
-
-# as_percent_avg_assets <- function(numerator_df, assets_df) {  
-#   numerator_df |> add_column(calc_value = round((numerator_df$Value/assets_df$Value)*100,2)) |>
-#                 mutate(Value = calc_value,
-#                         value_diff = difference(Value),
-#                         Measure = paste0(Measure,"C"),
-#                         Label = paste0(Label,"_CALC"),
-#                         Description = paste(Description,", % Avg Assets")) |> 
-#                         select(-calc_value)
-# }
-
 us_economy <- memoise(function(freq = "M") {
   read_csv(glue("data/US_Economic_Data_{freq}.csv"), show_col_types = FALSE) |>
     mutate(Month = yearmonth(Date)) |>
     dplyr::select(-Date)|>
     as_tsibble(index = Month)
 })
+
 
 us_economy.recession <- memoise(function() {
   read_csv("data/JHDUSRGDPBR_M.csv", col_names = c("Month", "Flag"), show_col_types = FALSE) |>
@@ -290,7 +251,7 @@ white.noise.plot <- function() {
 }
 
 credit_card.partnerships <- function() {
-  tibble::tibble_row(name = "Cosco",
+  tibble::tibble_row(name = "Costco",
                 old="AMERICAN EXPRESS NATIONAL BANK (1394676)", 
                 new="CITIBANK, N.A. (476810)",
                 acquired = "2016-04-01",
@@ -383,7 +344,8 @@ outlier.plot <- function(data, pca_output, P1_lower, P1_upper, P2_lower, P2_uppe
       facet_wrap(~BankName, ncol = 1) +
       theme(legend.position = "none")  +
       labs(subtitle = glue("Outliers: {P1_lower} < PC1 < {P1_upper}, {P2_lower} < PC2 < {P2_upper}"),
-           y = paste0(credit_card.target_label(), "\n", value_name))
+           y = paste0(credit_card.target_label(), "\n", value_name)) +
+      scale_color_colorblind7()
   }
 }
 
@@ -464,11 +426,14 @@ partnership.plot <- function(name, old, new, acquired, available, selected_measu
     annotate("text", x=as.numeric(date_acquired-10), y=0, label="acquired", angle=90, hjust = 0)+
     geom_vline(xintercept = as.numeric(date_available), linetype=4) +
     annotate("text", x=as.numeric(date_available-10), y=0, label="available", angle=90, hjust = 0) 
-    #ggsave(glue("images/{name}_{measures_label}_{value_name}_{trend_calc}_partnership.png"), width = 16, height = nrow(measures)*4, dpi = 300)
+    ggsave(glue("images/{name}_{measures_label}_{value_name}_{trend_calc}_partnership.png"), width = 16, height = nrow(measures)*4, dpi = 300)
 }
 
-run_granger_test <- function(data, target_variable, exog_variable, order = 4) {
+run_granger_test <- function(data, target_variable, exog_variable, order = 4, do_difference = TRUE) {
     if (is.numeric(data[[exog_variable]])) {
+        if(do_difference) {
+            data <- data |> mutate(across(!Quarter, ~difference(.)))                
+        }
         lmtest::grangertest(data[[target_variable]], data[[exog_variable]], order = order) |> as_tibble() |> na.omit() |> tibble::add_column(exog_variable)
     }
 }
@@ -478,7 +443,7 @@ run_ccf_test <- function(data, target_variable, exog_variable, do_difference = T
         if(do_difference) {
             data <- data |> mutate(across(!Quarter, ~difference(.)))                
         }
-        feasts::CCF(y = !!as.name(target_variable), x = !!as.name(exog_variable), .data = data) |> autoplot() + labs(subtitle = {exog_variable})
+        feasts::CCF(y = !!as.name(target_variable), x = !!as.name(exog_variable), .data = data) |> autoplot()
     }
 }
 
@@ -502,13 +467,13 @@ max_tstibble <- function(data) {
         summarise(across(where(is.numeric), \(x) max(x, na.rm = TRUE))) |> max()
 }
 
-plot_us_category <- function(category, us_measures, target_data, target_measure = "target_median") {
+plot_us_category <- function(category, measures, target_data, target_measure = "target_median") {
     target_label <-credit_card.target_label()
-    index_var <- index_var(us_measures)
+    index_var <- index_var(measures)
     recessions <- us_economy.recession() |> 
                     filter(Flag == 1, 
                            Month >= ym("1989-10"))
-    data <- us_measures |> na.omit() |>
+    data <- measures |> drop_na() |>
               mutate(across(!as.name(index_var), scale))
     max_y <- max_tstibble(data)     
 
@@ -530,6 +495,6 @@ plot_us_category <- function(category, us_measures, target_data, target_measure 
         geom_line(mapping = aes(y = !!as.name(target_measure)), data = target_data,
                   colour = 'darkslategrey') +
         geom_vline(xintercept = as.numeric(yq(get_regulation_cutoff())), linetype=1,colour="darkred") +
-        annotate("text", x=as.numeric(yq(get_regulation_cutoff())), y=max_y-1, size = 8/.pt, label="Credit Card Regulations",vjust = -0.5, colour = "darkred")             
+        annotate("text", x=as.numeric(yq(get_regulation_cutoff())), y=max_y-1, size = 8/.pt, label="Credit Card Regulations",vjust = -0.5, colour = "darkred") +
+        scale_color_colorblind7()                     
 }
-

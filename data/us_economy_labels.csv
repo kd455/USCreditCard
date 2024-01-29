@@ -1,11 +1,12 @@
 Name,Desc,Formula,Category
-UNRATE,Unemployment Rate,UNRATE,Income & Savings
+UNRATE,Unemployment Rate,UNRATE,Economy
 PSAVERT,US Personal Savings Rate,PSAVERT,Income & Savings
-CSCICP03USM665S,US Composite Confidence Indicator,CSCICP03USM665S,Other
-B069RC1.Pop.CPI,Real Personal interest payments per capita,B069RC1/POPTHM/PCEPI,Other
+CSCICP03USM665S,US Composite Confidence Indicator,CSCICP03USM665S,Economy
+B069RC1.Pop.CPI,Real Personal interest payments per capita,B069RC1/POPTHM/PCEPI,Debt
 PCEDG.Pop.CPI,Real Personal Consumption Expenditures: Durable Goods per capita,PCEDG/POPTHM/PCEPI,Expenditures
 PCE.Pop.CPI,Real Personal Consumption Expenditures per capita,PCE/POPTHM/PCEPI,Expenditures
 RRSFS.Pop,Real Advance Retail and Food Services Sales per capita,RSAFS/POPTHM,Expenditures
 A229RC0.CPI,Real Disposable Personal Income per capita,A229RC0/PCEPI,Income & Savings
 PSAVE.Pop.CPI,Real US Personal Savings per capita,PSAVE/POPTHM/PCEPI,Income & Savings
-A939RX0Q048SBEA,Real gross domestic product per capita,A939RX0Q048SBEA,
+CDSP,Consumer Debt Service Payments as a Percent of Disposable Personal Income,CDSP,Debt
+TDSP,Household Debt Service Payments as a Percent of Disposable Personal Income,TDSP,Debt

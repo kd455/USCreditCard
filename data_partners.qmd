@@ -1,7 +1,9 @@
 ---
 title: "Bank Partnerships"
 number-sections: true
-format: html
+format: 
+   html:
+     df-print: paged
 ---
 
 ## Exploring Partnership Events
@@ -13,9 +15,9 @@ source('functions.R')
 target_label <- credit_card.target_label()
 ``` 
 
-Using three partnership events as case studies, we can visualise *`r target_label`* to see if we can observe any changes around the partnership event. There are two dates of interest; the official date of acquisition and the date when cards become available for use. For example, Baclays's acquisition of GAP Inc. was on May 1, 2022 but it wasn't until June 20, 2022 that the old Synchrony borrowers could use their new Barclays partnership cards.
+Using three partnership events as case studies, we can visualise *`r target_label`* to see if we can observe any changes around the partnership event. There are two dates of interest; the official date of acquisition and the date when cards become available for use. For example, Barclays's acquisition of GAP Inc. was on May 1, 2022 but it wasn't until June 20, 2022 that the old Synchrony borrowers could use their new Barclays partnership cards.
 
-As mentioned in section @sec-intro-events we may not noticeably see the impact of a partnership event if it is not material to one or both of the Banks involved. To get a sense of the magnitude of the event we can look at the measures: *Loans to Individuals..Credit Cards* (UBPRB538) and *Unused commitments on Credit Credit Cards* (UBPR3815). These measures can tell us if borrowers utilise their partnership card; a new partnership that brings in substantial number of new borrowers may not impact delinquency if the borrowers are not using the partnership card. 
+As mentioned in @sec-intro-events we may not noticeably see the impact of a partnership event if it is not material to one or both of the Banks involved. To get a sense of the magnitude of the event we can look at the measures: *Loans to Individuals..Credit Cards* (UBPRB538) and *Unused commitments on Credit Credit Cards* (UBPR3815). These measures tell us if borrowers utilise their partnership card; a new partnership that brings in a substantial number of new borrowers may not impact delinquency if the borrowers are not using the partnership card. 
 
 ```{r}
 #| warning: false
@@ -62,30 +64,30 @@ partner_data |> pmap(partnership.plot,bind_rows(loan_amt_pct_change,loan_unused_
 
 source: [@gap2021; and @gap2022]
 
-## Cosco
+## Costco
 
-![`r target_label`](images/Cosco_UBPRE524_Value_median_partnership.png){#fig-cosco-val}
+![`r target_label`](images/Costco_UBPRE524_Value_median_partnership.png){#fig-Costco-val}
 
-![`r target_label` quarterly difference](images/Cosco_UBPRE524_value_diff_median_partnership.png){#fig-cosco-diff}
+![`r target_label` quarterly difference](images/Costco_UBPRE524_value_diff_median_partnership.png){#fig-Costco-diff}
 
-::: {#fig-magitude-cosco .panel-tabset}
+::: {#fig-magitude-Costco .panel-tabset}
 
 ## Magnitude Measures - Value
 
-![Magnitude Measures](images/Cosco_UBPR3815_UBPRB538_Value_median_partnership.png){#fig-cosco-val-mag}
+![Magnitude Measures](images/Costco_UBPR3815_UBPRB538_Value_median_partnership.png){#fig-Costco-val-mag}
 
 ## Magnitude Measures - Percentage Change
 
-![Magnitude Measures](images/Cosco_UBPR3815_UBPRB538_pct_change_median_partnership.png){#fig-cosco-pct-mag}
+![Magnitude Measures](images/Costco_UBPR3815_UBPRB538_pct_change_median_partnership.png){#fig-Costco-pct-mag}
 
 :::
 
-source: @cosco2016
+source: [@Costco2016]
 
 ## Walmart
 ![`r target_label`](images/Walmart_UBPRE524_Value_median_partnership.png){#fig-walmart-val}
 
-![`r target_label` quarterly difference](images/Walmart_UBPRE524_value_diff_median_partnership.png){#fig-cosco-diff}
+![`r target_label` quarterly difference](images/Walmart_UBPRE524_value_diff_median_partnership.png){#fig-Costco-diff}
 
 ::: {#fig-magitude-walmart .panel-tabset}
 
@@ -101,7 +103,7 @@ source: @cosco2016
 source: [@walmart2018; and @walmart2019]
 :::
 
-## Disambiguating Trend vs. Event 
+## Disambiguating Trend vs. Event  {#sec-trend-event}
 
 Depending on the relative quality of the partnership portfolio we may see `r target_label` remain: 
 
@@ -109,16 +111,46 @@ Depending on the relative quality of the partnership portfolio we may see `r tar
 * Both portfolios improve / degrade
 * One improves the other degrades.
 
-For the GAP and Cosco partnerships we can see that the quality degrades i.e. *`r target_label`* shows increased delinquency, in both the *old* and *new* bank during the transitional period (between acquisition and card availability). This may suggest the partnership portfolio adds riskier borrowers relative to the *new* bank's existing portfolio and removes less risky borrowers relative to the *old* bank's remaining portfolio. This assertion is questionable as the increase we are seeing may just be the trend, shown in grey (calculated as the median across all peer Banks), which also increases. 
+For the GAP and Costco partnerships we can see that the quality degrades i.e. *`r target_label`* shows increased delinquency, in both the *old* and *new* bank during the transitional period (between acquisition and card availability). This may suggest the partnership portfolio adds riskier borrowers relative to the *new* bank's existing portfolio and removes less risky borrowers relative to the *old* bank's remaining portfolio. This assertion is questionable as the increase we are seeing may just be the trend, shown in grey (calculated as the median across all peer Banks), which also increases. 
 
 Another factor, as we saw in @fig-lfeature-6, was a tendency for short term reversal, or a reversion to a mean. This may be a factor of banks enacting policies to keep delinquency within their risk tolerance levels. Consequently, where we see an increase after a decrease it may be due in part to this data characteristic.
 
-In section X we will look to model the partnership impact by accounting for trend.
+We will look to model the partnership impact by accounting for trend.
 
 ## Magnitude measures
 
 Anecdotal accounts indicate that a spike in Unused commitments before the *available* date could be due to borrowers paying down their cards, and even closing them, to mitigate concerns around the transition [@redditBarc]. The borrowers who can pay down their loans are likely low-risk, which may result in the portfolio, at the time of the partnership event, looking more risky than it really is (given *`r target_label`* is a proportion of the credit card loans). 
 
-Increases in credit card loans in the *old* bank, as seen in GAP and Walmart, is unexpected. An assumption is that these banks did not want to lose borrowers and marketed 'bank branded' alternative cards.   
+Increases in credit card loans in the *old* bank, as seen in GAP and Walmart, is unexpected. An assumption is that these banks marketed alternative cards to keep borrowers.   
+
+## Additional information on partnerships
+
+Given our goal to generalise partnership impacts by FICO and/or Industry we need to use additional public data sources to provide this mapping. 
+
+### FICO Score
+The *Terms of credit card plans (TCCP) survey* [@TCCP2022] provides credit card details including their target FICO Tiers. For our case studies all the cards are available to individuals with minimum *Poor or fair credit (credit score 619 or less)*. We may not have enough partnerships with different FICO minimums to say whether FICO score has an impact. 
+
+```{r}
+#| warning: false
+#| label: tbl-tccp
+#| tbl-cap: "Subset of TCCP survey (2022)"
+
+readxl::read_excel("data/cfpb_tccp-data_2022-07-01_2022_12-31.xlsx", skip=9) |> filter(`Availability of Credit Card Plan` == "National",
+grepl("Walmart|GAP|Apple|Costco|Wayfair|GP", `Product Name`, ignore.case = TRUE)) |>
+dplyr::select(`Product Name`, `Institution Name`, `Targeted Credit Tiers`,
+Services,`Other Services`,Rewards,`Other Rewards`,`Website for Consumer`) 
+
+```
+
+### Industry Classification
+
+The US uses the *North American Industry Classification System (NAICS)* [@naics] which we will utilise at the granularity that provides some grouping. For our use cases NAICS hierarchy level 5 looks promising.
+
+| Firm | NAICS | level 6 | level 5 | 
+|---------|:-----|------:|:------:|
+|Costco|455211|Warehouse Clubs and Supercenters|Department Stores
+|Walmart|455110|Department Stores|Department Stores
+|GAP|458110|Clothing and Clothing Accessories Retailers|Clothing and Clothing Accessories Retailers
+
 
 ## References

@@ -59,7 +59,7 @@ bank_n |> right_join(bank_type.desc()) |>
 Why are there thousands of Banks? The US Banking system grew out of 19th-century regulations that restricted where banks could operate. This resulted in a very localised Banking market. Today big banks such as JPMorgan Chase, Bank of America, Citigroup and Wells Fargo, dominate the industry but there are still about 4,100 US Banks compared with 353 in Britain and 261 in Germany [@economist2023]. 
 :::
 
-## Data Period
+## Data Period {#sec-cardact}
 
 Regulation implemented in 2010 had a material impact on the credit card market [@cfpb2013; also @boston2014]. As highlighted by @boston2014, regulation coincided with the 2008 financial crisis and recession, making it difficult to fully assert causation [-@boston2014].
 

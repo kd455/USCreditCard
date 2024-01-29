@@ -5,20 +5,23 @@ format:
      df-print: paged
 ---
 
-US Federal Reserve Economic Data [@fred]
-
-Yearly/Quarterly/Monthly data series covering various categories. For this project we are interested in data series that tell us about the financial health of households:
-Employment rate
-Personal Savings Rate
-Disposable Income
-
-@taghiyeh2021
-
-
 ```{r}
 #| echo: false
 #| warning: false
 source('functions.R')
+```
+
+As discussed in @sec-trend-event the impact of the partnership event can be masked by trends and seasonality.
+
+A preliminary approach involves adjusting each Bank's *`r credit_card.target_label()`* by removing the influence of the broader trend within its respective group (Large Banks or Large Credit Card Banks). This is achieved by subtracting the group's central tendency (mean or median). We assume the residuals fluctuations are due to the unique characteristics of each Bank's credit card portfolio. These characteristics might include the bank's specific credit policies, customer risk profiles, or portfolio management strategies.
+
+However, this method may not capture all the factors influencing credit card delinquencies. Macroeconomic variables, such as changes in unemployment and other economic conditions, also play a crucial role in shaping delinquency trends. @Agarwal2003, using proprietary credit card data of 700 thousand customers from 1995 to 2001, concluded that *unemployment* is a key determinant of consumer delinquency and bankruptcy. @GHJ2001 pointed to *consumer debt ratio* i.e. when debt payment obligations become too high relative to disposable income for the population as a whole, borrowers are unable to service their debts. @taghiyeh2021 explored 19 lagged macroeconomic measures and found the most significant to predict credit card loss was: previous quarter *Unemployment*, *Building permits* and *Initial unemployment insurance claims*; previous year's (lag 4) *Money stock* and *ISM Purchasing Mangers Index* and the current quarter's *Weekly hours worked by manufacturing workers*.
+
+US Federal Reserve Economic Data [@fred] provides data series covering various categories, and we can use past literature and new analysis to inform our choice of measures.
+
+```{r}
+#| echo: false
+#| warning: false
                 
 granger_test_permutations <- function(data, target_col_name = "target_mean", exog_names, max_lag = 4) {
     results <- list()
@@ -29,21 +32,19 @@ granger_test_permutations <- function(data, target_col_name = "target_mean", exo
     results 
 }    
 
-us_measures <- us_economy() |>
+us_measures <- us_economy() |> 
             mutate(B069RC1.Pop.CPI =B069RC1/POPTHM/PCEPI) |>
             mutate(PCEDG.Pop.CPI = PCEDG/POPTHM/PCEPI) |>
             mutate(PCE.Pop.CPI = PCE/POPTHM/PCEPI) |>
             mutate(RRSFS.Pop = RRSFS/POPTHM) |> 
             mutate(A229RC0.CPI = A229RC0/PCEPI) |> 
-            #mutate(PSAVE.Pop.CPI = PSAVE/POPTHM/PCEPI) |>
-            select(-c(RRSFS,PSAVE,A229RC0,CPILFESL,CPIAUCSL,DSPI,DSPIC96,B069RC1,PCEDG,PCE,POPTHM,PCEPI))
+            select(-c(RRSFS,A229RC0,CPILFESL,CPIAUCSL,DSPI,DSPIC96,B069RC1,PCEDG,PCE,POPTHM,PCEPI))
 
-us_measures_qtr <- us_measures |>
+us_measures_qtr <- us_measures |> 
                     mutate(Quarter = yearquarter(Month)) |>
                     index_by(Quarter) |>
-                    summarise(across(!Month, mean))
-                    #filter(Quarter >= yearquarter(get_regulation_cutoff())) 
-                    
+                    summarise(across(!Month, mean, na.rm = TRUE)) |> drop_na()
+
 apply_bank_filters = TRUE
 apply_reg_filter = FALSE
 overdue30to89.all <- credit_card.overdue30to89.agg(apply_bank_filters, apply_reg_filter) 
@@ -56,11 +57,56 @@ overdue30to89.post.lcbank <- credit_card.overdue30to89.agg.lccbank(apply_bank_fi
 overdue30to89.post.lbank <-  credit_card.overdue30to89.agg.lbank(apply_bank_filters, apply_reg_filter)             
 
 ```
+
+## US Economic Measures
+
+The plots presented below offer insightful trends regarding consumer financial behaviour following the 2008 financial crisis and the enactment of the Credit Card Accountability Responsibility and Disclosure (CARD) Act in 2010 (see @sec-cardact). In the decade that ensued, there is a noticeable trend of increasing personal expenditures. Concurrently, although personal incomes also exhibit an upward trajectory, their rate of increase does not match that of expenditures. This divergence results in a gradual rise in the consumer debt service ratio (CDSP), indicating an expanding gap between income and debt obligations. Notably, throughout this period, credit card delinquency rates remain relatively stable, suggesting improved risk management practices. However, the onset of the COVID-19 pandemic marks a distinct phase of economic upheaval.
+
+If required, each measure has been adjusted for population changes and inflation to ensure we can compare across different time periods.
+
+::: {#fig-usmeasures .panel-tabset}
+
+## Combined
+```{r}
+#| warning: false
+#| error: false
+
+plot_us_category("Expenditures",us_measures_qtr, overdue30to89.all)
+plot_us_category("Income & Savings",us_measures_qtr, overdue30to89.all)
+plot_us_category("Debt",us_measures_qtr, overdue30to89.all)
+plot_us_category("Economy",us_measures_qtr, overdue30to89.all)
+```
+
+## Large Bank
+```{r}
+#| warning: false
+#| error: false
+
+plot_us_category("Expenditures", us_measures_qtr, overdue30to89.all.lbank)
+plot_us_category("Income & Savings", us_measures_qtr, overdue30to89.all.lbank)
+plot_us_category("Debt", us_measures_qtr, overdue30to89.all.lbank)
+plot_us_category("Economy", us_measures_qtr, overdue30to89.all.lbank)
+```
+
+## Large Credit Card Bank
+```{r}
+#| warning: false
+#| error: false
+plot_us_category("Expenditures", us_measures_qtr, overdue30to89.all.lcbank)
+plot_us_category("Income & Savings", us_measures_qtr, overdue30to89.all.lcbank)
+plot_us_category("Debt", us_measures_qtr, overdue30to89.all.lcbank)
+plot_us_category("Economy", us_measures_qtr, overdue30to89.all.lcbank)
+
+```
+
+:::
+
+
 ## Granger Test
 
-Checks that the lagged values of X jointly improve the forecast of Y
+"X is said to Granger-cause Y if Y can be better predicted using the histories of both X and Y than it can by using the history of Y alone."[@granger2011]
 
-When choosing lags, note that there is a trade-off between bias and power. With too few lags the test may be biased because of residual auto-correlation. Too many, and you risk spurious rejections of the null because of random correlations
+The tables presented below, show the macroeconomic measures and lag (Df column) that Granger-cause *`r credit_card.target_label()`* (Y).
 
 ::: {#fig-granger .panel-tabset}
 
@@ -72,19 +118,20 @@ When choosing lags, note that there is a trade-off between bias and power. With 
 #| label: tbl-granger-comb
 #| tbl-cap: "Granger Test at Lags 1 to 4"
 #| tbl-subcap:
-#|   - "All Series from 2002 Q4"
 #|   - "Post Regulatory Changes 2010 Q2"
+#|   - "Series from 2002 Q4"
 #| layout-ncol: 1
+
+granger_test_permutations(data = overdue30to89.post |> left_join (us_measures_qtr,by = join_by(Quarter)), 
+                            target_col_name = "target_median",
+                            exog_names = names(us_measures_qtr),
+                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
 granger_test_permutations(data = overdue30to89.all |> left_join (us_measures_qtr,by = join_by(Quarter)), 
                             target_col_name = "target_median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
-granger_test_permutations(data = overdue30to89.post |> left_join (us_measures_qtr,by = join_by(Quarter)), 
-                            target_col_name = "target_median",
-                            exog_names = names(us_measures_qtr),
-                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 ```
 
 
@@ -96,21 +143,19 @@ granger_test_permutations(data = overdue30to89.post |> left_join (us_measures_qt
 #| label: tbl-granger-lb
 #| tbl-cap: "Granger Test at Lags 1 to 4"
 #| tbl-subcap:
-#|   - "All Series from 2002 Q4"
 #|   - "Post Regulatory Changes 2010 Q2"
+#|   - "Series from 2002 Q4"
 #| layout-ncol: 1
-
- 
-granger_test_permutations(data = overdue30to89.all.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
-                            target_col_name = "target_median",
-                            exog_names = names(us_measures_qtr),
-                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
 granger_test_permutations(data = overdue30to89.post.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
                             target_col_name = "target_median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
+granger_test_permutations(data = overdue30to89.all.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
+                            target_col_name = "target_median",
+                            exog_names = names(us_measures_qtr),
+                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
 ```
 ## Large Credit Card Bank
@@ -121,84 +166,141 @@ granger_test_permutations(data = overdue30to89.post.lbank |> left_join (us_measu
 #| label: tbl-granger-lcb
 #| tbl-cap: "Granger Test at Lags 1 to 4"
 #| tbl-subcap:
-#|   - "All Series from 2002 Q4"
 #|   - "Post Regulatory Changes 2010 Q2"
+#|   - "Series from 2002 Q4"
 #| layout-ncol: 1
-
- 
-granger_test_permutations(data = overdue30to89.all.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
-                            target_col_name = "target_median",
-                            exog_names = names(us_measures_qtr),
-                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
 granger_test_permutations(data = overdue30to89.post.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
                             target_col_name = "target_median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
+granger_test_permutations(data = overdue30to89.all.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
+                            target_col_name = "target_median",
+                            exog_names = names(us_measures_qtr),
+                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
 ```
 
 :::
 
-## CCF 
+## Cross-Correlation Function 
+
+Cross-Correlation Function (CCF) shows the correlation between our macroeconomic measure (X) and *`r credit_card.target_label()`* (Y) at various lags. Unlike the Granger test, it includes the current lag.
+
+::: {#fig-ccf .panel-tabset}
+
+## Combined
+
 ```{r}
 #| warning: false
 #| error: false
 #| label: fig-ccf
+#| fig-cap: "Cross-Correlation Function"
+#| fig-subcap:
+#|   - "RRSFS.Pop - Real Advance Retail and Food Services Sales per capita"
+#|   - "CDSP - Consumer Debt Service Payments as a Percent of Disposable Personal Income"
+#|   - "UNRATE - Unemployment Rate"
+#| layout-ncol: 3
 
 run_ccf_test(data = overdue30to89.all |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "target_mean",
+             target_variable = "target_median",
              exog_variable = "RRSFS.Pop",
              do_difference = TRUE)
 
 run_ccf_test(data = overdue30to89.post |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "target_mean",
-             exog_variable = "A229RC0.CPI",
+             target_variable = "target_median",
+             exog_variable = "CDSP",
              do_difference = TRUE)    
 
 run_ccf_test(data = overdue30to89.post |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "target_mean",
+             target_variable = "target_median",
              exog_variable = "UNRATE",
              do_difference = TRUE)                          
-#us_measures_qtr |> names() |> purrr::map(\(x) run_ccf_test(overdue30to89 |> left_join (us_measures_qtr,by = join_by(Quarter)), "target_mean", x, 4))
 
 ```
-
-## US Economic Measures
-
-::: {#fig-usmeasures .panel-tabset}
-
-## Combined
-```{r}
-#| warning: false
-#| error: false
-
-plot_us_category("Expenditures",us_measures_qtr, overdue30to89.all)
-plot_us_category("Income & Savings",us_measures_qtr, overdue30to89.all)
-plot_us_category("Other",us_measures_qtr, overdue30to89.all)
-```
-
-
-
 ## Large Bank
+
 ```{r}
 #| warning: false
 #| error: false
+#| label: fig-ccf-lb
+#| fig-cap: "Cross-Correlation Function"
+#| fig-subcap:
+#|   - "RRSFS.Pop - Real Advance Retail and Food Services Sales per capita"
+#|   - "CDSP - Consumer Debt Service Payments as a Percent of Disposable Personal Income"
+#|   - "UNRATE - Unemployment Rate"
+#| layout-ncol: 3
+run_ccf_test(data = overdue30to89.all.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
+             target_variable = "target_median",
+             exog_variable = "RRSFS.Pop",
+             do_difference = TRUE)
 
-plot_us_category("Expenditures", us_measures_qtr, overdue30to89.all.lbank)
-plot_us_category("Income & Savings", us_measures_qtr, overdue30to89.all.lbank)
-plot_us_category("Other", us_measures_qtr, overdue30to89.all.lbank)
+run_ccf_test(data = overdue30to89.post.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
+             target_variable = "target_median",
+             exog_variable = "CDSP",
+             do_difference = TRUE)    
+
+run_ccf_test(data = overdue30to89.post.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
+             target_variable = "target_median",
+             exog_variable = "UNRATE",
+             do_difference = TRUE)                          
+
 ```
 
 ## Large Credit Card Bank
+
 ```{r}
 #| warning: false
 #| error: false
+#| label: fig-ccf-lcb
+#| fig-cap: "Cross-Correlation Function"
+#| fig-subcap:
+#|   - "RRSFS.Pop - Real Advance Retail and Food Services Sales per capita"
+#|   - "CDSP - Consumer Debt Service Payments as a Percent of Disposable Personal Income"
+#|   - "UNRATE - Unemployment Rate"
+#| layout-ncol: 3
+run_ccf_test(data = overdue30to89.all.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
+             target_variable = "target_median",
+             exog_variable = "RRSFS.Pop",
+             do_difference = TRUE)
 
-plot_us_category("Expenditures", us_measures_qtr, overdue30to89.all.lcbank)
-plot_us_category("Income & Savings", us_measures_qtr, overdue30to89.all.lcbank)
-plot_us_category("Other", us_measures_qtr, overdue30to89.all.lcbank)
+run_ccf_test(data = overdue30to89.post.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
+             target_variable = "target_median",
+             exog_variable = "CDSP",
+             do_difference = TRUE)    
+
+run_ccf_test(data = overdue30to89.post.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
+             target_variable = "target_median",
+             exog_variable = "UNRATE",
+             do_difference = TRUE)                                  
+
 ```
 
 :::
+
+### Cross-Correlation between macro economic variables
+
+Taking *Real Advance Retail and Food Services Sales per capita* (RRSFS.Pop) as our X variable we can see from @fig-ccf-rrsfs that significant correlations are found at both positive and negative lags which suggests a bidirectional or feedback relationship between X and Y. For example, in @fig-ccf-rrsfs-2 the lag at -1 suggests a change in retail and food sales impacts unemployment in the following quarter. Similarly, the significant correlation at +1 lag suggests that changes in unemployment have an impact on retail and food sales in the next quarter. 
+
+```{r}
+#| warning: false
+#| error: false
+#| label: fig-ccf-rrsfs
+#| fig-cap: "Cross-Correlation Function"
+#| fig-subcap:
+#|   - "CCF for RRSFS.Pop (X) and CDSP (Y)"
+#|   - "CCF for RRSFS.Pop (X) and UNRATE (Y)"
+#| layout-ncol: 2 
+run_ccf_test(data = us_measures_qtr,
+             target_variable = "CDSP",
+             exog_variable = "RRSFS.Pop",
+             do_difference = TRUE)
+
+run_ccf_test(data = us_measures_qtr,
+             target_variable = "UNRATE",
+             exog_variable = "RRSFS.Pop",
+             do_difference = TRUE)             
+```
+
+## References
