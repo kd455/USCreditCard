@@ -75,7 +75,7 @@ credit_card <- memoise(function(apply_bank_filters = FALSE, post_regulation = FA
               filter(BankType %in% c("LargeBank", "LargeCreditCardBank")) |>
               tsibble::group_by_key() |>
               filter(Value != 0) |>
-              slice(3:n())
+              slice(2:n())
   }
 
   if (post_regulation) {
@@ -260,21 +260,21 @@ white.noise.plot <- function() {
 }
 
 credit_card.partnerships <- function() {
-  tibble::tibble_row(name = "Costco",
-                old="AMERICAN EXPRESS NATIONAL BANK (1394676)", 
-                new="CITIBANK, N.A. (476810)",
-                acquired = "2016-04-01",
-                available = "2016-06-20") |>
-                tibble::add_row(name = "Walmart",
-                old="SYNCHRONY BANK (1216022)",
-                new="CAPITAL ONE, NATIONAL ASSOCIATION (112837)",
-                acquired = "2019-07-01",
-                available = "2019-09-24")|>
-                tibble::add_row(name = "GAP",
-                old="SYNCHRONY BANK (1216022)", 
-                new="BARCLAYS BANK DELAWARE (2980209)",
-                acquired = "2022-05-01",
-                available = "2022-06-20")
+  tibble::tibble_row(Partner = "Costco",
+                Old="AMERICAN EXPRESS NATIONAL BANK (1394676)", 
+                New="CITIBANK, N.A. (476810)",
+                Acquired = "2016-04-01",
+                Available = "2016-06-20") |>
+                tibble::add_row(Partner = "Walmart",
+                Old="SYNCHRONY BANK (1216022)",
+                New="CAPITAL ONE, NATIONAL ASSOCIATION (112837)",
+                Acquired = "2019-07-01",
+                Available = "2019-09-24")|>
+                tibble::add_row(Partner = "GAP",
+                Old="SYNCHRONY BANK (1216022)", 
+                New="BARCLAYS BANK DELAWARE (2980209)",
+                Acquired = "2022-05-01",
+                Available = "2022-06-20")
 }
 
 credit_card.target_label <- function() {
@@ -506,4 +506,79 @@ plot_us_category <- function(category, measures, target_data, target_measure = "
         geom_vline(xintercept = as.numeric(yq(get_regulation_cutoff())), linetype=1,colour="darkred") +
         annotate("text", x=as.numeric(yq(get_regulation_cutoff())), y=max_y-1, size = 8/.pt, label="Credit Card Regulations",vjust = -0.5, colour = "darkred") +
         scale_colour_colorblind7()                     
+}
+
+us_economy.quarterly_selected <- function() {
+  us_economy() |> 
+    mutate(B069RC1.Pop.CPI =B069RC1/POPTHM/PCEPI) |>
+    mutate(PCEDG.Pop.CPI = PCEDG/POPTHM/PCEPI) |>
+    mutate(PCE.Pop.CPI = PCE/POPTHM/PCEPI) |>
+    mutate(RRSFS.Pop = RRSFS/POPTHM) |> 
+    mutate(A229RC0.CPI = A229RC0/PCEPI) |> 
+    select(-c(RRSFS,A229RC0,CPILFESL,CPIAUCSL,DSPI,DSPIC96,B069RC1,PCEDG,PCE,POPTHM,PCEPI)) |>
+    mutate(Quarter = yearquarter(Month)) |>
+    index_by(Quarter) |>
+    summarise(across(!Month, \(x) mean(x, na.rm = TRUE))) |> drop_na()  
+}
+
+generate_model_data <- function() {
+  useful_cc_measures <- c("UBPR3815", "UBPRB538", "UBPRD659", "UBPRE524", "UBPRE263", "UBPRE425")
+  cc_data <- credit_card(apply_bank_filters = TRUE, post_regulation = FALSE) |>
+              filter(Measure %in% useful_cc_measures) |> 
+              as_tibble() |> 
+              select(Quarter,IDRSSD, BankName, BankType, Measure, Value) |> 
+              group_by(Measure, IDRSSD) |>
+              mutate(diff = difference(Value),
+                    diff.lag1 = lag(diff, 1),
+                    diff.lag2 = lag(diff, 2),
+                    diff.lag3 = lag(diff, 3),
+                    diff.lag4 = lag(diff, 4)) |> pivot_wider(names_from = Measure, values_from = Value:last_col(), names_glue = "{Measure}.{.value}") 
+  
+  #group 
+  cc_data <- cc_data |> left_join (group_by(cc_data, Quarter, BankType) |> 
+                        summarise(UBPRE524.group.diff = mean(UBPRE524.diff, na.rm= TRUE))) |>
+              mutate(UBPRE524.group.diff.lag1 = lag(UBPRE524.group.diff,1),
+                      UBPRE524.group.diff.lag2 = lag(UBPRE524.group.diff,2),
+                      UBPRE524.group.diff.lag3 = lag(UBPRE524.group.diff,3),
+                      UBPRE524.group.diff.lag4 = lag(UBPRE524.group.diff,4))
+
+  # percentage change economic measures
+  econ_measures <- us_economy.quarterly_selected() |> 
+                    pivot_longer(cols=!Quarter, names_to = "Measure", values_to = "raw") |>
+                            group_by(Measure) |>
+                            mutate(pct_change = difference(raw)/lag(raw),
+                                   pct_change.lag1 = lag(pct_change,1),
+                                   pct_change.lag2 = lag(pct_change,2),
+                                   pct_change.lag3 = lag(pct_change,3),
+                                   pct_change.lag4 = lag(pct_change,4)) |>
+                              pivot_wider(names_from = Measure, values_from = raw:last_col(), names_glue = "{Measure}.{.value}") 
+  cc_data |> 
+    left_join(econ_measures, by = join_by(Quarter)) |> 
+      as_tsibble(index = Quarter, key = c(IDRSSD, BankName, BankType)) |> 
+        filter_index(get_regulation_cutoff() ~ .) |> readr::write_csv("data/final_model_data.csv")
+}
+
+.read_all_model_data <- function() {
+  file_loc <- "data/final_model_data.csv"
+  if (!file.exists(file_loc)) {
+    generate_model_data()
+  }
+  read_csv("data/final_model_data.csv", show_col_types = FALSE) |> mutate(Quarter = yearquarter(Quarter)) |>
+     as_tsibble(index = Quarter, key = c(IDRSSD, BankName, BankType))
+}
+
+get_model_data <- function(qtrs_post_event = 3, qtrs_prior_event = 1) {
+  partnerships <- credit_card.partnerships() |> 
+                    mutate(across(c("Acquired", "Available"), lubridate::ymd),
+                            PeriodStart = yearquarter(Acquired) - qtrs_prior_event,
+                            PeriodEnd = yearquarter(Acquired) + qtrs_post_event) |> 
+                    pivot_longer(cols = c(New,Old), names_to = "Partnership", values_to = "BankName")|>                             
+                    select(Partner, PeriodStart, PeriodEnd, BankName, Partnership) |> 
+                    pivot_longer(cols = starts_with("Period"), names_to = "PeriodName", values_to = "Quarter")|> 
+                    as_tsibble(index=Quarter, key=c(BankName,Partner)) |>
+                    group_by_key() |>
+                    fill_gaps() |> tidyr::fill(Partnership,.direction = "down") |> mutate(Period = -qtrs_prior_event:qtrs_post_event) |>
+                    select(-PeriodName) |> pivot_wider(names_from = "Partner", values_from=Period)
+
+  .read_all_model_data() |> left_join(partnerships,by = join_by(Quarter, BankName))
 }
