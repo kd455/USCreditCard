@@ -23,7 +23,7 @@ scale_fill_colorblind7 = function(.ColorList = 2L:8L, ...){
     scale_fill_discrete(..., type = colorblind_pal()(8)[.ColorList])
 }
 
-scale_color_colorblind7 = function(.ColorList = 2L:8L, ...){
+scale_colour_colorblind7 = function(.ColorList = 2L:8L, ...){
     scale_color_discrete(..., type = colorblind_pal()(8)[.ColorList])
 }
 
@@ -97,9 +97,11 @@ get_regulation_cutoff <- function(f = "Q") {
   as_tsibble(index = Quarter, key = (-c(Quarter,Value))) |>
     group_by_key() |>
     fill_gaps() |>
-    mutate(value_diff = difference(Value)) |>
-    ungroup()
+    mutate(value_diff = difference(Value)) |> 
+    drop_na(value_diff) |>
+    ungroup() 
 }
+
 
 credit_card.data_types_ref <- function() {
   tibble(
@@ -120,22 +122,29 @@ credit_card.overdue_3089 <- memoise(function(apply_bank_filters = FALSE, post_re
 
 credit_card.overdue30to89.agg  <- function(apply_bank_filters = FALSE, post_regulation = FALSE) {
   credit_card.overdue_3089(apply_bank_filters, post_regulation) |> 
-    summarise(target_mean = mean(Value, na.rm = TRUE),
-            target_median = median(Value, na.rm = TRUE)) 
+    summarise(value.all.mean = mean(Value, na.rm = TRUE),
+              value.all.median = median(Value, na.rm = TRUE),
+              value_diff.all.mean = mean(value_diff, na.rm = TRUE),
+              value_diff.all.median = median(value_diff, na.rm = TRUE)) 
+}
+
+credit_card.overdue30to89.agg.group  <- function(apply_bank_filters = FALSE, post_regulation = FALSE) {
+  credit_card.overdue_3089(apply_bank_filters, post_regulation) |> 
+    group_by(BankType) |> 
+    summarise(value.group.mean = mean(Value, na.rm = TRUE),
+              value.group.median = median(Value, na.rm = TRUE),
+              value_diff.group.mean = mean(value_diff, na.rm = TRUE),
+              value_diff.group.median = median(value_diff, na.rm = TRUE))
 }
 
 credit_card.overdue30to89.agg.lbank  <- function(apply_bank_filters = FALSE, post_regulation = FALSE) {
-  credit_card.overdue_3089(apply_bank_filters, post_regulation) |> 
-    filter(BankType == "LargeBank") |> 
-    summarise(target_mean = mean(Value, na.rm = TRUE),
-              target_median = median(Value, na.rm = TRUE))
+  credit_card.overdue30to89.agg.group(apply_bank_filters, post_regulation) |>
+    filter(BankType == "LargeBank") 
 }
 
 credit_card.overdue30to89.agg.lccbank  <- function(apply_bank_filters = FALSE, post_regulation = FALSE) {
-  credit_card.overdue_3089(apply_bank_filters, post_regulation) |> 
-    filter(BankType == "LargeCreditCardBank") |> 
-    summarise(target_mean = mean(Value, na.rm = TRUE),
-              target_median = median(Value, na.rm = TRUE))
+  credit_card.overdue30to89.agg.group(apply_bank_filters, post_regulation) |>
+    filter(BankType == "LargeCreditCardBank")
 }
 
 #'Unused Commitments on Credit Cards
@@ -345,7 +354,7 @@ outlier.plot <- function(data, pca_output, P1_lower, P1_upper, P2_lower, P2_uppe
       theme(legend.position = "none")  +
       labs(subtitle = glue("Outliers: {P1_lower} < PC1 < {P1_upper}, {P2_lower} < PC2 < {P2_upper}"),
            y = paste0(credit_card.target_label(), "\n", value_name)) +
-      scale_color_colorblind7()
+      scale_colour_colorblind7()
   }
 }
 
@@ -467,7 +476,7 @@ max_tstibble <- function(data) {
         summarise(across(where(is.numeric), \(x) max(x, na.rm = TRUE))) |> max()
 }
 
-plot_us_category <- function(category, measures, target_data, target_measure = "target_median") {
+plot_us_category <- function(category, measures, target_data, target_measure = "value.median") {
     target_label <-credit_card.target_label()
     index_var <- index_var(measures)
     recessions <- us_economy.recession() |> 
@@ -496,5 +505,5 @@ plot_us_category <- function(category, measures, target_data, target_measure = "
                   colour = 'darkslategrey') +
         geom_vline(xintercept = as.numeric(yq(get_regulation_cutoff())), linetype=1,colour="darkred") +
         annotate("text", x=as.numeric(yq(get_regulation_cutoff())), y=max_y-1, size = 8/.pt, label="Credit Card Regulations",vjust = -0.5, colour = "darkred") +
-        scale_color_colorblind7()                     
+        scale_colour_colorblind7()                     
 }

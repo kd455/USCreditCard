@@ -13,7 +13,10 @@ source('functions.R')
 
 As discussed in @sec-trend-event the impact of the partnership event can be masked by trends and seasonality.
 
-A preliminary approach involves adjusting each Bank's *`r credit_card.target_label()`* by removing the influence of the broader trend within its respective group (Large Banks or Large Credit Card Banks). This is achieved by subtracting the group's central tendency (mean or median). We assume the residuals fluctuations are due to the unique characteristics of each Bank's credit card portfolio. These characteristics might include the bank's specific credit policies, customer risk profiles, or portfolio management strategies.
+#REDO
+e.g., market model it estimates how much of a firm's returns can be explained by market movements, effectively isolating the component of returns attributable to market-wide factors from the firm-specific component
+
+A preliminary approach involves adjusting each Bank's *`r credit_card.target_label()`* by removing the influence of the broader trend within its respective group (Large Banks or Large Credit Card Banks). This is achieved by subtracting the group's central tendency (mean or median). We assume the residuals are due to the unique characteristics of each Bank's credit card portfolio. These characteristics might include the bank's specific credit policies, customer risk profiles, or portfolio management strategies.
 
 However, this method may not capture all the factors influencing credit card delinquencies. Macroeconomic variables, such as changes in unemployment and other economic conditions, also play a crucial role in shaping delinquency trends. @Agarwal2003, using proprietary credit card data of 700 thousand customers from 1995 to 2001, concluded that *unemployment* is a key determinant of consumer delinquency and bankruptcy. @GHJ2001 pointed to *consumer debt ratio* i.e. when debt payment obligations become too high relative to disposable income for the population as a whole, borrowers are unable to service their debts. @taghiyeh2021 explored 19 lagged macroeconomic measures and found the most significant to predict credit card loss was: previous quarter *Unemployment*, *Building permits* and *Initial unemployment insurance claims*; previous year's (lag 4) *Money stock* and *ISM Purchasing Mangers Index* and the current quarter's *Weekly hours worked by manufacturing workers*.
 
@@ -23,7 +26,7 @@ US Federal Reserve Economic Data [@fred] provides data series covering various c
 #| echo: false
 #| warning: false
                 
-granger_test_permutations <- function(data, target_col_name = "target_mean", exog_names, max_lag = 4) {
+granger_test_permutations <- function(data, target_col_name = "value.mean", exog_names, max_lag = 4) {
     results <- list()
     for (lag in 1:max_lag) {
         results[[lag]] <- exog_names |>
@@ -123,12 +126,12 @@ The tables presented below, show the macroeconomic measures and lag (Df column) 
 #| layout-ncol: 1
 
 granger_test_permutations(data = overdue30to89.post |> left_join (us_measures_qtr,by = join_by(Quarter)), 
-                            target_col_name = "target_median",
+                            target_col_name = "value.median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
 granger_test_permutations(data = overdue30to89.all |> left_join (us_measures_qtr,by = join_by(Quarter)), 
-                            target_col_name = "target_median",
+                            target_col_name = "value.median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
@@ -148,12 +151,12 @@ granger_test_permutations(data = overdue30to89.all |> left_join (us_measures_qtr
 #| layout-ncol: 1
 
 granger_test_permutations(data = overdue30to89.post.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
-                            target_col_name = "target_median",
+                            target_col_name = "value.median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
 granger_test_permutations(data = overdue30to89.all.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
-                            target_col_name = "target_median",
+                            target_col_name = "value.median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
@@ -171,12 +174,12 @@ granger_test_permutations(data = overdue30to89.all.lbank |> left_join (us_measur
 #| layout-ncol: 1
 
 granger_test_permutations(data = overdue30to89.post.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
-                            target_col_name = "target_median",
+                            target_col_name = "value.median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
 granger_test_permutations(data = overdue30to89.all.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
-                            target_col_name = "target_median",
+                            target_col_name = "value.median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
@@ -204,17 +207,17 @@ Cross-Correlation Function (CCF) shows the correlation between our macroeconomic
 #| layout-ncol: 3
 
 run_ccf_test(data = overdue30to89.all |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "target_median",
+             target_variable = "value.median",
              exog_variable = "RRSFS.Pop",
              do_difference = TRUE)
 
 run_ccf_test(data = overdue30to89.post |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "target_median",
+             target_variable = "value.median",
              exog_variable = "CDSP",
              do_difference = TRUE)    
 
 run_ccf_test(data = overdue30to89.post |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "target_median",
+             target_variable = "value.median",
              exog_variable = "UNRATE",
              do_difference = TRUE)                          
 
@@ -232,17 +235,17 @@ run_ccf_test(data = overdue30to89.post |> left_join (us_measures_qtr,by = join_b
 #|   - "UNRATE - Unemployment Rate"
 #| layout-ncol: 3
 run_ccf_test(data = overdue30to89.all.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "target_median",
+             target_variable = "value.median",
              exog_variable = "RRSFS.Pop",
              do_difference = TRUE)
 
 run_ccf_test(data = overdue30to89.post.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "target_median",
+             target_variable = "value.median",
              exog_variable = "CDSP",
              do_difference = TRUE)    
 
 run_ccf_test(data = overdue30to89.post.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "target_median",
+             target_variable = "value.median",
              exog_variable = "UNRATE",
              do_difference = TRUE)                          
 
@@ -261,17 +264,17 @@ run_ccf_test(data = overdue30to89.post.lbank |> left_join (us_measures_qtr,by = 
 #|   - "UNRATE - Unemployment Rate"
 #| layout-ncol: 3
 run_ccf_test(data = overdue30to89.all.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "target_median",
+             target_variable = "value.median",
              exog_variable = "RRSFS.Pop",
              do_difference = TRUE)
 
 run_ccf_test(data = overdue30to89.post.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "target_median",
+             target_variable = "value.median",
              exog_variable = "CDSP",
              do_difference = TRUE)    
 
 run_ccf_test(data = overdue30to89.post.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "target_median",
+             target_variable = "value.median",
              exog_variable = "UNRATE",
              do_difference = TRUE)                                  
 
