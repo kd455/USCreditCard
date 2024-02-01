@@ -1,0 +1,124 @@
+---
+title: "Market Model"
+format: html
+---
+
+```{r}
+#| warning: false
+#| echo: false
+source('functions.R')
+```
+
+To determine the normal return we can adopt the market model [@MacKinlay1997]
+$$
+D_{it} = \alpha_i + \beta_i D_{gt} + \epsilon_{it}
+$$
+
+And the AR is 
+$$
+AR_{it} = D_{it} – (\alpha_i + \beta_i D_{gt})
+$$
+
+Where:
+
+$D_{it}$ is *`r credit_card.target_label()`* (differenced) $i$ at time $t$, \
+$\alpha_i$ is the firm-specific intercept, \
+$\beta_i$ is the sensitivity of firm value $i$ to the group $g$,\
+$D_{gt}$ is the group *`r credit_card.target_label()`* (differenced) at time $t$, and
+$\varepsilon_{it}$ is the error term for $i$ at time $t$.
+
+## Model Summary
+
+```{r}
+#| warning: false
+data <- get_model_data() |> drop_na(UBPRE524.diff)
+
+estimation_data <- data |> filter(is.na(Partnership)) |> fill_gaps()
+observation_data <- data |> filter(!is.na(Partnership))
+
+results <- tibble(model = character(),
+                    rsme = numeric())
+
+market_formula <- "UBPRE524.diff ~ UBPRE524.group.diff"
+m_table <- estimation_data |> fabletools::model(tslm = TSLM(as.formula(market_formula)))
+m_table |> tidy()
+```
+
+```{r}
+#| warning: false
+#| label: fig-plot-fit
+#| fig-cap: "Fitted vs. Observed for estimation data on sub-set of firms"
+
+augmented_data <- m_table |> augment()
+
+augmented_data |> filter(BankName %in% unique(observation_data$BankName)) |>
+        autoplot(UBPRE524.diff, colour = "darkgrey") + 
+        geom_line(aes(y = .fitted, colour = "#D55E00")) + facet_wrap(~BankName+BankType, ncol = 2) +
+        labs(title = "<span style='color:#D55E00'>Fitted</span> vs. <span style='color:darkgrey'>Observed</span>") +
+        theme(legend.position = "none", plot.title = element_markdown(),plot.subtitle = element_markdown())
+
+```
+
+
+### Visual Checks
+
+```{r}
+#| warning: false
+#| label: fig-fit
+#| fig-cap: "Linear regression model diagnostics"
+#| layout-ncol: 3
+#| fig-subcap:
+#|   - "Residuals vs Fitted - The red line is not flat suggesting we need to add additional interaction terms to better capture the relationship between the predictors and the response variable"
+#|   - "Q-Q Residuals - the S shape indicates residuals have heavier tails than expected normal distribution"
+#|   - "Scale-Location - slight funnel shape indicates heteroscedasticity i.e. violates linear assumption of equal variance"
+augmented_data|> 
+  ggplot(aes(x = UBPRE524.diff, y = .fitted)) +
+  geom_point() +
+        labs(y = "Fitted (predicted values)",
+             x = "Data (actual values)",) +
+        theme(legend.position = "none", plot.title = element_markdown(),plot.subtitle = element_markdown())+
+  geom_abline(intercept = 0, slope = 1, colour="red")
+  
+qqnorm(augmented_data$.fitted, pch = 1, frame = FALSE);qqline(augmented_data$.fitted, col = "steelblue", lwd = 2)
+
+augmented_data|> group_by(BankName) |> mutate(y = sqrt(abs(.fitted/sd(.fitted)))) |>
+  ggplot(aes(x = UBPRE524.diff, y = y)) +
+  geom_point() +
+        labs(y = "sqrt standardised residuals",
+             x = "Data (actual values)",) +
+        theme(legend.position = "none", plot.title = element_markdown(),plot.subtitle = element_markdown())
+        
+
+```
+
+### Cross-Validation
+
+```{r}
+#| warning: false
+#m_table |> filter(grepl("BARCLAYS",BankName)) |> select(tslm) |> gg_tsresiduals()
+
+#A portmanteau test returns a large p-value, also suggesting that the residuals are white noise.
+augment(m_table) |>
+  filter(grepl("BARCLAYS",BankName))  |>
+  features(.innov, ljung_box)  
+
+bar_est_data <- estimation_data |> filter(grepl("BARCLAYS",BankName))
+bar_event_data <- observation_data |> filter(grepl("BARCLAYS",BankName))
+bar_data <- estimation_data |> filter(!is.na(UBPRE524.diff)) |> add_row(observation_data)
+m_table |>
+    filter(grepl("BARCLAYS",BankName))  |>
+    forecast(new_data=bar_event_data) |>
+    filter(.model=='tslm') |> View()
+    autoplot(bar_data, colour = "pink")  + 
+    geom_line(aes(x = Quarter, y=UBPRE524.diff), data= bar_event_data)
+
+
+
+# selected_model <- m_table |> filter(grepl("BARCLAYS",BankName))
+# fabletools::glance(selected_model) |> arrange(selected_model) |> select(.model:BIC)
+
+# bar_est_data |> 
+#        run_timeseries_cv(selected_model$tslm)
+
+  
+```

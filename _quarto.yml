@@ -14,7 +14,9 @@ book:
         - data_banks.qmd
         - data_partners.qmd 
         - data_fed.qmd               
-    - part: "Models"      
+    - part: model_event.qmd   
+      chapters:
+        - model_market.qmd 
 bibliography: references.bib
 
 format:

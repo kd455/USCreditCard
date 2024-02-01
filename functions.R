@@ -1,6 +1,8 @@
 library(tidyverse)
 #using the https://tidyverts.org/ world
 library(fable)
+library(caret)
+#library(lmer4)
 library(feasts)
 library(tsibble)
 library(glue)
@@ -16,6 +18,7 @@ library(broom)
 library(tseries)
 library(lmtest)
 library(ggthemes)
+library(Metrics)
 #set seed for reproducibility
 set.seed(42)
 
@@ -441,7 +444,7 @@ partnership.plot <- function(name, old, new, acquired, available, selected_measu
 run_granger_test <- function(data, target_variable, exog_variable, order = 4, do_difference = TRUE) {
     if (is.numeric(data[[exog_variable]])) {
         if(do_difference) {
-            data <- data |> mutate(across(!Quarter, ~difference(.)))                
+            data <- data |> mutate(across(where(is.numeric), ~difference(.)))              
         }
         lmtest::grangertest(data[[target_variable]], data[[exog_variable]], order = order) |> as_tibble() |> na.omit() |> tibble::add_column(exog_variable)
     }
@@ -450,7 +453,7 @@ run_granger_test <- function(data, target_variable, exog_variable, order = 4, do
 run_ccf_test <- function(data, target_variable, exog_variable, do_difference = TRUE) {
     if (is.numeric(data[[exog_variable]])) {
         if(do_difference) {
-            data <- data |> mutate(across(!Quarter, ~difference(.)))                
+            data <- data |> mutate(across(where(is.numeric), ~difference(.)))                
         }
         feasts::CCF(y = !!as.name(target_variable), x = !!as.name(exog_variable), .data = data) |> autoplot()
     }
@@ -529,6 +532,12 @@ generate_model_data <- function() {
               select(Quarter,IDRSSD, BankName, BankType, Measure, Value) |> 
               group_by(Measure, IDRSSD) |>
               mutate(diff = difference(Value),
+                    log = log(Value),
+                    log.diff = log - lag(log),
+                    log.diff.lag1 = lag(log.diff, 1),
+                    log.diff.lag2 = lag(log.diff, 2),
+                    log.diff.lag3 = lag(log.diff, 3),
+                    log.diff.lag4 = lag(log.diff, 4),
                     diff.lag1 = lag(diff, 1),
                     diff.lag2 = lag(diff, 2),
                     diff.lag3 = lag(diff, 3),
@@ -584,7 +593,7 @@ get_model_data <- function(qtrs_post_event = 3, qtrs_prior_event = 1) {
 }
 
 
-run_timeseries_cv <- function(data, formula_string, model_func = lm, predict_func= predict, initial_window = 9, horizon = 1, dependent_var = "UBPRE524.diff", fixedWindow = TRUE) {
+run_timeseries_cv <- function(data, formula_string, model_func = TSLM, predict_func= predict, initial_window = 9, horizon = 1, dependent_var = "UBPRE524.diff", fixedWindow = TRUE) {
     set.seed(123)  # For reproducibility
     # Create 5-fold cross-validation indices
     slices <- caret::createTimeSlices(1:nrow(data), initial_window, horizon, fixedWindow = fixedWindow)
@@ -602,7 +611,7 @@ run_timeseries_cv <- function(data, formula_string, model_func = lm, predict_fun
           next
         }
         # Fit model on the training data
-        model <- model_func(formula_string, data = training_set)
+        model <- training_set |> fabletools::model(m = model_func(as.formula(formula_string)))
 
         # Predict on the validation data
         predictions <- predict_func(model, newdata = validation_set)
@@ -658,29 +667,30 @@ run_timeseries_cv <- function(data, formula_string, model_func = lm, predict_fun
 #   return(results)
 # }
 
-run_kfold_validation <- function(data, formula_string,model_func = lm, predict_func= predict) {
-    set.seed(123)  # For reproducibility
-    folds <- createFolds(data$IDRSSD, k = 5)
-    results <- data.frame()  # Data frame to store results
-    formula <- as.formula(formula_string)
-
-    for(i in 1:length(folds)) {
-        # Split the data into training and validation sets
-        training_set <- data[-folds[[i]], ]
-        validation_set <- data[folds[[i]], ]
+# run_kfold_validation <- function(fitted_model, data, predict_func = predict) {
+#     set.seed(123)  # For reproducibility
+#     folds <- caret::createFolds(data$IDRSSD, k = 5)
+#     results <- data.frame()  # Data frame to store results
+    
+#     for(i in 1:length(folds)) {
+#         # Split the data into training and validation sets
+#         training_set <- data[-folds[[i]], ]
+#         validation_set <- data[folds[[i]], ]
         
-        model <- model_func(formula, data = training_set)
-        # Predict on the validation set
-        validation_preds <- predict_func(model, newdata = validation_set)
+#         # Predict on the validation set
+#         validation_preds <- predict_func(fitted_model, newdata = validation_set)
 
-        # Evaluate the model (using an appropriate metric like RMSE)
-        rmse_value <- Metrics::rmse(validation_set$value_diff, validation_preds)
+#         # Evaluate the model (using an appropriate metric like RMSE)
+#         rmse_value <- rmse(validation_set$UBPRE524.diff, validation_preds)
+#         mae_value <- mae(validation_set$UBPRE524.diff, validation_preds)
+#         # Store the results
+#         results <- rbind(results, data.frame(Fold = i, RMSE = rmse_value))
+#     }
 
-        # Store the results
-        results <- rbind(results, data.frame(Fold = i, RMSE = rmse_value))
-    }
+#     return(list(PerFirmRMSE = cv_results, OverallMeanRMSE = overall_mean_rmse))
 
-    # Calculate the average performance across all folds
-    average_performance <- mean(results$RMSE)
-    return(average_performance)
-}
+#     # Calculate the average performance across all folds
+#     average_performance <- mean(results$RMSE)
+#     return(average_performance)
+# }
+
