@@ -5,7 +5,9 @@ format: html
 
 Event studies are a common approach in econometrics to assess the impact of an event such as earnings announcements, mergers and acquisitions, regulatory changes, or macroeconomic news.
 
-The goal is to estimate the portion of post-event change that can be attributed to the event itself, isolating it from other market and firm-specific effects. We do this by predicting what would have happened if the event had not occurred (the counterfactual) and comparing it to the actual observed data to estimate the resulting "abnormal returns" (AR).
+The goal is to estimate the portion of post-event change that can be attributed to the event itself, isolating it from other market and firm-specific effects. We do this by predicting what would have happened if the event had not occurred (the counterfactual) and comparing it to the actual observed data to estimate the resulting *abnormal returns* (AR).
+
+## Market Model
 
 To determine the normal return we can adopt the market model [@MacKinlay1997]
 $$
@@ -25,9 +27,71 @@ $\beta_i$ is the sensitivity of firm value $i$ to the group $g$,
 $D_{gt}$ is the group *`r credit_card.target_label()`* (differenced) at time $t$, and
 $\varepsilon_{it}$ is the error term for $i$ at time $t$.
 
-## Evaluation
+### Estimation and Observation Data
 
-The joint test problem arises because we are effectively testing two things: the counterfactual model and the event impact. Consequently, we need an approach to accurately evaluate if our counterfactual model results are credible. One approach is to test using observations where we expect no effect; if there were resulting "abnormal returns" this would point to an issue with the model [see @HuntingtonKlein, chap 17.3.3]. 
+Following the process described by @HuntingtonKlein [chap 17.2.1], we pick an "estimation period" and an "observation period" from just before the event to the period of interest after the event.
+
+The time period after We have certainty about each partnership's acquisition date, however, as discussed in @sec-partners, there is a transition period as borrowers may not get their new partner cards until after the acquisition date. 
+
+The data to estimate *normal returns* needs to exclude partnerships event. I've excluded 5 quarters starting from the quarter before each acquisition. 
+
+### Sense check
+
+The joint test problem arises because we are effectively testing two things: the counterfactual model and the event impact. Consequently, we need an approach to accurately evaluate if our counterfactual model results are credible. One approach is to test using observations where we expect no effect; if there were resulting "abnormal returns" this would point to an issue with the model  
+
+```{r}
+#| warning: false
+library(lm)
+source('functions.R')
+
+data <- get_model_data() |> drop_na(UBPRE524.diff)
+
+estimation_data <- data |> filter(is.na(Partnership))
+event_data <- data |> filter(!is.na(Partnership))
+
+results <- tibble(model = character(),
+                    rsme = numeric())
+
+market_formula <- "UBPRE524.diff ~ UBPRE524.group.diff"
+
+plot_fit <- function(model_func = lm, formula, data, selected_firms) {
+    m <- model_func(as.formula(formula), data = data)
+
+    data |> add_column(.fitted = fitted.values(m)) |> 
+        filter(BankName %in% selected_firms) |>
+        autoplot(UBPRE524.diff, colour = "darkgrey") + 
+        geom_line(aes(y = .fitted, colour = "#D55E00")) + facet_wrap(~BankName+BankType, ncol = 2) +
+        labs(title = "<span style='color:#D55E00'>Fitted</span> vs. <span style='color:darkgrey'>Observed</span>") +
+        theme(legend.position = "none", plot.title = element_markdown(),plot.subtitle = element_markdown())
+}   
+    
+plot_fit(lm, market_formula, estimation_data, event_data$BankName)
+
+```
+### Visual Checks
+
+```{r}
+#| warning: false
+#| label: fig-fit
+#| fig-cap: "Linear regression model diagnostics"
+#| layout-ncol: 4
+#| fig-subcap:
+#|   - "Residuals vs Fitted - The red line is not perfectly flat suggesting we need to add additional interaction terms to better capture the relationship between the predictors and the response variable"
+#|   - "Q-Q Residuals - the S shape indicates residuals have heavier tails"
+#|   - "Scale-Location - the funnel shape indicates heteroscedasticity i.e. violates linear assumption of equal variance"
+#|   - "Residuals vs Leverage - There are no points above Cook's distance threshold where removal of observation would change the regression coefficients"
+#| 
+plot(m_market,which = 1)
+plot(m_market,which = 2)
+plot(m_market,which = 3)
+plot(m_market,which = 5)
+```
+
+### Cross-Validation
+
+```{r}
+```
+
 
 ```{r}
 library(lme4)
@@ -36,106 +100,6 @@ library(Metrics)
 
 source('functions.R')
 
-run_timeseries_cv <- function(data, formula_string, model_func = lm, predict_func= predict, initial_window = 9, horizon = 1, dependent_var = "value_diff", fixedWindow = TRUE) {
-    set.seed(123)  # For reproducibility
-    # Create 5-fold cross-validation indices
-    slices <- caret::createTimeSlices(1:nrow(data), initial_window, horizon, fixedWindow = fixedWindow)
-    results <- list()
-
-    for(i in 1:length(slices$train)) {
-        # Extract training and testing data using the indices
-        training_indices <- slices$train[[i]]
-        validation_indices <- slices$test[[i]]
-        training_set <- data |> filter(Quarter %in% data$Quarter[training_indices])
-        validation_set <- data |> filter(Quarter %in% data$Quarter[validation_indices])
-
-        # Skip if validation set contains FirmID levels not present in training set
-        if(any(!(validation_set$IDRSSD %in% training_set$IDRSSD))) {
-          next
-        }
-        # Fit model on the training data
-        model <- model_func(formula_string, data = training_set)
-
-        # Predict on the validation data
-        predictions <- predict_func(model, newdata = validation_set)
-        
-        # Evaluate the model (you can choose your evaluation metric, e.g., RMSE)
-        rmse_value <- Metrics::rmse(validation_set[[dependent_var]], predictions)
-
-        # Store the results
-        results[[i]] <- rmse_value
-    }
-
-    # Calculate the average performance across all slices
-    average_performance <- mean(unlist(results))
-    average_performance
-}
-
-# run_timeseries_cv_multiple_firms <- function(data, formula_string, model_func = lm, predict_func= predict, initial_window = 3, horizon = 1, dependent_var = "value_diff") {
-#     # Split the data by firm
-#     firm_data_list <- split(data, data$IDRSSD)
-
-#     # Perform cross-validation for each firm and calculate mean RMSE per firm
-#     cv_results <- map(firm_data_list, ~time_series_cv_per_firm(.x, formula_string, model_func, predict_func, initial_window, horizon, dependent_var)) |>
-#                   map_df(~mutate(.x, MeanRMSE = mean(RMSE)), .id = "IDRSSD")
-
-#     # Calculate the overall mean RMSE across all firms
-#     overall_mean_rmse <- mean(cv_results$MeanRMSE)
-
-#     return(list(PerFirmRMSE = cv_results, OverallMeanRMSE = overall_mean_rmse))
-# }
-
-
-# time_series_cv_per_firm <- function(data, formula_string, model_func=lm, predict_func = predict, initial_window = 3, horizon = 1, dependent_var = "value_diff") {
-#   total_points <- nrow(data)
-#   results <- tibble()
-
-#   for (start_idx in 1:(total_points - initial_window - horizon + 1)) {
-#     end_idx <- start_idx + initial_window - 1 + horizon
-#     if (end_idx > total_points) {
-#       break
-#     }
-
-#     training_set <- data[start_idx:(end_idx - horizon), ]
-#     validation_set <- data[(end_idx - horizon + 1):end_idx, ]
-
-#     model <- model_func(formula_string, data = training_set)
-#     validation_preds <- predict_func(model, newdata = validation_set)
-
-#     rmse_value <- Metrics::rmse(validation_set[[dependent_var]], validation_preds)
-
-#     results <- rbind(results, tibble(Start = start_idx, RMSE = rmse_value))
-#   }
-
-#   return(results)
-# }
-
-run_kfold_validation <- function(data, formula_string,model_func = lm, predict_func= predict) {
-    set.seed(123)  # For reproducibility
-    folds <- createFolds(data$IDRSSD, k = 5)
-    results <- data.frame()  # Data frame to store results
-    formula <- as.formula(formula_string)
-
-    for(i in 1:length(folds)) {
-        # Split the data into training and validation sets
-        training_set <- data[-folds[[i]], ]
-        validation_set <- data[folds[[i]], ]
-        
-        model <- model_func(formula, data = training_set)
-        # Predict on the validation set
-        validation_preds <- predict_func(model, newdata = validation_set)
-
-        # Evaluate the model (using an appropriate metric like RMSE)
-        rmse_value <- Metrics::rmse(validation_set$value_diff, validation_preds)
-
-        # Store the results
-        results <- rbind(results, data.frame(Fold = i, RMSE = rmse_value))
-    }
-
-    # Calculate the average performance across all folds
-    average_performance <- mean(results$RMSE)
-    return(average_performance)
-}
 
 data <- get_model_data() |> drop_na(UBPRE524.diff)
 
@@ -148,6 +112,8 @@ results <- tibble(model = character(),
 #estimation_data |> select(starts_with("UBPRE524")) |>View()
 
 market_formula <- "UBPRE524.diff ~ UBPRE524.group.diff"
+trend_formula <- "UBPRE524.diff ~ UBPRE524.group.diff + trend() + season()"
+
 fixed_formula <- "UBPRE524.diff ~ BankType*factor(Quarter) + (1|BankName)"
 
 fixed_2way_formula <- "UBPRE524.diff ~  UBPRE524.group.diff | BankName + Quarter"
@@ -155,25 +121,37 @@ mixed_formula <- "UBPRE524.diff ~ BankType + (1 | BankName)"
 hier_formula <- "UBPRE524.diff ~ BankType + (1 | BankType/IDRSSD) + UBPRE425.diff "
 
 
+
 # Fit the models
-m_market <- estimation_data |> model( lm = TSLM(as.formula(market_formula)))
-
 fit <- estimation_data |> 
-                model( lm = TSLM(UBPRE524.diff ~ UBPRE524.group.diff + trend() + season()))
-
-forecast(fit, newdata = event_data)
-
-event_data |> select(UBPRE524.group.diff)
+                model( lm = TSLM(as.formula(market_formula)) )
 
 augmented_data <- fit |>
                     augment()
 
+augmented_data |>  filter(BankName %in% event_data$BankName) |>
+    autoplot(UBPRE524.diff, colour = "darkgrey") + 
+    geom_line(aes(y = .fitted)) + facet_wrap(~BankName, ncol = 2) +
+    theme(legend.position = "top") 
 
-RMSE(augmented_data$.fitted, augmented_data$.innov)
+###########
 
-estimation_data |>
-    autoplot(UBPRE524.diff) + 
-    geom_line(data= fitted(m), aes(y = .fitted, colour = .model)) + facet_wrap(~BankName)
+
+
+AIC(m_market) #944.1663
+fitted.values(m_market)
+anova(m_market)
+summary(m_market)
+plot(m_market,which = 1)
+plot(m_market,which = 2)
+plot(m_market,which = 3)
+plot(m_market,which = 4)
+plot(m_market,which = 5)
+
+augmented_data |>  filter(BankName %in% event_data$BankName) |>
+    autoplot(UBPRE524.diff, colour = "darkgrey") + 
+    geom_line(aes(y = .fitted)) + facet_wrap(~BankName, ncol = 2) +
+    theme(legend.position = "top")
 
 m_fixed <- lmer(as.formula(fixed_formula), data = estimation_data)
 m_fixed2 <- feols(as.formula(fixed_2way_formula), data = estimation_data)

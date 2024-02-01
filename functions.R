@@ -75,7 +75,7 @@ credit_card <- memoise(function(apply_bank_filters = FALSE, post_regulation = FA
               filter(BankType %in% c("LargeBank", "LargeCreditCardBank")) |>
               tsibble::group_by_key() |>
               filter(Value != 0) |>
-              slice(2:n())
+              slice(3:n())
   }
 
   if (post_regulation) {
@@ -247,17 +247,17 @@ us_economy.confidence <- function() {
 #     filter(Measure == "UBPRE524", BankName %in% select_firms$BankName)
 # }
 
-white.noise.sample <- function() {
-  tsibble(Period = 1:100, Value = rnorm(100), index = Period)
-}
+# white.noise.sample <- function() {
+#   tsibble(Period = 1:100, Value = rnorm(100), index = Period)
+# }
 
-white.noise.plot <- function() {
-  white.noise.sample() |> 
-    ggplot(aes(x = Period, y = Value)) +
-    geom_line(linewidth = .2) +
-    labs(title="White noise")
+# white.noise.plot <- function() {
+#   white.noise.sample() |> 
+#     ggplot(aes(x = Period, y = Value)) +
+#     geom_line(linewidth = .2) +
+#     labs(title="White noise")
   
-}
+# }
 
 credit_card.partnerships <- function() {
   tibble::tibble_row(Partner = "Costco",
@@ -476,7 +476,7 @@ max_tstibble <- function(data) {
         summarise(across(where(is.numeric), \(x) max(x, na.rm = TRUE))) |> max()
 }
 
-plot_us_category <- function(category, measures, target_data, target_measure = "value.median") {
+plot_us_category <- function(category, measures, target_data, target_measure = "value_median") {
     target_label <-credit_card.target_label()
     index_var <- index_var(measures)
     recessions <- us_economy.recession() |> 
@@ -581,4 +581,106 @@ get_model_data <- function(qtrs_post_event = 3, qtrs_prior_event = 1) {
                     select(-PeriodName) |> pivot_wider(names_from = "Partner", values_from=Period)
 
   .read_all_model_data() |> left_join(partnerships,by = join_by(Quarter, BankName))
+}
+
+
+run_timeseries_cv <- function(data, formula_string, model_func = lm, predict_func= predict, initial_window = 9, horizon = 1, dependent_var = "UBPRE524.diff", fixedWindow = TRUE) {
+    set.seed(123)  # For reproducibility
+    # Create 5-fold cross-validation indices
+    slices <- caret::createTimeSlices(1:nrow(data), initial_window, horizon, fixedWindow = fixedWindow)
+    results <- list()
+
+    for(i in 1:length(slices$train)) {
+        # Extract training and testing data using the indices
+        training_indices <- slices$train[[i]]
+        validation_indices <- slices$test[[i]]
+        training_set <- data |> filter(Quarter %in% data$Quarter[training_indices])
+        validation_set <- data |> filter(Quarter %in% data$Quarter[validation_indices])
+
+        # Skip if validation set contains FirmID levels not present in training set
+        if(any(!(validation_set$IDRSSD %in% training_set$IDRSSD))) {
+          next
+        }
+        # Fit model on the training data
+        model <- model_func(formula_string, data = training_set)
+
+        # Predict on the validation data
+        predictions <- predict_func(model, newdata = validation_set)
+        
+        # Evaluate the model (you can choose your evaluation metric, e.g., RMSE)
+        rmse_value <- Metrics::rmse(validation_set[[dependent_var]], predictions)
+
+        # Store the results
+        results[[i]] <- rmse_value
+    }
+
+    # Calculate the average performance across all slices
+    average_performance <- mean(unlist(results))
+    average_performance
+}
+
+# run_timeseries_cv_multiple_firms <- function(data, formula_string, model_func = lm, predict_func= predict, initial_window = 3, horizon = 1, dependent_var = "value_diff") {
+#     # Split the data by firm
+#     firm_data_list <- split(data, data$IDRSSD)
+
+#     # Perform cross-validation for each firm and calculate mean RMSE per firm
+#     cv_results <- map(firm_data_list, ~time_series_cv_per_firm(.x, formula_string, model_func, predict_func, initial_window, horizon, dependent_var)) |>
+#                   map_df(~mutate(.x, MeanRMSE = mean(RMSE)), .id = "IDRSSD")
+
+#     # Calculate the overall mean RMSE across all firms
+#     overall_mean_rmse <- mean(cv_results$MeanRMSE)
+
+#     return(list(PerFirmRMSE = cv_results, OverallMeanRMSE = overall_mean_rmse))
+# }
+
+
+# time_series_cv_per_firm <- function(data, formula_string, model_func=lm, predict_func = predict, initial_window = 3, horizon = 1, dependent_var = "value_diff") {
+#   total_points <- nrow(data)
+#   results <- tibble()
+
+#   for (start_idx in 1:(total_points - initial_window - horizon + 1)) {
+#     end_idx <- start_idx + initial_window - 1 + horizon
+#     if (end_idx > total_points) {
+#       break
+#     }
+
+#     training_set <- data[start_idx:(end_idx - horizon), ]
+#     validation_set <- data[(end_idx - horizon + 1):end_idx, ]
+
+#     model <- model_func(formula_string, data = training_set)
+#     validation_preds <- predict_func(model, newdata = validation_set)
+
+#     rmse_value <- Metrics::rmse(validation_set[[dependent_var]], validation_preds)
+
+#     results <- rbind(results, tibble(Start = start_idx, RMSE = rmse_value))
+#   }
+
+#   return(results)
+# }
+
+run_kfold_validation <- function(data, formula_string,model_func = lm, predict_func= predict) {
+    set.seed(123)  # For reproducibility
+    folds <- createFolds(data$IDRSSD, k = 5)
+    results <- data.frame()  # Data frame to store results
+    formula <- as.formula(formula_string)
+
+    for(i in 1:length(folds)) {
+        # Split the data into training and validation sets
+        training_set <- data[-folds[[i]], ]
+        validation_set <- data[folds[[i]], ]
+        
+        model <- model_func(formula, data = training_set)
+        # Predict on the validation set
+        validation_preds <- predict_func(model, newdata = validation_set)
+
+        # Evaluate the model (using an appropriate metric like RMSE)
+        rmse_value <- Metrics::rmse(validation_set$value_diff, validation_preds)
+
+        # Store the results
+        results <- rbind(results, data.frame(Fold = i, RMSE = rmse_value))
+    }
+
+    # Calculate the average performance across all folds
+    average_performance <- mean(results$RMSE)
+    return(average_performance)
 }

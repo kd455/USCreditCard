@@ -35,18 +35,8 @@ granger_test_permutations <- function(data, target_col_name = "value.mean", exog
     results 
 }    
 
-us_measures <- us_economy() |> 
-            mutate(B069RC1.Pop.CPI =B069RC1/POPTHM/PCEPI) |>
-            mutate(PCEDG.Pop.CPI = PCEDG/POPTHM/PCEPI) |>
-            mutate(PCE.Pop.CPI = PCE/POPTHM/PCEPI) |>
-            mutate(RRSFS.Pop = RRSFS/POPTHM) |> 
-            mutate(A229RC0.CPI = A229RC0/PCEPI) |> 
-            select(-c(RRSFS,A229RC0,CPILFESL,CPIAUCSL,DSPI,DSPIC96,B069RC1,PCEDG,PCE,POPTHM,PCEPI))
 
-us_measures_qtr <- us_measures |> 
-                    mutate(Quarter = yearquarter(Month)) |>
-                    index_by(Quarter) |>
-                    summarise(across(!Month, mean, na.rm = TRUE)) |> drop_na()
+us_measures_qtr <- us_economy.quarterly_selected() |> drop_na()
 
 apply_bank_filters = TRUE
 apply_reg_filter = FALSE
@@ -85,20 +75,20 @@ plot_us_category("Economy",us_measures_qtr, overdue30to89.all)
 #| warning: false
 #| error: false
 
-plot_us_category("Expenditures", us_measures_qtr, overdue30to89.all.lbank)
-plot_us_category("Income & Savings", us_measures_qtr, overdue30to89.all.lbank)
-plot_us_category("Debt", us_measures_qtr, overdue30to89.all.lbank)
-plot_us_category("Economy", us_measures_qtr, overdue30to89.all.lbank)
+plot_us_category("Expenditures", us_measures_qtr, overdue30to89.all.lbank, "value.group.median")
+plot_us_category("Income & Savings", us_measures_qtr, overdue30to89.all.lbank, "value.group.median")
+plot_us_category("Debt", us_measures_qtr, overdue30to89.all.lbank, "value.group.median")
+plot_us_category("Economy", us_measures_qtr, overdue30to89.all.lbank, "value.group.median")
 ```
 
 ## Large Credit Card Bank
 ```{r}
 #| warning: false
 #| error: false
-plot_us_category("Expenditures", us_measures_qtr, overdue30to89.all.lcbank)
-plot_us_category("Income & Savings", us_measures_qtr, overdue30to89.all.lcbank)
-plot_us_category("Debt", us_measures_qtr, overdue30to89.all.lcbank)
-plot_us_category("Economy", us_measures_qtr, overdue30to89.all.lcbank)
+plot_us_category("Expenditures", us_measures_qtr, overdue30to89.all.lcbank, "value.group.median")
+plot_us_category("Income & Savings", us_measures_qtr, overdue30to89.all.lcbank, "value.group.median")
+plot_us_category("Debt", us_measures_qtr, overdue30to89.all.lcbank, "value.group.median")
+plot_us_category("Economy", us_measures_qtr, overdue30to89.all.lcbank, "value.group.median")
 
 ```
 
@@ -126,12 +116,12 @@ The tables presented below, show the macroeconomic measures and lag (Df column) 
 #| layout-ncol: 1
 
 granger_test_permutations(data = overdue30to89.post |> left_join (us_measures_qtr,by = join_by(Quarter)), 
-                            target_col_name = "value.median",
+                            target_col_name = "value.all.median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
 granger_test_permutations(data = overdue30to89.all |> left_join (us_measures_qtr,by = join_by(Quarter)), 
-                            target_col_name = "value.median",
+                            target_col_name = "value.all.median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
@@ -151,12 +141,12 @@ granger_test_permutations(data = overdue30to89.all |> left_join (us_measures_qtr
 #| layout-ncol: 1
 
 granger_test_permutations(data = overdue30to89.post.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
-                            target_col_name = "value.median",
+                            target_col_name = "value.group.median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
 granger_test_permutations(data = overdue30to89.all.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
-                            target_col_name = "value.median",
+                            target_col_name = "value.group.median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
@@ -174,12 +164,12 @@ granger_test_permutations(data = overdue30to89.all.lbank |> left_join (us_measur
 #| layout-ncol: 1
 
 granger_test_permutations(data = overdue30to89.post.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
-                            target_col_name = "value.median",
+                            target_col_name = "value.group.median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
 granger_test_permutations(data = overdue30to89.all.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
-                            target_col_name = "value.median",
+                            target_col_name = "value.group.median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category))  
 
@@ -207,17 +197,17 @@ Cross-Correlation Function (CCF) shows the correlation between our macroeconomic
 #| layout-ncol: 3
 
 run_ccf_test(data = overdue30to89.all |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "value.median",
+             target_variable = "value.all.median",
              exog_variable = "RRSFS.Pop",
              do_difference = TRUE)
 
 run_ccf_test(data = overdue30to89.post |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "value.median",
+             target_variable = "value.group.median",
              exog_variable = "CDSP",
              do_difference = TRUE)    
 
 run_ccf_test(data = overdue30to89.post |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "value.median",
+             target_variable = "value.group.median",
              exog_variable = "UNRATE",
              do_difference = TRUE)                          
 
@@ -235,17 +225,17 @@ run_ccf_test(data = overdue30to89.post |> left_join (us_measures_qtr,by = join_b
 #|   - "UNRATE - Unemployment Rate"
 #| layout-ncol: 3
 run_ccf_test(data = overdue30to89.all.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "value.median",
+             target_variable = "value.all.median",
              exog_variable = "RRSFS.Pop",
              do_difference = TRUE)
 
 run_ccf_test(data = overdue30to89.post.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "value.median",
+             target_variable = "value.group.median",
              exog_variable = "CDSP",
              do_difference = TRUE)    
 
 run_ccf_test(data = overdue30to89.post.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "value.median",
+             target_variable = "value.group.median",
              exog_variable = "UNRATE",
              do_difference = TRUE)                          
 
@@ -264,17 +254,17 @@ run_ccf_test(data = overdue30to89.post.lbank |> left_join (us_measures_qtr,by = 
 #|   - "UNRATE - Unemployment Rate"
 #| layout-ncol: 3
 run_ccf_test(data = overdue30to89.all.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "value.median",
+             target_variable = "value.all.median",
              exog_variable = "RRSFS.Pop",
              do_difference = TRUE)
 
 run_ccf_test(data = overdue30to89.post.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "value.median",
+             target_variable = "value.group.median",
              exog_variable = "CDSP",
              do_difference = TRUE)    
 
 run_ccf_test(data = overdue30to89.post.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
-             target_variable = "value.median",
+             target_variable = "value.group.median",
              exog_variable = "UNRATE",
              do_difference = TRUE)                                  
 
