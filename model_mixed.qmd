@@ -28,7 +28,7 @@ observation_data <- data |> filter(!is.na(Partnership))
 # lmer1_formula <- "value_diff  ~ Qtr + RRSFS.Pop + RRSFS.Pop.lag1 + (1 | IDRSSD)"
 # lmer2_formula <- "value_diff  ~ Qtr + RRSFS.Pop + RRSFS.Pop.lag1 + UNRATE + UNRATE.lag1 + (1 | IDRSSD)"
 # lmer3_formula <- "value_diff  ~ Qtr + RRSFS.Pop + RRSFS.Pop.lag1 + UNRATE + UNRATE.lag1 + (1 | BankType/IDRSSD)"
-lmer4_formula <- "UBPRE524.diff  ~ (1 + Year + Qtr | BankType/BankName)  + UBPRE524.group.pct_change + UBPRE524.all.pct_change + RRSFS.Pop.pct_change + RRSFS.Pop.pct_change.lag1 + UBPRB538.pct_change + UBPRE263.pct_change + UNRATE.pct_change + UNRATE.pct_change.lag1"
+lmer4_formula <- "UBPRE524.diff  ~ (1 + Year + Qtr | BankType/BankName) + UBPRE524.group.pct_change + UBPRE524.all.pct_change + RRSFS.Pop.pct_change + RRSFS.Pop.pct_change.lag1 + UBPRB538.pct_change + UBPRE263.pct_change + UNRATE.pct_change + UNRATE.pct_change.lag1"
 # lmer5_formula <- "value_diff  ~ Qtr + value_diff.group.mean + (1 | IDRSSD)"
 # lmer6_formula <- "value_diff  ~ Qtr + value_diff.group.mean + (1 | BankType)"
 # lmer7_formula <- "value_diff  ~ Qtr + value_diff.median + (1 | BankType)"
@@ -37,6 +37,10 @@ lmer4_formula <- "UBPRE524.diff  ~ (1 + Year + Qtr | BankType/BankName)  + UBPRE
 
 best_model <- lmer(as.formula(lmer4_formula), data = estimation_data)
 summary(best_model)
+
+install.packages("glmnet")
+library(glmnet)
+?glmnet
 
 ```
 
