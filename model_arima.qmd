@@ -1,5 +1,5 @@
 ---
-title: "Market Model"
+title: "ARIMA Model"
 format: html
 ---
 
@@ -9,23 +9,8 @@ format: html
 source('functions.R')
 ```
 
-To determine the normal return we can adopt the market model [@MacKinlay1997]
-$$
-D_{it} = \alpha_i + \beta_i D_{gt} + \epsilon_{it}
-$$
+To determine the normal return we can adopt a ARIMA model [@Hyndman2021 ch.9]
 
-And the AR is 
-$$
-AR_{it} = D_{it} – (\alpha_i + \beta_i D_{gt})
-$$
-
-Where:
-
-$D_{it}$ is *`r credit_card.target_label()`* (differenced) $i$ at time $t$, \
-$\alpha_i$ is the firm-specific intercept, \
-$\beta_i$ is the sensitivity of firm value $i$ to the group $g$,\
-$D_{gt}$ is the group *`r credit_card.target_label()`* (differenced) at time $t$, and
-$\varepsilon_{it}$ is the error term for $i$ at time $t$.
 
 ## Model Summary
 
@@ -35,23 +20,26 @@ install.packages("gt")
 library(gt)
 data <- get_model_data() |> drop_na(UBPRE524.diff)
 
+data |> select(starts_with("RRSFS"))
+
 estimation_data <- data |> filter(is.na(Partnership)) |> fill_gaps()
 observation_data <- data |> filter(!is.na(Partnership))
 
-results <- tibble(model = character(),
-                    rsme = numeric())
+m_table <- estimation_data |> 
+            model(
+                arima = ARIMA(UBPRE524.diff),
+                arima_rrsfs = ARIMA(UBPRE524.diff ~ 1 + RRSFS.Pop.pct_change + RRSFS.Pop.pct_change.lag1),
+                arima_rrsfs_unrate = ARIMA(UBPRE524.diff ~ 1 + RRSFS.Pop.pct_change +RRSFS.Pop.pct_change.lag1 + UNRATE.pct_change + UNRATE.pct_change.lag1)
+            )
 
-market_formula <- "UBPRE524.diff ~ UBPRE524.group.diff"
-m_table <- estimation_data |> fabletools::model(tslm = TSLM(as.formula(market_formula)))
-
-m_table |> 
+m_table |> filter(grepl("BARCLAYS",BankName))  |>
   tidy() |> 
     mutate(across(where(is.numeric), round, 2)) |> 
       rmarkdown::paged_table()
 ```
 
 ```{r}
-m_table |> 
+m_table |> filter(grepl("BARCLAYS",BankName))  |>
   tidy() |> 
     mutate(across(where(is.numeric), round, 2)) |> 
       gt()
@@ -59,12 +47,13 @@ m_table |>
 
 ```{r}
 #| warning: false
-#| label: fig-plot-fit
+#| label: fig-plot-arima-fit
 #| fig-cap: "Fitted vs. Observed for estimation data on sub-set of firms"
 
 augmented_data <- m_table |> augment()
 
-augmented_data |> filter(BankName %in% unique(observation_data$BankName)) |>
+augmented_data |> 
+        filter(.model == "arima", BankName %in% unique(observation_data$BankName)) |>
         autoplot(UBPRE524.diff, colour = "darkgrey") + 
         geom_line(aes(y = .fitted, colour = "#D55E00")) + facet_wrap(~BankName+BankType, ncol = 2) +
         labs(title = "<span style='color:#D55E00'>Fitted</span> vs. <span style='color:darkgrey'>Observed</span>") +
@@ -85,25 +74,22 @@ augmented_data |> filter(BankName %in% unique(observation_data$BankName)) |>
 #|   - "Q-Q Residuals - the S shape indicates residuals have heavier tails than expected normal distribution"
 #|   - "Scale-Location - slight funnel shape indicates heteroscedasticity i.e. violates linear assumption of equal variance"
 
-m_table |> fabletools::accuracy()
+#values are autocorrelated. If the p-value > 0.05 (good), this implies that the residuals of the data are are independent.
+selected_m = "arima"
+filtered_aug_data <- augmented_data|> filter(.model == selected_m)
 
-augmented_data|> 
+augmented_data |> features(.innov, ljung_box) |> filter(lb_pvalue <= 0.05)
+
+filtered_aug_data |>
   ggplot(aes(x = UBPRE524.diff, y = .fitted)) +
   geom_point() +
         labs(y = "Fitted (predicted values)",
              x = "Data (actual values)",) +
         theme(legend.position = "none", plot.title = element_markdown(),plot.subtitle = element_markdown())+
   geom_abline(intercept = 0, slope = 1, colour="red")
-  
-qqnorm(augmented_data$.fitted, pch = 1, frame = FALSE);qqline(augmented_data$.fitted, col = "steelblue", lwd = 2)
 
-augmented_data|> group_by(BankName) |> mutate(y = sqrt(abs(.fitted/sd(.fitted)))) |>
-  ggplot(aes(x = UBPRE524.diff, y = y)) +
-  geom_point() +
-        labs(y = "sqrt standardised residuals",
-             x = "Data (actual values)",) +
-        theme(legend.position = "none", plot.title = element_markdown(),plot.subtitle = element_markdown())
-        
+qqnorm(filtered_aug_data$.fitted, pch = 1, frame = FALSE);qqline(filtered_aug_data$.fitted, col = "steelblue", lwd = 2)
+      
 
 ```
 
@@ -114,19 +100,20 @@ augmented_data|> group_by(BankName) |> mutate(y = sqrt(abs(.fitted/sd(.fitted)))
 #m_table |> filter(grepl("BARCLAYS",BankName)) |> select(tslm) |> gg_tsresiduals()
 
 #A portmanteau test returns a large p-value, also suggesting that the residuals are white noise.
-augment(m_table) |>
+filtered_aug_data |>
   filter(grepl("BARCLAYS",BankName))  |>
   features(.innov, ljung_box)  
 
+event_duration <- 6
 bar_est_data <- estimation_data |> filter(grepl("BARCLAYS",BankName))
-bar_event_data <- observation_data |> filter(grepl("BARCLAYS",BankName))
+bar_event_data <- observation_data |> filter(grepl("BARCLAYS",BankName))|> filter(GAP <event_duration)
 bar_data <- bar_est_data |> filter(!is.na(UBPRE524.diff)) |> add_row(bar_event_data)
-bar_model <- m_table |> filter(grepl("BARCLAYS",BankName)) |> select(tslm)
+bar_model <- m_table |> filter(grepl("BARCLAYS",BankName)) |> select(!!selected_m)
 
-m_table |>
+m_table |> select(!!selected_m) |>
     filter(grepl("BARCLAYS",BankName))  |>
     forecast(new_data=bar_event_data) |>
-    filter(.model=='tslm') |> 
+   # filter(.model==!!selected_m) |> 
     autoplot(bar_data, colour = "pink")  + 
     geom_line(aes(x = Quarter, y=UBPRE524.diff), data= bar_event_data)
 
@@ -134,32 +121,26 @@ bar_est_data_tr <- bar_est_data |>
                     stretch_tsibble(.init = 3, .step = 1) |>
                     relocate( .id)
 
-far2_xreg <- function(x, h, xreg, newxreg) {
-  forecast(Arima(x, order=c(2,0,0), xreg=xreg), xreg=newxreg)
-}
-
-y <- ts(rnorm(50))
-xreg <- matrix(rnorm(100),ncol=2)
-e <- tsCV(y, far2_xreg, h=3, xreg=xreg)
-
-
-
 # TSCV accuracy
 bar_est_data_tr |>
-  model(TSLM(as.formula(market_formula))) |>
-  forecast(new_data = bar_est_data_tr |> select(UBPRE524.group.diff)) |>
+  model(ARIMA(UBPRE524.diff)) |>
+  forecast(h=event_duration) |>
   fabletools::accuracy(bar_est_data)
   
 # Training set accuracy
 bar_est_data |>
-  model(TSLM(as.formula(market_formula))) |>
+  model(ARIMA(UBPRE524.diff)) |>
   fabletools::accuracy()
 
-google_2015_tr |>
-  model(RW(Close ~ drift())) |>
-  forecast(h = 1) |>
-  accuracy(google_2015)
-  
+estimation_data_tr <- estimation_data |>
+                      stretch_tsibble(.init = 3, .step = 1) |>
+                      relocate( .id)
+
+estimation_data_tr |>
+  model(ARIMA(UBPRE524.diff)) |>
+  forecast(new_data = estimation_data_tr |> select(UBPRE524.group.diff)) |>
+  fabletools::accuracy(estimation_data)
+
 # selected_model <- m_table |> filter(grepl("BARCLAYS",BankName))
 # fabletools::glance(selected_model) |> arrange(selected_model) |> select(.model:BIC)
 

@@ -541,15 +541,33 @@ generate_model_data <- function() {
                     diff.lag1 = lag(diff, 1),
                     diff.lag2 = lag(diff, 2),
                     diff.lag3 = lag(diff, 3),
-                    diff.lag4 = lag(diff, 4)) |> pivot_wider(names_from = Measure, values_from = Value:last_col(), names_glue = "{Measure}.{.value}") 
-  
+                    diff.lag4 = lag(diff, 4),
+                    pct_change = diff/lag(Value),
+                    pct_change.lag1 = lag(pct_change,1),
+                    pct_change.lag2 = lag(pct_change,2),
+                    pct_change.lag3 = lag(pct_change,3),
+                    pct_change.lag4 = lag(pct_change,4)) |> pivot_wider(names_from = Measure, values_from = Value:last_col(), names_glue = "{Measure}.{.value}") 
+
   #group 
   cc_data <- cc_data |> left_join (group_by(cc_data, Quarter, BankType) |> 
-                        summarise(UBPRE524.group.diff = mean(UBPRE524.diff, na.rm= TRUE))) |>
-              mutate(UBPRE524.group.diff.lag1 = lag(UBPRE524.group.diff,1),
-                      UBPRE524.group.diff.lag2 = lag(UBPRE524.group.diff,2),
-                      UBPRE524.group.diff.lag3 = lag(UBPRE524.group.diff,3),
-                      UBPRE524.group.diff.lag4 = lag(UBPRE524.group.diff,4))
+                                    summarise(
+                                      UBPRE524.group = mean(UBPRE524.Value, na.rm= TRUE),
+                                      UBPRE524.group.diff = mean(UBPRE524.diff, na.rm= TRUE))) |>
+                        mutate(UBPRE524.group.diff.lag1 = lag(UBPRE524.group.diff,1),
+                                UBPRE524.group.diff.lag2 = lag(UBPRE524.group.diff,2),
+                                UBPRE524.group.diff.lag3 = lag(UBPRE524.group.diff,3),
+                                UBPRE524.group.diff.lag4 = lag(UBPRE524.group.diff,4),
+                                UBPRE524.group.pct_change = UBPRE524.group.diff/lag(UBPRE524.group))
+  #all
+  cc_data <- cc_data |> left_join (group_by(cc_data, Quarter) |> 
+                                    summarise(
+                                      UBPRE524.all = mean(UBPRE524.Value, na.rm= TRUE),
+                                      UBPRE524.all.diff = mean(UBPRE524.diff, na.rm= TRUE))) |>
+                        mutate(UBPRE524.all.diff.lag1 = lag(UBPRE524.all.diff,1),
+                                UBPRE524.all.diff.lag2 = lag(UBPRE524.all.diff,2),
+                                UBPRE524.all.diff.lag3 = lag(UBPRE524.all.diff,3),
+                                UBPRE524.all.diff.lag4 = lag(UBPRE524.all.diff,4),
+                                UBPRE524.all.pct_change = UBPRE524.all.diff/lag(UBPRE524.all))
 
   # percentage change economic measures
   econ_measures <- us_economy.quarterly_selected() |> 
@@ -576,22 +594,37 @@ generate_model_data <- function() {
      as_tsibble(index = Quarter, key = c(IDRSSD, BankName, BankType))
 }
 
-get_model_data <- function(qtrs_post_event = 3, qtrs_prior_event = 1) {
+# get_model_data <- function(qtrs_post_event = 3, qtrs_prior_event = 1) {
+#   partnerships <- credit_card.partnerships() |> 
+#                     mutate(across(c("Acquired", "Available"), lubridate::ymd),
+#                             PeriodStart = yearquarter(Acquired) - qtrs_prior_event,
+#                             PeriodEnd = yearquarter(Acquired) + qtrs_post_event) |> 
+#                     pivot_longer(cols = c(New,Old), names_to = "Partnership", values_to = "BankName")|>                             
+#                     select(Partner, PeriodStart, PeriodEnd, BankName, Partnership) |> 
+#                     pivot_longer(cols = starts_with("Period"), names_to = "PeriodName", values_to = "Quarter")|> 
+#                     as_tsibble(index=Quarter, key=c(BankName,Partner)) |>
+#                     group_by_key() |>
+#                     fill_gaps() |> tidyr::fill(Partnership,.direction = "down") |> mutate(Period = -qtrs_prior_event:qtrs_post_event) |>
+#                     select(-PeriodName) |> pivot_wider(names_from = "Partner", values_from=Period)
+
+#   .read_all_model_data() |> left_join(partnerships,by = join_by(Quarter, BankName))
+# }
+get_model_data <- function(qtrs_prior_event = 1) {
   partnerships <- credit_card.partnerships() |> 
                     mutate(across(c("Acquired", "Available"), lubridate::ymd),
                             PeriodStart = yearquarter(Acquired) - qtrs_prior_event,
-                            PeriodEnd = yearquarter(Acquired) + qtrs_post_event) |> 
+                            PeriodEnd = yearquarter(today()))  |> 
                     pivot_longer(cols = c(New,Old), names_to = "Partnership", values_to = "BankName")|>                             
                     select(Partner, PeriodStart, PeriodEnd, BankName, Partnership) |> 
                     pivot_longer(cols = starts_with("Period"), names_to = "PeriodName", values_to = "Quarter")|> 
                     as_tsibble(index=Quarter, key=c(BankName,Partner)) |>
                     group_by_key() |>
-                    fill_gaps() |> tidyr::fill(Partnership,.direction = "down") |> mutate(Period = -qtrs_prior_event:qtrs_post_event) |>
+                    fill_gaps() |> tidyr::fill(Partnership,.direction = "down") |> 
+                      mutate(Period = row_number()-(1+qtrs_prior_event)) |>
                     select(-PeriodName) |> pivot_wider(names_from = "Partner", values_from=Period)
-
+  
   .read_all_model_data() |> left_join(partnerships,by = join_by(Quarter, BankName))
 }
-
 
 run_timeseries_cv <- function(data, formula_string, model_func = TSLM, predict_func= predict, initial_window = 9, horizon = 1, dependent_var = "UBPRE524.diff", fixedWindow = TRUE) {
     set.seed(123)  # For reproducibility
