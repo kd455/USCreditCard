@@ -11,12 +11,16 @@ book:
     - part: "Data"
       chapters:
         - data_ffiec.qmd
-        - data_banks.qmd
         - data_partners.qmd 
         - data_fed.qmd               
-    - part: model_event.qmd   
+    - part: "Models"
       chapters:
+        - model_event.qmd   
         - model_market.qmd 
+    - references.qmd   
+    - part: "Appendix"
+      chapters:
+        - data_banks.qmd
 bibliography: references.bib
 
 format:

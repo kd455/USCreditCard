@@ -7,13 +7,15 @@ Event studies are a common approach in econometrics to assess the impact of an e
 
 The goal is to estimate the portion of post-event change that can be attributed to the event itself, isolating it from other market and firm-specific effects. We do this by predicting what would have happened if the event had not occurred (the counterfactual) and comparing it to the actual observed data to estimate the resulting *abnormal returns* (AR).
 
-### Estimation and Observation Data
+### Estimation and Observation Data {#sec-data-split}
 
 Following the process described by @HuntingtonKlein [chap 17.2.1], we pick an "estimation period" and an "observation period" from just before the event to the period of interest after the event.
 
 The observation period includes 1 quarter before so we can determine if borrowers anticipate the event. This possibility was speculated in @sec-partners as we saw some fluctuation in credit card measures before the acquisition. 
 
-The observation period chosen is 4 quarters after the event as the event impact may be after the acquisition  borrowers get their new partner cards after the acquisition.
+The observation period chosen is 4 quarters after the event as the event impact may be after the acquisition as  borrowers get their new partner cards after the acquisition.
+
+Data after the observation period is not used in the models so as to remove the influence of the parnter event or from subsequent events or changes in market conditions unrelated to the event being modelled.
 
 ### Sense check
 

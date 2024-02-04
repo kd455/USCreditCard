@@ -609,7 +609,7 @@ generate_model_data <- function() {
 
 #   .read_all_model_data() |> left_join(partnerships,by = join_by(Quarter, BankName))
 # }
-get_model_data <- function(qtrs_prior_event = 1) {
+.model_data_with_partnerships <- function(qtrs_prior_event = 1) {
   partnerships <- credit_card.partnerships() |> 
                     mutate(across(c("Acquired", "Available"), lubridate::ymd),
                             PeriodStart = yearquarter(Acquired) - qtrs_prior_event,
@@ -623,7 +623,20 @@ get_model_data <- function(qtrs_prior_event = 1) {
                       mutate(Period = row_number()-(1+qtrs_prior_event)) |>
                     select(-PeriodName) |> pivot_wider(names_from = "Partner", values_from=Period)
   
-  .read_all_model_data() |> left_join(partnerships,by = join_by(Quarter, BankName))
+  .read_all_model_data() |> left_join(partnerships,by = join_by(Quarter, BankName)) |>
+    drop_na(UBPRE524.diff)|> 
+    mutate(Qtr = quarter(Quarter), Year = year(Quarter)) |>
+    readr::write_csv("data/final_model_data_wpartner.csv")
+}
+
+get_model_data <- function() {
+  file_loc <- "data/final_model_data_wpartner.csv"
+  if (!file.exists(file_loc)) {
+    .model_data_with_partnerships()
+  }
+  read_csv("data/final_model_data_wpartner.csv", show_col_types = FALSE) |> 
+    mutate(Quarter = yearquarter(Quarter)) |>
+     as_tsibble(index = Quarter, key = c(IDRSSD, BankName, BankType))
 }
 
 run_timeseries_cv <- function(data, formula_string, model_func = TSLM, predict_func= predict, initial_window = 9, horizon = 1, dependent_var = "UBPRE524.diff", fixedWindow = TRUE) {

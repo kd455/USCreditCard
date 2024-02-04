@@ -7,7 +7,9 @@ format: html
 #| warning: false
 #| echo: false
 source('functions.R')
+target_label = credit_card.target_label()
 ```
+## Specification {#sec-model-market}
 
 To determine the normal return we can adopt the market model [@MacKinlay1997]
 $$
@@ -21,18 +23,16 @@ $$
 
 Where:
 
-$D_{it}$ is *`r credit_card.target_label()`* (differenced) $i$ at time $t$, \
+$D_{it}$ is *`r target_label`* (differenced) $i$ at time $t$, \
 $\alpha_i$ is the firm-specific intercept, \
 $\beta_i$ is the sensitivity of firm value $i$ to the group $g$,\
-$D_{gt}$ is the group *`r credit_card.target_label()`* (differenced) at time $t$, and
+$D_{gt}$ is the group *`r target_label`* (differenced) at time $t$, and
 $\varepsilon_{it}$ is the error term for $i$ at time $t$.
 
-## Model Summary
+## Model Results
 
 ```{r}
 #| warning: false
-install.packages("gt")
-library(gt)
 data <- get_model_data() |> drop_na(UBPRE524.diff)
 
 estimation_data <- data |> filter(is.na(Partnership)) |> fill_gaps()
@@ -43,128 +43,209 @@ results <- tibble(model = character(),
 
 market_formula <- "UBPRE524.diff ~ UBPRE524.group.diff"
 m_table <- estimation_data |> fabletools::model(tslm = TSLM(as.formula(market_formula)))
+augmented_data <- m_table |> augment()
 
-m_table |> 
-  tidy() |> 
-    mutate(across(where(is.numeric), round, 2)) |> 
-      rmarkdown::paged_table()
+# m_table |> 
+#   tidy() |> 
+#     mutate(across(where(is.numeric), \(x) round(x,2))) |> 
+#       rmarkdown::paged_table()
 ```
 
-```{r}
-m_table |> 
-  tidy() |> 
-    mutate(across(where(is.numeric), round, 2)) |> 
-      gt()
-```
+### Estimated Fit
+
+As outlined in @sec-data-split, we have split our data into estimation and observation periods. For firms that do not have partnership events, the full data series is used in the estimation period. For firms with partnership events the estimation period is until the quarter before each event. 
+
+If the market model demonstrates a robust fit with the estimation data, this instills confidence in our ability to forecast the "normal" return using the fresh, unseen data from the observation period.
+
+@fig-plot-fit displays some of the fitted vs actual results. 
 
 ```{r}
 #| warning: false
 #| label: fig-plot-fit
 #| fig-cap: "Fitted vs. Observed for estimation data on sub-set of firms"
-
-augmented_data <- m_table |> augment()
-
 augmented_data |> filter(BankName %in% unique(observation_data$BankName)) |>
         autoplot(UBPRE524.diff, colour = "darkgrey") + 
         geom_line(aes(y = .fitted, colour = "#D55E00")) + facet_wrap(~BankName+BankType, ncol = 2) +
-        labs(title = "<span style='color:#D55E00'>Fitted</span> vs. <span style='color:darkgrey'>Observed</span>") +
-        theme(legend.position = "none", plot.title = element_markdown(),plot.subtitle = element_markdown())
+        labs(title = "<span style='color:#D55E00'>Fitted</span> vs. <span style='color:darkgrey'>Observed</span>",
+        y = glue("{target_label} (differenced)")) +
+        theme(legend.position = "none", plot.title = element_markdown(),plot.subtitle = element_markdown()) 
+```
+### Residual diagnostics {#sec-residual-check}
+
+Residuals should have the following properties [@Hyndman2021, ch. 5.4]. Residuals:
+
+* Are uncorrelated. Correlations indicate that the model is missing information left in the residuals.
+* Have zero mean. If they have a mean other than zero, then the forecasts are biased.
+* Have constant variance i.e. does not violate "homoscedasticity" assumption.
+* Are normally distributed. 
+
+::: {#fig-market-checks .panel-tabset}
+
+### CITIBANK
+```{r}
+#| warning: false
+#| label: fig-fit-citi
+#| fig-subcap: 
+#|   - "The time plot of the residuals shows that the variation of the residuals is relatively constant but with one significant outlier. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outlier." 
+#|   - "Explaining the outlier: Deliquency dropped at a time when CITIBANK's credit card portfolio became a larger business concern. The borrowers added appear to be less risky as we see the unused proportion go from below 10% to over 40%"
+
+bank = "CITIBANK"
+m_table |> filter(grepl(bank,BankName)) |> select(tslm) |> gg_tsresiduals()  
+
+estimation_data |> filter(grepl(bank,BankName)) |> 
+  select(
+   'Credit Card Loans, % Gross LN&LS (UBPRE425)' = UBPRE425.Value,
+   'Unused Commitments on Credit Cards, % of Total Assets (UBPRE263)' = UBPRE263.Value,
+   'Credit Card Plans-30-89 DAYS P/D % (UBPRE524)' = UBPRE524.Value) |> pivot_longer(cols= -Quarter) |> ggplot(aes(x = Quarter, y =value, colour = name)) + geom_line() + labs(y='%') +
+   theme(legend.position = "none") +
+   facet_wrap(~name, scales = "free_y", ncol=1)
 
 ```
 
-
-### Visual Checks
+### BARCLAYS
 
 ```{r}
 #| warning: false
-#| label: fig-fit
-#| fig-cap: "Linear regression model diagnostics"
-#| layout-ncol: 3
-#| fig-subcap:
-#|   - "Residuals vs Fitted - The red line is not flat suggesting we need to add additional interaction terms to better capture the relationship between the predictors and the response variable"
-#|   - "Q-Q Residuals - the S shape indicates residuals have heavier tails than expected normal distribution"
-#|   - "Scale-Location - slight funnel shape indicates heteroscedasticity i.e. violates linear assumption of equal variance"
+#| label: fig-fit-bar
+#| fig-cap: "The time plot of the residuals shows that the variation of the residuals is relatively constant up until the onset of the COVID-19 pandemic in 2020; the model needs more information to account for this period. The acf shows residuals are uncorrelated"
+m_table |> filter(grepl("BARCLAYS",BankName)) |> select(tslm) |> gg_tsresiduals()  
+```
 
-m_table |> fabletools::accuracy()
 
-augmented_data|> 
-  ggplot(aes(x = UBPRE524.diff, y = .fitted)) +
-  geom_point() +
-        labs(y = "Fitted (predicted values)",
-             x = "Data (actual values)",) +
-        theme(legend.position = "none", plot.title = element_markdown(),plot.subtitle = element_markdown())+
-  geom_abline(intercept = 0, slope = 1, colour="red")
-  
-qqnorm(augmented_data$.fitted, pch = 1, frame = FALSE);qqline(augmented_data$.fitted, col = "steelblue", lwd = 2)
+### AMERICAN EXPRESS
+```{r}
+#| warning: false
+#| label: fig-fit-ae
+#| fig-cap: "The time plot of the residuals shows that the variation of the residuals is relatively constant. The acf shows residuals are uncorrelated and are normally distributed."
 
-augmented_data|> group_by(BankName) |> mutate(y = sqrt(abs(.fitted/sd(.fitted)))) |>
-  ggplot(aes(x = UBPRE524.diff, y = y)) +
-  geom_point() +
-        labs(y = "sqrt standardised residuals",
-             x = "Data (actual values)",) +
-        theme(legend.position = "none", plot.title = element_markdown(),plot.subtitle = element_markdown())
-        
+m_table |> filter(grepl("AMERICAN EXPRESS NATIONAL BANK",BankName)) |> select(tslm) |> gg_tsresiduals()  
 
 ```
 
-### Cross-Validation
+### CAPITAL ONE
+```{r}
+#| warning: false
+#| label: fig-fit-cap
+#| fig-subcap: 
+#|   - "The time plot of the residuals shows that the variation of the residuals is relatively constant but with two significant outliers at the start of the series. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outliers." 
+#|   - "Explaining the outlier: Deliquency dropped at a time when CAPITAL ONE's credit card portfolio became a larger business concern. The U shape for deliquency % indicates initial improvement in the portfolio's quality, however, by the end of the estimation period, the % is back up. This increase coincides with a decrease in unused commitments i.e. borrowers are putting more expenditures on their credit cards."
+
+m_table |> filter(grepl("CAPITAL ONE",BankName)) |> select(tslm) |> gg_tsresiduals()  
+
+estimation_data |> filter(grepl("CAPITAL ONE",BankName)) |> 
+  select(
+   'Credit Card Plans-30-89 DAYS P/D % (UBPRE524)' = UBPRE524.Value,
+   'Unused Commitments on Credit Cards, % of Total Assets (UBPRE263)' = UBPRE263.Value,
+   'Credit Card Loans, % Gross LN&LS (UBPRE425)' = UBPRE425.Value
+   ) |> pivot_longer(cols= -Quarter) |> ggplot(aes(x = Quarter, y =value, colour = name)) + geom_line() + labs(y='%') +
+   theme(legend.position = "none") +
+   facet_wrap(~name, scales = "free_y", ncol=1)
+```
+
+:::
+
+### Residuals White Noise
+
+The sub-set of banks analysed in @sec-residual-check did not exhibit significant autocorrelation.
+
+@tbl-lb-test lists the results of Ljung–Box test for all banks filtered to those where we reject the null hypothesis, indicating the presence of significant autocorrelation in the residuals.  
+
+The residuals for banks not listed are indistinguishable from a white noise series.
 
 ```{r}
 #| warning: false
-#m_table |> filter(grepl("BARCLAYS",BankName)) |> select(tslm) |> gg_tsresiduals()
+#| label: tbl-lb-test
+#| tbl-cap: Ljung–Box results where P-value < Significance Level of 0.05
+augmented_data  |>
+  features(.innov, ljung_box) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> 
+    filter(lb_pvalue <= 0.05)|> select(BankName,lb_stat,lb_pvalue) |>
+      rmarkdown::paged_table()
+```
 
-#A portmanteau test returns a large p-value, also suggesting that the residuals are white noise.
-augment(m_table) |>
-  filter(grepl("BARCLAYS",BankName))  |>
-  features(.innov, ljung_box)  
+## Time Series Cross-Validation
 
-bar_est_data <- estimation_data |> filter(grepl("BARCLAYS",BankName))
-bar_event_data <- observation_data |> filter(grepl("BARCLAYS",BankName))
-bar_data <- bar_est_data |> filter(!is.na(UBPRE524.diff)) |> add_row(bar_event_data)
-bar_model <- m_table |> filter(grepl("BARCLAYS",BankName)) |> select(tslm)
+Look-Ahead Bias: If data from after the test period is included in the training set, the model may inadvertently learn information from the future (known as "look-ahead bias"). This makes the model unrealistic and potentially over-optimistic in its predictive performance
 
-m_table |>
-    filter(grepl("BARCLAYS",BankName))  |>
-    forecast(new_data=bar_event_data) |>
-    filter(.model=='tslm') |> 
-    autoplot(bar_data, colour = "pink")  + 
-    geom_line(aes(x = Quarter, y=UBPRE524.diff), data= bar_event_data)
+To evaluating the predictive performance we use cross validation that are specifically for timeseries.One-step ahead cross-validation, also known as walk-forward validation, is a method specifically designed for evaluating the predictive performance of time series.
 
-bar_est_data_tr <- bar_est_data |>
+R package
+
+```{r}
+#| warning: false
+#| output: false
+#| eval: false
+
+# Estimation Data 
+m_table |> fabletools::accuracy()|> readr::write_csv("data/results/estimate_market_metrics.csv")
+
+# Timeseries CV 
+
+est_data_tr <- estimation_data |>
                     stretch_tsibble(.init = 3, .step = 1) |>
                     relocate( .id)
 
-far2_xreg <- function(x, h, xreg, newxreg) {
-  forecast(Arima(x, order=c(2,0,0), xreg=xreg), xreg=newxreg)
+# TSCV accuracy
+est_data_tr |>
+  model(tslm = TSLM(as.formula(market_formula))) |>
+  forecast(new_data = est_data_tr) |>
+  fabletools::accuracy(estimation_data)|> 
+  readr::write_csv("data/results/estimate_tscv_market_metrics.csv")
+
+```
+
+
+```{r}
+#| warning: false
+#| label: tbl-lb-cv
+#| tbl-cap: Cross-Validation. Fit on Training and validation (Test)
+cv_results_est <- readr::read_csv("data/results/estimate_market_metrics.csv",show_col_types = FALSE) |> select(-.model) |>
+  mutate(across(where(is.numeric), \(x) round(x,4))) |> 
+  relocate(.type, BankName, RMSE, MAE) |>
+  rmarkdown::paged_table() 
+
+cv_results_test <-readr::read_csv("data/results/estimate_tscv_market_metrics.csv",show_col_types = FALSE) |> select(-.model) |>
+  mutate(across(where(is.numeric), \(x) round(x,4))) |> 
+    relocate(.type, BankName, RMSE, MAE) |> mutate(.type = "CV")|> 
+      rmarkdown::paged_table()
+
+bind_rows(cv_results_est, cv_results_test) |> arrange(BankName,.type)      
+
+```
+
+## Prediction 
+
+Observation Period 
+
+```{r}
+#| warning: false
+#| echo: false
+#| label: fig-pred-bar
+#| fig-cap: "Prediction vs. Observed Event"
+
+plot_prediction <- function(bank_name, partner_name, estimation_data, observation_data, models) {
+  est_data <- estimation_data |> filter(BankName == bank_name)
+  est_data_trunc <- est_data |> tail(max(nrow(est_data),13))
+  event_data <- observation_data |> filter(BankName == bank_name) |> head(5)
+  comb_data <- bind_rows(est_data_trunc, event_data)
+
+  models |>
+    filter(BankName == bank_name)  |>
+    forecast(new_data= event_data) |>
+    filter(.model=='tslm') |> 
+    autoplot()  + 
+    geom_line(aes(x = Quarter, y=UBPRE524.diff), data = comb_data, colour='darkslategrey',linetype = "longdash") +
+    labs(title = bank_name, subtitle = partner_name, y = glue("{target_label} (differenced)"))
 }
 
-y <- ts(rnorm(50))
-xreg <- matrix(rnorm(100),ncol=2)
-e <- tsCV(y, far2_xreg, h=3, xreg=xreg)
+partner_banks <- credit_card.partnerships() |> 
+                  pivot_longer(cols = c("Old","New")) |> 
+                      distinct(value,Partner = paste(Partner, "-", name))
 
+map2(partner_banks$value, partner_banks$Partner, plot_prediction,estimation_data, observation_data, m_table)
 
-
-# TSCV accuracy
-bar_est_data_tr |>
-  model(TSLM(as.formula(market_formula))) |>
-  forecast(new_data = bar_est_data_tr |> select(UBPRE524.group.diff)) |>
-  fabletools::accuracy(bar_est_data)
-  
-# Training set accuracy
-bar_est_data |>
-  model(TSLM(as.formula(market_formula))) |>
-  fabletools::accuracy()
-
-google_2015_tr |>
-  model(RW(Close ~ drift())) |>
-  forecast(h = 1) |>
-  accuracy(google_2015)
-  
-# selected_model <- m_table |> filter(grepl("BARCLAYS",BankName))
-# fabletools::glance(selected_model) |> arrange(selected_model) |> select(.model:BIC)
-
-# bar_est_data |> 
-#        run_timeseries_cv(selected_model$tslm)
-
-  
+#plot_prediction(bank_name, partner_name,estimation_data, observation_data, m_table )
 ```
+### Abnormal Return
+
+
+## References
