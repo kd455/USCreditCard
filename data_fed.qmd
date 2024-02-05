@@ -1,7 +1,8 @@
 ---
-title: "US Economic Data"
+title: "Explanatory Data"
 ---
 
+## US Economic Data
 ```{r}
 #| echo: false
 #| warning: false
@@ -31,6 +32,7 @@ granger_test_permutations <- function(data, target_col_name = "value.mean", exog
     } 
     results 
 }    
+
 us_measures_qtr <- us_economy.quarterly_selected() |> drop_na()
 
 apply_bank_filters = TRUE
@@ -43,15 +45,7 @@ apply_reg_filter = TRUE
 overdue30to89.post <- credit_card.overdue30to89.agg(apply_bank_filters, apply_reg_filter)       
 overdue30to89.post.lcbank <- credit_card.overdue30to89.agg.lccbank(apply_bank_filters, apply_reg_filter)
 overdue30to89.post.lbank <-  credit_card.overdue30to89.agg.lbank(apply_bank_filters, apply_reg_filter)             
-
-# library(corrplot)
-# cor_data = overdue30to89.post.lbank |> left_join(us_measures_qtr) |> as_tibble() |> select(value_diff.group.mean, UNRATE:A229RC0.CPI)
-# corrplot(cor(cor_data), method = "color", type = "upper", order = "hclust",
-#          tl.col = "black", tl.srt = 45, 
-#          addCoef.col = "black")
 ```
-
-## US Economic Variables
 
 The figures below plot data series related to consumer financial behaviour following the 2008 financial crisis and the enactment of the Credit Card Accountability Responsibility and Disclosure (CARD) Act in 2010 (see @sec-cardact). 
 
@@ -97,7 +91,7 @@ plot_us_category("Economy", us_measures_qtr, overdue30to89.all.lcbank, "value.gr
 :::
 
 
-## Granger Test
+### Granger Test
 
  Intuitively, changes in the macroeconomic environment will take time to impact credit card deliquency. We can test for significance of different lags using the Granger test for each variable.
 
@@ -113,18 +107,10 @@ The tables presented below, show the macroeconomic variable and lag (Df column) 
 #| warning: false
 #| error: false
 #| label: tbl-granger-comb
-#| tbl-cap: "Granger Test at Lags 1 to 4"
-#| tbl-subcap:
-#|   - "Post Regulatory Changes 2010 Q2"
-#|   - "Series from 2002 Q4"
+#| tbl-cap: "Granger Test at Lags 1 to 4 (post regulatory period)"
 #| layout-ncol: 1
 
 granger_test_permutations(data = overdue30to89.post |> left_join (us_measures_qtr,by = join_by(Quarter)), 
-                            target_col_name = "value.all.median",
-                            exog_names = names(us_measures_qtr),
-                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category)) |> rmarkdown::paged_table()
-
-granger_test_permutations(data = overdue30to89.all |> left_join (us_measures_qtr,by = join_by(Quarter)), 
                             target_col_name = "value.all.median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category)) |> rmarkdown::paged_table()
@@ -138,18 +124,10 @@ granger_test_permutations(data = overdue30to89.all |> left_join (us_measures_qtr
 #| warning: false
 #| error: false
 #| label: tbl-granger-lb
-#| tbl-cap: "Granger Test at Lags 1 to 4"
-#| tbl-subcap:
-#|   - "Post Regulatory Changes 2010 Q2"
-#|   - "Series from 2002 Q4"
+#| tbl-cap: "Granger Test at Lags 1 to 4 (post regulatory period)"
 #| layout-ncol: 1
 
 granger_test_permutations(data = overdue30to89.post.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
-                            target_col_name = "value.group.median",
-                            exog_names = names(us_measures_qtr),
-                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category)) |> rmarkdown::paged_table()  
-
-granger_test_permutations(data = overdue30to89.all.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
                             target_col_name = "value.group.median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category)) |> rmarkdown::paged_table()  
@@ -161,18 +139,10 @@ granger_test_permutations(data = overdue30to89.all.lbank |> left_join (us_measur
 #| warning: false
 #| error: false
 #| label: tbl-granger-lcb
-#| tbl-cap: "Granger Test at Lags 1 to 4"
-#| tbl-subcap:
-#|   - "Post Regulatory Changes 2010 Q2"
-#|   - "Series from 2002 Q4"
+#| tbl-cap: "Granger Test at Lags 1 to 4 (post regulatory period)"
 #| layout-ncol: 1
 
 granger_test_permutations(data = overdue30to89.post.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
-                            target_col_name = "value.group.median",
-                            exog_names = names(us_measures_qtr),
-                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category)) |> rmarkdown::paged_table()  
-
-granger_test_permutations(data = overdue30to89.all.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
                             target_col_name = "value.group.median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category)) |> rmarkdown::paged_table()  
@@ -181,7 +151,7 @@ granger_test_permutations(data = overdue30to89.all.lcbank |> left_join (us_measu
 
 :::
 
-## Cross-Correlation Function 
+### Cross-Correlation Function 
 
 The Cross-Correlation function measures the correlation between series X at time $t+k$ and series Y at time $t$, for various lags $k$. A positive $k$ indicates future values of X relative to Y, conversely, a negative $k$ indicates past values of X relative to Y.
 
@@ -200,9 +170,9 @@ Below tests various macroeconomic variables (X) against *`r credit_card.target_l
 #|   - "RRSFS.Pop - Real Advance Retail and Food Services Sales per capita"
 #|   - "CDSP - Consumer Debt Service Payments as a Percent of Disposable Personal Income"
 #|   - "UNRATE - Unemployment Rate"
-#| layout-ncol: 3
+#| layout-ncol: 2
 
-run_ccf_test(data = overdue30to89.all |> left_join (us_measures_qtr,by = join_by(Quarter)),
+run_ccf_test(data = overdue30to89.post |> left_join (us_measures_qtr,by = join_by(Quarter)),
              target_variable = "value.all.median",
              exog_variable = "RRSFS.Pop",
              do_difference = TRUE)
@@ -229,8 +199,8 @@ run_ccf_test(data = overdue30to89.post |> left_join (us_measures_qtr,by = join_b
 #|   - "RRSFS.Pop - Real Advance Retail and Food Services Sales per capita"
 #|   - "CDSP - Consumer Debt Service Payments as a Percent of Disposable Personal Income"
 #|   - "UNRATE - Unemployment Rate"
-#| layout-ncol: 3
-run_ccf_test(data = overdue30to89.all.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
+#| layout-ncol: 2
+run_ccf_test(data = overdue30to89.post.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
              target_variable = "value.group.median",
              exog_variable = "RRSFS.Pop",
              do_difference = TRUE)
@@ -258,8 +228,8 @@ run_ccf_test(data = overdue30to89.post.lbank |> left_join (us_measures_qtr,by = 
 #|   - "RRSFS.Pop - Real Advance Retail and Food Services Sales per capita"
 #|   - "CDSP - Consumer Debt Service Payments as a Percent of Disposable Personal Income"
 #|   - "UNRATE - Unemployment Rate"
-#| layout-ncol: 3
-run_ccf_test(data = overdue30to89.all.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
+#| layout-ncol: 2
+run_ccf_test(data = overdue30to89.post.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)),
              target_variable = "value.group.median",
              exog_variable = "RRSFS.Pop",
              do_difference = TRUE)
@@ -278,7 +248,7 @@ run_ccf_test(data = overdue30to89.post.lcbank |> left_join (us_measures_qtr,by =
 
 :::
 
-### Cross-Correlation between macro economic variables
+#### Cross-Correlation between macro economic variables
 
 @fig-ccf-rrsfs assumes *Real Advance Retail and Food Services Sales per capita* (RRSFS.Pop) is our dependant variable (Y). we observe significant correlations at both positive and negative lags. This pattern indicates a bidirectional or feedback relationship between X and the dependent variable Y. For example, @fig-ccf-rrsfs-2 shows significant correlation at -1 lag suggesting that changes in unemployment have an impact on retail and food sales in the next quarter. But there's also a weaker but significant correlation at +1 which suggests a change in retail and food sales impacts unemployment in the following quarter. To remove the potential risk of multicollinearity we would only have one of these variables included in the same model.  
 
@@ -302,5 +272,123 @@ run_ccf_test(data = us_measures_qtr,
              do_difference = TRUE)                  
 
 ```
+
+## Portfolio Data
+
+### Granger Test
+
+```{r}
+#| warning: false
+#| echo: false
+ubpr_data <- get_model_data() |> select(dplyr::matches("UBPR.*.Value")) |> 
+                rename_with(~str_remove(., '.Value')) |>
+                group_by(BankType) |>
+                summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE)))
+
+exog_measures <- c("UBPR3815","UBPRB538", "UBPRE263", "UBPRE425")
+ubpr_data.lbank <- ubpr_data |> filter(BankType == "LargeBank")
+ubpr_data.lcbank <- ubpr_data |> filter(BankType == "LargeCreditCardBank")
+ubpr_data.all <- ubpr_data |> summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE)))
+ubpr_labs <- credit_card.udpr()
+```
+::: {#fig-granger-port .panel-tabset}
+
+## Combined
+```{r}
+#| warning: false
+#| tbl-cap: "Granger Test at Lags 1 to 4 (post regulatory period)"
+granger_test_permutations(data = ubpr_data.all |> filter(), 
+                            target_col_name = "UBPRE524",
+                            exog_names = exog_measures,
+                            max_lag = 4) |> list_rbind() |> left_join(ubpr_labs, join_by(exog_variable==UBPR_Code)) |> rmarkdown::paged_table()  
+```
+
+## Large Bank
+```{r}
+#| warning: false
+#| tbl-cap: "Granger Test at Lags 1 to 4 (post regulatory period)"
+granger_test_permutations(data = ubpr_data.lbank |> filter(), 
+                            target_col_name = "UBPRE524",
+                            exog_names = exog_measures,
+                            max_lag = 4) |> list_rbind() |> left_join(ubpr_labs, join_by(exog_variable==UBPR_Code)) |> rmarkdown::paged_table()  
+```
+## Large Credit Card Bank
+```{r}
+#| warning: false
+#| tbl-cap: "Granger Test at Lags 1 to 4 (post regulatory period)"
+granger_test_permutations(data = ubpr_data.lcbank |> filter(), 
+                            target_col_name = "UBPRE524",
+                            exog_names = exog_measures,
+                            max_lag = 4) |> list_rbind() |> left_join(ubpr_labs, join_by(exog_variable==UBPR_Code)) |> rmarkdown::paged_table()  
+
+```
+
+:::
+
+### Cross-Correlation Function  
+
+```{r}
+#| warning: false
+#| echo: false
+figure_captions <- ubpr_labs |> filter(UBPR_Code %in% exog_measures)
+```
+
+::: {#fig-ccf-port .panel-tabset}
+
+## Combined
+```{r}
+#| label: fig-ccf-port
+#| fig-cap: "Cross-Correlation Function"
+#| fig-subcap:
+#|   - "Credit Card Loans, % Gross LN&LS"
+#|   - "Unused Commitments on Credit Cards as a percent of Total Assets"
+#|   - "Unused Commitments on Credit Cards"
+#|   - "Loans to Individuals for Household, Family, and Other Personal Expenditures:Credit Cards"
+#| results: hide
+#| fig-keep: all
+#| layout-ncol: 2 
+
+exog_measures |> map(\(x) run_ccf_test(data = ubpr_data.all,
+             target_variable = "UBPRE524",
+             exog_variable = x,
+             do_difference = TRUE))
+```
+
+## Large Bank
+```{r}
+#| label: fig-ccf-port-l
+#| fig-cap: "Cross-Correlation Function"
+#| fig-subcap:
+#|   - "Credit Card Loans, % Gross LN&LS"
+#|   - "Unused Commitments on Credit Cards as a percent of Total Assets"
+#|   - "Unused Commitments on Credit Cards"
+#|   - "Loans to Individuals for Household, Family, and Other Personal Expenditures:Credit Cards"
+#| results: hide
+#| fig-keep: all
+#| layout-ncol: 2
+exog_measures |> map(\(x) run_ccf_test(data = ubpr_data.lbank,
+             target_variable = "UBPRE524",
+             exog_variable = x,
+             do_difference = TRUE))
+```
+
+## Large Credit Card Bank
+```{r}
+#| label: fig-ccf-port-cc
+#| fig-cap: "Cross-Correlation Function"
+#| fig-subcap:
+#|   - "Credit Card Loans, % Gross LN&LS"
+#|   - "Unused Commitments on Credit Cards as a percent of Total Assets"
+#|   - "Unused Commitments on Credit Cards"
+#|   - "Loans to Individuals for Household, Family, and Other Personal Expenditures:Credit Cards"
+#| results: hide
+#| fig-keep: all
+#| layout-ncol: 2
+exog_measures |> map(\(x) run_ccf_test(data = ubpr_data.lcbank,
+             target_variable = "UBPRE524",
+             exog_variable = x,
+             do_difference = TRUE))
+```
+:::
 
 ## References
