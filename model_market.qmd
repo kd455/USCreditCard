@@ -8,6 +8,29 @@ format: html
 #| echo: false
 source('functions.R')
 target_label = credit_card.target_label()
+ubpr_labels =  credit_card.udpr()
+
+ubpr_labels |> filter(UBPR_Code == "UBPRB538")
+
+plot_cc_measures <- function(bank_fuzzy, data, ubpr_labels) {
+  data |> filter(grepl(bank_fuzzy,BankName)) |> 
+  select(UBPRE524 = UBPRE524.Value, UBPRE263 = UBPRE263.Value, UBPRE425 = UBPRE425.Value, UBPRB538 = UBPRB538.Value) |> 
+   pivot_longer(cols= -Quarter, names_to = "UBPR_Code") |> 
+   mutate(display_order = case_when(
+                          UBPR_Code == "UBPRE524" ~ "(a)",
+                          UBPR_Code == "UBPRE263" ~ "(b)",
+                          UBPR_Code == "UBPRE425" ~ "(c)",
+                          UBPR_Code == "UBPRB538" ~ "(d)"),
+                          .default = "" ) |>
+   left_join(ubpr_labels,by = join_by(UBPR_Code)) |> 
+   mutate(Description = paste(display_order, Description)) |>
+   ggplot(aes(x = Quarter, y =value, colour = UBPR_Code)) + 
+   geom_line() + 
+   labs(y='') +
+   theme(legend.position = "none") +
+   facet_wrap(~Description, scales = "free_y", ncol=1)
+}
+
 ```
 ## Specification {#sec-model-market}
 
@@ -87,18 +110,12 @@ Residuals should have the following properties [@Hyndman2021, ch. 5.4]. Residual
 #| label: fig-fit-citi
 #| fig-subcap: 
 #|   - "The time plot of the residuals shows that the variation of the residuals is relatively constant but with one significant outlier. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outlier." 
-#|   - "Explaining the outlier: Deliquency dropped at a time when CITIBANK's credit card portfolio became a larger business concern. The borrowers added appear to be less risky as we see the unused proportion go from below 10% to over 40%"
+#|   - "Explaining the outlier: Deliquency dropped at a time when CITIBANK's credit card portfolio became a larger business concern (c). The borrowers added appear to be less risky as we see the unused proportion go from below 10% to over 40% in (b)"
 
-bank = "CITIBANK"
+bank <- "CITIBANK"
 m_table |> filter(grepl(bank,BankName)) |> select(tslm) |> gg_tsresiduals()  
 
-estimation_data |> filter(grepl(bank,BankName)) |> 
-  select(
-   'Credit Card Loans, % Gross LN&LS (UBPRE425)' = UBPRE425.Value,
-   'Unused Commitments on Credit Cards, % of Total Assets (UBPRE263)' = UBPRE263.Value,
-   'Credit Card Plans-30-89 DAYS P/D % (UBPRE524)' = UBPRE524.Value) |> pivot_longer(cols= -Quarter) |> ggplot(aes(x = Quarter, y =value, colour = name)) + geom_line() + labs(y='%') +
-   theme(legend.position = "none") +
-   facet_wrap(~name, scales = "free_y", ncol=1)
+plot_cc_measures(bank, estimation_data,ubpr_labels)
 
 ```
 
@@ -107,8 +124,13 @@ estimation_data |> filter(grepl(bank,BankName)) |>
 ```{r}
 #| warning: false
 #| label: fig-fit-bar
-#| fig-cap: "The time plot of the residuals shows that the variation of the residuals is relatively constant up until the onset of the COVID-19 pandemic in 2020; the model needs more information to account for this period. The acf shows residuals are uncorrelated"
-m_table |> filter(grepl("BARCLAYS",BankName)) |> select(tslm) |> gg_tsresiduals()  
+#| fig-subcap: 
+#| - "The time plot of the residuals shows that the variation of the residuals is relatively constant up until the onset of the COVID-19 pandemic in 2020; the model needs more information to account for this period. The acf shows residuals are uncorrelated"
+#| - ""
+bank <- "BARCLAYS"
+m_table |> filter(grepl(bank,BankName)) |> select(tslm) |> gg_tsresiduals()  
+
+plot_cc_measures(bank, estimation_data,ubpr_labels)
 ```
 
 
@@ -116,9 +138,14 @@ m_table |> filter(grepl("BARCLAYS",BankName)) |> select(tslm) |> gg_tsresiduals(
 ```{r}
 #| warning: false
 #| label: fig-fit-ae
-#| fig-cap: "The time plot of the residuals shows that the variation of the residuals is relatively constant. The acf shows residuals are uncorrelated and are normally distributed."
+#| fig-subcap: 
+#| - "The time plot of the residuals shows that the variation of the residuals is relatively constant. The acf shows residuals are uncorrelated. and  normally distributed."
+#| - "Explaining the outlier: Deliquency dropped at a time when CITIBANK's credit card portfolio became a larger business concern. The borrowers added appear to be less risky as we see the unused proportion go from below 10% to over 40%"
 
-m_table |> filter(grepl("AMERICAN EXPRESS NATIONAL BANK",BankName)) |> select(tslm) |> gg_tsresiduals()  
+bank <- "AMERICAN EXPRESS NATIONAL BANK"
+m_table |> filter(grepl(bank,BankName)) |> select(tslm) |> gg_tsresiduals()  
+
+plot_cc_measures(bank, estimation_data,ubpr_labels)
 
 ```
 
@@ -130,16 +157,10 @@ m_table |> filter(grepl("AMERICAN EXPRESS NATIONAL BANK",BankName)) |> select(ts
 #|   - "The time plot of the residuals shows that the variation of the residuals is relatively constant but with two significant outliers at the start of the series. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outliers." 
 #|   - "Explaining the outlier: Deliquency dropped at a time when CAPITAL ONE's credit card portfolio became a larger business concern. The U shape for deliquency % indicates initial improvement in the portfolio's quality, however, by the end of the estimation period, the % is back up. This increase coincides with a decrease in unused commitments i.e. borrowers are putting more expenditures on their credit cards."
 
-m_table |> filter(grepl("CAPITAL ONE",BankName)) |> select(tslm) |> gg_tsresiduals()  
+bank <- "CAPITAL ONE"
+m_table |> filter(grepl(bank,BankName)) |> select(tslm) |> gg_tsresiduals()  
+plot_cc_measures(bank, estimation_data, ubpr_labels)
 
-estimation_data |> filter(grepl("CAPITAL ONE",BankName)) |> 
-  select(
-   'Credit Card Plans-30-89 DAYS P/D % (UBPRE524)' = UBPRE524.Value,
-   'Unused Commitments on Credit Cards, % of Total Assets (UBPRE263)' = UBPRE263.Value,
-   'Credit Card Loans, % Gross LN&LS (UBPRE425)' = UBPRE425.Value
-   ) |> pivot_longer(cols= -Quarter) |> ggplot(aes(x = Quarter, y =value, colour = name)) + geom_line() + labs(y='%') +
-   theme(legend.position = "none") +
-   facet_wrap(~name, scales = "free_y", ncol=1)
 ```
 
 :::
@@ -214,17 +235,19 @@ bind_rows(cv_results_est, cv_results_test) |> arrange(BankName,.type)
 
 ## Prediction 
 
-Observation Period 
+Observation Period...TO WRITE
 
 ```{r}
 #| warning: false
 #| echo: false
+#| results: hide
+#| fig-keep: all
 #| label: fig-pred-bar
 #| fig-cap: "Prediction vs. Observed Event"
 
 plot_prediction <- function(bank_name, partner_name, estimation_data, observation_data, models) {
   est_data <- estimation_data |> filter(BankName == bank_name)
-  est_data_trunc <- est_data |> tail(max(nrow(est_data),13))
+  est_data_trunc <- est_data |> tail(ifelse(nrow(est_data)<11,nrow(est_data),11))
   event_data <- observation_data |> filter(BankName == bank_name) |> head(5)
   comb_data <- bind_rows(est_data_trunc, event_data)
 
