@@ -10,8 +10,6 @@ source('functions.R')
 target_label = credit_card.target_label()
 ubpr_labels =  credit_card.udpr()
 
-ubpr_labels |> filter(UBPR_Code == "UBPRB538")
-
 plot_cc_measures <- function(bank_fuzzy, data, ubpr_labels) {
   data |> filter(grepl(bank_fuzzy,BankName)) |> 
   select(UBPRE524 = UBPRE524.Value, UBPRE263 = UBPRE263.Value, UBPRE425 = UBPRE425.Value, UBPRB538 = UBPRB538.Value) |> 
