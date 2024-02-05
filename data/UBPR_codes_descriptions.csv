@@ -1,0 +1,130 @@
+UBPR_Code,Description
+UBPRE420,"Total Real Estate, % Gross LN&LS"
+UBPRE414,"Construction & Development, % Avg Gross LN&LS"
+UBPRE393,"1-4 Family Construction, % Avg Gross LN&LS"
+UBPRE417,"Farmland, % Gross LN&LS"
+UBPRE415,"1-4 Family Residential, % Gross LN&LS"
+UBPRE416,"Home Equity Loans, % Gross LN&LS"
+UBPRE418,"Multifamily, % Gross LN&LS"
+UBPRE396,"Owner Occupied Non-Farm Non-Residential, % Gross LN&LS"
+UBPRE389,"Other Non-Farm Non-Residential, % Gross LN&LS"
+UBPRE421,"Financial Institution Loans, % Gross LN&LS"
+UBPRE422,"Agricultural Loans, % Gross LN&LS"
+UBPRE423,"Commercial & Industrial Loans, % Gross LN&LS"
+UBPRE425,"Credit Card Loans, % Gross LN&LS"
+UBPRE426,"Municipal Loans, % Gross LN&LS"
+UBPRE429,"All Other Loans, % Gross LN&LS"
+UBPRE431,"Loans to Foreign Governments, % Gross LN&LS"
+UBPRE430,"Lease Financing Receivables, % Gross LN&LS"
+UBPRE432,"Loans to Finance Comml Real Est, % Gross LN&LS"
+UBPRE428,"Foreign Office Loans and Leases, % Gross LN&LS"
+UBPRE434,"Officer & Shareholder Loans, % Avg Tot LN&LS"
+UBPRE435,"Officer & Shareholder Loans, % of Assets"
+UBPRE436,"Construction & Land Development OREO, % Assets"
+UBPRE437,"Farmland OREO, % Assets"
+UBPRE438,"1-4 Family OREO, % Assets"
+UBPRE439,"Multifamily OREO, % Assets"
+UBPRE440,"Non-Farm Non-Residential OREO, % Assets"
+UBPRE441,Foreign Office OREO
+UBPRE442,"Subtotal OREO, % Assets"
+UBPRE443,"Direct and Indirect Inv OREO, % Assets"
+UBPRE444,"Total OREO, % Assets"
+UBPRE445,Mortgage Servicing w/ Recourse % Assets
+UBPRE446,Mortgage Servicing w/o Recourse % Assets
+UBPRE447,Other Financial Assets % Assets
+UBPRE448,Total Servicing % Assets
+UBPRE884,"Total Real Estate Loans, % Tier 1 Capital plus Allowance"
+UBPRE632,"1-4 Family Construction Loans, % Tier 1 Capital plus Allowance"
+UBPRE657,"Other Const & Land Development Loans, % Tier 1 Capital plus Allowance
+5.1,UBPRE880,Farmland Loans"
+UBPRE658,"1-4 Family Residential Loans, % Tier 1 Capital plus Allowance"
+UBPRE663,"Home Equity Loans, % Tier 1 Capital plus Allowance"
+UBPRE881,"Mulitfamily Loans, % Tier 1 Capital plus Allowance"
+UBPRE882,"Non-Farm Non-Residential Loans, % Tier 1 Capital plus Allowance"
+UBPRE883,"Owner Occupied Non-Farm Non-Residential Loans, % Tier 1 Capital plus Allowance"
+UBPRE392,"Other Non-Farm Non-Residential Loans, % Tier 1 Capital plus Allowance"
+UBPRE885,"Financial Institution Loans, % Tier 1 Capital plus Allowance"
+UBPRE886,"Agricultural Loans, % Tier 1 Capital plus Allowance"
+UBPRE887,"Commercial & Industrial Loans, % Tier 1 Capital plus Allowance"
+UBPRE888,"Loans to Individuals, % Tier 1 Capital plus Allowance"
+UBPRE889,"Credit Card Loans, % Tier 1 Capital plus Allowance"
+UBPRE890,"Municipal Loans, % Tier 1 Capital plus Allowance"
+UBPRE892,"All Other Loans, % Tier 1 Capital plus Allowance"
+UBPRE894,"Loans to Foreign Governments, % Tier 1 Capital plus Allowance"
+UBPRE893,"Lease Financing Receivables, % Tier 1 Capital plus Allowance"
+UBPRE895,"Loans to Finance Commercial Real Estate, % Tier 1 Capital plus Allowance"
+UBPRE891,"Foreign Office Loans & Leases, % Tier 1 Capital plus Allowance"
+UBPRE497,Coml & Indust LNS-90+ Days P/D %
+UBPRE498,Coml & Indust LNS-Nonaccrual %
+UBPRE499,Coml & Indust LNS - Total %
+UBPRE500,Coml & Indust LNS-30-89 DAYS P/D %
+UBPRE533,Agricultural LNS-90+ Days P/D %
+UBPRE534,Agricultural LNS-Nonaccrual %
+UBPRE535,Agricultural LNS-Total %
+UBPRE536,Agricultural LNS-30-89 DAYS P/D %
+UBPRE501,Loans to Individuals 90 + Days P/D %
+UBPRE502,Loans to Individuals - Nonaccrual %
+UBPRE503,Loans to Individuals - Total %
+UBPRE504,Loans to Individuals 30-89 DAYS P/D %
+UBPRE521,Credit Card Plans-90+ Days P/D %
+UBPRE522,Credit Card Plans-Nonaccrual %
+UBPRE524,Credit Card Plans-30-89 DAYS P/D %
+UBPRE537,Other LN&LS-90+ Days P/D %
+UBPRE538,Other LN&LS-Nonaccrual %
+UBPRE539,Other LN&LS-Total %
+UBPRE540,Other LN&LS-30-89 DAYS P/D %
+UBPRE529,Lease Financing-90+ Days P/D %
+UBPRE530,Lease Financing-Nonaccrual %
+UBPRE531,Lease Financing-Total %
+UBPRE532,Lease Financing-30-89 DAYS P/D %
+UBPRE541,Total Loans and Leases 90+ Days Past Due to Gross Loans and Leases
+UBPRE544,Total LN&LS-30-89 DAYS Past Due %
+UBPRE545,Non-Cur LN&LS to-LN&LS Allowance
+UBPRE546,Noncurr LN&LS to Equity Capital
+UBPRE547,% Total P/D LN&LS-Incl Nonaccrual
+UBPRE549,Non-Curr LNS+OREO to LNS+OREO
+UBPRE026,Restructured Loans + Nonaccrual Loans + Real Estate Acquired to Equity Capital + Loan and Lease Allowance
+UBPRE550,Non-Curr Restruct Debt/Gr LN&LS
+UBPRE551,Curr+Non-Curr Restruct/GR LN&LS
+UBPRE552,Current Restruct LN&LS %
+UBPRE001,Interest Income (TE) as a percent of Average Assets
+UBPRE002,Interest Expense as a percent of Average Assets
+UBPRE003,Net Interest Income (TE) as a percent of Average Assets
+UBPRE004,"Noninterest Income as a percent of Average Assets"""
+UBPRE005,Non-Interest Expense as a percent of Average Assets
+UBPRE006,Provision for Loan & Lease Losses as a percent of Average Assets
+UBPRE007,Pretax Operating Income (TE) as a percent of Average Assets
+UBPRE008,Realized Gains(Losses) on the sale of Securities as a percent of Average Assets
+UBPRE009,Pretax Net Operating Income (TE) as a percent of Average Assets
+UBPRE010,Net Operating Income as a percent of Average Assets
+UBPRE012,Net Income Adjusted for Sub Chapter S Status as a percent of Average Assets
+UBPRE013,Net Income as a percent of Average Assets
+UBPRE014,Average Earning Assets as a percent of Average Assets
+UBPRE016,Interest Income (TE) as a percent of Average Earning Assets
+UBPRE017,Interest Expense to Average Earning Assets
+UBPRE018,Net Interest Income (TE) as a percent of Average Earning Assets
+UBPRE019,Net Loss as a percent of Average Total Loans and Leases
+UBPRE020,Earnings Coverage of Net Losses (X)
+UBPRE022,LN&LS Allowance to LN&LS Not HFS
+UBPRE021,Loan and Lease Allowance to Net Loss (times)
+UBPRE395,LN&LS Allowance to Nonaccrual LN&LS (X)
+UBPRE544,Total LN&LS-30-89 DAYS Past Due %
+UBPRE549,Non-Curr LNS+OREO to LNS+OREO
+UBPRE024,Net Loans and Leases to Total Assets
+UBPRE600,Net Loans & Leases as a percent of Total Deposits
+UBPRE027,Net Loans and Leases 12-month growth rate
+UBPRE028,Short Term Investments 12-month growth rate
+UBPRE029,Short Term Non Core Funding 12-month growth rate
+UBPRE523,90 days+ Nonaccrual (UBPRE521+UBPRE522)
+UBPRE263,Unused Commitments on Credit Cards as a percent of Total Assets
+UBPR3815,Unused Commitments on Credit Cards
+UBPR3123,Loan and Lease Allowance
+UBPRD665,"Individual loans Domestic-office loans to individuals for household, family and other personal expenditures."
+UBPRB538,"Loans to Individuals for Household, Family, and Other Personal Expenditures (I.E., Consumer Loans)(Includes Purchased Paper):Credit Cards"
+UBPRE411,Credit Card Plans Net Losses (%)
+UBPRB575,"Loans to Individuals for Household, Family, and Other Personal Expenditures: Credit Cards - Past Due 30 through 89 Days and Still Accruing"
+UBPRD095,PAST DUE CREDIT CARD LOANS 90 DAYS AND ON NONACCRUAL BASIS
+UBPRE683,LN&LS Allowance to Net Losses (X) - One Qtr Ann
+UBPRE682,Earnings Coverage of Net Loss (X) - One Qtr Ann
+UBPRE681,Net Loss to Average Total LN&LS - One Qtr Ann
+UBPRE670,Provision: Loan & Lease Losses - One Qtr Ann

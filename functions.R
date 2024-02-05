@@ -511,6 +511,10 @@ plot_us_category <- function(category, measures, target_data, target_measure = "
         scale_colour_colorblind7()                     
 }
 
+credit_card.udpr <- function() {
+    read_csv("data/UBPR_codes_descriptions.csv", show_col_types = FALSE)
+}
+
 us_economy.quarterly_selected <- function() {
   us_economy() |> 
     mutate(B069RC1.Pop.CPI =B069RC1/POPTHM/PCEPI) |>
