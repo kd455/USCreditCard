@@ -327,12 +327,6 @@ granger_test_permutations(data = ubpr_data.lcbank |> filter(),
 
 ### Cross-Correlation Function  
 
-```{r}
-#| warning: false
-#| echo: false
-figure_captions <- ubpr_labs |> filter(UBPR_Code %in% exog_measures)
-```
-
 ::: {#fig-ccf-port .panel-tabset}
 
 ## Combined
@@ -340,10 +334,10 @@ figure_captions <- ubpr_labs |> filter(UBPR_Code %in% exog_measures)
 #| label: fig-ccf-port
 #| fig-cap: "Cross-Correlation Function"
 #| fig-subcap:
-#|   - "Credit Card Loans, % Gross LN&LS"
-#|   - "Unused Commitments on Credit Cards as a percent of Total Assets"
-#|   - "Unused Commitments on Credit Cards"
-#|   - "Loans to Individuals for Household, Family, and Other Personal Expenditures:Credit Cards"
+#|   - "UBPRE425: Credit Card Loans, % Gross LN&LS"
+#|   - "UBPRE263: Unused Commitments on Credit Cards as a percent of Total Assets"
+#|   - "UBPR3815: Unused Commitments on Credit Cards"
+#|   - "UBPRB538: Loans to Individuals for Household, Family, and Other Personal Expenditures:Credit Cards"
 #| results: hide
 #| fig-keep: all
 #| layout-ncol: 2 
@@ -359,10 +353,10 @@ exog_measures |> map(\(x) run_ccf_test(data = ubpr_data.all,
 #| label: fig-ccf-port-l
 #| fig-cap: "Cross-Correlation Function"
 #| fig-subcap:
-#|   - "Credit Card Loans, % Gross LN&LS"
-#|   - "Unused Commitments on Credit Cards as a percent of Total Assets"
-#|   - "Unused Commitments on Credit Cards"
-#|   - "Loans to Individuals for Household, Family, and Other Personal Expenditures:Credit Cards"
+#|   - "UBPRE425: Credit Card Loans, % Gross LN&LS"
+#|   - "UBPRE263: Unused Commitments on Credit Cards as a percent of Total Assets"
+#|   - "UBPR3815: Unused Commitments on Credit Cards"
+#|   - "UBPRB538: Loans to Individuals for Household, Family, and Other Personal Expenditures:Credit Cards"
 #| results: hide
 #| fig-keep: all
 #| layout-ncol: 2
@@ -377,10 +371,10 @@ exog_measures |> map(\(x) run_ccf_test(data = ubpr_data.lbank,
 #| label: fig-ccf-port-cc
 #| fig-cap: "Cross-Correlation Function"
 #| fig-subcap:
-#|   - "Credit Card Loans, % Gross LN&LS"
-#|   - "Unused Commitments on Credit Cards as a percent of Total Assets"
-#|   - "Unused Commitments on Credit Cards"
-#|   - "Loans to Individuals for Household, Family, and Other Personal Expenditures:Credit Cards"
+#|   - "UBPRE425: Credit Card Loans, % Gross LN&LS"
+#|   - "UBPRE263: Unused Commitments on Credit Cards as a percent of Total Assets"
+#|   - "UBPR3815: Unused Commitments on Credit Cards"
+#|   - "UBPRB538: Loans to Individuals for Household, Family, and Other Personal Expenditures:Credit Cards"
 #| results: hide
 #| fig-keep: all
 #| layout-ncol: 2
