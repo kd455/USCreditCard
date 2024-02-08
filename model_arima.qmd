@@ -7,145 +7,433 @@ format: html
 #| warning: false
 #| echo: false
 source('functions.R')
+target_label = credit_card.target_label()
+ubpr_labels =  credit_card.udpr()
+
+get_model_cols <-function(model_table, ignore_cols) {
+  model_cols <- model_table |> names()
+  model_cols[!names(model_table) %in% ignore_cols]
+}
+
+data <- get_model_data() |> drop_na(UBPRE524.Value)
+
+estimation_data <- data |> filter(is.na(Partnership)) |> fill_gaps()
+estimation_data_grp <- estimation_data |> group_by(BankType) |> select(-IDRSSD) |> summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) 
+
+estimation_data_grp.lc <- estimation_data_grp |> filter(BankType == "LargeCreditCardBank")
+estimation_data_grp.l <- estimation_data_grp |> filter(BankType == "LargeBank")
+
+observation_data <- data |> filter(!is.na(Partnership))
+
 ```
 
 To determine the normal return we can adopt a ARIMA model [@Hyndman2021 ch.9]
 
+Information criteria are likelihood-based measures of model fit that include a penalty for complexity
 
-## Model Summary
+## Model selection {#sec-model-arima}
+
+Using auto.arima and AIC for model selection. Unlike the Market model we are using the undifferenced value for `r credit_card.target_label()` as the auto.arima process will perform the differencing if optimal.
 
 ```{r}
 #| warning: false
-install.packages("gt")
-library(gt)
-data <- get_model_data() |> drop_na(UBPRE524.diff)
+#| code-fold: false
+#| eval: false
 
-data |> select(starts_with("RRSFS"))
+arima  <- as.formula("UBPRE524.Value")
+rrsfs1 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.pct_change")
+rrsfs2 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.pct_change.lag1")
+rrsfs3 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.pct_change + RRSFS.Pop.pct_change.lag1")
+rrsfs4 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.pct_change + RRSFS.Pop.pct_change.lag1 + RRSFS.Pop.pct_change.lag2")
+rrsfs5 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.pct_change + RRSFS.Pop.pct_change.lag1 + RRSFS.Pop.pct_change.lag2 + RRSFS.Pop.pct_change.lag3")
 
-estimation_data <- data |> filter(is.na(Partnership)) |> fill_gaps()
-observation_data <- data |> filter(!is.na(Partnership))
+unrate1 <- as.formula("UBPRE524.Value ~ UNRATE.pct_change")
+unrate2 <- as.formula("UBPRE524.Value ~ UNRATE.pct_change.lag1")
+unrate3 <- as.formula("UBPRE524.Value ~ UNRATE.pct_change + UNRATE.pct_change.lag1")
+unrate4 <- as.formula("UBPRE524.Value ~ UNRATE.pct_change + UNRATE.pct_change.lag1 + UNRATE.pct_change.lag2")
+unrate5 <- as.formula("UBPRE524.Value ~ UNRATE.pct_change + UNRATE.pct_change.lag1 + UNRATE.pct_change.lag2 + UNRATE.pct_change.lag3")
 
-m_table <- estimation_data |> 
-            model(
-                arima = ARIMA(UBPRE524.diff),
-                arima_rrsfs = ARIMA(UBPRE524.diff ~ 1 + RRSFS.Pop.pct_change + RRSFS.Pop.pct_change.lag1),
-                arima_rrsfs_unrate = ARIMA(UBPRE524.diff ~ 1 + RRSFS.Pop.pct_change +RRSFS.Pop.pct_change.lag1 + UNRATE.pct_change + UNRATE.pct_change.lag1)
-            )
+portfolio1 <- as.formula("UBPRE524.Value ~ UBPRB538.pct_change")
+portfolio2 <- as.formula("UBPRE524.Value ~ UBPRB538.pct_change.lag1")
+portfolio3 <- as.formula("UBPRE524.Value ~ UBPRB538.pct_change + UBPRB538.pct_change.lag1")
 
-m_table |> filter(grepl("BARCLAYS",BankName))  |>
-  tidy() |> 
-    mutate(across(where(is.numeric), round, 2)) |> 
-      rmarkdown::paged_table()
+comb1 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.pct_change + UNRATE.pct_change + UNRATE.pct_change.lag1")
+comb2 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.pct_change + RRSFS.Pop.pct_change.lag1 + UNRATE.pct_change + UNRATE.pct_change.lag1")
+comb3 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.pct_change + RRSFS.Pop.pct_change.lag1 + UNRATE.pct_change + UNRATE.pct_change.lag1 + UNRATE.pct_change.lag2")
+comb4 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.pct_change + UNRATE.pct_change + UNRATE.pct_change.lag1 + UBPRB538.pct_change")
+
+manual1 <- as.formula("UBPRE524.Value ~ 0 + RRSFS.Pop.pct_change + UNRATE.pct_change + UNRATE.pct_change.lag1 + UBPRB538.pct_change + pdq(1, 1, 0) + PDQ(0,0,0)")
+manual2 <- as.formula("UBPRE524.Value ~ 0 + RRSFS.Pop.pct_change + UNRATE.pct_change + UNRATE.pct_change.lag1 + UBPRB538.pct_change + pdq(1, 1, 0) + PDQ(1,0,0)")
+manual3 <- as.formula("UBPRE524.Value ~ 0 + RRSFS.Pop.pct_change + UNRATE.pct_change + UNRATE.pct_change.lag1 + pdq(1, 1, 0) + PDQ(0,0,0)")
+manual4 <- as.formula("UBPRE524.Value ~ 0 + RRSFS.Pop.pct_change + UNRATE.pct_change + UNRATE.pct_change.lag1 + pdq(1, 1, 0) + PDQ(1,0,0)")
+manual5 <- as.formula("UBPRE524.Value ~ 0 + RRSFS.Pop.pct_change + UNRATE.pct_change + UNRATE.pct_change.lag1 + pdq(2, 1, 0) + PDQ(0,0,0)")
+
 ```
-
 ```{r}
-m_table |> filter(grepl("BARCLAYS",BankName))  |>
-  tidy() |> 
-    mutate(across(where(is.numeric), round, 2)) |> 
-      gt()
+#| warning: false
+#| eval: false
+run_arima <- function(estimation_data, fname_suffix = "") {
+  ## 1. Expenditure
+  m_table <- estimation_data |> drop_na(RRSFS.Pop.pct_change.lag3) |>
+              model(
+                  arima = ARIMA(UBPRE524.Value),
+                  rrsfs1 = ARIMA(rrsfs1),
+                  rrsfs2 = ARIMA(rrsfs2),
+                  rrsfs3 = ARIMA(rrsfs3),
+                  rrsfs4 = ARIMA(rrsfs4),
+                  rrsfs5 = ARIMA(rrsfs5)
+              )
+
+  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_rrsfs{fname_suffix}_results.csv"))
+
+  ## 2. Unemployment
+  m_table <- estimation_data |> drop_na(RRSFS.Pop.pct_change.lag3) |>
+              model(
+                  unrate1 = ARIMA(unrate1),
+                  unrate2 = ARIMA(unrate2),
+                  unrate3 = ARIMA(unrate3),
+                  unrate4 = ARIMA(unrate4),
+                  unrate5 = ARIMA(unrate5),
+              )
+
+  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_unrate{fname_suffix}_results.csv"))
+
+  ## 3. Portfolio
+  m_table <- estimation_data |> drop_na(RRSFS.Pop.pct_change.lag3) |>
+              model(
+                  portfolio1 = ARIMA(portfolio1),
+                  portfolio2= ARIMA(portfolio2),
+                  portfolio3= ARIMA(portfolio3),
+              )
+
+  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_portfolio{fname_suffix}_results.csv"))
+
+  ## 4. Combinations
+  m_table <- estimation_data |> drop_na(RRSFS.Pop.pct_change.lag3) |>
+              model(
+                  comb1= ARIMA(comb1),
+                  comb2= ARIMA(comb2),
+                  comb3= ARIMA(comb3),
+                  comb4= ARIMA(comb4)
+              )
+
+  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_other{fname_suffix}_results.csv"))
+
+  ## 4. Combinations
+  m_table <- estimation_data |> drop_na(RRSFS.Pop.pct_change.lag3) |>
+              model(
+                  manual1= ARIMA(manual1),
+                  manual2= ARIMA(manual2),
+                  manual3= ARIMA(manual3),
+                  manual4= ARIMA(manual4),
+                  manual5= ARIMA(manual5)
+              )
+
+  fname_suffix = "_l"
+  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_manual{fname_suffix}_results.csv"))
+
+}
+run_arima(estimation_data)
+run_arima(estimation_data_grp.lc, "_lc")
+run_arima(estimation_data_grp.l, "_l")
+
+```
+::: {#fig-arima-aic .panel-tabset}
+
+### Large Bank
+```{r}
+#| warning: false
+#| label: tbl-arima-lb-aic
+#| tbl-cap: Ordered Best-Worst ARIMA model by AIC
+arima_results <- read_arima_results() 
+
+arima_results |> filter(is.na(BankName), BankType == "LargeBank") |> select(-BankType) |> relocate(.model, 
+.model_spec, AIC) |> arrange(AIC) |> rmarkdown::paged_table()
+
 ```
 
+### Large Credit Card Bank
+```{r}
+#| warning: false
+#| label: tbl-arima-lc-aic
+#| tbl-cap: Ordered Best-Worst ARIMA model by AIC
+arima_results |> filter(is.na(BankName), BankType == "LargeCreditCardBank") |> select(-BankType) |> relocate(.model, .model_spec, AIC) |> arrange(AIC)  |> rmarkdown::paged_table()
+
+```
+
+### CITIBANK
+```{r}
+#| warning: false
+#| label: tbl-arima-citi-aic
+#| tbl-cap: Ordered Best-Worst ARIMA model by AIC 
+arima_results |> filter(grepl("CITIBANK",BankName)) |> select(-BankName) |> relocate(.model, 
+.model_spec, AIC) |> arrange(AIC) |> rmarkdown::paged_table()
+```
+### SYNCHRONY
+```{r}
+#| warning: false
+#| label: tbl-arima-syn-aic
+#| tbl-cap: Ordered Best-Worst ARIMA model by AIC
+arima_results |> filter(grepl("SYNCHRONY",BankName)) |> select(-BankName) |> relocate(.model, 
+.model_spec, AIC) |> arrange(AIC) |> rmarkdown::paged_table()
+```
+
+### BARCLAYS
+```{r}
+#| warning: false
+#| label: tbl-arima-bar-aic
+#| tbl-cap: Ordered Best-Worst ARIMA model by AIC
+arima_results |> filter(grepl("BARCLAYS",BankName)) |> select(-BankName) |> relocate(.model, 
+.model_spec, AIC) |> arrange(AIC) |> rmarkdown::paged_table()
+```
+
+### AMERICAN EXPRESS NATIONAL BANK
+```{r}
+#| warning: false
+#| label: tbl-arima-ae-aic
+#| tbl-cap: Ordered Best-Worst ARIMA model by AIC
+arima_results |> filter(grepl("AMERICAN EXPRESS NATIONAL BANK",BankName)) |> select(-BankName) |> relocate(.model, 
+.model_spec, AIC) |> arrange(AIC) |> rmarkdown::paged_table()
+```
+
+### CAPITAL ONE
+```{r}
+#| warning: false
+#| label: tbl-arima-cap-aic
+#| tbl-cap: Ordered Best-Worst ARIMA model by AIC
+arima_results |> filter(grepl("CAPITAL ONE",BankName)) |> select(-BankName) |> relocate(.model, 
+.model_spec, AIC) |> arrange(AIC) |> rmarkdown::paged_table()
+```
+
+::: 
+```{r}
+#| warning: false
+#| label: tbl-arima-rank
+#| tbl-cap: Best-Worst ARIMA model by AIC
+#| tbl-subcap: 
+#|   - "Models ordered by combined ranking of all banks"
+#|   - "ARIMA specification. There are 29 Banks and 25 different ARIMA specifications."
+#| layout-ncol: 1
+arima_results |> filter(!is.na(BankName)) |> 
+  group_by(BankType,BankName) |>
+    mutate(rank_aic= rank(AIC, ties.method = "min")) |> 
+          relocate(rank_aic, BankName) |> 
+    group_by(BankType, .model) |>
+      summarise(rank_aic = sum(rank_aic), 
+                mean_aic = mean(AIC, na.rm=TRUE)) |> 
+      mutate(rank = dense_rank(rank_aic)) |> 
+      select(-rank_aic) |> 
+      arrange(rank) |> rmarkdown::paged_table()
+
+arima_results |> filter(.model %in% c("comb4")) |> 
+  group_by(BankType,.model,.model_spec) |> count() |> arrange(desc(n)) |> rmarkdown::paged_table()
+
+
+```
+
+
+Auto ARIMA (Automatic ARIMA) to model a non-stationary time series, the algorithm attempts to identify the best combination of ARIMA parameters (p, d, q) that minimizes a given criterion, usually the AIC (Akaike Information Criterion), BIC (Bayesian Information Criterion), or similar. The 
+�
+d parameter represents the order of differencing needed to make the series stationary. Ideally, if your series is non-stationary, you might expect Auto ARIMA to suggest differencing it at least once (
+�
+=
+1
+d=1) to achieve stationarity.
+
+### Estimated Fit
 ```{r}
 #| warning: false
 #| label: fig-plot-arima-fit
 #| fig-cap: "Fitted vs. Observed for estimation data on sub-set of firms"
 
-augmented_data <- m_table |> augment()
+best_formula <- manual4
 
+best_model = estimation_data |> drop_na(UNRATE.pct_change.lag1) |>
+                model(arima = ARIMA(best_formula))
+
+augmented_data <- best_model |> augment()
 augmented_data |> 
-        filter(.model == "arima", BankName %in% unique(observation_data$BankName)) |>
-        autoplot(UBPRE524.diff, colour = "darkgrey") + 
-        geom_line(aes(y = .fitted, colour = "#D55E00")) + facet_wrap(~BankName+BankType, ncol = 2) +
-        labs(title = "<span style='color:#D55E00'>Fitted</span> vs. <span style='color:darkgrey'>Observed</span>") +
-        theme(legend.position = "none", plot.title = element_markdown(),plot.subtitle = element_markdown())
+        filter(BankName %in% unique(observation_data$BankName)) |> plot_model_fit("UBPRE524.Value")
+
+```
+
+### Residual diagnostics {#sec-residual-check}
+
+Residuals should have the following properties [@Hyndman2021, ch. 5.4]. Residuals:
+
+* Are uncorrelated. Correlations indicate that the model is missing information left in the residuals.
+* Have zero mean. If they have a mean other than zero, then the forecasts are biased.
+* Have constant variance i.e. does not violate "homoscedasticity" assumption.
+* Are normally distributed. 
+
+::: {#fig-market-checks .panel-tabset}
+
+### CITIBANK
+```{r}
+#| warning: false
+#| label: fig-fit-citi-arima
+#| fig-subcap: 
+#|   - "The time plot of the residuals shows that the variation of the residuals is relatively constant but with one significant outlier. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outlier." 
+bank <- "CITIBANK"
+best_model |> filter(grepl(bank,BankName)) |> gg_tsresiduals()  
+```
+### SYNCHRONY
+```{r}
+#| warning: false
+#| label: fig-fit-sync-arima
+#| fig-subcap: 
+#|   - "The time plot of the residuals shows that the variation of the residuals is relatively constant but with one significant outlier. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outlier." 
+
+bank <- "SYNCHRONY"
+best_model |> filter(grepl(bank,BankName)) |> gg_tsresiduals()  
+```
+
+### BARCLAYS
+
+```{r}
+#| warning: false
+#| label: fig-fit-bar-arima
+#| fig-subcap: 
+#| - "The time plot of the residuals shows that the variation of the residuals is relatively constant up until the onset of the COVID-19 pandemic in 2020; the model needs more information to account for this period. The acf shows residuals are uncorrelated"
+bank <- "BARCLAYS"
+best_model |> filter(grepl(bank,BankName)) |> gg_tsresiduals()  
 
 ```
 
 
-### Visual Checks
-
+### AMERICAN EXPRESS
 ```{r}
 #| warning: false
-#| label: fig-fit
-#| fig-cap: "Linear regression model diagnostics"
-#| layout-ncol: 3
-#| fig-subcap:
-#|   - "Residuals vs Fitted - The red line is not flat suggesting we need to add additional interaction terms to better capture the relationship between the predictors and the response variable"
-#|   - "Q-Q Residuals - the S shape indicates residuals have heavier tails than expected normal distribution"
-#|   - "Scale-Location - slight funnel shape indicates heteroscedasticity i.e. violates linear assumption of equal variance"
+#| label: fig-fit-ae-arima
+#| fig-subcap: 
+#| - "The time plot of the residuals shows that the variation of the residuals is relatively constant. The acf shows residuals are uncorrelated. and  normally distributed."
+bank <- "AMERICAN EXPRESS NATIONAL BANK"
+best_model |> filter(grepl(bank,BankName)) |> gg_tsresiduals()  
+```
 
-#values are autocorrelated. If the p-value > 0.05 (good), this implies that the residuals of the data are are independent.
-selected_m = "arima"
-filtered_aug_data <- augmented_data|> filter(.model == selected_m)
-
-augmented_data |> features(.innov, ljung_box) |> filter(lb_pvalue <= 0.05)
-
-filtered_aug_data |>
-  ggplot(aes(x = UBPRE524.diff, y = .fitted)) +
-  geom_point() +
-        labs(y = "Fitted (predicted values)",
-             x = "Data (actual values)",) +
-        theme(legend.position = "none", plot.title = element_markdown(),plot.subtitle = element_markdown())+
-  geom_abline(intercept = 0, slope = 1, colour="red")
-
-qqnorm(filtered_aug_data$.fitted, pch = 1, frame = FALSE);qqline(filtered_aug_data$.fitted, col = "steelblue", lwd = 2)
-      
+### CAPITAL ONE
+```{r}
+#| warning: false
+#| label: fig-fit-cap-arima
+#| fig-subcap: 
+#|   - "The time plot of the residuals shows that the variation of the residuals is relatively constant but with two significant outliers at the start of the series. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outliers." 
+bank <- "CAPITAL ONE"
+best_model |> filter(grepl(bank,BankName)) |> gg_tsresiduals()  
 
 ```
 
-### Cross-Validation
+:::
+
+### Residuals White Noise
+
+The sub-set of banks analysed in @sec-residual-check did not exhibit significant autocorrelation.
+
+@tbl-lb-arima lists the results of Ljung–Box test for all banks filtered to those where we reject the null hypothesis, indicating the presence of significant autocorrelation in the residuals.  
+
+The residuals for banks not listed are indistinguishable from a white noise series.
 
 ```{r}
 #| warning: false
-#m_table |> filter(grepl("BARCLAYS",BankName)) |> select(tslm) |> gg_tsresiduals()
+#| label: tbl-lb-arima
+#| tbl-cap: Ljung–Box results where P-value < Significance Level of 0.05
+augmented_data  |>
+  features(.innov, ljung_box) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> 
+    filter(lb_pvalue <= 0.05)|> select(BankName,lb_stat,lb_pvalue) |>
+      rmarkdown::paged_table()
+```
 
-#A portmanteau test returns a large p-value, also suggesting that the residuals are white noise.
-filtered_aug_data |>
-  filter(grepl("BARCLAYS",BankName))  |>
-  features(.innov, ljung_box)  
 
-event_duration <- 6
-bar_est_data <- estimation_data |> filter(grepl("BARCLAYS",BankName))
-bar_event_data <- observation_data |> filter(grepl("BARCLAYS",BankName))|> filter(GAP <event_duration)
-bar_data <- bar_est_data |> filter(!is.na(UBPRE524.diff)) |> add_row(bar_event_data)
-bar_model <- m_table |> filter(grepl("BARCLAYS",BankName)) |> select(!!selected_m)
+## Time Series Cross-Validation
 
-m_table |> select(!!selected_m) |>
-    filter(grepl("BARCLAYS",BankName))  |>
-    forecast(new_data=bar_event_data) |>
-   # filter(.model==!!selected_m) |> 
-    autoplot(bar_data, colour = "pink")  + 
-    geom_line(aes(x = Quarter, y=UBPRE524.diff), data= bar_event_data)
+Look-Ahead Bias: If data from after the test period is included in the training set, the model may inadvertently learn information from the future (known as "look-ahead bias"). This makes the model unrealistic and potentially over-optimistic in its predictive performance
 
-bar_est_data_tr <- bar_est_data |>
+To evaluating the predictive performance we use cross validation that are specifically for timeseries.One-step ahead cross-validation, also known as walk-forward validation, is a method specifically designed for evaluating the predictive performance of time series.
+
+R package
+
+```{r}
+#| warning: false
+#| output: false
+#| eval: false
+
+# Estimation Data 
+best_model |> fabletools::accuracy() |> readr::write_csv("data/results/estimate_arima_metrics.csv")
+
+best_model |> group_by(comb4) |> count()
+
+# Timeseries CV 
+
+est_data_tr <- estimation_data |> drop_na(UNRATE.pct_change.lag1) |>
+                    stretch_tsibble(.init = 3, .step = 1) |>
+                    relocate( .id)
+# TSCV accuracy
+m <- estimation_data |> group_by(BankName) |> filter(Quarter <= max(Quarter)-5) |>
+filter(grepl("CAPITAL ONE", BankName)) |> 
+model(
+    ARIMA(as.formula(comb4))
+  ) 
+
+new_data <- estimation_data |> group_by(BankName) |> filter(Quarter > max(Quarter)-5)
+
+m |> forecast(new_data = new_data) |>
+  accuracy(new_data) 
+
+est_data_tr <- estimation_data |> filter(grepl("CAPITAL ONE", BankName)) |>
                     stretch_tsibble(.init = 3, .step = 1) |>
                     relocate( .id)
 
-# TSCV accuracy
-bar_est_data_tr |>
-  model(ARIMA(UBPRE524.diff)) |>
-  forecast(h=event_duration) |>
-  fabletools::accuracy(bar_est_data)
-  
-# Training set accuracy
-bar_est_data |>
-  model(ARIMA(UBPRE524.diff)) |>
-  fabletools::accuracy()
+est_data_tr |>
+  stretch_tsibble(.init = 3) |>
+  model(
+    ARIMA(as.formula(comb4))
+  ) |>
+  forecast(new_data = est_data_tr) |>
+  accuracy(estimation_data |> group_by(BankName)) |>
+  select(.model, RMSE:MAPE) |> 
+  readr::write_csv("data/results/estimate_tscv_market_metrics.csv")
 
-estimation_data_tr <- estimation_data |>
-                      stretch_tsibble(.init = 3, .step = 1) |>
-                      relocate( .id)
-
-estimation_data_tr |>
-  model(ARIMA(UBPRE524.diff)) |>
-  forecast(new_data = estimation_data_tr |> select(UBPRE524.group.diff)) |>
-  fabletools::accuracy(estimation_data)
-
-# selected_model <- m_table |> filter(grepl("BARCLAYS",BankName))
-# fabletools::glance(selected_model) |> arrange(selected_model) |> select(.model:BIC)
-
-# bar_est_data |> 
-#        run_timeseries_cv(selected_model$tslm)
-
-  
 ```
+
+
+```{r}
+#| warning: false
+#| label: tbl-arima-cv
+#| eval: false
+#| tbl-cap: Cross-Validation. Fit on Training and validation (Test)
+cv_results_est <- readr::read_csv("data/results/estimate_arima_metrics.csv",show_col_types = FALSE) |> select(-.model) |>
+  mutate(across(where(is.numeric), \(x) round(x,4))) |> 
+  relocate(.type, BankName, RMSE, MAE)
+
+cv_results_test <-readr::read_csv("data/results/estimate_tscv_arima_metrics.csv",show_col_types = FALSE) |> select(-.model) |>
+  mutate(across(where(is.numeric), \(x) round(x,4))) |> 
+    relocate(.type, BankName, RMSE, MAE) |> mutate(.type = "CV")
+
+bind_rows(cv_results_est, cv_results_test) |> arrange(BankName,.type) |> 
+      rmarkdown::paged_table()     
+
+```
+
+## Prediction 
+
+Observation Period...TO WRITE
+
+```{r}
+#| warning: false
+#| echo: false
+#| results: hide
+#| fig-keep: all
+#| label: fig-pred-bar
+#| fig-cap: "Prediction vs. Observed Event"
+#| eval: false
+partner_banks <- credit_card.partnerships() |> 
+                  pivot_longer(cols = c("Old","New")) |> 
+                      distinct(value,Partner = paste(Partner, "-", name))
+
+map2(partner_banks$value, partner_banks$Partner, plot_prediction,estimation_data, observation_data, m_table)
+
+#plot_prediction(bank_name, partner_name,estimation_data, observation_data, m_table )
+```
+### Abnormal Return
+
+
+## References

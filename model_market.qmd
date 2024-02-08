@@ -10,25 +10,6 @@ source('functions.R')
 target_label = credit_card.target_label()
 ubpr_labels =  credit_card.udpr()
 
-plot_cc_measures <- function(bank_fuzzy, data, ubpr_labels) {
-  data |> filter(grepl(bank_fuzzy,BankName)) |> 
-  select(UBPRE524 = UBPRE524.Value, UBPRE263 = UBPRE263.Value, UBPRE425 = UBPRE425.Value, UBPRB538 = UBPRB538.Value) |> 
-   pivot_longer(cols= -Quarter, names_to = "UBPR_Code") |> 
-   mutate(display_order = case_when(
-                          UBPR_Code == "UBPRE524" ~ "(a)",
-                          UBPR_Code == "UBPRE263" ~ "(b)",
-                          UBPR_Code == "UBPRE425" ~ "(c)",
-                          UBPR_Code == "UBPRB538" ~ "(d)"),
-                          .default = "" ) |>
-   left_join(ubpr_labels,by = join_by(UBPR_Code)) |> 
-   mutate(Description = paste(display_order, Description)) |>
-   ggplot(aes(x = Quarter, y =value, colour = UBPR_Code)) + 
-   geom_line() + 
-   labs(y='') +
-   theme(legend.position = "none") +
-   facet_wrap(~Description, scales = "free_y", ncol=1)
-}
-
 ```
 ## Specification {#sec-model-market}
 
@@ -59,9 +40,6 @@ data <- get_model_data() |> drop_na(UBPRE524.diff)
 estimation_data <- data |> filter(is.na(Partnership)) |> fill_gaps()
 observation_data <- data |> filter(!is.na(Partnership))
 
-results <- tibble(model = character(),
-                    rsme = numeric())
-
 market_formula <- "UBPRE524.diff ~ UBPRE524.group.diff"
 m_table <- estimation_data |> fabletools::model(tslm = TSLM(as.formula(market_formula)))
 augmented_data <- m_table |> augment()
@@ -74,9 +52,9 @@ augmented_data <- m_table |> augment()
 
 ### Estimated Fit
 
-As outlined in @sec-data-split, we have split our data into estimation and observation periods. For firms that do not have partnership events, the full data series is used in the estimation period. For firms with partnership events the estimation period is until the quarter before each event. 
+As outlined in @sec-data-split, we have split our data into estimation and observation periods. For firms that do not have partnership events, the full data series is used in the estimation period. For firms with partnership events the estimation period is up to the quarter before each event. 
 
-If the market model demonstrates a robust fit with the estimation data, this instills confidence in our ability to forecast the "normal" return using the fresh, unseen data from the observation period.
+If the market model demonstrates a robust fit with the estimation data, this instills confidence in our ability to forecast the "normal" return using the unseen data from the observation period.
 
 @fig-plot-fit displays some of the fitted vs actual results. 
 
@@ -85,11 +63,7 @@ If the market model demonstrates a robust fit with the estimation data, this ins
 #| label: fig-plot-fit
 #| fig-cap: "Fitted vs. Observed for estimation data on sub-set of firms"
 augmented_data |> filter(BankName %in% unique(observation_data$BankName)) |>
-        autoplot(UBPRE524.diff, colour = "darkgrey") + 
-        geom_line(aes(y = .fitted, colour = "#D55E00")) + facet_wrap(~BankName+BankType, ncol = 2) +
-        labs(title = "<span style='color:#D55E00'>Fitted</span> vs. <span style='color:darkgrey'>Observed</span>",
-        y = glue("{target_label} (differenced)")) +
-        theme(legend.position = "none", plot.title = element_markdown(),plot.subtitle = element_markdown()) 
+        plot_model_fit("UBPRE524.diff")
 ```
 ### Residual diagnostics {#sec-residual-check}
 
@@ -117,6 +91,21 @@ plot_cc_measures(bank, estimation_data,ubpr_labels)
 
 ```
 
+### SYNCHRONY
+```{r}
+#| warning: false
+#| label: fig-fit-sync
+#| fig-subcap: 
+#|   - "The time plot of the residuals shows a couple of outliers at the start of the time period and in 2018 Q1. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outliers." 
+#|   - "Comparative credit card portfolio variables"
+
+bank <- "SYNCHRONY"
+m_table |> filter(grepl(bank,BankName)) |> select(tslm) |> gg_tsresiduals()  
+
+plot_cc_measures(bank, estimation_data,ubpr_labels)
+
+```
+
 ### BARCLAYS
 
 ```{r}
@@ -124,7 +113,7 @@ plot_cc_measures(bank, estimation_data,ubpr_labels)
 #| label: fig-fit-bar
 #| fig-subcap: 
 #| - "The time plot of the residuals shows that the variation of the residuals is relatively constant up until the onset of the COVID-19 pandemic in 2020; the model needs more information to account for this period. The acf shows residuals are uncorrelated"
-#| - ""
+#| - "Comparative credit card portfolio variables"
 bank <- "BARCLAYS"
 m_table |> filter(grepl(bank,BankName)) |> select(tslm) |> gg_tsresiduals()  
 
@@ -137,8 +126,8 @@ plot_cc_measures(bank, estimation_data,ubpr_labels)
 #| warning: false
 #| label: fig-fit-ae
 #| fig-subcap: 
-#| - "The time plot of the residuals shows that the variation of the residuals is relatively constant. The acf shows residuals are uncorrelated. and  normally distributed."
-#| - "Explaining the outlier: Deliquency dropped at a time when CITIBANK's credit card portfolio became a larger business concern. The borrowers added appear to be less risky as we see the unused proportion go from below 10% to over 40%"
+#| - "The time plot of the residuals shows a couple of outliers at the start of the time period causing a left skew. The acf shows residuals are uncorrelated."
+#| - "Comparative credit card portfolio variables"
 
 bank <- "AMERICAN EXPRESS NATIONAL BANK"
 m_table |> filter(grepl(bank,BankName)) |> select(tslm) |> gg_tsresiduals()  
@@ -167,13 +156,13 @@ plot_cc_measures(bank, estimation_data, ubpr_labels)
 
 The sub-set of banks analysed in @sec-residual-check did not exhibit significant autocorrelation.
 
-@tbl-lb-test lists the results of Ljung–Box test for all banks filtered to those where we reject the null hypothesis, indicating the presence of significant autocorrelation in the residuals.  
+@tbl-lb-market lists banks where we reject the null hypothesis of the Ljung–Box test, indicating the presence of significant autocorrelation in the residuals. 
 
-The residuals for banks not listed are indistinguishable from a white noise series.
+Banks not listed have residuals that are indistinguishable from a white noise series i.e. have uncorrelated observations and with constant variance.
 
 ```{r}
 #| warning: false
-#| label: tbl-lb-test
+#| label: tbl-lb-market
 #| tbl-cap: Ljung–Box results where P-value < Significance Level of 0.05
 augmented_data  |>
   features(.innov, ljung_box) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> 
@@ -182,8 +171,6 @@ augmented_data  |>
 ```
 
 ## Time Series Cross-Validation
-
-Look-Ahead Bias: If data from after the test period is included in the training set, the model may inadvertently learn information from the future (known as "look-ahead bias"). This makes the model unrealistic and potentially over-optimistic in its predictive performance
 
 To evaluating the predictive performance we use cross validation that are specifically for timeseries.One-step ahead cross-validation, also known as walk-forward validation, is a method specifically designed for evaluating the predictive performance of time series.
 
@@ -215,19 +202,18 @@ est_data_tr |>
 
 ```{r}
 #| warning: false
-#| label: tbl-lb-cv
+#| label: tbl-market-cv
 #| tbl-cap: Cross-Validation. Fit on Training and validation (Test)
 cv_results_est <- readr::read_csv("data/results/estimate_market_metrics.csv",show_col_types = FALSE) |> select(-.model) |>
   mutate(across(where(is.numeric), \(x) round(x,4))) |> 
-  relocate(.type, BankName, RMSE, MAE) |>
-  rmarkdown::paged_table() 
+  relocate(.type, BankName, RMSE, MAE)
 
 cv_results_test <-readr::read_csv("data/results/estimate_tscv_market_metrics.csv",show_col_types = FALSE) |> select(-.model) |>
   mutate(across(where(is.numeric), \(x) round(x,4))) |> 
-    relocate(.type, BankName, RMSE, MAE) |> mutate(.type = "CV")|> 
-      rmarkdown::paged_table()
+    relocate(.type, BankName, RMSE, MAE) |> mutate(.type = "CV")
+      
 
-bind_rows(cv_results_est, cv_results_test) |> arrange(BankName,.type)      
+bind_rows(cv_results_est, cv_results_test) |> arrange(BankName,.type) |> rmarkdown::paged_table()     
 
 ```
 

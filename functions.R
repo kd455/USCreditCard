@@ -678,6 +678,59 @@ run_timeseries_cv <- function(data, formula_string, model_func = TSLM, predict_f
     average_performance
 }
 
+plot_cc_measures <- function(bank_fuzzy, data, ubpr_labels) {
+  data |> filter(grepl(bank_fuzzy,BankName)) |> 
+  select(UBPRE524 = UBPRE524.Value, UBPRE263 = UBPRE263.Value, UBPRE425 = UBPRE425.Value, UBPRB538 = UBPRB538.Value) |> 
+   pivot_longer(cols= -Quarter, names_to = "UBPR_Code") |> 
+   mutate(display_order = case_when(
+                          UBPR_Code == "UBPRE524" ~ "(a)",
+                          UBPR_Code == "UBPRE263" ~ "(b)",
+                          UBPR_Code == "UBPRE425" ~ "(c)",
+                          UBPR_Code == "UBPRB538" ~ "(d)"),
+                          .default = "" ) |>
+   left_join(ubpr_labels,by = join_by(UBPR_Code)) |> 
+   mutate(Description = paste(display_order, Description)) |>
+   ggplot(aes(x = Quarter, y =value, colour = UBPR_Code)) + 
+   geom_line() + 
+   labs(y='') +
+   theme(legend.position = "none") +
+   facet_wrap(~Description, scales = "free_y", ncol=1)
+}
+
+plot_model_fit <- function (data, target_name) {
+  data |>
+    autoplot(!!as.name(target_name), colour = "darkgrey") + 
+        geom_line(aes(y = .fitted, colour = "#D55E00")) + facet_wrap(~BankName+BankType, ncol = 2) +
+        labs(title = "<span style='color:#D55E00'>Fitted</span> vs. <span style='color:darkgrey'>Observed</span>") +
+        theme(legend.position = "none", plot.title = element_markdown(),plot.subtitle = element_markdown())
+}
+
+save_arima_results <- function(table_results, model_cols, file_name) {
+  table_results |> 
+    pivot_longer(cols = !!model_cols, names_to = ".model", values_to = ".model_spec") |> 
+      left_join(glance(table_results)) |>
+      readr::write_csv(glue("data/results/{file_name}"))
+}
+
+read_arima_results <- function() {
+  list.files("data/results", pattern = "arima.*results.csv", full.names = TRUE) |> 
+    map(read_csv, show_col_types = FALSE) |> list_rbind()
+}
+
+plot_prediction <- function(bank_name, partner_name, estimation_data, observation_data, models) {
+  est_data <- estimation_data |> filter(BankName == bank_name)
+  est_data_trunc <- est_data |> tail(ifelse(nrow(est_data)<11,nrow(est_data),11))
+  event_data <- observation_data |> filter(BankName == bank_name) |> head(5)
+  comb_data <- bind_rows(est_data_trunc, event_data)
+
+  models |>
+    filter(BankName == bank_name)  |>
+    forecast(new_data= event_data) |>
+    filter(.model=='tslm') |> 
+    autoplot()  + 
+    geom_line(aes(x = Quarter, y=UBPRE524.Value), data = comb_data, colour='darkslategrey',linetype = "longdash") +
+    labs(title = bank_name, subtitle = partner_name, y = glue("{target_label} (differenced)"))
+}
 # run_timeseries_cv_multiple_firms <- function(data, formula_string, model_func = lm, predict_func= predict, initial_window = 3, horizon = 1, dependent_var = "value_diff") {
 #     # Split the data by firm
 #     firm_data_list <- split(data, data$IDRSSD)
