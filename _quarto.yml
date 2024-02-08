@@ -17,6 +17,7 @@ book:
       chapters:
         - model_event.qmd   
         - model_market.qmd 
+        - model_arima.qmd 
     - references.qmd   
     - part: "Appendix"
       chapters:
