@@ -15,6 +15,19 @@ get_model_cols <-function(model_table, ignore_cols) {
   model_cols[!names(model_table) %in% ignore_cols]
 }
 
+print_top_group_model <-function(arima_results, bank_type, score_by = "AICc", n=10) {
+  arima_results |> 
+    filter(is.na(BankName), BankType == bank_type) |> 
+      select(-BankType) |> relocate(.model, .model_spec, !!score_by) |> arrange(!!as.name(score_by)) |> head(n) |> mutate(across(where(is.numeric), \(x) round(x,2))) |>  rmarkdown::paged_table()
+}
+
+print_top_bank_model <- function(arima_results, fuzzy_bankname, score_by = "AICc", n = 10) {
+  arima_results |> 
+    filter(grepl(fuzzy_bankname,BankName)) |> select(-BankName) |> 
+      relocate(.model, .model_spec, !!score_by) |> arrange(!!as.name(score_by)) |> head(n) |> rmarkdown::paged_table()
+}
+  
+
 data <- get_model_data() |> drop_na(UBPRE524.Value)
 
 estimation_data <- data |> filter(is.na(Partnership)) |> fill_gaps()
@@ -169,11 +182,10 @@ run_arima(estimation_data_grp.l, "_l")
 ```{r}
 #| warning: false
 #| label: tbl-arima-lb-aic
-#| tbl-cap: Ordered Best-Worst ARIMA model by AICc
+#| tbl-cap: Ordered Top 10 Best-Worst ARIMA model by AICc
 arima_results <- read_arima_results() 
 
-arima_results |> filter(is.na(BankName), BankType == "LargeBank") |> select(-BankType) |> relocate(.model, 
-.model_spec, AICc) |> arrange(AICc) |> rmarkdown::paged_table()
+print_top_group_model(arima_results, "LargeBank")
 
 ```
 
@@ -181,8 +193,8 @@ arima_results |> filter(is.na(BankName), BankType == "LargeBank") |> select(-Ban
 ```{r}
 #| warning: false
 #| label: tbl-arima-lc-aic
-#| tbl-cap: Ordered Best-Worst ARIMA model by AICc
-arima_results |> filter(is.na(BankName), BankType == "LargeCreditCardBank") |> select(-BankType) |> relocate(.model, .model_spec, AICc) |> arrange(AICc)  |> rmarkdown::paged_table()
+#| tbl-cap: Ordered Top 10 Best-Worst ARIMA model by AICc
+print_top_group_model(arima_results, "LargeCreditCardBank")
 
 ```
 
@@ -190,44 +202,39 @@ arima_results |> filter(is.na(BankName), BankType == "LargeCreditCardBank") |> s
 ```{r}
 #| warning: false
 #| label: tbl-arima-citi-aic
-#| tbl-cap: Ordered Best-Worst ARIMA model by AICc
-arima_results |> filter(grepl("CITIBANK",BankName)) |> select(-BankName) |> relocate(.model, 
-.model_spec, AICc) |> arrange(AICc) |> rmarkdown::paged_table()
+#| tbl-cap: Ordered Top 10 Best-Worst ARIMA model by AICc
+print_top_bank_model(arima_results, "CITIBANK")
 ```
 ### SYNCHRONY
 ```{r}
 #| warning: false
 #| label: tbl-arima-syn-aic
-#| tbl-cap: Ordered Best-Worst ARIMA model by AICc
-arima_results |> filter(grepl("SYNCHRONY",BankName)) |> select(-BankName) |> relocate(.model, 
-.model_spec, AICc) |> arrange(AICc) |> rmarkdown::paged_table()
+#| tbl-cap: Ordered Top 10 Best-Worst ARIMA model by AICc
+print_top_bank_model(arima_results, "SYNCHRONY")
 ```
 
 ### BARCLAYS
 ```{r}
 #| warning: false
 #| label: tbl-arima-bar-aic
-#| tbl-cap: Ordered Best-Worst ARIMA model by AICc
-arima_results |> filter(grepl("BARCLAYS",BankName)) |> select(-BankName) |> relocate(.model, 
-.model_spec, AICc) |> arrange(AICc) |> rmarkdown::paged_table()
+#| tbl-cap: Ordered Top 10 Best-Worst ARIMA model by AICc
+print_top_bank_model(arima_results, "BARCLAYS")
 ```
 
 ### AMERICAN EXPRESS NATIONAL BANK
 ```{r}
 #| warning: false
 #| label: tbl-arima-ae-aic
-#| tbl-cap: Ordered Best-Worst ARIMA model by AICc
-arima_results |> filter(grepl("AMERICAN EXPRESS NATIONAL BANK",BankName)) |> select(-BankName) |> relocate(.model, 
-.model_spec, AICc) |> arrange(AICc) |> rmarkdown::paged_table()
+#| tbl-cap: Ordered Top 10 Best-Worst ARIMA model by AICc
+print_top_bank_model(arima_results, "AMERICAN EXPRESS NATIONAL BANK")
 ```
 
 ### CAPITAL ONE
 ```{r}
 #| warning: false
 #| label: tbl-arima-cap-aic
-#| tbl-cap: Ordered Best-Worst ARIMA model by AICc
-arima_results |> filter(grepl("CAPITAL ONE",BankName)) |> select(-BankName) |> relocate(.model, 
-.model_spec, AICc) |> arrange(AICc) |> rmarkdown::paged_table()
+#| tbl-cap: Ordered Top 10 Best-Worst ARIMA model by AICc
+print_top_bank_model(arima_results, "CAPITAL ONE")
 ```
 
 ::: 
@@ -239,6 +246,7 @@ arima_results |> filter(grepl("CAPITAL ONE",BankName)) |> select(-BankName) |> r
 #|   - "Models ordered by combined ranking of all banks"
 #|   - "ARIMA specification. There are 29 Banks and 25 different ARIMA specifications."
 #| layout-ncol: 1
+#| eval: false
 arima_results |> filter(!is.na(BankName)) |> 
   group_by(BankType,BankName) |>
     mutate(rank_aicc= rank(AICc, ties.method = "min")) |> 
@@ -265,21 +273,22 @@ d parameter represents the order of differencing needed to make the series stati
 1
 d=1) to achieve stationarity.
 
+```{r}
+#| warning: false
+best_formula <- manual8
+overall_model <- estimation_data |> drop_na(UNRATE.diff.lag1) |>
+                model(arima = ARIMA(best_formula))
+augmented_data <- overall_model |> augment()
+```
+
 ### Estimated Fit
 ```{r}
 #| warning: false
 #| label: fig-plot-arima-fit
 #| fig-cap: "Fitted vs. Observed for estimation data on sub-set of firms"
-
-best_formula <- manual8
-
-best_model = estimation_data |> drop_na(UNRATE.diff.lag1) |>
-                model(arima = ARIMA(best_formula))
-
-augmented_data <- best_model |> augment()
+#| eval: false
 augmented_data |> 
         filter(BankName %in% unique(observation_data$BankName)) |> plot_model_fit("UBPRE524.diff")
-
 ```
 
 ### Residual diagnostics {#sec-residual-check}
@@ -293,66 +302,152 @@ Residuals should have the following properties [@Hyndman2021, ch. 5.4]. Residual
 
 ::: {#fig-market-checks .panel-tabset}
 
+```{r}
+best_bank_model <- function(estimation_data, arima_results, fuzzy_bankname, score_by = "AICc") {
+  results <- arima_results |> filter(grepl(fuzzy_bankname,BankName)) |> arrange(!!as.name(score_by))
+  m_spec <- results |> pluck(".model", 1)
+  aicc <- results |> pluck(score_by, 1) |> round(2)
+  formula <- eval(as.name(m_spec))
+  model <- estimation_data |> 
+                  filter(grepl(fuzzy_bankname,BankName)) |> 
+                    drop_na(UNRATE.diff.lag1) |>
+                      model(arima = ARIMA(formula))
+
+  list(BankModel = model, AICc = aicc, Spec = m_spec, Formula = formula)
+}                          
+```
 ### CITIBANK
 ```{r}
 #| warning: false
-#| label: fig-fit-citi-arima
-#| fig-cap: "The time plot of the residuals shows that the variation of the residuals is relatively constant but with one significant outlier. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outlier." 
+#| label: fig-fit-citi
+#| fig-cap: ""Fitted vs. Observed"" 
 bank <- "CITIBANK"
-best_model |> filter(grepl(bank,BankName)) |> gg_tsresiduals()  
+bank_model <- best_bank_model(estimation_data, arima_results, bank)
+
+augmented_data |> 
+        filter(grepl(bank,BankName)) |> plot_model_fit("UBPRE524.diff") +
+        geom_line(aes(y = .fitted, x= Quarter, colour = "green"),data = bank_model$BankModel |> augment())
+
+```
+
+```{r}
+#| warning: false
+#| label: fig-fit-citi-arima
+#| fig-subcap: 
+#| - "Best Bank Model: The time plot of the residuals shows that the variation of the residuals is relatively constant but with one significant outlier. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outlier." 
+#| - "Best Overall Model:"
+#| layout-ncol: 2
+augmented_data |> 
+        filter(grepl(bank,BankName)) |> plot_model_fit("UBPRE524.diff")
+
+bank_model |> gg_tsresiduals() + 
+                labs(title=glue("Model {best_bank_spec}, AIC: {best_bank_AICc}"),
+                     subtitle = best_bank_formula)
+
+
+bank_AICc <- overall_model |> filter(grepl(bank,BankName)) |> glance() |> pluck("AICc",1) |> round(2)
+
+overall_model |> filter(grepl(bank,BankName)) |> gg_tsresiduals() + 
+                    labs(title=glue("Model: manual8, AIC: {bank_AICc}"),
+                         subtitle = best_formula)
+
+
 ```
 ```{r}
 #| warning: false
 #| label: tbl-citi-coeff
-#| tbl-cap: "Coefficients"
-best_model |> filter(grepl(bank,BankName)) |> tidy() |> select(term:last_col()) |> rmarkdown::paged_table()
+#| tbl-subcap: 
+#| - "Best Bank Model Coefficients"
+#| - "Overall Bank Model Coefficients"
+bank_model |> tidy() |> select(term:last_col()) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> rmarkdown::paged_table()
+
+overall_model |> filter(grepl(bank,BankName)) |> tidy() |> select(term:last_col()) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> rmarkdown::paged_table()
 ```
 
 ### SYNCHRONY
 ```{r}
 #| warning: false
+#| label: fig-fit-sync
+#| fig-cap: ""Fitted vs. Observed"" 
+bank <- "SYNCHRONY"
+bank_model <- best_bank_model(estimation_data, arima_results, bank)
+
+augmented_data |> 
+        filter(grepl(bank,BankName)) |> plot_model_fit("UBPRE524.diff") +
+        geom_line(aes(y = .fitted, x= Quarter, colour = "green"),data = bank_model$BankModel |> augment() |> mutate(.fitted = difference(.fitted)))
+
+```
+
+```{r}
+#| warning: false
 #| label: fig-fit-sync-arima
 #| fig-cap: "The time plot of the residuals shows that the variation of the residuals is relatively constant but with one significant outlier. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outlier." 
-bank <- "SYNCHRONY"
-best_model |> filter(grepl(bank,BankName)) |> gg_tsresiduals()  
+
+overall_model |> filter(grepl(bank,BankName)) |> gg_tsresiduals()  
 ```
 ```{r}
 #| warning: false
 #| label: tbl-sync-coeff
 #| tbl-cap: "Coefficients"
-best_model |> filter(grepl(bank,BankName)) |> tidy() |> select(term:last_col()) |> rmarkdown::paged_table()
+overall_model |> filter(grepl(bank,BankName)) |> tidy() |> select(term:last_col()) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> rmarkdown::paged_table()
 ```
 
 ### BARCLAYS
 
 ```{r}
 #| warning: false
+#| label: fig-fit-bar
+#| fig-cap: ""Fitted vs. Observed"" 
+bank <- "BARCLAYS"
+bank_model <- best_bank_model(estimation_data, arima_results, bank)
+
+augmented_data |> 
+        filter(grepl(bank,BankName)) |> plot_model_fit("UBPRE524.diff")
+
+```
+
+```{r}
+#| warning: false
 #| label: fig-fit-bar-arima
 #| fig-cap: "The time plot of the residuals shows that the variation of the residuals is relatively constant up until the onset of the COVID-19 pandemic in 2020; the model needs more information to account for this period. The acf shows residuals are uncorrelated"
-bank <- "BARCLAYS"
-best_model |> filter(grepl(bank,BankName)) |> gg_tsresiduals()  
+
+overall_model |> filter(grepl(bank,BankName)) |> gg_tsresiduals()  
 ```
 ```{r}
 #| warning: false
 #| label: tbl-bar-coeff
 #| tbl-cap: "Coefficients"
-best_model |> filter(grepl(bank,BankName)) |> tidy() |> select(term:last_col()) |> rmarkdown::paged_table()
+overall_model |> filter(grepl(bank,BankName)) |> tidy() |> select(term:last_col()) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> rmarkdown::paged_table()
 ```
 
 ### AMERICAN EXPRESS
+
+```{r}
+#| warning: false
+#| label: fig-fit-ae
+#| fig-cap: ""Fitted vs. Observed"" 
+bank <- "AMERICAN EXPRESS NATIONAL BANK"
+bank_model <- best_bank_model(estimation_data, arima_results, bank)
+
+augmented_data |> 
+        filter(grepl(bank,BankName)) |> plot_model_fit("UBPRE524.diff") +
+        geom_line(aes(y = .fitted, x= Quarter, colour = "green"),data = bank_model$BankModel |> augment() |> mutate(.fitted = difference(.fitted)))
+
+```
+
 ```{r}
 #| warning: false
 #| label: fig-fit-ae-arima
 #| fig-subcap: 
 #| - "The time plot of the residuals shows that the variation of the residuals is relatively constant. The acf shows residuals are uncorrelated. and  normally distributed."
-bank <- "AMERICAN EXPRESS NATIONAL BANK"
-best_model |> filter(grepl(bank,BankName)) |> gg_tsresiduals()  
+
+overall_model |> filter(grepl(bank,BankName)) |> gg_tsresiduals()  
 ```
 ```{r}
 #| warning: false
 #| label: tbl-ae-coeff
 #| tbl-cap: "Coefficients"
-best_model |> filter(grepl(bank,BankName)) |> tidy() |> select(term:last_col()) |> rmarkdown::paged_table()
+overall_model |> filter(grepl(bank,BankName)) |> tidy() |> select(term:last_col()) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> rmarkdown::paged_table()
 ```
 
 ### CAPITAL ONE
@@ -362,13 +457,13 @@ best_model |> filter(grepl(bank,BankName)) |> tidy() |> select(term:last_col()) 
 #| fig-subcap: 
 #|   - "The time plot of the residuals shows that the variation of the residuals is relatively constant but with two significant outliers at the start of the series. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outliers." 
 bank <- "CAPITAL ONE"
-best_model |> filter(grepl(bank,BankName)) |> gg_tsresiduals()  
+overall_model |> filter(grepl(bank,BankName)) |> gg_tsresiduals()  
 ```
 ```{r}
 #| warning: false
 #| label: tbl-cap-coeff
 #| tbl-cap: "Coefficients"
-best_model |> filter(grepl(bank,BankName)) |> tidy() |> select(term:last_col()) |> rmarkdown::paged_table()
+overall_model |> filter(grepl(bank,BankName)) |> tidy() |> select(term:last_col()) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> rmarkdown::paged_table()
 ```
 
 :::
@@ -406,9 +501,9 @@ R package
 #| eval: false
 
 # Estimation Data 
-best_model |> fabletools::accuracy() |> readr::write_csv("data/results/estimate_arima_metrics.csv")
+overall_model |> fabletools::accuracy() |> readr::write_csv("data/results/estimate_arima_metrics.csv")
 
-best_model |> group_by(comb4) |> count()
+overall_model |> group_by(comb4) |> count()
 
 # Timeseries CV 
 
