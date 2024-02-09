@@ -250,7 +250,7 @@ arima_results |> filter(!is.na(BankName)) |>
       select(-rank_aicc) |> 
       arrange(rank) |> rmarkdown::paged_table()
 
-arima_results |> filter(.model %in% c("comb4")) |> 
+arima_results |> filter(.model %in% c("comb1")) |> 
   group_by(BankType,.model,.model_spec) |> count() |> arrange(desc(n)) |> rmarkdown::paged_table()
 
 
@@ -271,14 +271,14 @@ d=1) to achieve stationarity.
 #| label: fig-plot-arima-fit
 #| fig-cap: "Fitted vs. Observed for estimation data on sub-set of firms"
 
-best_formula <- manual4
+best_formula <- manual8
 
 best_model = estimation_data |> drop_na(UNRATE.diff.lag1) |>
                 model(arima = ARIMA(best_formula))
 
 augmented_data <- best_model |> augment()
 augmented_data |> 
-        filter(BankName %in% unique(observation_data$BankName)) |> plot_model_fit("UBPRE524.Value")
+        filter(BankName %in% unique(observation_data$BankName)) |> plot_model_fit("UBPRE524.diff")
 
 ```
 

@@ -577,7 +577,12 @@ generate_model_data <- function() {
   econ_measures <- us_economy.quarterly_selected() |> 
                     pivot_longer(cols=!Quarter, names_to = "Measure", values_to = "raw") |>
                             group_by(Measure) |>
-                            mutate(pct_change = difference(raw)/lag(raw),
+                            mutate(diff = difference(raw),
+                                   diff.lag1 = lag(diff,1),
+                                   diff.lag2 = lag(diff,2),
+                                   diff.lag3 = lag(diff,3),
+                                   diff.lag4 = lag(diff,4),
+                                   pct_change = diff/lag(raw),
                                    pct_change.lag1 = lag(pct_change,1),
                                    pct_change.lag2 = lag(pct_change,2),
                                    pct_change.lag3 = lag(pct_change,3),
