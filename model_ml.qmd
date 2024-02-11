@@ -1,0 +1,207 @@
+Look-Ahead Bias: If data from after the test period is included in the training set, the model may inadvertently learn information from the future (known as "look-ahead bias"). This makes the model unrealistic and potentially over-optimistic in its predictive performance
+
+```{r}
+source("functions.R")
+require(data.table)
+library(xgboost)
+require(Matrix)
+library(caret)
+set.seed(42)
+
+plot_xgboost_fit <- function(predictions, actuals) {
+  data.frame(Actual = actuals, Predicted = predictions) |>
+    ggplot(aes(x = Actual, y = Predicted)) +
+    geom_point() +
+    geom_smooth(method = lm, se = FALSE, color = "red") +
+    labs(title = "Actual vs. Predicted", x = "Actual Values", y = "Predicted Values")
+}
+
+data <- get_model_data() |>    
+          filter(is.na(Partnership)) |> mutate(Qtr = as.factor(Qtr)) |> as_tibble() 
+
+# pct_change_cols <- data |> select(contains(".pct_change")) |> 
+#                     select(-starts_with("UBPRE524.pct_change")) |> names()
+
+log_change_cols <- data |> select(contains(".log.diff")) |> 
+                    select(-starts_with("UBPRE524.log.diff")) |> names()                    
+
+estimation_data <- data |> select(c(UBPRE524.diff,BankType, log_change_cols, Qtr)) |> drop_na() 
+
+s <- createDataPartition(estimation_data$UBPRE524.diff, p = 0.65, list=FALSE)
+training <- estimation_data[s,]
+test <- estimation_data[-s,]
+
+# Convert the data to matrix and assign output variable
+train.outcome <- training$UBPRE524.diff
+train.predictors <- sparse.model.matrix(UBPRE524.diff ~ .-1, data = training)#[, -1]
+test.outcome <- test$UBPRE524.diff
+test.predictors <- sparse.model.matrix(UBPRE524.diff ~ .-1, data = test)#[, -1]
+
+# Convert the matrix objects to DMatrix objects
+dtrain <- xgb.DMatrix(train.predictors, label = train.outcome)
+dtest <- xgb.DMatrix(test.predictors, label = test.outcome)
+
+```
+
+```{r}
+# warning: false
+# echo: false
+
+run_xgb.cv <- function(dtrain) {
+  param_grid <- expand.grid(
+    eta = c(0.01, 0.1, 0.3),
+    max_depth = c(3, 6, 9),
+    gamma = c(0,0.1,0.2),
+    colsample_bytree = c(0.5, 0.8),
+    min_child_weight = c(1, 5),
+    subsample = c(0.5, 0.75),
+    alpha = c(0, 0.1, 1, 10),
+    lambda = c(0, 0.1, 1, 10)
+  )
+
+  # Placeholder for cross-validation results
+  cv_results <- list()
+
+  for(i in seq_len(nrow(param_grid))) {
+    params <- list(
+      booster = "gbtree",
+      eta = param_grid$eta[i],
+      max_depth = param_grid$max_depth[i],
+      subsample = param_grid$subsample[i],
+      colsample_bytree = param_grid$colsample_bytree[i],
+      min_child_weight = param_grid$min_child_weight[i],
+      alpha = param_grid$alpha[i],
+      lambda = param_grid$lambda[i],
+      objective = "reg:squarederror"
+    )
+    
+    cv <- xgb.cv(params = params, data = dtrain, nrounds = 100, nfold = 5, early_stopping_rounds = 10)
+    cv_results[[i]] <- list(params = params, cv_metrics = cv)
+  }
+
+  best_score <- Inf
+  best_model <- NULL
+
+  for(i in seq_along(cv_results)) {
+    score <- min(cv_results[[i]]$cv_metrics$evaluation_log)
+    if(score < best_score) {
+      best_score <- score
+      best_model <- cv_results[[i]]
+    }
+  }
+  best_model$cv_metrics[4]$evaluation_log |> readr::write_csv("data/results/xgboost_cv_metrics.csv")
+  best_model$params |> as.data.frame() |> readr::write_csv("data/results/xgboost_cv_params.csv")
+}
+
+run_xgb.caret.cv <- function(train.predictors, train.outcome, n_folds, n_repeats, method = "xgbTree", seeds) {
+  
+  if (method == "xgbTree") {
+    grid <- expand.grid(eta = c(0.01, 0.1, 0.3),
+                        max_depth = c(3, 6, 9),
+                        gamma = c(0, 0.1),
+                        colsample_bytree = c(0.5, 0.8),
+                        min_child_weight = c(1, 5),
+                        subsample = c(0.5, 0.75),
+                        nrounds = c(100,150,200)
+                      )
+  } else {
+    # grid <- expand.grid(eta = c(0.01, 0.1, 0.3),
+    #                     alpha = c(0, 0.1, 1, 10),
+    #                     lambda = c(0, 0.5, 1, 2, 4, 10),
+    #                     nrounds = c(100,150,200)
+    # )
+    grid <- expand.grid(eta = 0.01,
+                        alpha = c(0.1, 0.5, 1),
+                        lambda = c(0.1, 1, 5, 10, 15, 25, 30, 50),
+                        nrounds = 100
+    )
+  }
+
+  set.seed(123)
+  control <- trainControl(method = "repeatedcv", number = n_folds, repeats = n_repeats, seeds = seeds)
+
+  # Train the model
+  model <- train(train.predictors, train.outcome,
+                method = method,
+                trControl = control,
+                tuneGrid = grid,
+                metric = "RMSE")
+
+  # Save the plot
+  png(glue("data/results/{method}_tuning_plot.png"), width = 800, height = 600)
+  plot(model)
+  dev.off() 
+
+  #save tuning results
+  model$results  |> readr::write_csv(glue("data/results/{method}_tuning_results.csv"))
+  model$bestTune |> readr::write_csv(glue("data/results/{method}_best_tune.csv"))
+  xgb.save(model = model$finalModel, fname = glue("data/results/best_{method}_model.model"))
+}
+
+# Define the number of folds and repeats
+n_folds <- 5
+n_repeats <- 3
+seeds <- lapply(1:(n_folds * n_repeats), function(x) sample.int(1000, 144))
+seeds[[length(seeds) + 1]] <- sample.int(1000, 1)  # The last seed for the final model
+
+run_xgb.caret.cv(train.predictors, train.outcome, n_folds, n_repeats, method = "xgbTree", seeds)
+run_xgb.caret.cv(train.predictors, train.outcome, n_folds, n_repeats, method = "xgbLinear", seeds)
+#run_xgb.cv(dtrain)
+```
+
+```{r}
+#(dt <- xgb.model.dt.tree(model = loaded_model))
+#booster = "gblinear"
+#m <- xgb.load("data/results/best_xgbLinear_model.model")
+
+params <- read_csv("data/results/xgbLinear_best_tune.csv",show_col_types = FALSE) |> as.list()
+m <- xgboost(booster = "gbtree", data = dtrain, params= params, nrounds=params$nrounds)
+plot(m$evaluation_log)
+
+params <- read_csv("data/results/xgbTree_best_tune.csv",show_col_types = FALSE) |> as.list()
+m <- xgboost(booster = "gbtree", data = dtrain, params= params, nrounds=params$nrounds)
+plot(m$evaluation_log)
+
+#Training fit
+train_predictions <- predict(m, dtrain)
+plot_xgboost_fit(train_predictions, train.outcome)
+
+# See Fit on unseen data: Generate Predictions
+test_predictions <- predict(m, dtest)
+plot_xgboost_fit(test_predictions, test.outcome)
+
+# Evaluate the model performance
+postResample(test_predictions, test.outcome)
+
+# Examine feature importance
+#cols <- names(training[, -which(names(training) == "UBPRE524.diff")])
+importance_matrix <- xgb.importance(model = m)
+print(importance_matrix)
+xgb.plot.importance(importance_matrix = importance_matrix)
+importance_matrix |> write_csv("data/results/xgbTree_importance_matrix.csv")
+
+install.packages("SHAPforxgboost")
+library(SHAPforxgboost)
+
+X <- data.matrix(train.predictors)
+
+shap <- shap.prep(m, X_train = X)
+# SHAP importance
+shap.plot.summary(shap)
+# Loop over dependence plots in decreasing importance
+for (v in shap.importance(shap, names_only = TRUE)) {
+  p <- shap.plot.dependence(shap, v, color_feature = "auto", 
+                            alpha = 0.5, jitter_width = 0.1) +
+    ggtitle(v)
+  print(p)
+}
+#install.packages("shapviz")
+library(shapviz)
+
+shp <- shapviz(m,X_pred = dtrain,X=data.matrix(train.predictors))
+shapviz::sv_importance(shp, kind = "both", show_numbers = TRUE)
+sv_dependence(shp, "carat", color_var = "auto")
+sv_dependence(shp, "clarity", color_var = "auto")
+sv_force(shp, row_id = 1)
+sv_waterfall(shp, row_id = 1)
+```

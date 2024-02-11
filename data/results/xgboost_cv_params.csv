@@ -1,0 +1,2 @@
+booster,eta,max_depth,subsample,colsample_bytree,min_child_weight,alpha,lambda,objective
+gbtree,0.01,6,0.5,0.5,5,1,0.1,reg:squarederror

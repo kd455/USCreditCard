@@ -78,7 +78,7 @@ credit_card <- memoise(function(apply_bank_filters = FALSE, post_regulation = FA
               filter(BankType %in% c("LargeBank", "LargeCreditCardBank")) |>
               tsibble::group_by_key() |>
               filter(Value != 0) |>
-              slice(3:n())
+              dplyr::slice(3:n())
   }
 
   if (post_regulation) {
@@ -537,7 +537,7 @@ generate_model_data <- function() {
               group_by(Measure, IDRSSD) |>
               mutate(diff = difference(Value),
                     log = log(Value),
-                    log.diff = log - lag(log),
+                    log.diff = difference(log),
                     log.diff.lag1 = lag(log.diff, 1),
                     log.diff.lag2 = lag(log.diff, 2),
                     log.diff.lag3 = lag(log.diff, 3),
@@ -550,34 +550,61 @@ generate_model_data <- function() {
                     pct_change.lag1 = lag(pct_change,1),
                     pct_change.lag2 = lag(pct_change,2),
                     pct_change.lag3 = lag(pct_change,3),
-                    pct_change.lag4 = lag(pct_change,4)) |> pivot_wider(names_from = Measure, values_from = Value:last_col(), names_glue = "{Measure}.{.value}") 
+                    pct_change.lag4 = lag(pct_change,4)) |> 
+                      pivot_wider(names_from = Measure, values_from = Value:last_col(), names_glue = "{Measure}.{.value}") 
 
   #group 
   cc_data <- cc_data |> left_join (group_by(cc_data, Quarter, BankType) |> 
                                     summarise(
                                       UBPRE524.group = mean(UBPRE524.Value, na.rm= TRUE),
                                       UBPRE524.group.diff = mean(UBPRE524.diff, na.rm= TRUE))) |>
-                        mutate(UBPRE524.group.diff.lag1 = lag(UBPRE524.group.diff,1),
+                        mutate( UBPRE524.group.log = log(UBPRE524.group),
+                                UBPRE524.group.log.diff = difference(UBPRE524.group.log),
+                                UBPRE524.group.log.diff.lag1 = lag(UBPRE524.group.log.diff, 1),
+                                UBPRE524.group.log.diff.lag2 = lag(UBPRE524.group.log.diff, 2),
+                                UBPRE524.group.log.diff.lag3 = lag(UBPRE524.group.log.diff, 3),
+                                UBPRE524.group.log.diff.lag4 = lag(UBPRE524.group.log.diff, 4),
+                                UBPRE524.group.diff.lag1 = lag(UBPRE524.group.diff,1),
                                 UBPRE524.group.diff.lag2 = lag(UBPRE524.group.diff,2),
                                 UBPRE524.group.diff.lag3 = lag(UBPRE524.group.diff,3),
                                 UBPRE524.group.diff.lag4 = lag(UBPRE524.group.diff,4),
-                                UBPRE524.group.pct_change = UBPRE524.group.diff/lag(UBPRE524.group))
+                                UBPRE524.group.pct_change = UBPRE524.group.diff/lag(UBPRE524.group),
+                                UBPRE524.group.pct_change.lag1 = lag(UBPRE524.group.pct_change,1),
+                                UBPRE524.group.pct_change.lag2 = lag(UBPRE524.group.pct_change,2),
+                                UBPRE524.group.pct_change.lag3 = lag(UBPRE524.group.pct_change,3),
+                                UBPRE524.group.pct_change.lag4 = lag(UBPRE524.group.pct_change,4))
   #all
   cc_data <- cc_data |> left_join (group_by(cc_data, Quarter) |> 
                                     summarise(
                                       UBPRE524.all = mean(UBPRE524.Value, na.rm= TRUE),
                                       UBPRE524.all.diff = mean(UBPRE524.diff, na.rm= TRUE))) |>
-                        mutate(UBPRE524.all.diff.lag1 = lag(UBPRE524.all.diff,1),
+                        mutate(UBPRE524.all.log = log(UBPRE524.all),
+                                UBPRE524.all.log.diff = difference(UBPRE524.all.log),
+                                UBPRE524.all.log.diff.lag1 = lag(UBPRE524.all.log.diff, 1),
+                                UBPRE524.all.log.diff.lag2 = lag(UBPRE524.all.log.diff, 2),
+                                UBPRE524.all.log.diff.lag3 = lag(UBPRE524.all.log.diff, 3),
+                                UBPRE524.all.log.diff.lag4 = lag(UBPRE524.all.log.diff, 4),
+                                UBPRE524.all.diff.lag1 = lag(UBPRE524.all.diff,1),
                                 UBPRE524.all.diff.lag2 = lag(UBPRE524.all.diff,2),
                                 UBPRE524.all.diff.lag3 = lag(UBPRE524.all.diff,3),
                                 UBPRE524.all.diff.lag4 = lag(UBPRE524.all.diff,4),
-                                UBPRE524.all.pct_change = UBPRE524.all.diff/lag(UBPRE524.all))
+                                UBPRE524.all.pct_change = UBPRE524.all.diff/lag(UBPRE524.all),
+                                UBPRE524.all.pct_change.lag1 = lag(UBPRE524.all.pct_change,1),
+                                UBPRE524.all.pct_change.lag2 = lag(UBPRE524.all.pct_change,2),
+                                UBPRE524.all.pct_change.lag3 = lag(UBPRE524.all.pct_change,3),
+                                UBPRE524.all.pct_change.lag4 = lag(UBPRE524.all.pct_change,4))
 
   # percentage change economic measures
   econ_measures <- us_economy.quarterly_selected() |> 
                     pivot_longer(cols=!Quarter, names_to = "Measure", values_to = "raw") |>
                             group_by(Measure) |>
                             mutate(diff = difference(raw),
+                                   log = log(raw),
+                                   log.diff = difference(log),
+                                   log.diff.lag1 = lag(log.diff, 1),
+                                   log.diff.lag2 = lag(log.diff, 2),
+                                   log.diff.lag3 = lag(log.diff, 3),
+                                   log.diff.lag4 = lag(log.diff, 4),
                                    diff.lag1 = lag(diff,1),
                                    diff.lag2 = lag(diff,2),
                                    diff.lag3 = lag(diff,3),
