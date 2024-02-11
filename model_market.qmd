@@ -172,7 +172,7 @@ augmented_data  |>
 
 ## Time Series Cross-Validation
 
-To evaluating the predictive performance we use cross validation that are specifically for timeseries.One-step ahead cross-validation, also known as walk-forward validation, is a method specifically designed for evaluating the predictive performance of time series.
+To evaluating the predictive performance we use cross validation that are specifically for timeseries. One-step ahead cross-validation, also known as walk-forward validation, is a method specifically designed for evaluating the predictive performance of time series.
 
 R package
 
@@ -203,7 +203,9 @@ est_data_tr |>
 ```{r}
 #| warning: false
 #| label: tbl-market-cv
-#| tbl-cap: Cross-Validation. Fit on Training and validation (Test)
+#| tbl-subcap: 
+#| - Accuracy Metrics on Training and Cross Validation data for sub-set of banks
+#| - Mean Accuracy Metrics across all banks
 cv_results_est <- readr::read_csv("data/results/estimate_market_metrics.csv",show_col_types = FALSE) |> select(-.model) |>
   mutate(across(where(is.numeric), \(x) round(x,4))) |> 
   relocate(.type, BankName, RMSE, MAE)
@@ -212,8 +214,10 @@ cv_results_test <-readr::read_csv("data/results/estimate_tscv_market_metrics.csv
   mutate(across(where(is.numeric), \(x) round(x,4))) |> 
     relocate(.type, BankName, RMSE, MAE) |> mutate(.type = "CV")
       
+comb <- bind_rows(cv_results_est, cv_results_test) 
+comb |> filter(BankName %in% observation_data$BankName) |> arrange(BankName,.type) |> rmarkdown::paged_table()     
 
-bind_rows(cv_results_est, cv_results_test) |> arrange(BankName,.type) |> rmarkdown::paged_table()     
+comb |> group_by(.type) |> summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> arrange(.type) |> rmarkdown::paged_table()     
 
 ```
 
@@ -226,7 +230,7 @@ Observation Period...TO WRITE
 #| echo: false
 #| results: hide
 #| fig-keep: all
-#| label: fig-pred-bar
+#| label: fig-pred-observed
 #| fig-cap: "Prediction vs. Observed Event"
 
 plot_prediction <- function(bank_name, partner_name, estimation_data, observation_data, models) {
@@ -249,10 +253,6 @@ partner_banks <- credit_card.partnerships() |>
                       distinct(value,Partner = paste(Partner, "-", name))
 
 map2(partner_banks$value, partner_banks$Partner, plot_prediction,estimation_data, observation_data, m_table)
-
-#plot_prediction(bank_name, partner_name,estimation_data, observation_data, m_table )
 ```
-### Abnormal Return
-
 
 ## References
