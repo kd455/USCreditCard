@@ -13,21 +13,30 @@ plot_xgboost_fit <- function(predictions, actuals) {
     ggplot(aes(x = Actual, y = Predicted)) +
     geom_point() +
     geom_smooth(method = lm, se = FALSE, color = "red") +
-    labs(title = "Actual vs. Predicted", x = "Actual Values", y = "Predicted Values")
+    labs(title = "Actual vs.     ", x = "Actual Values", y = "Predicted Values")
 }
 
-data <- get_model_data() |>    
-          filter(is.na(Partnership)) |> mutate(Qtr = as.factor(Qtr)) |> as_tibble() 
+model_data <- get_model_data() 
+data <- model_data |> filter(is.na(Partnership)) |> 
+          mutate(Qtr = as.factor(Qtr)) |> relocate(Qtr) |>
+            select(-c(Partnership:last_col()))|>             
+            as_tibble() |> drop_na()
 
 # pct_change_cols <- data |> select(contains(".pct_change")) |> 
 #                     select(-starts_with("UBPRE524.pct_change")) |> names()
 
 log_change_cols <- data |> select(contains(".log.diff")) |> 
-                    select(-starts_with("UBPRE524.log.diff")) |> names()                    
+                    select(-starts_with("UBPRE524.log.diff")) |> 
+                      select(-c(starts_with("UBPRE524.group"), starts_with("UBPRE524.all"))) |>
+                        names()                    
+estimation_data <- data |> 
+                    select(c(UBPRE524.diff, BankName, BankType, log_change_cols, Qtr))
 
-estimation_data <- data |> select(c(UBPRE524.diff,BankType, log_change_cols, Qtr)) |> drop_na() 
+observation_data <- model_data |> filter(!is.na(Partnership))
+# estimation_data <- data |> 
+#                     select(c(UBPRE524.diff,BankName, log_change_cols, Qtr)) |> filter(grepl("BARCLAYS", BankName)) |> select(-BankName)
 
-s <- createDataPartition(estimation_data$UBPRE524.diff, p = 0.65, list=FALSE)
+s <- createDataPartition(estimation_data$UBPRE524.diff, p = 0.70, list=FALSE)
 training <- estimation_data[s,]
 test <- estimation_data[-s,]
 
@@ -152,13 +161,14 @@ run_xgb.caret.cv(train.predictors, train.outcome, n_folds, n_repeats, method = "
 ```{r}
 #(dt <- xgb.model.dt.tree(model = loaded_model))
 #booster = "gblinear"
-#m <- xgb.load("data/results/best_xgbLinear_model.model")
+# m <- xgb.load("data/results/best_xgbLinear_model.model")
 
-params <- read_csv("data/results/xgbLinear_best_tune.csv",show_col_types = FALSE) |> as.list()
-m <- xgboost(booster = "gbtree", data = dtrain, params= params, nrounds=params$nrounds)
-plot(m$evaluation_log)
+# params <- read_csv("data/results/xgbLinear_best_tune.csv",show_col_types = FALSE) |> as.list()
+# m <- xgboost(booster = "gblinear", data = dtrain, params= params, nrounds=params$nrounds)
+# plot(m$evaluation_log)
 
 params <- read_csv("data/results/xgbTree_best_tune.csv",show_col_types = FALSE) |> as.list()
+
 m <- xgboost(booster = "gbtree", data = dtrain, params= params, nrounds=params$nrounds)
 plot(m$evaluation_log)
 
@@ -170,6 +180,20 @@ plot_xgboost_fit(train_predictions, train.outcome)
 test_predictions <- predict(m, dtest)
 plot_xgboost_fit(test_predictions, test.outcome)
 
+#plot bank
+bank_data_pred <- data[s,]
+bank_data_test <- data[-s,]
+bank_data_pred$train_pred <- train_predictions
+bank_data_test$test_pred <- test_predictions
+bank_data <- bind_rows(bank_data_test, bank_data_pred) |> 
+              filter(BankName %in% observation_data$BankName) |>
+                select(Quarter, BankName, BankType,UBPRE524.diff,train_pred,test_pred) |>
+                  pivot_longer(cols = where(is.numeric))
+
+bank_data |>
+  ggplot(aes(x=Quarter, y = value, colour=name)) + geom_line() + facet_wrap(~BankType+BankName, ncol = 1) + geom_line() + geom_point()
+
+
 # Evaluate the model performance
 postResample(test_predictions, test.outcome)
 
@@ -180,28 +204,34 @@ print(importance_matrix)
 xgb.plot.importance(importance_matrix = importance_matrix)
 importance_matrix |> write_csv("data/results/xgbTree_importance_matrix.csv")
 
-install.packages("SHAPforxgboost")
-library(SHAPforxgboost)
-
-X <- data.matrix(train.predictors)
-
-shap <- shap.prep(m, X_train = X)
-# SHAP importance
-shap.plot.summary(shap)
-# Loop over dependence plots in decreasing importance
-for (v in shap.importance(shap, names_only = TRUE)) {
-  p <- shap.plot.dependence(shap, v, color_feature = "auto", 
-                            alpha = 0.5, jitter_width = 0.1) +
-    ggtitle(v)
-  print(p)
-}
-#install.packages("shapviz")
 library(shapviz)
+save_sv_dependence <- function(shp, feature, colour_var) {
+  tryCatch({
+  # Start PNG device
+  png(filename = glue::glue("data/results/sv_dependence/{feature}_plot.png"), width = 800, height = 600)
+  plot_obj <- sv_dependence(shp, feature, color_var)
+  print(plot_obj)
+  
+  # Turn off the device
+  dev.off()
+  }, error = function(e) {
+    # Handle errors
+    dev.off()
+    print(glue::glue("sv_dependence could not be plotted for {feature}"))
+  })
+}
+
 
 shp <- shapviz(m,X_pred = dtrain,X=data.matrix(train.predictors))
-shapviz::sv_importance(shp, kind = "both", show_numbers = TRUE)
-sv_dependence(shp, "carat", color_var = "auto")
-sv_dependence(shp, "clarity", color_var = "auto")
+shapviz::sv_importance(shp, kind = "bar", show_numbers = TRUE)
+
+names(estimation_data) |> walk(\(x) save_sv_dependence(shp, x, NULL))
+
+
+sv_dependence(shp, "UBPRE524.group.log.diff", color_var = NULL)
+sv_dependence(shp, "UBPRE263.log.diff.lag1", color_var = NULL)
+sv_dependence(shp, "UBPRB538.log.diff", color_var = NULL)
+sv_dependence(shp, "UBPR3815.log.diff", color_var = NULL)
 sv_force(shp, row_id = 1)
 sv_waterfall(shp, row_id = 1)
 ```
