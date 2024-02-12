@@ -280,6 +280,52 @@ credit_card.partnerships <- function() {
                 Available = "2022-06-20")
 }
 
+credit_card.partnerships.all <- function() {
+  tibble::tibble_row(Partner = "Costco",
+                Old="AMERICAN EXPRESS NATIONAL BANK (1394676)", 
+                New="CITIBANK, N.A. (476810)",
+                Acquired = "2016-04-01",
+                Available = "2016-06-20") |>
+                tibble::add_row(Partner = "Walmart",
+                Old="SYNCHRONY BANK (1216022)",
+                New="CAPITAL ONE, NATIONAL ASSOCIATION (112837)",
+                Acquired = "2019-07-01",
+                Available = "2019-09-24")|>
+                tibble::add_row(Partner = "GAP",
+                Old="SYNCHRONY BANK (1216022)", 
+                New="BARCLAYS BANK DELAWARE (2980209)",
+                Acquired = "2022-05-01",
+                Available = "2022-06-20")|>
+                tibble::add_row(Partner = "GM",
+                Old="CAPITAL ONE, NATIONAL ASSOCIATION (112837)", 
+                New="GOLDMAN SACHS BANK USA (2182786)",
+                Acquired = "2022-01-01",
+                 Available = "2022-01-10") |>
+                tibble::add_row(Partner = "Apple",
+                Old="BARCLAYS BANK DELAWARE (2980209)", 
+                Acquired = "2020-09-15") |>
+                tibble::add_row(Partner = "Apple",
+                New="GOLDMAN SACHS BANK USA (2182786)", 
+                Acquired = "2019-09-01")|>
+                tibble::add_row(Partner = "Apple",
+                New="GOLDMAN SACHS BANK USA (2182786)", 
+                Acquired = "2019-09-01") |>
+                tibble::add_row(Partner = "Wayfair",
+                New ="CITIBANK, N.A. (476810)", 
+                Acquired = "2020-09-11") |>
+                tibble::add_row(Partner = "HSBCPortfolio",
+                Old="HSBC BANK USA, NATIONAL ASSOCIATION (413208)", 
+                New="CAPITAL ONE, NATIONAL ASSOCIATION (112837)",
+                Acquired = "2012-05-01",
+                Available = "2012-05-01") |>
+                tibble::add_row(Partner = "BestBuy",
+                Old="CAPITAL ONE, NATIONAL ASSOCIATION (112837)", 
+                New="CITIBANK, N.A. (476810)",
+                Acquired = "2013-09-01",
+                Available = "2013-09-01")
+
+}
+
 credit_card.target_label <- function() {
   "Credit Card Plans-30-89 DAYS P/D %"
 }
@@ -621,30 +667,43 @@ generate_model_data <- function() {
         filter_index(get_regulation_cutoff() ~ .) |> readr::write_csv("data/final_model_data.csv")
 }
 
-.read_all_model_data <- function() {
-  file_loc <- "data/final_model_data.csv"
-  if (!file.exists(file_loc)) {
-    generate_model_data()
-  }
-  read_csv("data/final_model_data.csv", show_col_types = FALSE) |> mutate(Quarter = yearquarter(Quarter)) |>
-     as_tsibble(index = Quarter, key = c(IDRSSD, BankName, BankType))
+.generate_model_hierachy_data <- function() {
+  model_data <- .read_all_model_data()
+  partnerships <- credit_card.partnerships.all() |>
+                        mutate(across(c("Acquired", "Available"), \(x) yearquarter(lubridate::ymd(x)))) |>
+                        pivot_longer(cols = c(New,Old), names_to = "Partnership", values_to = "BankName") |> filter(!is.na(BankName))
+
+  new_partnerships <- partnerships |> filter(Partnership == "New")|>
+                        select(Partner, BankName) |>
+                        cross_join(
+                          tibble(
+                            Quarter = seq(as.Date("2010-01-01"), as.Date("2024-01-01"), by = "quarter")                        
+                          )
+                        ) |> mutate(Quarter = yearquarter(Quarter)) |> left_join(partnerships, by = join_by(Quarter == Acquired, BankName, Partner)) |> 
+                        group_by(Partner, BankName) |>
+                        tidyr::fill(Partnership,.direction = "down") |>  mutate(HasPartner = if_else(is.na(Partnership), 0, 1)) |> select(-c(Available, Partnership)) |> ungroup()
+
+  old_partnerships <- partnerships |> filter(Partnership == "Old")|>
+                        select(Partner, BankName) |>
+                        cross_join(
+                          tibble(
+                            Quarter = seq(as.Date("2010-01-01"), as.Date("2024-01-01"), by = "quarter")                        
+                          )
+                        ) |> mutate(Quarter = yearquarter(Quarter)) |> left_join(partnerships, by = join_by(Quarter == Acquired, BankName, Partner)) |> 
+                        group_by(Partner, BankName) |>
+                        tidyr::fill(Partnership,.direction = "up") |>  mutate(HasPartner = if_else(is.na(Partnership), 0, 1)) |> select(-c(Available, Partnership))|> ungroup()
+  
+  #have all the data for partnerships. As a bank can be involved in multiple partnerships we have to ensure the data is repeated per partner
+  all_partnerships <- bind_rows(new_partnerships, old_partnerships) |> left_join(model_data, by = join_by(Quarter, BankName)) |> filter(!is.na(IDRSSD))       
+
+  final_data <- all_partnerships |> 
+                  add_row(model_data |> filter(!BankName %in% all_partnerships$BankName)) |> 
+                    mutate(Partner = replace_na(Partner, "None"),
+                           HasPartner = replace_na(HasPartner, 0))  
+
+  final_data |> readr::write_csv("data/final_hierarchy_model_data.csv")
 }
 
-# get_model_data <- function(qtrs_post_event = 3, qtrs_prior_event = 1) {
-#   partnerships <- credit_card.partnerships() |> 
-#                     mutate(across(c("Acquired", "Available"), lubridate::ymd),
-#                             PeriodStart = yearquarter(Acquired) - qtrs_prior_event,
-#                             PeriodEnd = yearquarter(Acquired) + qtrs_post_event) |> 
-#                     pivot_longer(cols = c(New,Old), names_to = "Partnership", values_to = "BankName")|>                             
-#                     select(Partner, PeriodStart, PeriodEnd, BankName, Partnership) |> 
-#                     pivot_longer(cols = starts_with("Period"), names_to = "PeriodName", values_to = "Quarter")|> 
-#                     as_tsibble(index=Quarter, key=c(BankName,Partner)) |>
-#                     group_by_key() |>
-#                     fill_gaps() |> tidyr::fill(Partnership,.direction = "down") |> mutate(Period = -qtrs_prior_event:qtrs_post_event) |>
-#                     select(-PeriodName) |> pivot_wider(names_from = "Partner", values_from=Period)
-
-#   .read_all_model_data() |> left_join(partnerships,by = join_by(Quarter, BankName))
-# }
 .model_data_with_partnerships <- function(qtrs_prior_event = 1) {
   partnerships <- credit_card.partnerships() |> 
                     mutate(across(c("Acquired", "Available"), lubridate::ymd),
@@ -663,6 +722,24 @@ generate_model_data <- function() {
     drop_na(UBPRE524.diff)|> 
     mutate(Qtr = quarter(Quarter), Year = year(Quarter)) |>
     readr::write_csv("data/final_model_data_wpartner.csv")
+}
+
+.read_all_model_data <- function() {
+  file_loc <- "data/final_model_data.csv"
+  if (!file.exists(file_loc)) {
+    generate_model_data()
+  }
+  read_csv("data/final_model_data.csv", show_col_types = FALSE) |> mutate(Quarter = yearquarter(Quarter)) |>
+     as_tsibble(index = Quarter, key = c(IDRSSD, BankName, BankType))
+}
+
+get_hierarchy_model_data <- function() {
+  file_loc <- "data/final_hierarchy_model_data.csv"
+  if (!file.exists(file_loc)) {
+    .generate_model_hierachy_data()
+  }
+  read_csv("data/final_hierarchy_model_data.csv", show_col_types = FALSE) |> 
+    mutate(Quarter = yearquarter(Quarter))      
 }
 
 get_model_data <- function() {
