@@ -9,13 +9,11 @@ The goal is to estimate the portion of post-event change that can be attributed 
 
 ### Estimation and Observation Data {#sec-data-split}
 
-Following the process described by @HuntingtonKlein [chap 17.2.1], we pick an "estimation period" and an "observation period" from just before the event to the period of interest after the event.
+Following the process described by @HuntingtonKlein [chap 17.2.1], we pick an "estimation period" and an "observation period".
 
-The observation period includes 1 quarter before so we can determine if borrowers anticipate the event. This possibility was speculated in @sec-partners as we saw some fluctuation in credit card measures before the acquisition. 
+The estimation period ends 1 quarter before the acquisition. This is to remove impacts of borrowers potentially anticipating the event. This possibility was speculated in @sec-partners as we saw some fluctuation in credit card measures before the acquisition. 
 
-The observation period chosen is 4 quarters after the event as the event impact may be after the acquisition as  borrowers get their new partner cards after the acquisition.
-
-Data after the observation period is not used in the models so as to remove the influence of the parnter event or from subsequent events or changes in market conditions unrelated to the event being modelled.
+The observation period chosen is 8 quarters after the event. Based on partnership agreement the portfolio can be transferred with deliquent borrowers on day one [e.g., @gap2021] or the impact may be some quarters after the acquisition as borrowers receive and start using their new partner cards. It will take least 30 days to determine if any of these borrowers are deliquent.
 
 ### Sense check
 

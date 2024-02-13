@@ -81,7 +81,7 @@ source: [@gap2021; and @gap2022]
 
 :::
 
-source: [@Costco2016]
+source: [@costco2016]
 
 ## Walmart
 ![`r target_label`](images/Walmart_UBPRE524_Value_median_partnership.png){#fig-walmart-val}
@@ -118,7 +118,7 @@ We will look to model the partnership impact by accounting for trend.
 
 ## Magnitude measures
 
-Anecdotal accounts indicate that a spike in Unused commitments before the *available* date could be due to borrowers paying down their cards, and even closing them, to mitigate concerns around the transition [@redditBarc]. The borrowers who can pay down their loans are likely low-risk, which may result in the portfolio, at the time of the partnership event, looking more risky than it really is (given *`r target_label`* is a proportion of the credit card loans). 
+Anecdotal accounts indicate that a spike in Unused commitments before the *acquisition* date could be due to borrowers paying down their cards, and even closing them, to mitigate concerns around the transition [@redditBarc]. The borrowers who can pay down their loans are likely low-risk, which may result in the portfolio, at the time of the partnership event, looking more risky than it really is (given *`r target_label`* is a proportion of the credit card loans). 
 
 Increases in credit card loans in the *old* bank, as seen in GAP and Walmart, is unexpected. An assumption is that these banks marketed alternative cards to keep borrowers.   
 

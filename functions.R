@@ -12,13 +12,13 @@ library(tidyr)
 library(readr)
 library(memoise)
 library(ggrepel)
-library(ggtext)
 #library(prophet)
 library(broom)
 library(tseries)
 library(lmtest)
 library(ggthemes)
 library(Metrics)
+library(ggtext)
 #set seed for reproducibility
 set.seed(42)
 
@@ -429,21 +429,21 @@ get_mean_trend <- function(data, value_name = "Value") {
 user_friendly_label <- function(measure, value_name) {
     mtype <- credit_card.data_types_ref() |> filter(Measure == measure) |> pull(mtype)
     case_when(
-              value_name == "value_diff" & mtype == "M" ~ "difference from prior period ($)",
-              value_name == "value_diff" & mtype == "P" ~ "difference from prior period (%)",
+              value_name == "value_diff" & mtype == "M" ~ "difference from prior period",
+              value_name == "value_diff" & mtype == "P" ~ "difference from prior period",
               value_name == "pct_change" ~ "% change from prior period",
               value_name == "Value" & mtype == "M" ~ "Value ($)",
               value_name == "Value" & mtype == "P" ~ "Value (%)",
               .default = value_name)
 }
 
-partnership.plot <- function(name, old, new, acquired, available, selected_measures,value_name, trend_calc = "median", date_obs_period = 2) {
-  date_acquired <- as.Date(acquired)
-  date_available <- as.Date(available)
-  from_date <- year(date_acquired) -date_obs_period
-  to_date <- year(date_acquired) +date_obs_period
+partnership.plot <- function(Partner, Old, New, Acquired, Available, selected_measures,value_name, trend_calc = "median", date_obs_period = 2) {
+  date_acquired <- as.Date(Acquired)
+  date_available <- as.Date(Available)
+  from_date <- year(date_acquired) - date_obs_period
+  to_date <- year(date_acquired) + date_obs_period
 
-  group.colours <- c(old = "#1B9E77", new = "#D95F02", aggregate = "#999999")
+  group.colours <- c(Old = "#1B9E77", New = "#D95F02", aggregate = "#999999")
   trend_data <- NULL
   if (trend_calc == "stl") 
       trend_data <- get_stl(selected_measures, value_name) |> mutate(!!quo_name(value_name) := trend)
@@ -460,31 +460,31 @@ partnership.plot <- function(name, old, new, acquired, available, selected_measu
   y_label <- measures$Measure |> map_chr(user_friendly_label,value_name) |> unique()
 
   selected_measures |>
-    filter(BankName %in% c(old, new)) |> 
+    filter(BankName %in% c(Old, New)) |> 
     bind_rows(trend_data) |> 
     mutate(group_column = case_when(
-                              BankName == old ~ "old",
-                              BankName == new ~ "new")) |> 
+                              BankName == Old ~ "Old",
+                              BankName == New ~ "New")) |> 
     filter_index(as.character(from_date) ~ as.character(to_date)) |>
     autoplot(!!as.name(value_name), aes(colour = group_column)) +
     scale_colour_manual(values = group.colours) +
     facet_wrap(~ Description, scales = "free", ncol=1) +
-    labs(title=glue("{name} Partnership: <span style='colour:#D95F02'>{old}</span> to 
-                    <span style='colour:#1B9E77'>{new}</span>
-                    against <span style='colour:#333333'>{trend_calc} PEER Banks</span>"),
-        subtitle = glue("Acquired {date_acquired}. Card available {date_available}"),
-        y = y_label,
-        x = "Year")  +
     theme(legend.position = "none",
           plot.title = element_markdown(),
           strip.text = element_text(size = 12))  +
+    labs(title=glue("{Partner} Partnership: <span style='color:#D95F02'>{Old}</span> to 
+                    <span style='color:#1B9E77'>{New}</span>
+                    against <span style='color:#333333'>{trend_calc} PEER Banks</span>"),
+        subtitle = glue("Acquired {date_acquired}. Card available {date_available}"),
+        y = y_label,
+        x = "Year")  +
     scale_y_continuous(labels = scales::comma) +
     scale_x_yearmonth(date_breaks = "1 year", date_labels = "%Y")   +
     geom_vline(xintercept = as.numeric(date_acquired), linetype=1,colour="#00259e") +
     annotate("text", x=as.numeric(date_acquired-10), y=0, label="acquired", angle=90, hjust = 0)+
     geom_vline(xintercept = as.numeric(date_available), linetype=4) +
     annotate("text", x=as.numeric(date_available-10), y=0, label="available", angle=90, hjust = 0) 
-    ggsave(glue("images/{name}_{measures_label}_{value_name}_{trend_calc}_partnership.png"), width = 16, height = nrow(measures)*4, dpi = 300)
+    ggsave(glue("images/{Partner}_{measures_label}_{value_name}_{trend_calc}_partnership.png"), width = 16, height = nrow(measures)*4, dpi = 300)
 }
 
 run_granger_test <- function(data, target_variable, exog_variable, order = 4, do_difference = TRUE) {
@@ -546,7 +546,7 @@ plot_us_category <- function(category, measures, target_data, target_measure = "
               plot.title = element_markdown(size = 12),
               plot.subtitle = element_text(size = 9)) +
         labs(y = "Normalised (Normal=0)",
-            title = glue("{category} measures against <span style='colour:darkslategrey'>**{target_label}**</span>"),
+            title = glue("{category} measures against <span style='color:darkslategrey'>**{target_label}**</span>"),
             subtitle = "Recessions shown in boxed area") +     
         geom_rect(data = recessions,inherit.aes = FALSE, 
                   aes(xmin = Month, xmax = Month + 30, ymin = -Inf, ymax = Inf), fill = "lightgrey", alpha = 0.5) +

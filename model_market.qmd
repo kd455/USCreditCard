@@ -169,23 +169,27 @@ augmented_data  |>
     filter(lb_pvalue <= 0.05)|> select(BankName,lb_stat,lb_pvalue) |>
       rmarkdown::paged_table()
 ```
+### AICc
+```{r}
+#| warning: false
+#| label: tbl-market-aicc
+#| tbl-cap: AICc Summary for sub-set of banks
+m_table |> filter(BankName %in% observation_data$BankName) |> glance() |> relocate(BankName, AICc, AIC) |> select(-IDRSSD)|>
+    rmarkdown::paged_table()  
+```
 
 ## Time Series Cross-Validation
 
-To evaluating the predictive performance we use cross validation that are specifically for timeseries. One-step ahead cross-validation, also known as walk-forward validation, is a method specifically designed for evaluating the predictive performance of time series.
-
-R package
+One approach to evaluate the predictive performance of our model is to use One-step ahead cross-validation, also known as walk-forward validation, which is specifically designed for time series.
 
 ```{r}
 #| warning: false
 #| output: false
 #| eval: false
 
-# Estimation Data 
 m_table |> fabletools::accuracy()|> readr::write_csv("data/results/estimate_market_metrics.csv")
 
 # Timeseries CV 
-
 est_data_tr <- estimation_data |>
                     stretch_tsibble(.init = 3, .step = 1) |>
                     relocate( .id)
@@ -203,27 +207,33 @@ est_data_tr |>
 ```{r}
 #| warning: false
 #| label: tbl-market-cv
+#| tbl-cap: Comparing Accuracy Metrics for Training and Cross-Validation data
 #| tbl-subcap: 
 #| - Accuracy Metrics on Training and Cross Validation data for sub-set of banks
+#| - Mean Accuracy Metrics for our sub-set of banks
 #| - Mean Accuracy Metrics across all banks
 cv_results_est <- readr::read_csv("data/results/estimate_market_metrics.csv",show_col_types = FALSE) |> select(-.model) |>
   mutate(across(where(is.numeric), \(x) round(x,4))) |> 
-  relocate(.type, BankName, RMSE, MAE)
+  select(.type, BankName, RMSE, MAE)
 
 cv_results_test <-readr::read_csv("data/results/estimate_tscv_market_metrics.csv",show_col_types = FALSE) |> select(-.model) |>
   mutate(across(where(is.numeric), \(x) round(x,4))) |> 
-    relocate(.type, BankName, RMSE, MAE) |> mutate(.type = "CV")
+    select(.type, BankName, RMSE, MAE) |> mutate(.type = "CV")
       
 comb <- bind_rows(cv_results_est, cv_results_test) 
 comb |> filter(BankName %in% observation_data$BankName) |> arrange(BankName,.type) |> rmarkdown::paged_table()     
 
-comb |> group_by(.type) |> summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> arrange(.type) |> rmarkdown::paged_table()     
+comb |> filter(BankName %in% observation_data$BankName) |> 
+  group_by(.type) |> summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |>
+    rmarkdown::paged_table()  
+
+comb |> group_by(.type) |> 
+  summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
+    rmarkdown::paged_table()     
 
 ```
 
 ## Prediction 
-
-Observation Period...TO WRITE
 
 ```{r}
 #| warning: false
@@ -233,26 +243,28 @@ Observation Period...TO WRITE
 #| label: fig-pred-observed
 #| fig-cap: "Prediction vs. Observed Event"
 
-plot_prediction <- function(bank_name, partner_name, estimation_data, observation_data, models) {
-  est_data <- estimation_data |> filter(BankName == bank_name)
+plot_prediction <- function(Bank, Partner, all_data, models) {
+  est_data <- all_data |> filter(BankName == Bank, is.na(!!as.name(Partner)))
   est_data_trunc <- est_data |> tail(ifelse(nrow(est_data)<11,nrow(est_data),11))
-  event_data <- observation_data |> filter(BankName == bank_name) |> head(5)
+  event_data <- all_data |> filter(BankName == Bank, 
+                                          !!as.name(Partner) >=0) |> head(8) 
   comb_data <- bind_rows(est_data_trunc, event_data)
 
   models |>
-    filter(BankName == bank_name)  |>
+    filter(BankName == Bank)  |>
     forecast(new_data= event_data) |>
     filter(.model=='tslm') |> 
     autoplot()  + 
     geom_line(aes(x = Quarter, y=UBPRE524.diff), data = comb_data, colour='darkslategrey',linetype = "longdash") +
-    labs(title = bank_name, subtitle = partner_name, y = glue("{target_label} (differenced)"))
+    labs(title = Bank, subtitle = glue("{Partner}"), y = glue("{target_label} (differenced)"))
 }
 
 partner_banks <- credit_card.partnerships() |> 
                   pivot_longer(cols = c("Old","New")) |> 
-                      distinct(value,Partner = paste(Partner, "-", name))
+                      distinct(Bank = value, Partner)
 
-map2(partner_banks$value, partner_banks$Partner, plot_prediction,estimation_data, observation_data, m_table)
+map2(partner_banks$Bank, partner_banks$Partner, plot_prediction, data, m_table)
+
 ```
 
 ## References

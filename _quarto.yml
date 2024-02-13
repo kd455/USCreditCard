@@ -13,7 +13,7 @@ book:
         - data_ffiec.qmd
         - data_partners.qmd 
         - data_fed.qmd               
-    - part: "Models"
+    - part: "Event Study"
       chapters:
         - model_event.qmd   
         - model_market.qmd 
