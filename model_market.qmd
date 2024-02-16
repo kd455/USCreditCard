@@ -28,7 +28,7 @@ Where:
 $D_{it}$ is *`r target_label`* (differenced) $i$ at time $t$, \
 $\alpha_i$ is the firm-specific intercept, \
 $\beta_i$ is the sensitivity of firm value $i$ to the group $g$,\
-$D_{gt}$ is the group *`r target_label`* (differenced) at time $t$, and
+$D_{gt}$ is the group *`r target_label`* (differenced) at time $t$, and \
 $\varepsilon_{it}$ is the error term for $i$ at time $t$.
 
 ## Model Results
@@ -43,11 +43,6 @@ observation_data <- data |> filter(!is.na(Partnership))
 market_formula <- "UBPRE524.diff ~ UBPRE524.group.diff"
 m_table <- estimation_data |> fabletools::model(tslm = TSLM(as.formula(market_formula)))
 augmented_data <- m_table |> augment()
-
-# m_table |> 
-#   tidy() |> 
-#     mutate(across(where(is.numeric), \(x) round(x,2))) |> 
-#       rmarkdown::paged_table()
 ```
 
 ### Estimated Fit
@@ -56,14 +51,33 @@ As outlined in @sec-data-split, we have split our data into estimation and obser
 
 If the market model demonstrates a robust fit with the estimation data, this instills confidence in our ability to forecast the "normal" return using the unseen data from the observation period.
 
-@fig-plot-fit displays some of the fitted vs actual results. 
+@fig-plot-fit displays fitted vs actual results for a sub-set of firms. The Intercept and Coefficient is displayed in @tbl-coef-market. The model is   
 
 ```{r}
 #| warning: false
 #| label: fig-plot-fit
 #| fig-cap: "Fitted vs. Observed for estimation data on sub-set of firms"
+#| fig-height: 10
 augmented_data |> filter(BankName %in% unique(observation_data$BankName)) |>
         plot_model_fit("UBPRE524.diff")
+```
+
+```{r}
+#| warning: false
+#| label: tbl-market-aicc
+#| tbl-cap: AICc Summary for sub-set of banks
+m_table |> filter(BankName %in% observation_data$BankName) |> glance() |> relocate(BankName, AICc, AIC) |> select(-IDRSSD)|>
+    mutate(across(where(is.numeric), \(x) round(x,4))) |>  
+    rmarkdown::paged_table()  
+```
+```{r}
+#| warning: false
+#| label: tbl-coef-market
+#| tbl-cap: "Intercept and coefficients"
+m_table |> filter(BankName %in% unique(observation_data$BankName)) |> 
+  tidy() |> select(BankName, term:last_col())|>
+    mutate(across(where(is.numeric), \(x) round(x,4))) |>  
+    rmarkdown::paged_table()
 ```
 ### Residual diagnostics {#sec-residual-check}
 
@@ -86,9 +100,7 @@ Residuals should have the following properties [@Hyndman2021, ch. 5.4]. Residual
 
 bank <- "CITIBANK"
 m_table |> filter(grepl(bank,BankName)) |> select(tslm) |> gg_tsresiduals()  
-
 plot_cc_measures(bank, estimation_data,ubpr_labels)
-
 ```
 
 ### SYNCHRONY
@@ -101,11 +113,8 @@ plot_cc_measures(bank, estimation_data,ubpr_labels)
 
 bank <- "SYNCHRONY"
 m_table |> filter(grepl(bank,BankName)) |> select(tslm) |> gg_tsresiduals()  
-
 plot_cc_measures(bank, estimation_data,ubpr_labels)
-
 ```
-
 ### BARCLAYS
 
 ```{r}
@@ -116,10 +125,8 @@ plot_cc_measures(bank, estimation_data,ubpr_labels)
 #| - "Comparative credit card portfolio variables"
 bank <- "BARCLAYS"
 m_table |> filter(grepl(bank,BankName)) |> select(tslm) |> gg_tsresiduals()  
-
 plot_cc_measures(bank, estimation_data,ubpr_labels)
 ```
-
 
 ### AMERICAN EXPRESS
 ```{r}
@@ -131,11 +138,9 @@ plot_cc_measures(bank, estimation_data,ubpr_labels)
 
 bank <- "AMERICAN EXPRESS NATIONAL BANK"
 m_table |> filter(grepl(bank,BankName)) |> select(tslm) |> gg_tsresiduals()  
-
 plot_cc_measures(bank, estimation_data,ubpr_labels)
 
 ```
-
 ### CAPITAL ONE
 ```{r}
 #| warning: false
@@ -147,9 +152,7 @@ plot_cc_measures(bank, estimation_data,ubpr_labels)
 bank <- "CAPITAL ONE"
 m_table |> filter(grepl(bank,BankName)) |> select(tslm) |> gg_tsresiduals()  
 plot_cc_measures(bank, estimation_data, ubpr_labels)
-
 ```
-
 :::
 
 ### Residuals White Noise
@@ -168,14 +171,6 @@ augmented_data  |>
   features(.innov, ljung_box) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> 
     filter(lb_pvalue <= 0.05)|> select(BankName,lb_stat,lb_pvalue) |>
       rmarkdown::paged_table()
-```
-### AICc
-```{r}
-#| warning: false
-#| label: tbl-market-aicc
-#| tbl-cap: AICc Summary for sub-set of banks
-m_table |> filter(BankName %in% observation_data$BankName) |> glance() |> relocate(BankName, AICc, AIC) |> select(-IDRSSD)|>
-    rmarkdown::paged_table()  
 ```
 
 ## Time Series Cross-Validation
@@ -214,11 +209,11 @@ est_data_tr |>
 #| - Mean Accuracy Metrics across all banks
 cv_results_est <- readr::read_csv("data/results/estimate_market_metrics.csv",show_col_types = FALSE) |> select(-.model) |>
   mutate(across(where(is.numeric), \(x) round(x,4))) |> 
-  select(.type, BankName, RMSE, MAE)
+  select(BankName, .type, RMSE, MAE)
 
 cv_results_test <-readr::read_csv("data/results/estimate_tscv_market_metrics.csv",show_col_types = FALSE) |> select(-.model) |>
   mutate(across(where(is.numeric), \(x) round(x,4))) |> 
-    select(.type, BankName, RMSE, MAE) |> mutate(.type = "CV")
+    select(BankName, .type, RMSE, MAE) |> mutate(.type = "CV")
       
 comb <- bind_rows(cv_results_est, cv_results_test) 
 comb |> filter(BankName %in% observation_data$BankName) |> arrange(BankName,.type) |> rmarkdown::paged_table()     
@@ -259,11 +254,35 @@ plot_prediction <- function(Bank, Partner, all_data, models) {
     labs(title = Bank, subtitle = glue("{Partner}"), y = glue("{target_label} (differenced)"))
 }
 
+
+get_prediction <- function(Bank, Partner, all_data, models) {
+  est_data <- all_data |> filter(BankName == Bank, is.na(!!as.name(Partner)))
+  est_data_trunc <- est_data |> tail(ifelse(nrow(est_data)<11,nrow(est_data),11))
+  event_data <- all_data |> filter(BankName == Bank, 
+                                          !!as.name(Partner) >=0) |> head(8) 
+  models |>
+    filter(BankName == Bank)  |>
+    forecast(new_data= event_data) |> add_column(Partner = Partner)    
+}
+
+
 partner_banks <- credit_card.partnerships() |> 
                   pivot_longer(cols = c("Old","New")) |> 
                       distinct(Bank = value, Partner)
 
-map2(partner_banks$Bank, partner_banks$Partner, plot_prediction, data, m_table)
+map2(partner_banks$Bank, partner_banks$Partner, plot_prediction, data, m_table) 
+
+
+result <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, data, m_table)  |> 
+  list_rbind() |> left_join(data |> select(Observed = UBPRE524.diff),by = join_by(IDRSSD, BankName, BankType, Quarter) ) |> as_tibble() |> select(Partner,BankName, Quarter, Observed, Predicted = .mean) |> mutate(AR = Observed - Predicted)
+
+# result |> group_by(Partner,BankName) |> mutate(Period = row_number()) |> ggplot(aes(x=Period, y=AR, color=BankName))  + geom_line() + facet_wrap(~Partner, ncol=1)
+
+# result |> group_by(Partner,BankName) |> summarise(mean_ar = mean(AR, na.rm=TRUE))
+
+result |> group_by(Partner,BankName) |> summarise(median_ar = median(AR, na.rm=TRUE))
+
+
 
 ```
 

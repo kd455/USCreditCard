@@ -1,20 +1,19 @@
+---
+title: "XGBoost Model"
+format: html
+---
+
 Look-Ahead Bias: If data from after the test period is included in the training set, the model may inadvertently learn information from the future (known as "look-ahead bias"). This makes the model unrealistic and potentially over-optimistic in its predictive performance
 
 ```{r}
+#| warning: false
 source("functions.R")
-require(data.table)
+library(data.table)
 library(xgboost)
-require(Matrix)
+library(Matrix)
 library(caret)
+library(patchwork)
 set.seed(42)
-
-plot_xgboost_fit <- function(predictions, actuals) {
-  data.frame(Actual = actuals, Predicted = predictions) |>
-    ggplot(aes(x = Actual, y = Predicted)) +
-    geom_point() +
-    geom_smooth(method = lm, se = FALSE, color = "red") +
-    labs(title = "Actual vs.     ", x = "Actual Values", y = "Predicted Values")
-}
 
 model_data <- get_model_data() 
 data <- model_data |> filter(is.na(Partnership)) |> 
@@ -22,19 +21,15 @@ data <- model_data |> filter(is.na(Partnership)) |>
             select(-c(Partnership:last_col()))|>             
             as_tibble() |> drop_na()
 
-# pct_change_cols <- data |> select(contains(".pct_change")) |> 
-#                     select(-starts_with("UBPRE524.pct_change")) |> names()
-
 log_change_cols <- data |> select(contains(".log.diff")) |> 
                     select(-starts_with("UBPRE524.log.diff")) |> 
                       select(-c(starts_with("UBPRE524.group"), starts_with("UBPRE524.all"))) |>
                         names()                    
+
 estimation_data <- data |> 
                     select(c(UBPRE524.diff, BankName, BankType, log_change_cols, Qtr))
 
 observation_data <- model_data |> filter(!is.na(Partnership))
-# estimation_data <- data |> 
-#                     select(c(UBPRE524.diff,BankName, log_change_cols, Qtr)) |> filter(grepl("BARCLAYS", BankName)) |> select(-BankName)
 
 s <- createDataPartition(estimation_data$UBPRE524.diff, p = 0.70, list=FALSE)
 training <- estimation_data[s,]
@@ -42,9 +37,9 @@ test <- estimation_data[-s,]
 
 # Convert the data to matrix and assign output variable
 train.outcome <- training$UBPRE524.diff
-train.predictors <- sparse.model.matrix(UBPRE524.diff ~ .-1, data = training)#[, -1]
+train.predictors <- sparse.model.matrix(UBPRE524.diff ~ .-1, data = training)
 test.outcome <- test$UBPRE524.diff
-test.predictors <- sparse.model.matrix(UBPRE524.diff ~ .-1, data = test)#[, -1]
+test.predictors <- sparse.model.matrix(UBPRE524.diff ~ .-1, data = test)
 
 # Convert the matrix objects to DMatrix objects
 dtrain <- xgb.DMatrix(train.predictors, label = train.outcome)
@@ -53,9 +48,9 @@ dtest <- xgb.DMatrix(test.predictors, label = test.outcome)
 ```
 
 ```{r}
-# warning: false
-# echo: false
-
+#| warning: false
+#| echo: false
+#| eval: false
 run_xgb.cv <- function(dtrain) {
   param_grid <- expand.grid(
     eta = c(0.01, 0.1, 0.3),
@@ -114,11 +109,6 @@ run_xgb.caret.cv <- function(train.predictors, train.outcome, n_folds, n_repeats
                         nrounds = c(100,150,200)
                       )
   } else {
-    # grid <- expand.grid(eta = c(0.01, 0.1, 0.3),
-    #                     alpha = c(0, 0.1, 1, 10),
-    #                     lambda = c(0, 0.5, 1, 2, 4, 10),
-    #                     nrounds = c(100,150,200)
-    # )
     grid <- expand.grid(eta = 0.01,
                         alpha = c(0.1, 0.5, 1),
                         lambda = c(0.1, 1, 5, 10, 15, 25, 30, 50),
@@ -154,49 +144,210 @@ seeds <- lapply(1:(n_folds * n_repeats), function(x) sample.int(1000, 144))
 seeds[[length(seeds) + 1]] <- sample.int(1000, 1)  # The last seed for the final model
 
 run_xgb.caret.cv(train.predictors, train.outcome, n_folds, n_repeats, method = "xgbTree", seeds)
-run_xgb.caret.cv(train.predictors, train.outcome, n_folds, n_repeats, method = "xgbLinear", seeds)
-#run_xgb.cv(dtrain)
+
+```
+## Model Selection
+5-Fold Cross-Validation:
+
+The dataset is divided into 5 equal (or nearly equal) parts, or "folds".
+For each fold:
+The fold is temporarily held out as the test set.
+The model is trained on the remaining 4 folds combined.
+The trained model is then tested on the held-out fold to evaluate its performance.
+This process is repeated 5 times, once for each fold, ensuring that every data point is used exactly once as part of the test set.
+The 5 performance metrics (e.g., accuracy, MSE) obtained from each fold are typically averaged to get a single performance estimate for the model.
+Repeating the Process 3 Times:
+
+After completing the 5-fold cross-validation once, you repeat the entire process 2 more times, each time with a different random division of the dataset into 5 folds.
+This means you will perform a total of 15 train-test splits (3 repeats × 5 folds).
+For each repeat, you calculate an average performance metric over its 5 folds, just like in the single round of 5-fold cross-validation.
+Finally, you might average the performance metrics across all 3 repeats to get an overall performance estimate, or you might assess the variability of the model performance across repeats.
+
+![Caption](images/xgbTree_tuning_plot.png){#fig-xgcv}
+
+## Model Results
+
+```{r}
+#| warning: false
+#| results: hide
+params <- read_csv("data/results/xgbTree_best_tune.csv",show_col_types = FALSE) |> as.list()
+
+#train model   
+m <- xgboost(booster = "gbtree", data = dtrain, params= params, nrounds=params$nrounds)
+#Training fit
+train_predictions <- predict(m, dtrain)
+# See Fit on unseen data: Generate Predictions
+test_predictions <- predict(m, dtest)
+
+```
+```{r}
+#| warning: false
+#| label: tbl-xgboost-param
+#| tbl-cap: Best model parameters 
+params |> as_tibble() |> pivot_longer(cols = everything()) |> rmarkdown::paged_table()   
 ```
 
 ```{r}
-#(dt <- xgb.model.dt.tree(model = loaded_model))
-#booster = "gblinear"
-# m <- xgb.load("data/results/best_xgbLinear_model.model")
-
-# params <- read_csv("data/results/xgbLinear_best_tune.csv",show_col_types = FALSE) |> as.list()
-# m <- xgboost(booster = "gblinear", data = dtrain, params= params, nrounds=params$nrounds)
-# plot(m$evaluation_log)
-
-params <- read_csv("data/results/xgbTree_best_tune.csv",show_col_types = FALSE) |> as.list()
-
-m <- xgboost(booster = "gbtree", data = dtrain, params= params, nrounds=params$nrounds)
-plot(m$evaluation_log)
-
-#Training fit
-train_predictions <- predict(m, dtrain)
-plot_xgboost_fit(train_predictions, train.outcome)
-
-# See Fit on unseen data: Generate Predictions
-test_predictions <- predict(m, dtest)
-plot_xgboost_fit(test_predictions, test.outcome)
-
-#plot bank
+#| warning: false
+#| label: fig-plot-fit-xgboost
+#| fig-cap: "Fitted vs. Observed for estimation data on sub-set of firms"
+#| fig-height: 10
 bank_data_pred <- data[s,]
 bank_data_test <- data[-s,]
 bank_data_pred$train_pred <- train_predictions
 bank_data_test$test_pred <- test_predictions
-bank_data <- bind_rows(bank_data_test, bank_data_pred) |> 
-              filter(BankName %in% observation_data$BankName) |>
-                select(Quarter, BankName, BankType,UBPRE524.diff,train_pred,test_pred) |>
-                  pivot_longer(cols = where(is.numeric))
+bank_results <- bind_rows(bank_data_test, bank_data_pred) |> 
+                mutate(resid = UBPRE524.diff - coalesce(test_pred,train_pred)) |>
+                select(Quarter, BankName, BankType,UBPRE524.diff,train_pred,test_pred, resid) 
+                  
+bank_results |> 
+  filter(BankName %in% observation_data$BankName) |> select(-resid) |>
+    pivot_longer(cols = where(is.numeric))|> 
+      ggplot(aes(x=Quarter, y = value, color=name)) + geom_line() + geom_point()+
+      facet_wrap(~BankType+BankName, ncol = 1) + 
+      scale_colour_manual(values = c("train_pred" = "#1B9E77", 
+                                     "test_pred" = "#D55E00", 
+                                      UBPRE524.diff = "darkgrey")) + 
+      theme(legend.position = "top", legend.title = element_blank(), legend.direction = "vertical")
 
-bank_data |>
-  ggplot(aes(x=Quarter, y = value, colour=name)) + geom_line() + facet_wrap(~BankType+BankName, ncol = 1) + geom_line() + geom_point()
+```
+### Residual diagnostics {#sec-residual-check-xgboost}
 
+::: {#fig-xgboost-checks .panel-tabset}
 
-# Evaluate the model performance
-postResample(test_predictions, test.outcome)
+```{r}
+#| warning: false
+plot_xgboost_residual <- function(fuzzy_bankname, data) {
+  bank_data <- data |> filter(grepl(fuzzy_bankname,BankName))
 
+  plot1 <- bank_data |> ggplot(aes(x = Quarter, y = resid)) + geom_line() + geom_point() 
+  plot2 <- acf(bank_data$resid,plot = FALSE) %>% forecast::autoplot() + labs(title = element_blank())
+  plot3 <- bank_data |> ggplot(aes(x = resid)) + geom_histogram(bins = 10) 
+  plot_layout <- plot1 / 
+               (plot2 | plot3) + 
+               plot_layout(widths = c(7, 3)) # This sets the widths for plots 2 and 3
+  plot_layout              
+}
+
+```
+### CITIBANK
+```{r}
+#| warning: false
+#| label: fig-res-citi-xgboost
+#| fig-cap: "XGBoost Residuals"
+bank <- "CITIBANK"
+plot_xgboost_residual(bank, bank_results)
+
+```
+
+### SYNCHRONY
+```{r}
+#| warning: false
+#| label: fig-res-sync-xgboost
+#| fig-cap: "Best Bank Model Residuals"
+bank <- "SYNCHRONY"
+plot_xgboost_residual(bank, bank_results)
+```
+
+### BARCLAYS
+```{r}
+#| warning: false
+#| label: fig-res-bar-xgboost
+#| fig-cap: "Model Residuals"
+bank <- "BARCLAYS"
+plot_xgboost_residual(bank, bank_results)
+```
+
+### AMERICAN EXPRESS
+```{r}
+#| warning: false
+#| label: fig-res-ae-xgboost
+#| fig-cap: "Model Residuals"
+bank <- "AMERICAN EXPRESS"
+plot_xgboost_residual(bank, bank_results)
+```
+
+### CAPITAL ONE
+
+```{r}
+#| warning: false
+#| label: fig-res-cap-xgboost
+#| fig-cap: "Model Residuals"
+bank <-  "CAPITAL ONE"
+plot_xgboost_residual(bank, bank_results)
+```
+
+:::
+
+### Residuals White Noise
+
+The sub-set of banks analysed in @sec-residual-check-xgboost did not exhibit significant autocorrelation.
+
+@tbl-lb-xgboost lists banks where we reject the null hypothesis of the Ljung–Box test, indicating the presence of significant autocorrelation in the residuals. 
+
+Banks not listed have residuals that are indistinguishable from a white noise series i.e. have uncorrelated observations and with constant variance.
+```{r}
+#| warning: false
+#| label: tbl-lb-xgboost
+#| tbl-cap: Ljung–Box results where P-value < Significance Level of 0.05
+bank_results |>
+ as_tsibble(index = Quarter, key = BankName) |> features(resid, ljung_box) |> 
+  mutate(across(where(is.numeric), \(x) round(x,4))) |> 
+    filter(lb_pvalue <= 0.05)|> select(BankName,lb_stat,lb_pvalue) |>
+      rmarkdown::paged_table()
+```
+
+## Train/Test Split Validation
+
+```{r}
+#| warning: false
+#| label: tbl-xgboost-test
+#| tbl-cap: Comparing Accuracy Metrics for Training and Test data
+#| tbl-subcap: 
+#| - Accuracy Metrics on Training and Test data for sub-set of banks
+#| - Mean Accuracy Metrics for our sub-set of banks
+#| - Mean Accuracy Metrics across all banks
+
+bank_fit_result <- function(bankname, data, train_test = "Train", target_name = "UBPRE524.diff") {
+  tryCatch({
+    X_filtered <- data |> filter(BankName == bankname) |> pull(predictions)
+    Y_filtered <- data |> filter(BankName == bankname) |> pull(target_name)
+    caret::postResample(pred = X_filtered, obs = Y_filtered) |> t() |>as_tibble() |>
+      add_column(BankName = bankname,
+                 .type = train_test) |> relocate(BankName,.type)
+  }, error = function(e) {
+    print(glue::glue("metrics error for {bankname}: {e}"))
+  })
+}
+
+train_result <- training |> mutate(predictions = train_predictions)
+test_result <- test |> mutate(predictions = test_predictions)
+
+results_est <- unique(estimation_data$BankName) |> 
+                    map(bank_fit_result,train_result, "Train") |> list_rbind()
+
+results_test <- unique(estimation_data$BankName) |> 
+                    map(bank_fit_result,test_result, "Test") |> list_rbind()
+                       
+
+comb <- bind_rows(results_est, results_test) |>
+          mutate(across(where(is.numeric), \(x) round(x,4))) |> 
+            select(BankName, .type, RMSE, MAE, Rsquared)
+
+comb |> filter(BankName %in% observation_data$BankName) |> arrange(BankName,.type) |> rmarkdown::paged_table()     
+
+comb |> filter(BankName %in% observation_data$BankName) |> 
+  group_by(.type) |> summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |>
+    rmarkdown::paged_table()  
+
+comb |> group_by(.type) |> 
+  summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
+    rmarkdown::paged_table()   
+
+```
+
+```{r}
+#| eval: false
 # Examine feature importance
 #cols <- names(training[, -which(names(training) == "UBPRE524.diff")])
 importance_matrix <- xgb.importance(model = m)

@@ -3,6 +3,39 @@ title: "ARIMA Model"
 format: html
 ---
 
+Seasonal Autoregressive Integrated Moving Average, extends the ARIMA model by adding seasonal terms. It is denoted as ARIMA(p,d,q)(P,D,Q)[s], where:
+
+* p,d,q are the non-seasonal components (autoregressive order, differencing order, and moving average order, respectively),
+* P,D,Q are the seasonal components of the model, with similar definitions but applied on a seasonal cycle, and 
+* s is the length of the seasonal cycle in time units (=4
+quarterly data with an annual cycle).
+
+ARIMA is focused on modeling time series data without external predictors, aiming to forecast future values based on its own past values.
+
+We compare with SARIMA model
+
+Linear Regression with AR Errors:
+The primary focus here is on understanding the relationship between the dependent variable and other explanatory variables, with the addition of modeling the time series nature of the residuals to account for autocorrelation that might not be explained by the independent variables alone
+
+This approach is particularly useful when you have both time series data and external predictors affecting the dependent variable, and you are interested in quantifying the impact of these predictors while also accounting for the autocorrelation in the errors
+
+p, d, and q which are non-negative integers that refer to the order of the autoregressive, integrated, and moving average parts of the model respectively.
+
+auto.arima for the automatic selection of exponential and ARIMA models.R uses a combination of unit root tests, minimization of the AIC and MLE to obtain an ARIMA model
+
+The p,d, and q are then chosen by minimizing the AICc. The algorithm uses a stepwise search to traverse the model space to select the best model with smallest AICc
+
+learnt from our analysis so far.
+manual - i've differenced the values but 
+
+Auto ARIMA (Automatic ARIMA) to model a non-stationary time series, the algorithm attempts to identify the best combination of ARIMA parameters (p, d, q) that minimizes a given criterion, usually the AIC (Akaike Information Criterion), BIC (Bayesian Information Criterion), or similar. The 
+�
+d parameter represents the order of differencing needed to make the series stationary. Ideally, if your series is non-stationary, you might expect Auto ARIMA to suggest differencing it at least once (
+�
+=
+1
+d=1) to achieve stationarity.
+
 ```{r}
 #| warning: false
 #| echo: false
@@ -21,14 +54,16 @@ print_top_group_model <-function(arima_results, bank_type, score_by = "AICc", n=
       select(-BankType) |> relocate(.model, .model_spec, !!score_by) |> arrange(!!as.name(score_by)) |> head(n) |> mutate(across(where(is.numeric), \(x) round(x,2))) |>  rmarkdown::paged_table()
 }
 
-print_top_bank_model <- function(arima_results, fuzzy_bankname, score_by = "AICc", n = 10) {
+print_top_bank_model <- function(fuzzy_bankname, arima_results, score_by = "AICc", n = 10) {
   arima_results |> 
-    filter(grepl(fuzzy_bankname,BankName)) |> select(-BankName) |> 
-      relocate(.model, .model_spec, !!score_by) |> arrange(!!as.name(score_by)) |> head(n) |> rmarkdown::paged_table()
+    filter(grepl(fuzzy_bankname,BankName)) |> select(-c(BankName,BankType,IDRSSD)) |> 
+      relocate(.model, .model_spec, !!score_by) |> arrange(!!as.name(score_by)) |> head(n) |> 
+        mutate(across(where(is.numeric), \(x) round(x,4))) |>  
+          rmarkdown::paged_table()
 }
 
-best_bank_model <- function(estimation_data, arima_results, fuzzy_bankname, score_by = "AICc") {
-  results <- arima_results |> filter(grepl(fuzzy_bankname,BankName)) |> arrange(!!as.name(score_by))
+best_bank_model <- function(bankname, estimation_data, arima_results, score_by = "AICc") {
+  results <- arima_results |> filter(BankName == bankname) |> arrange(!!as.name(score_by))
   aicc <- results |> pluck(score_by, 1) |> round(2)
   model_name <- as.name(results$.model[1])
   formula <- eval(as.name(results$.model[1]))
@@ -36,11 +71,13 @@ best_bank_model <- function(estimation_data, arima_results, fuzzy_bankname, scor
     formula <- as.name(formula)
   }  
   model <- estimation_data |> 
-                  filter(grepl(fuzzy_bankname,BankName)) |> 
-                    drop_na(UNRATE.log.diff.lag1) |>
-                      model(!!model_name := ARIMA(!!formula))
+            filter(BankName == bankname) |> 
+              drop_na(UNRATE.log.diff.lag1) |>
+                model(!!model_name := ARIMA(!!formula))
 
-  list(BankModel = model, Name = model_name,  AICc = aicc, Formula = formula)
+  augmented_data <- model |> augment()|> diff_results() |> as_tibble()
+
+  list(Bank = bankname, BankModel = model, Name = model_name,  AICc = aicc, Formula = formula, Augmented = augmented_data)
 }  
 
 diff_results <- function(augmented_data) {
@@ -55,26 +92,20 @@ diff_results <- function(augmented_data) {
   }
 }
 
-plot_arima_model_fit <- function (model1_aug_data, model2_aug_data, target_name) {
-  model1_name <- model1_aug_data$.model[1]
-  model2_name <- model2_aug_data$.model[1]
-  data <- model2_aug_data
-  if (model1_name != model2_name) {
-    data <- bind_rows(model1_aug_data , model2_aug_data)
-  }  
-  data |>
-    select(-c(IDRSSD, .innov, .resid)) |> pivot_longer(cols = where(is.numeric)) |>
-      mutate(name = case_when(
-                        name == target_name ~ "Observed",
-                        .model == model1_name ~ paste("Best Overall Model Fit:",model1_name),
-                        .default = paste("Best Bank Model Fit:", model2_name)
-            )) |> 
-      filter(!(.model == model1_name & model1_name != model2_name & name == "Observed")) |>
-      ggplot(aes(x = Quarter, y=value, colour = name))  + 
-          geom_line() + facet_wrap(~BankName+BankType) + 
-            theme(legend.position="top",
-                  legend.direction = "vertical", 
-                  legend.title=element_blank())
+print_coeff <- function(fuzzy_bankname, bank_models) {
+  bank_model <- bank_models |> 
+                  filter(grepl(fuzzy_bankname,bank)) |> pluck("model_details",1)
+  
+  bank_model$BankModel |> tidy() |> 
+    select(.model:last_col()) |> 
+      mutate(across(where(is.numeric), \(x) round(x,4))) |> rmarkdown::paged_table()
+}
+
+plot_bank_residuals <- function(fuzzy_bankname, bank_models) {
+  bank_model <- bank_models |> filter(grepl(fuzzy_bankname,bank)) |> pluck("model_details",1)
+  bank_model$BankModel |> gg_tsresiduals()+ 
+                      labs(title=glue("Model {bank_model$Name}, AIC: {bank_model$AICc}"),
+                      subtitle = bank_model$Formula)
 }
 
 data <- get_model_data() 
@@ -83,14 +114,10 @@ estimation_data <- data |> filter(is.na(Partnership)) |>
                     select(-c(Partnership:last_col())) |>
                       drop_na() |> tsibble::fill_gaps()
 
-estimation_data_grp <- estimation_data |> group_by(BankType) |> select(-IDRSSD) |> summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) 
-
-estimation_data_grp.lc <- estimation_data_grp |> filter(BankType == "LargeCreditCardBank")
-estimation_data_grp.l <- estimation_data_grp |> filter(BankType == "LargeBank")
-
 observation_data <- data |> filter(!is.na(Partnership))
 
 ```
+
 
 To determine the normal return we can adopt a ARIMA model [@Hyndman2021 ch.9]
 
@@ -106,24 +133,36 @@ Using auto.arima and AIC for model selection. Unlike the Market model we are usi
 #| eval: true
 
 arima  <- "UBPRE524.Value"
+
+# Real Advance Retail and Food Services Sales per capita
 rrsfs1 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff")
 rrsfs2 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff.lag1")
 rrsfs3 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1")
 rrsfs4 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + RRSFS.Pop.log.diff.lag2")
 rrsfs5 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + RRSFS.Pop.log.diff.lag2 + RRSFS.Pop.log.diff.lag3")
 
+# Unemployment Rate
 unrate1 <- as.formula("UBPRE524.Value ~ UNRATE.log.diff")
 unrate2 <- as.formula("UBPRE524.Value ~ UNRATE.log.diff.lag1")
 unrate3 <- as.formula("UBPRE524.Value ~ UNRATE.log.diff + UNRATE.log.diff.lag1")
 unrate4 <- as.formula("UBPRE524.Value ~ UNRATE.log.diff + UNRATE.log.diff.lag1 + UNRATE.log.diff.lag2")
 unrate5 <- as.formula("UBPRE524.Value ~ UNRATE.log.diff + UNRATE.log.diff.lag1 + UNRATE.log.diff.lag2 + UNRATE.log.diff.lag3")
 
+# Consumer Debt Service Payments as a Percent of Disposable Personal Income
 debt1 <- as.formula("UBPRE524.Value ~ CDSP.log.diff")
 debt2 <- as.formula("UBPRE524.Value ~ CDSP.log.diff.lag1")
 debt3 <- as.formula("UBPRE524.Value ~ CDSP.log.diff + CDSP.log.diff.lag1")
 debt4 <- as.formula("UBPRE524.Value ~ CDSP.log.diff + CDSP.log.diff.lag1 + CDSP.log.diff.lag2")
 debt5 <- as.formula("UBPRE524.Value ~ CDSP.log.diff + CDSP.log.diff.lag1 + CDSP.log.diff.lag2 + CDSP.log.diff.lag3")
 
+# Household Debt Service Payments as a Percent of Disposable Personal Income
+debth1 <- as.formula("UBPRE524.Value ~ TDSP.log.diff")
+debth2 <- as.formula("UBPRE524.Value ~ TDSP.log.diff.lag1")
+debth3 <- as.formula("UBPRE524.Value ~ TDSP.log.diff + TDSP.log.diff.lag1")
+debth4 <- as.formula("UBPRE524.Value ~ TDSP.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2")
+debth5 <- as.formula("UBPRE524.Value ~ TDSP.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 + TDSP.log.diff.lag3")
+
+# Loans to Individuals for Household, Family, and Other Personal Expenditures:Credit Cards
 portfolio1 <- as.formula("UBPRE524.Value ~ UBPRB538.pct_change")
 portfolio2 <- as.formula("UBPRE524.Value ~ UBPRB538.pct_change.lag1")
 portfolio3 <- as.formula("UBPRE524.Value ~ UBPRB538.pct_change + UBPRB538.pct_change.lag1")
@@ -173,7 +212,7 @@ run_arima <- function(estimation_data, fname_suffix = "") {
 
   save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_unrate{fname_suffix}_results.csv"))
 
-  ## 3. Debt
+  ## 3.1 Debt Consumer
   m_table <- estimation_data |>
               model(
                   debt1 = ARIMA(debt1),
@@ -184,6 +223,18 @@ run_arima <- function(estimation_data, fname_suffix = "") {
               )
 
   save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_debt{fname_suffix}_results.csv"))
+
+  ## 3.2 Debt Household
+  m_table <- estimation_data |>
+              model(
+                  debth1 = ARIMA(debth1),
+                  debth2 = ARIMA(debth2),
+                  debth3 = ARIMA(debth3),
+                  debth4 = ARIMA(debth4),
+                  debth5 = ARIMA(debth5)
+              )
+
+  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_debth{fname_suffix}_results.csv"))
 
   ## 4. Portfolio
   m_table <- estimation_data |> 
@@ -229,121 +280,107 @@ run_arima(estimation_data_grp.lc, "_lc")
 run_arima(estimation_data_grp.l, "_l")
 
 ```
-::: {#fig-arima-aic .panel-tabset}
 
-### Large Bank
 ```{r}
 #| warning: false
-#| label: tbl-arima-lb-aic
-#| tbl-cap: Ordered Top 10 Best-Worst ARIMA model by AICc
+#| label: fig-plot-fit-arima
+#| fig-cap: "Fitted vs. Observed for estimation data on sub-set of firms"
+#| fig-height: 10
 arima_results <- read_arima_results() 
 
-print_top_group_model(arima_results, "LargeBank")
+best_bank_models <- tibble(bank = unique(estimation_data$BankName)) |> 
+                      mutate(model_details = lapply(bank, best_bank_model, estimation_data, arima_results))
 
+bank_aug_data <- best_bank_models |> 
+                  mutate(augdata = map(model_details, ~ .x$Augmented)) |> unnest(augdata) |> 
+                    select(BankName:last_col()) 
+
+bank_aug_data |> 
+  filter(BankName %in% observation_data$BankName) |> 
+    as_tsibble(index = Quarter, key=c(BankName)) |> plot_model_fit("UBPRE524.diff")
+             
 ```
-
-### Large Credit Card Bank
-```{r}
-#| warning: false
-#| label: tbl-arima-lc-aic
-#| tbl-cap: Ordered Top 10 Best-Worst ARIMA model by AICc
-print_top_group_model(arima_results, "LargeCreditCardBank")
-
-```
+::: {#fig-arima-aic .panel-tabset}
 
 ### CITIBANK
 ```{r}
 #| warning: false
 #| label: tbl-arima-citi-aic
-#| tbl-cap: Ordered Top 10 Best-Worst ARIMA model by AICc
-print_top_bank_model(arima_results, "CITIBANK")
+#| tbl-cap: "Ordered Top 10 Best-Worst model by AICc"
+bank = "CITIBANK"
+print_top_bank_model(bank, arima_results)
 ```
+```{r}
+#| warning: false
+#| label: tbl-arima-citi-coef
+#| tbl-cap: "Top Model coefficients"
+print_coeff(bank, best_bank_models)
+```
+
 ### SYNCHRONY
 ```{r}
 #| warning: false
-#| label: tbl-arima-syn-aic
-#| tbl-cap: Ordered Top 10 Best-Worst ARIMA model by AICc
-print_top_bank_model(arima_results, "SYNCHRONY")
+#| label: tbl-arima-sync-aic
+#| tbl-cap: "Ordered Top 10 Best-Worst model by AICc"
+bank = "SYNCHRONY"
+print_top_bank_model(bank, arima_results)
+```
+```{r}
+#| warning: false
+#| label: tbl-arima-sync-coef
+#| tbl-cap: "Top Model coefficients"
+print_coeff(bank, best_bank_models)
 ```
 
 ### BARCLAYS
 ```{r}
 #| warning: false
 #| label: tbl-arima-bar-aic
-#| tbl-cap: Ordered Top 10 Best-Worst ARIMA model by AICc
-print_top_bank_model(arima_results, "BARCLAYS")
+#| tbl-cap: "Ordered Top 10 Best-Worst model by AICc"
+bank = "BARCLAYS"
+print_top_bank_model(bank, arima_results)
+```
+```{r}
+#| warning: false
+#| label: tbl-arima-bar-coef
+#| tbl-cap: "Top Model coefficients"
+print_coeff(bank, best_bank_models)
 ```
 
 ### AMERICAN EXPRESS NATIONAL BANK
+
 ```{r}
 #| warning: false
 #| label: tbl-arima-ae-aic
-#| tbl-cap: Ordered Top 10 Best-Worst ARIMA model by AICc
-print_top_bank_model(arima_results, "AMERICAN EXPRESS NATIONAL BANK")
+#| tbl-cap: "Ordered Top 10 Best-Worst model by AICc"
+bank = "AMERICAN EXPRESS NATIONAL BANK"
+print_top_bank_model(bank, arima_results)
+```
+```{r}
+#| warning: false
+#| label: tbl-arima-ae-coef
+#| tbl-cap: "Top Model coefficients"
+print_coeff(bank, best_bank_models)
 ```
 
 ### CAPITAL ONE
+
 ```{r}
 #| warning: false
 #| label: tbl-arima-cap-aic
-#| tbl-cap: Ordered Top 10 Best-Worst ARIMA model by AICc
-print_top_bank_model(arima_results, "CAPITAL ONE")
+#| tbl-cap: "Ordered Top 10 Best-Worst model by AICc"
+bank = "CAPITAL ONE"
+print_top_bank_model(bank, arima_results)
 ```
-
+```{r}
+#| warning: false
+#| label: tbl-arima-cap-coef
+#| tbl-cap: "Top Model coefficients"
+print_coeff(bank, best_bank_models)
+```
 ::: 
-```{r}
-#| warning: false
-#| label: tbl-arima-rank
-#| tbl-cap: Best-Worst ARIMA model by AIC
-#| tbl-subcap: 
-#|   - "Models ordered by combined ranking of all banks"
-#|   - "ARIMA specification. There are 29 Banks and 25 different ARIMA specifications."
-#| layout-ncol: 1
-#| eval: false
-arima_results |> filter(!is.na(BankName)) |> 
-  group_by(BankType,BankName) |>
-    mutate(rank_aicc= rank(AICc, ties.method = "min")) |> 
-          relocate(rank_aicc, BankName) |> 
-    group_by(BankType, .model) |>
-      summarise(rank_aicc = sum(rank_aicc), 
-                mean_aicc = mean(AICc, na.rm=TRUE)) |> 
-      mutate(rank = dense_rank(rank_aicc)) |> 
-      select(-rank_aicc) |> 
-      arrange(rank) |> rmarkdown::paged_table()
 
-arima_results |> filter(.model %in% c("comb1")) |> 
-  group_by(BankType,.model,.model_spec) |> count() |> arrange(desc(n)) |> rmarkdown::paged_table()
-
-
-```
-
-
-Auto ARIMA (Automatic ARIMA) to model a non-stationary time series, the algorithm attempts to identify the best combination of ARIMA parameters (p, d, q) that minimizes a given criterion, usually the AIC (Akaike Information Criterion), BIC (Bayesian Information Criterion), or similar. The 
-�
-d parameter represents the order of differencing needed to make the series stationary. Ideally, if your series is non-stationary, you might expect Auto ARIMA to suggest differencing it at least once (
-�
-=
-1
-d=1) to achieve stationarity.
-
-```{r}
-#| warning: false
-overall_model <- estimation_data |> drop_na(UNRATE.log.diff.lag1) |>
-                    model(manual8 = ARIMA(manual8))
-augmented_data <- overall_model |> augment()
-```
-
-### Estimated Fit
-```{r}
-#| warning: false
-#| label: fig-plot-arima-fit
-#| fig-cap: "Fitted vs. Observed for estimation data on sub-set of firms"
-#| eval: false
-augmented_data |> 
-        filter(BankName %in% unique(observation_data$BankName)) |> plot_model_fit("UBPRE524.diff")
-```
-
-### Residual diagnostics {#sec-residual-check}
+### Residual diagnostics {#sec-residual-check-arima}
 
 Residuals should have the following properties [@Hyndman2021, ch. 5.4]. Residuals:
 
@@ -352,241 +389,69 @@ Residuals should have the following properties [@Hyndman2021, ch. 5.4]. Residual
 * Have constant variance i.e. does not violate "homoscedasticity" assumption.
 * Are normally distributed. 
 
-::: {#fig-market-checks .panel-tabset}
+::: {#fig-arima-checks .panel-tabset}
 
-```{r}
-                        
-```
 ### CITIBANK
+
 ```{r}
 #| warning: false
-#| label: fig-fit-citi
-#| fig-cap: "Fitted vs. Observed"
+#| label: fig-res-citi-arima
+#| fig-cap: "Best Bank Model Residuals"
 bank <- "CITIBANK"
-bank_model <- best_bank_model(estimation_data, arima_results, bank)
-bank_model_aug <- bank_model$BankModel |> augment()|> diff_results()
-overall_m_bank_aug <- augmented_data |> filter(grepl(bank,BankName))
-
-plot_arima_model_fit(overall_m_bank_aug, bank_model_aug,"UBPRE524.diff") 
-
-```
-
-```{r}
-#| warning: false
-#| label: fig-fit-citi-arima
-#| fig-subcap: 
-#| - "Best Bank Model Residuals"
-#| - "Best Overall Model Residuals"
-#| layout-ncol: 2
-bank_model$BankModel |> gg_tsresiduals()+ 
-                      labs(title=glue("Model {bank_model$Name}, AIC: {bank_model$AICc}"),
-                      subtitle = bank_model$Formula)
-
-
-bank_AICc <- overall_model |> filter(grepl(bank,BankName)) |> glance() |> pluck("AICc",1) |> round(2)
-
-overall_model |> filter(grepl(bank,BankName)) |> gg_tsresiduals() + 
-                    labs(title=glue("Model: manual8, AIC: {bank_AICc}"),
-                         subtitle = manual8)
-```
-```{r}
-#| warning: false
-#| label: tbl-citi-coeff
-#| tbl-subcap: 
-#| - "Best Bank Model Coefficients"
-#| - "Overall Bank Model Coefficients"
-bank_model$BankModel |> tidy() |> select(term:last_col()) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> rmarkdown::paged_table()
-
-overall_model |> filter(grepl(bank,BankName)) |> tidy() |> select(term:last_col()) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> rmarkdown::paged_table()
+plot_bank_residuals(bank, best_bank_models)
 ```
 
 ### SYNCHRONY
 ```{r}
 #| warning: false
-#| label: fig-fit-sync
-#| fig-cap: "Fitted vs. Observed"
-
+#| label: fig-res-sync-arima
+#| fig-cap: "Best Bank Model Residuals"
 bank <- "SYNCHRONY"
-bank_model <- best_bank_model(estimation_data, arima_results, bank)
-bank_model_aug <- bank_model$BankModel |> augment() |> diff_results()
-overall_m_bank_aug <- augmented_data |> filter(grepl(bank,BankName))
-
-plot_arima_model_fit(overall_m_bank_aug, bank_model_aug,"UBPRE524.diff") 
-
+plot_bank_residuals(bank, best_bank_models)
 ```
 
-```{r}
-#| warning: false
-#| label: fig-fit-sync-arima
-#| fig-subcap: 
-#| - "Best Bank Model Residuals"
-#| - "Best Overall Model Residuals"
-#| layout-ncol: 2
-bank_model$BankModel |> gg_tsresiduals()+ 
-                      labs(title=glue("Model {bank_model$Name}, AIC: {bank_model$AICc}"),
-                      subtitle = bank_model$Formula)
-
-
-bank_AICc <- overall_model |> filter(grepl(bank,BankName)) |> glance() |> pluck("AICc",1) |> round(2)
-
-overall_model |> filter(grepl(bank,BankName)) |> gg_tsresiduals() + 
-                    labs(title=glue("Model: manual8, AIC: {bank_AICc}"),
-                         subtitle = manual8)
-```
-```{r}
-#| warning: false
-#| label: tbl-sync-coeff
-#| tbl-subcap: 
-#| - "Best Bank Model Coefficients"
-#| - "Overall Bank Model Coefficients"
-bank_model$BankModel |> tidy() |> select(term:last_col()) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> rmarkdown::paged_table()
-
-overall_model |> filter(grepl(bank,BankName)) |> tidy() |> select(term:last_col()) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> rmarkdown::paged_table()
-```
 ### BARCLAYS
 ```{r}
 #| warning: false
-#| label: fig-fit-bar
-#| fig-cap: "Fitted vs. Observed"
+#| label: fig-res-bar-arima
+#| fig-cap: "Best Bank Model Residuals"
 bank <- "BARCLAYS"
-bank_model <- best_bank_model(estimation_data, arima_results, bank)
-bank_model_aug <- bank_model$BankModel |> augment() |> diff_results()
-overall_m_bank_aug <- augmented_data |> filter(grepl(bank,BankName))
-
-plot_arima_model_fit(overall_m_bank_aug, bank_model_aug,"UBPRE524.diff") 
-
-```
-
-```{r}
-#| warning: false
-#| label: fig-fit-bar-arima
-#| fig-subcap: 
-#| - "Best Bank Model Residuals"
-#| - "Best Overall Model Residuals"
-#| layout-ncol: 2
-bank_model$BankModel |> gg_tsresiduals()+ 
-                      labs(title=glue("Model {bank_model$Name}, AIC: {bank_model$AICc}"),
-                      subtitle = bank_model$Formula)
-
-
-bank_AICc <- overall_model |> filter(grepl(bank,BankName)) |> glance() |> pluck("AICc",1) |> round(2)
-
-overall_model |> filter(grepl(bank,BankName)) |> gg_tsresiduals() + 
-                    labs(title=glue("Model: manual8, AIC: {bank_AICc}"),
-                         subtitle = manual8)
-```
-```{r}
-#| warning: false
-#| label: tbl-bar-coeff
-#| tbl-subcap: 
-#| - "Best Bank Model Coefficients"
-#| - "Overall Bank Model Coefficients"
-bank_model$BankModel |> tidy() |> select(term:last_col()) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> rmarkdown::paged_table()
-
-overall_model |> filter(grepl(bank,BankName)) |> tidy() |> select(term:last_col()) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> rmarkdown::paged_table()
+plot_bank_residuals(bank, best_bank_models)
 ```
 
 ### AMERICAN EXPRESS
 ```{r}
 #| warning: false
-#| label: fig-fit-ae
-#| fig-cap: "Fitted vs. Observed"
+#| label: fig-res-ae-arima
+#| fig-cap: "Best Bank Model Residuals"
 bank <- "AMERICAN EXPRESS"
-bank_model <- best_bank_model(estimation_data, arima_results, bank)
-bank_model_aug <- bank_model$BankModel |> augment() |> diff_results()
-overall_m_bank_aug <- augmented_data |> filter(grepl(bank,BankName))
-
-plot_arima_model_fit(overall_m_bank_aug, bank_model_aug,"UBPRE524.diff") 
-
-```
-
-```{r}
-#| warning: false
-#| label: fig-fit-ae-arima
-#| fig-subcap: 
-#| - "Best Bank Model Residuals"
-#| - "Best Overall Model Residuals"
-#| layout-ncol: 2
-bank_model$BankModel |> gg_tsresiduals()+ 
-                      labs(title=glue("Model {bank_model$Name}, AIC: {bank_model$AICc}"),
-                      subtitle = bank_model$Formula)
-
-
-bank_AICc <- overall_model |> filter(grepl(bank,BankName)) |> glance() |> pluck("AICc",1) |> round(2)
-
-overall_model |> filter(grepl(bank,BankName)) |> gg_tsresiduals() + 
-                    labs(title=glue("Model: manual8, AIC: {bank_AICc}"),
-                         subtitle = manual8)
-```
-```{r}
-#| warning: false
-#| label: tbl-ae-coeff
-#| tbl-subcap: 
-#| - "Best Bank Model Coefficients"
-#| - "Overall Bank Model Coefficients"
-bank_model$BankModel |> tidy() |> select(term:last_col()) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> rmarkdown::paged_table()
-
-overall_model |> filter(grepl(bank,BankName)) |> tidy() |> select(term:last_col()) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> rmarkdown::paged_table()
+plot_bank_residuals(bank, best_bank_models)
 ```
 
 ### CAPITAL ONE
-```{r}
-#| warning: false
-#| label: fig-fit-cap
-#| fig-cap: "Fitted vs. Observed"
-bank <- "CAPITAL ONE"
-bank_model <- best_bank_model(estimation_data, arima_results, bank)
-bank_model_aug <- bank_model$BankModel |> augment()|> diff_results()
-overall_m_bank_aug <- augmented_data |> filter(grepl(bank,BankName))
-
-plot_arima_model_fit(overall_m_bank_aug, bank_model_aug,"UBPRE524.diff") 
-
-```
 
 ```{r}
 #| warning: false
-#| label: fig-fit-cap-arima
-#| fig-subcap: 
-#| - "Best Bank Model Residuals"
-#| - "Best Overall Model Residuals"
-#| layout-ncol: 2
-bank_model$BankModel |> gg_tsresiduals()+ 
-                      labs(title=glue("Model {bank_model$Name}, AIC: {bank_model$AICc}"),
-                      subtitle = bank_model$Formula)
-
-
-bank_AICc <- overall_model |> filter(grepl(bank,BankName)) |> glance() |> pluck("AICc",1) |> round(2)
-
-overall_model |> filter(grepl(bank,BankName)) |> gg_tsresiduals() + 
-                    labs(title=glue("Model: manual8, AIC: {bank_AICc}"),
-                         subtitle = manual8)
-```
-```{r}
-#| warning: false
-#| label: tbl-cap-coeff
-#| tbl-subcap: 
-#| - "Best Bank Model Coefficients"
-#| - "Overall Bank Model Coefficients"
-bank_model$BankModel |> tidy() |> select(term:last_col()) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> rmarkdown::paged_table()
-
-overall_model |> filter(grepl(bank,BankName)) |> tidy() |> select(term:last_col()) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> rmarkdown::paged_table()
+#| label: fig-res-cap-arima
+#| fig-cap: "Best Bank Model Residuals"
+bank <-  "CAPITAL ONE"
+plot_bank_residuals(bank, best_bank_models)
 ```
 
 :::
 
 ### Residuals White Noise
 
-The sub-set of banks analysed in @sec-residual-check did not exhibit significant autocorrelation.
+The sub-set of banks analysed in @sec-residual-check-arima did not exhibit significant autocorrelation.
 
-@tbl-lb-arima lists the results of Ljung–Box test for all banks filtered to those where we reject the null hypothesis, indicating the presence of significant autocorrelation in the residuals.  
+@tbl-lb-arima lists banks where we reject the null hypothesis of the Ljung–Box test, indicating the presence of significant autocorrelation in the residuals. 
 
-The residuals for banks not listed are indistinguishable from a white noise series.
-
+Banks not listed have residuals that are indistinguishable from a white noise series i.e. have uncorrelated observations and with constant variance.
 ```{r}
 #| warning: false
 #| label: tbl-lb-arima
 #| tbl-cap: Ljung–Box results where P-value < Significance Level of 0.05
-augmented_data  |>
+bank_aug_data  |> as_tsibble(index=Quarter, key = BankName) |>
   features(.innov, ljung_box) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> 
     filter(lb_pvalue <= 0.05)|> select(BankName,lb_stat,lb_pvalue) |>
       rmarkdown::paged_table()
@@ -601,40 +466,78 @@ augmented_data  |>
 #| eval: false
 
 # Estimation Data 
-overall_model |> fabletools::accuracy() |> readr::write_csv("data/results/estimate_arima_metrics.csv")
+bank_models <- best_bank_models |> 
+                  mutate(model = map(model_details, ~ .x$BankModel)) 
+
+bank_top_formulas <- best_bank_models |> 
+                  mutate(formula = map(model_details, ~ .x$Formula)) 
+                  
+bank_models$model |> map(fabletools::accuracy) |> list_rbind() |> readr::write_csv("data/results/estimate_arima_metrics.csv")
 
 # Timeseries CV 
 
-unique(observation_data$BankName) |> walk(do_arima_cv, estimation_data)
-
-do_arima_cv <- function(bank_name, estimation_data, init = 5) {    
-  tryCatch({
-    filtered_data <- estimation_data |> filter(BankName == bank_name)
+do_arima_cv <- function(bankname, formulas, estimation_data, init = 5) {    
+  tryCatch({  
+    selected_formula <- formulas |> filter(bank == bankname) |> pluck("formula",1)
+    
+    filtered_data <- estimation_data |> filter(BankName == bankname)
+      
     est_data_tr <- filtered_data |>  
-                          stretch_tsibble(.init = init, .step = 1) |>
-                          relocate( .id)
+                    stretch_tsibble(.init = init, .step = 1) |>
+                      relocate( .id)
 
     step_data_tr <- filtered_data |> 
-                      slice(init+1:n()) |> mutate(.step = row_number()) |> 
-                      relocate(.step) |>
-                      group_by(.step) |> nest(data = -c(.step,UBPRE524.diff)) |> 
-                      rename(c("new_data" = "data", "UBPRE524.diff.observed" = "UBPRE524.diff"))
+                      dplyr::slice(init+1:n()) |> mutate(.step = row_number()) |> 
+                        relocate(.step) |>
+                          group_by(.step) |> nest(data = -c(.step,UBPRE524.diff)) |> 
+                            rename("new_data" = "data") |> select(-UBPRE524.diff)
+
 
     nested_data <- est_data_tr |>
-                      group_by(.id) |>
+                    group_by(.id) |>
                       nest(data = -.id) |> left_join(step_data_tr, by = join_by(.id == .step)) |>
-                      drop_na(new_data)
+                        drop_na(new_data)
+  
+    results <- nested_data |> 
+                  mutate(model = map(data, ~model(.x, ARIMA(!!selected_formula))),
+                        forecast = map(model, forecast, new_data = new_data))
 
-    results <- nested_data |>
-                mutate(model = map(data, ~model(.x, lm_arima = ARIMA(as.formula(manual8)))),
-                      forecast = map(model, forecast, new_data = new_data)) |>
-                select(-data, -model) 
+    results$forecast |> map(fabletools::accuracy, filtered_data) |> 
+      list_rbind() |>  readr::write_csv(glue("data/results/tscv/estimate_tscv_arima_{bankname}.csv"))
 
-    final_results <- results |>
-                      readr::write_csv(glue("data/results/estimate_tscv_arima_{bank_name}.csv"))
    }, error = function(e) {
-    print(glue::glue("cv error for {bank_name}: {e}"))
+    print(glue::glue("cv error for {bankname}: {e}"))
   })
 }
 
+unique(estimation_data$BankName) |> walk(\(x) do_arima_cv(x, bank_top_formulas, estimation_data))
+
+```
+
+```{r}
+#| warning: false
+#| label: tbl-arima-cv
+#| tbl-cap: Comparing Accuracy Metrics for Training and Cross-Validation data
+#| tbl-subcap: 
+#| - Accuracy Metrics on Training and Cross Validation data for sub-set of banks
+#| - Mean Accuracy Metrics for our sub-set of banks
+#| - Mean Accuracy Metrics across all banks
+cv_results_est <- readr::read_csv("data/results/estimate_arima_metrics.csv",show_col_types = FALSE) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> 
+  select(BankName, .type, RMSE, MAE)
+
+cv_results_test <- read_tscv_results("arima") |> group_by(.type,BankName) |> 
+  summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
+  mutate(across(where(is.numeric), \(x) round(x,4))) |> 
+  select(BankName, .type, RMSE, MAE) |> mutate(.type = "CV") 
+  
+comb <- bind_rows(cv_results_est, cv_results_test) 
+comb |> filter(BankName %in% observation_data$BankName) |> arrange(BankName,.type) |> rmarkdown::paged_table()     
+
+comb |> filter(BankName %in% observation_data$BankName) |> 
+  group_by(.type) |> summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |>
+    rmarkdown::paged_table()  
+
+comb |> group_by(.type) |> 
+  summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
+    rmarkdown::paged_table()     
 ```

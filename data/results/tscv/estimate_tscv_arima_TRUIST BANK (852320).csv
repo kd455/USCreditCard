@@ -1,0 +1,112 @@
+.model,IDRSSD,BankName,BankType,.type,ME,RMSE,MAE,MPE,MAPE,MASE,RMSSE,ACF1
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,NA,NA,NA,NA,NA,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,NA,NA,NA,NA,NA,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,NA,NA,NA,NA,NA,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,NA,NA,NA,NA,NA,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,NA,NA,NA,NA,NA,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,NA,NA,NA,NA,NA,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,NA,NA,NA,NA,NA,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,NA,NA,NA,NA,NA,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,-0.001616610610747549,0.001616610610747549,0.001616610610747549,16.16610610747549,16.16610610747549,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,NA,NA,NA,NA,NA,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,0.0022625946811102304,0.0022625946811102304,0.0022625946811102304,5.656486702775572,5.656486702775572,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,-0.015248116993796745,0.015248116993796745,0.015248116993796745,15.248116993796748,15.248116993796748,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,-0.010818184109522351,0.010818184109522351,0.010818184109522351,54.090920547611724,54.090920547611724,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,0.05547750467783613,0.05547750467783613,0.05547750467783613,61.64167186426239,61.64167186426239,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,NA,NA,NA,NA,NA,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,0.016773629420523628,0.016773629420523628,0.016773629420523628,-27.956049034206075,27.956049034206075,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,0.006034912805039351,0.006034912805039351,0.006034912805039351,-20.116376016797823,20.116376016797823,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,0.0785932029228831,0.0785932029228831,0.0785932029228831,43.66289051271283,43.66289051271283,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,NA,NA,NA,NA,NA,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,NA,NA,NA,NA,NA,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,NA,NA,NA,NA,NA,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,NA,NA,NA,NA,NA,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,0.09031516193524955,0.09031516193524955,0.09031516193524955,180.63032387049896,180.63032387049896,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,NA,NA,NA,NA,NA,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,0.09274983727713049,0.09274983727713049,0.09274983727713049,-24.407851915034332,24.407851915034332,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,-1.1235044663411191,1.1235044663411191,1.1235044663411191,-1123.5044663411193,1123.5044663411193,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,0.1486903172646128,0.1486903172646128,0.1486903172646128,51.272523194694045,51.272523194694045,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,-0.1988303496677835,0.1988303496677835,0.1988303496677835,68.56218954061497,68.56218954061497,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,NA,NA,NA,NA,NA,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,NA,NA,NA,NA,NA,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,-0.19080145086502187,0.19080145086502187,0.19080145086502187,-238.50181358127745,238.50181358127745,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,0.13549932218153143,0.13549932218153143,0.13549932218153143,150.55480242392366,150.55480242392366,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,0.10640401225624496,0.10640401225624496,0.10640401225624496,354.68004085414964,354.68004085414964,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,0.07853374158777134,0.07853374158777134,0.07853374158777134,60.41057045213185,60.41057045213185,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,0.0881849594762457,0.0881849594762457,0.0881849594762457,97.98328830693958,97.98328830693958,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,-0.09870206431495723,0.09870206431495723,0.09870206431495723,493.51032157478596,493.51032157478596,NA,NA,NA
+"ARIMA(UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + 
+    UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + 
+    PDQ(1, 0, 0))",852320,TRUIST BANK (852320),LargeBank,Test,0.00222905250194437,0.00222905250194437,0.00222905250194437,2.229052501944373,2.229052501944373,NA,NA,NA

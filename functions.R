@@ -808,8 +808,8 @@ plot_cc_measures <- function(bank_fuzzy, data, ubpr_labels) {
 
 plot_model_fit <- function (data, target_name) {
   data |>
-    autoplot(!!as.name(target_name), colour = "darkgrey") + 
-        geom_line(aes(y = .fitted, colour = "#D55E00")) + facet_wrap(~BankName+BankType, ncol = 2) +
+    autoplot(!!as.name(target_name), color = "darkgrey") + 
+        geom_line(aes(y = .fitted, color = "#D55E00")) + facet_wrap(~BankName+BankType+.model, ncol = 1) +
         labs(title = "<span style='color:#D55E00'>Fitted</span> vs. <span style='color:darkgrey'>Observed</span>") +
         theme(legend.position = "none", plot.title = element_markdown(),plot.subtitle = element_markdown())
 }
@@ -823,6 +823,11 @@ save_arima_results <- function(table_results, model_cols, file_name) {
 
 read_arima_results <- function() {
   list.files("data/results", pattern = "arima.*results.csv", full.names = TRUE) |> 
+    map(read_csv, show_col_types = FALSE) |> list_rbind()
+}
+
+read_tscv_results <- function(model_type = "arima") {
+  list.files("data/results/tscv",pattern = glue("*tscv_{model_type}*") , full.names = TRUE) |> 
     map(read_csv, show_col_types = FALSE) |> list_rbind()
 }
 
