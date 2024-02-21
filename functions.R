@@ -704,10 +704,10 @@ generate_model_data <- function() {
   final_data |> readr::write_csv("data/final_hierarchy_model_data.csv")
 }
 
-.model_data_with_partnerships <- function(qtrs_prior_event = 1) {
+.model_data_with_partnerships <- function() {
   partnerships <- credit_card.partnerships() |> 
                     mutate(across(c("Acquired", "Available"), lubridate::ymd),
-                            PeriodStart = yearquarter(Acquired) - qtrs_prior_event,
+                            PeriodStart = yearquarter(Acquired),
                             PeriodEnd = yearquarter(today()))  |> 
                     pivot_longer(cols = c(New,Old), names_to = "Partnership", values_to = "BankName")|>                             
                     select(Partner, PeriodStart, PeriodEnd, BankName, Partnership) |> 
@@ -715,7 +715,7 @@ generate_model_data <- function() {
                     as_tsibble(index=Quarter, key=c(BankName,Partner)) |>
                     group_by_key() |>
                     fill_gaps() |> tidyr::fill(Partnership,.direction = "down") |> 
-                      mutate(Period = row_number()-(1+qtrs_prior_event)) |>
+                      mutate(Period = row_number()-1) |>
                     select(-PeriodName) |> pivot_wider(names_from = "Partner", values_from=Period)
   
   .read_all_model_data() |> left_join(partnerships,by = join_by(Quarter, BankName)) |>

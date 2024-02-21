@@ -15,21 +15,26 @@ library(caret)
 library(patchwork)
 set.seed(42)
 
-model_data <- get_model_data() 
-data <- model_data |> filter(is.na(Partnership)) |> 
-          mutate(Qtr = as.factor(Qtr)) |> relocate(Qtr) |>
-            select(-c(Partnership:last_col()))|>             
-            as_tibble() |> drop_na()
+model_data <- get_model_data() |> 
+                mutate(Qtr = as.factor(Qtr), BankType = as.factor(BankType), BankName = as.factor(BankName)) |> relocate(Qtr) |> as_tibble()
 
-log_change_cols <- data |> select(contains(".log.diff")) |> 
+log_change_cols <- model_data |> select(contains(".log.diff")) |> 
                     select(-starts_with("UBPRE524.log.diff")) |> 
                       select(-c(starts_with("UBPRE524.group"), starts_with("UBPRE524.all"))) |>
                         names()                    
 
-estimation_data <- data |> 
-                    select(c(UBPRE524.diff, BankName, BankType, log_change_cols, Qtr))
+est_data_wQuarter <- model_data |> filter(is.na(Partnership)) |>
+                              select(c(Quarter, UBPRE524.diff, BankName, BankType, log_change_cols, Qtr)) |>
+                              drop_na()
 
-observation_data <- model_data |> filter(!is.na(Partnership))
+estimation_data <- est_data_wQuarter |> select(-Quarter)
+
+observation_data <- model_data |> filter(!is.na(Partnership)) |>
+                      select(c(UBPRE524.diff, BankName, BankType, log_change_cols, Qtr)) |> 
+                        drop_na()
+
+#need to have consistent factors
+observation_data$BankName <- factor(observation_data$BankName , levels = levels(estimation_data$BankName))
 
 s <- createDataPartition(estimation_data$UBPRE524.diff, p = 0.70, list=FALSE)
 training <- estimation_data[s,]
@@ -167,6 +172,8 @@ Finally, you might average the performance metrics across all 3 repeats to get a
 
 ## Model Results
 
+On estimation data
+
 ```{r}
 #| warning: false
 #| results: hide
@@ -178,6 +185,7 @@ m <- xgboost(booster = "gbtree", data = dtrain, params= params, nrounds=params$n
 train_predictions <- predict(m, dtrain)
 # See Fit on unseen data: Generate Predictions
 test_predictions <- predict(m, dtest)
+
 
 ```
 ```{r}
@@ -192,8 +200,8 @@ params |> as_tibble() |> pivot_longer(cols = everything()) |> rmarkdown::paged_t
 #| label: fig-plot-fit-xgboost
 #| fig-cap: "Fitted vs. Observed for estimation data on sub-set of firms"
 #| fig-height: 10
-bank_data_pred <- data[s,]
-bank_data_test <- data[-s,]
+bank_data_pred <- est_data_wQuarter[s,]
+bank_data_test <- est_data_wQuarter[-s,]
 bank_data_pred$train_pred <- train_predictions
 bank_data_test$test_pred <- test_predictions
 bank_results <- bind_rows(bank_data_test, bank_data_pred) |> 
@@ -345,6 +353,29 @@ comb |> group_by(.type) |>
     rmarkdown::paged_table()   
 
 ```
+## Prediction 
+
+```{r}
+#| warning: false
+# Convert the data to matrix and assign output variable
+estimation.outcome <- estimation_data$UBPRE524.diff
+estimation.predictors <- sparse.model.matrix(UBPRE524.diff ~ .-1, data = estimation_data)
+observation.outcome <- observation_data$UBPRE524.diff
+observation.predictors <- sparse.model.matrix(UBPRE524.diff ~ .-1, data = observation_data)
+
+# Convert the matrix objects to DMatrix objects
+dEst <- xgb.DMatrix(estimation.predictors, label = estimation.outcome)
+dObs <- xgb.DMatrix(observation.predictors, label = observation.outcome)
+
+#train model   
+m <- xgboost(booster = "gbtree", data = dEst, params= params, nrounds=params$nrounds)
+#predit
+predictions <- predict(m, dObs)
+
+
+#xgb.dump(m, with_stats = TRUE)[0:10]
+```
+
 
 ```{r}
 #| eval: false

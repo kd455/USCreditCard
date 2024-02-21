@@ -80,15 +80,15 @@ best_bank_model <- function(bankname, estimation_data, arima_results, score_by =
   list(Bank = bankname, BankModel = model, Name = model_name,  AICc = aicc, Formula = formula, Augmented = augmented_data)
 }  
 
-diff_results <- function(augmented_data) {
-  if("UBPRE524.Value" %in% names(augmented_data)) {
-    augmented_data |> 
-      mutate(UBPRE524.diff = difference(UBPRE524.Value),
-              .fitted = difference(.fitted),
-              .resid = difference(.fitted)) |> drop_na(UBPRE524.diff) |> 
-        select(-UBPRE524.Value) |> relocate(UBPRE524.diff, .before = .fitted)
+diff_results <- function(data) {
+  if("UBPRE524.Value" %in% names(data)) {
+    data |> 
+        mutate(UBPRE524.diff = difference(UBPRE524.Value),
+                .fitted = difference(.fitted),
+                .resid = difference(.fitted)) |> drop_na(UBPRE524.diff) |> 
+          select(-UBPRE524.Value) |> relocate(UBPRE524.diff, .before = .fitted)
   } else {
-    augmented_data
+    data
   }
 }
 
@@ -114,7 +114,11 @@ estimation_data <- data |> filter(is.na(Partnership)) |>
                     select(-c(Partnership:last_col())) |>
                       drop_na() |> tsibble::fill_gaps()
 
-observation_data <- data |> filter(!is.na(Partnership))
+observation_data <- data |> filter(!is.na(Partnership)) 
+
+partner_banks <- credit_card.partnerships() |> 
+                  pivot_longer(cols = c("Old","New")) |> 
+                      distinct(Bank = value, Partner)
 
 ```
 
@@ -173,15 +177,15 @@ comb3 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.la
 comb4 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.pct_change")
 comb5 <- as.formula("UBPRE524.Value ~ CDSP.log.diff + CDSP.log.diff.lag1 + UBPRB538.pct_change")
 
-manual1 <- as.formula("UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(0,0,0)")
-manual2 <- as.formula("UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(1,0,0)")
-manual3 <- as.formula("UBPRE524.diff ~ 0 + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(0,0,0)")
-manual4 <- as.formula("UBPRE524.diff ~ 0 + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(1,0,0)")
-manual5 <- as.formula("UBPRE524.diff ~ 0 + CDSP.log.diff + CDSP.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(0,0,0)")
-manual6 <- as.formula("UBPRE524.diff ~ 0 + CDSP.log.diff + CDSP.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(1,0,0)")
-manual7 <- as.formula("UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(0,0,0)")
-manual8 <- as.formula("UBPRE524.diff ~ 0 + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(1,0,0)")
-manual9 <- as.formula("UBPRE524.diff ~ 0 + TDSP.log.diff + B069RC1.Pop.CPI.log.diff.lag1 + UBPRB538.log.diff.lag2 + UBPRB538.log.diff.lag3 + UBPR3815.log.diff + RRSFS.Pop.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)")
+manual1 <- as.formula("UBPRE524.diff ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(0,0,0)")
+manual2 <- as.formula("UBPRE524.diff ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(1,0,0)")
+manual3 <- as.formula("UBPRE524.diff ~ UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(0,0,0)")
+manual4 <- as.formula("UBPRE524.diff ~ UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(1,0,0)")
+manual5 <- as.formula("UBPRE524.diff ~ CDSP.log.diff + CDSP.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(0,0,0)")
+manual6 <- as.formula("UBPRE524.diff ~ CDSP.log.diff + CDSP.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(1,0,0)")
+manual7 <- as.formula("UBPRE524.diff ~ RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(0,0,0)")
+manual8 <- as.formula("UBPRE524.diff ~ RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(1,0,0)")
+manual9 <- as.formula("UBPRE524.diff ~ TDSP.log.diff + B069RC1.Pop.CPI.log.diff.lag1 + UBPRB538.log.diff.lag2 + UBPRB538.log.diff.lag3 + UBPR3815.log.diff + RRSFS.Pop.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)")
 ```
 ```{r}
 #| warning: false
@@ -276,8 +280,6 @@ run_arima <- function(estimation_data, fname_suffix = "") {
 }
 
 run_arima(estimation_data)
-run_arima(estimation_data_grp.lc, "_lc")
-run_arima(estimation_data_grp.l, "_l")
 
 ```
 
@@ -465,7 +467,6 @@ bank_aug_data  |> as_tsibble(index=Quarter, key = BankName) |>
 #| output: false
 #| eval: false
 
-# Estimation Data 
 bank_models <- best_bank_models |> 
                   mutate(model = map(model_details, ~ .x$BankModel)) 
 
@@ -500,7 +501,7 @@ do_arima_cv <- function(bankname, formulas, estimation_data, init = 5) {
   
     results <- nested_data |> 
                   mutate(model = map(data, ~model(.x, ARIMA(!!selected_formula))),
-                        forecast = map(model, forecast, new_data = new_data))
+                        forecast = map(model, forecast, new_data = new_data, bootstrap=TRUE, times=10))
 
     results$forecast |> map(fabletools::accuracy, filtered_data) |> 
       list_rbind() |>  readr::write_csv(glue("data/results/tscv/estimate_tscv_arima_{bankname}.csv"))
@@ -511,7 +512,7 @@ do_arima_cv <- function(bankname, formulas, estimation_data, init = 5) {
 }
 
 unique(estimation_data$BankName) |> walk(\(x) do_arima_cv(x, bank_top_formulas, estimation_data))
-
+  
 ```
 
 ```{r}
@@ -541,3 +542,83 @@ comb |> group_by(.type) |>
   summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
     rmarkdown::paged_table()     
 ```
+
+
+## Prediction 
+
+```{r}
+#| warning: false
+#| echo: false
+#| results: hide
+#| fig-keep: all
+#| label: fig-pred-observed
+#| fig-cap: "Prediction vs. Observed Event"
+
+plot_prediction <- function(Bank, Partner, bank_fcasts, all_data) {
+    fcast_data <- bank_fcasts |> filter(BankName == Bank, Partner == Partner) |> head(8) 
+    est_data <- all_data |> filter(BankName == Bank, is.na(!!as.name(Partner)))
+    est_data_trunc <- est_data |> tail(ifelse(nrow(est_data)<11,nrow(est_data),11))
+    event_data <- all_data |> filter(BankName == Bank, !!as.name(Partner) >=0) |> head(8) 
+    comb_data <- bind_rows(est_data_trunc,event_data)
+
+    fcast_data |> 
+    ggplot()  + 
+    geom_line(aes(x = Quarter, y=predicted), color= "red") +
+    geom_line(aes(x = Quarter, y=UBPRE524.Value), data = comb_data, color='darkslategrey',linetype = "longdash") + 
+    labs(title = Bank, subtitle = glue("{Partner}"), y = glue("{target_label}"))    
+}
+
+original_scale <- function(fcast_bank_data, all_data) {
+  keys <- key_vars(fcast_bank_data)
+  result <- fcast_bank_data
+  bank_name <- fcast_bank_data[[1,"BankName"]]
+  if ("UBPRE524.diff" %in% names(fcast_bank_data) & class(fcast_bank_data[[1, "UBPRE524.diff"]])[1] != "numeric") {
+      print(paste("Bank uses Diff", bank_name))
+      quarter0 <- fcast_bank_data[[1,"Quarter"]] - 1      
+      value0 <- all_data |> 
+                  filter(BankName == bank_name, 
+                          Quarter == quarter0) |> pull(UBPRE524.Value)
+      result <- fcast_bank_data |> mutate(predicted = value0 + cumsum(.mean))                  
+  } else {
+    print(paste("Bank uses Value", bank_name))
+    result <- result |> rename(predicted = .mean)
+  }
+  result |> as_tsibble() |> select(all_of(c(keys,"predicted")))
+}
+
+get_prediction <- function(Bank, Partner, all_data, models) {
+  tryCatch({
+    bank_data <- all_data |> filter(BankName == Bank)
+    event_data <- bank_data |> filter(!!as.name(Partner) >=0) |> head(8)   
+    bank_model <- models |> 
+                    filter(bank == Bank)|> pluck("model_details",1)
+  
+    forecasts <- bank_model$BankModel |>
+      forecast(new_data = event_data, bootstrap=TRUE, times = 100)
+
+    original_scale(forecasts, all_data) |> add_column(Partner = Partner)
+  }, error = function(e) {
+    print(glue::glue("prediction error for {Bank}: {e}"))
+    NULL
+  })
+}
+
+result <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, data, best_bank_models) |>
+            list_rbind() |> left_join(data |> select(observed = UBPRE524.Value, Partner),by = join_by(IDRSSD, BankName, BankType, Quarter) ) |> as_tibble() |> select(Partner,BankName, Quarter, observed, predicted) |> mutate(AR = abs(observed) -abs(predicted))
+
+map2(partner_banks$Bank, partner_banks$Partner, plot_prediction, result, data) 
+
+result |> group_by(Partner,BankName) |> mutate(Period = row_number()) |> summarise(mean_ar = mean(AR, na.rm=TRUE))
+
+
+result |> group_by(Partner,BankName) |> mutate(Period = row_number()) |> mutate(cum_mean = cummean(AR))
+
+result |> group_by(Partner,BankName) |> mutate(Period = row_number()) |> mutate(cum_sum = cumsum(AR)) 
+
+
+result |> group_by(Partner,BankName) |> mutate(Period = row_number()) |> 
+filter(Period==2) |> summarise(mean_ar = mean(AR, na.rm=TRUE))
+
+```
+
+## References

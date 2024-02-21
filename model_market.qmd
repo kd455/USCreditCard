@@ -38,7 +38,7 @@ $\varepsilon_{it}$ is the error term for $i$ at time $t$.
 data <- get_model_data() |> drop_na(UBPRE524.diff)
 
 estimation_data <- data |> filter(is.na(Partnership)) |> fill_gaps()
-observation_data <- data |> filter(!is.na(Partnership))
+observation_data <- data |> filter(!is.na(Partnership)) 
 
 market_formula <- "UBPRE524.diff ~ UBPRE524.group.diff"
 m_table <- estimation_data |> fabletools::model(tslm = TSLM(as.formula(market_formula)))
@@ -238,51 +238,71 @@ comb |> group_by(.type) |>
 #| label: fig-pred-observed
 #| fig-cap: "Prediction vs. Observed Event"
 
-plot_prediction <- function(Bank, Partner, all_data, models) {
-  est_data <- all_data |> filter(BankName == Bank, is.na(!!as.name(Partner)))
-  est_data_trunc <- est_data |> tail(ifelse(nrow(est_data)<11,nrow(est_data),11))
-  event_data <- all_data |> filter(BankName == Bank, 
-                                          !!as.name(Partner) >=0) |> head(8) 
-  comb_data <- bind_rows(est_data_trunc, event_data)
+plot_prediction <- function(Bank, Partner, bank_fcasts, all_data) {
+    fcast_data <- bank_fcasts |> filter(BankName == Bank, Partner == Partner) |> head(8) 
+    est_data <- all_data |> filter(BankName == Bank, is.na(!!as.name(Partner)))
+    est_data_trunc <- est_data |> tail(ifelse(nrow(est_data)<11,nrow(est_data),11))
+    quarter_prior <- all_data |> filter(BankName == Bank, !!as.name(Partner) ==-1)
+    event_data <- all_data |> filter(BankName == Bank, !!as.name(Partner) >=0) |> head(8) 
+    comb_data <- bind_rows(est_data_trunc,quarter_prior,event_data)
 
-  models |>
-    filter(BankName == Bank)  |>
-    forecast(new_data= event_data) |>
-    filter(.model=='tslm') |> 
-    autoplot()  + 
-    geom_line(aes(x = Quarter, y=UBPRE524.diff), data = comb_data, colour='darkslategrey',linetype = "longdash") +
-    labs(title = Bank, subtitle = glue("{Partner}"), y = glue("{target_label} (differenced)"))
+    fcast_data |> 
+    ggplot()  + 
+    geom_line(aes(x = Quarter, y=predicted), color= "red") +
+    geom_line(aes(x = Quarter, y=UBPRE524.Value), data = comb_data, color='darkslategrey',linetype = "longdash") + 
+    labs(title = Bank, subtitle = glue("{Partner}"), y = glue("{target_label}"))    
+}
+
+original_scale <- function(fcast_bank_data, all_data) {
+  keys <- key_vars(fcast_bank_data)
+  result <- fcast_bank_data
+  bank_name <- fcast_bank_data[[1,"BankName"]]
+  if ("UBPRE524.diff" %in% names(fcast_bank_data) & class(fcast_bank_data[[1, "UBPRE524.diff"]])[1] != "numeric") {
+      print(paste("Bank uses Diff", bank_name))
+      quarter0 <- fcast_bank_data[[1,"Quarter"]] - 1      
+      value0 <- all_data |> 
+                  filter(BankName == bank_name, 
+                          Quarter == quarter0) |> pull(UBPRE524.Value)
+      result <- fcast_bank_data |> mutate(predicted = value0 + cumsum(.mean))                  
+  } else {
+    print(paste("Bank uses Value", bank_name))
+    result <- result |> rename(predicted = .mean)
+  }
+  result |> as_tsibble() |> select(all_of(c(keys,"predicted")))
 }
 
 
 get_prediction <- function(Bank, Partner, all_data, models) {
-  est_data <- all_data |> filter(BankName == Bank, is.na(!!as.name(Partner)))
-  est_data_trunc <- est_data |> tail(ifelse(nrow(est_data)<11,nrow(est_data),11))
-  event_data <- all_data |> filter(BankName == Bank, 
-                                          !!as.name(Partner) >=0) |> head(8) 
-  models |>
+  bank_data <- all_data |> filter(BankName == Bank)
+  event_data <- bank_data |> filter(!!as.name(Partner) >=0) |> head(8) 
+ 
+  fcast <- models |>
     filter(BankName == Bank)  |>
-    forecast(new_data= event_data) |> add_column(Partner = Partner)    
-}
+    forecast(new_data= event_data, bootstrap=TRUE, times = 100)
 
+  original_scale(fcast, all_data) |> add_column(Partner = Partner)
+}
 
 partner_banks <- credit_card.partnerships() |> 
                   pivot_longer(cols = c("Old","New")) |> 
                       distinct(Bank = value, Partner)
 
-map2(partner_banks$Bank, partner_banks$Partner, plot_prediction, data, m_table) 
-
-
 result <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, data, m_table)  |> 
-  list_rbind() |> left_join(data |> select(Observed = UBPRE524.diff),by = join_by(IDRSSD, BankName, BankType, Quarter) ) |> as_tibble() |> select(Partner,BankName, Quarter, Observed, Predicted = .mean) |> mutate(AR = Observed - Predicted)
-
-# result |> group_by(Partner,BankName) |> mutate(Period = row_number()) |> ggplot(aes(x=Period, y=AR, color=BankName))  + geom_line() + facet_wrap(~Partner, ncol=1)
-
-# result |> group_by(Partner,BankName) |> summarise(mean_ar = mean(AR, na.rm=TRUE))
-
-result |> group_by(Partner,BankName) |> summarise(median_ar = median(AR, na.rm=TRUE))
+  list_rbind() |> left_join(data |> select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter) ) |> as_tibble() |> select(Partner, BankName, Quarter, observed, predicted) |> mutate(AR = abs(observed) - abs(predicted))
 
 
+map2(partner_banks$Bank, partner_banks$Partner, plot_prediction, result, data) 
+
+result |> group_by(Partner,BankName) |> mutate(Period = row_number()) |> summarise(mean_ar = mean(AR, na.rm=TRUE))
+
+
+result |> group_by(Partner,BankName) |> mutate(Period = row_number()) |> mutate(cum_mean = cummean(AR)) |> View()
+
+result |> group_by(Partner,BankName) |> mutate(Period = row_number()) |> mutate(cum_sum = cumsum(AR)) |> View()
+
+
+result |> group_by(Partner,BankName) |> mutate(Period = row_number()) |> 
+filter(Period==2) |> summarise(mean_ar = mean(AR, na.rm=TRUE))
 
 ```
 
