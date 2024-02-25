@@ -48,11 +48,11 @@ get_model_cols <-function(model_table, ignore_cols) {
   model_cols[!names(model_table) %in% ignore_cols]
 }
 
-print_top_group_model <-function(arima_results, bank_type, score_by = "AICc", n=10) {
-  arima_results |> 
-    filter(is.na(BankName), BankType == bank_type) |> 
-      select(-BankType) |> relocate(.model, .model_spec, !!score_by) |> arrange(!!as.name(score_by)) |> head(n) |> mutate(across(where(is.numeric), \(x) round(x,2))) |>  rmarkdown::paged_table()
-}
+# print_top_group_model <-function(arima_results, bank_type, score_by = "AICc", n=10) {
+#   arima_results |> 
+#     filter(is.na(BankName), BankType == bank_type) |> 
+#       select(-BankType) |> relocate(.model, .model_spec, !!score_by) |> arrange(!!as.name(score_by)) |> head(n) |> mutate(across(where(is.numeric), \(x) round(x,2))) |>  rmarkdown::paged_table()
+# }
 
 print_top_bank_model <- function(fuzzy_bankname, arima_results, score_by = "AICc", n = 10) {
   arima_results |> 
@@ -60,6 +60,18 @@ print_top_bank_model <- function(fuzzy_bankname, arima_results, score_by = "AICc
       relocate(.model, .model_spec, !!score_by) |> arrange(!!as.name(score_by)) |> head(n) |> 
         mutate(across(where(is.numeric), \(x) round(x,4))) |>  
           rmarkdown::paged_table()
+}
+
+diff_results <- function(data) {
+  if("UBPRE524.Value" %in% names(data)) {
+    data |> 
+        mutate(UBPRE524.diff = difference(UBPRE524.Value),
+                .fitted = difference(.fitted),
+                .resid = difference(.fitted)) |> drop_na(UBPRE524.diff) |> 
+          select(-UBPRE524.Value) |> relocate(UBPRE524.diff, .before = .fitted)
+  } else {
+    data
+  }
 }
 
 best_bank_model <- function(bankname, estimation_data, arima_results, score_by = "AICc") {
@@ -80,18 +92,6 @@ best_bank_model <- function(bankname, estimation_data, arima_results, score_by =
   list(Bank = bankname, BankModel = model, Name = model_name,  AICc = aicc, Formula = formula, Augmented = augmented_data)
 }  
 
-diff_results <- function(data) {
-  if("UBPRE524.Value" %in% names(data)) {
-    data |> 
-        mutate(UBPRE524.diff = difference(UBPRE524.Value),
-                .fitted = difference(.fitted),
-                .resid = difference(.fitted)) |> drop_na(UBPRE524.diff) |> 
-          select(-UBPRE524.Value) |> relocate(UBPRE524.diff, .before = .fitted)
-  } else {
-    data
-  }
-}
-
 print_coeff <- function(fuzzy_bankname, bank_models) {
   bank_model <- bank_models |> 
                   filter(grepl(fuzzy_bankname,bank)) |> pluck("model_details",1)
@@ -108,17 +108,11 @@ plot_bank_residuals <- function(fuzzy_bankname, bank_models) {
                       subtitle = bank_model$Formula)
 }
 
-data <- get_model_data() 
-
-estimation_data <- data |> filter(is.na(Partnership)) |> 
-                    select(-c(Partnership:last_col())) |>
-                      drop_na() |> tsibble::fill_gaps()
-
-observation_data <- data |> filter(!is.na(Partnership)) 
-
-partner_banks <- credit_card.partnerships() |> 
-                  pivot_longer(cols = c("Old","New")) |> 
-                      distinct(Bank = value, Partner)
+model_data <- get_model_data()
+data <- model_data$all_data
+estimation_data <- model_data$estimation_data
+observation_data <- model_data$observation_data
+partner_banks <- credit_card.partnerships.long()
 
 ```
 
@@ -167,9 +161,13 @@ debth4 <- as.formula("UBPRE524.Value ~ TDSP.log.diff + TDSP.log.diff.lag1 + TDSP
 debth5 <- as.formula("UBPRE524.Value ~ TDSP.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 + TDSP.log.diff.lag3")
 
 # Loans to Individuals for Household, Family, and Other Personal Expenditures:Credit Cards
-portfolio1 <- as.formula("UBPRE524.Value ~ UBPRB538.pct_change")
-portfolio2 <- as.formula("UBPRE524.Value ~ UBPRB538.pct_change.lag1")
-portfolio3 <- as.formula("UBPRE524.Value ~ UBPRB538.pct_change + UBPRB538.pct_change.lag1")
+portfolio1 <- as.formula("UBPRE524.Value ~ UBPRB538.pct_change + UBPRB538.pct_change.lag1")
+portfolio2 <- as.formula("UBPRE524.Value ~ UBPRB538.log.diff + UBPRB538.log.diff.lag1")
+portfolio3 <- as.formula("UBPRE524.Value ~ UBPRB538.log.diff + UBPRB538.log.diff.lag1 + UBPR3815.log.diff")
+portfolio4 <- as.formula("UBPRE524.Value ~ UBPRB538.log.diff + UBPR3815.log.diff")
+
+group1 <- as.formula("UBPRE524.Value ~ UBPRE524.all.log.diff + UBPRE524.group.log.diff")
+group2 <- as.formula("UBPRE524.Value ~ UBPRE524.group.log.diff")
 
 comb1 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1")
 comb2 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UNRATE.log.diff + UNRATE.log.diff.lag1")
@@ -190,7 +188,7 @@ manual9 <- as.formula("UBPRE524.diff ~ TDSP.log.diff + B069RC1.Pop.CPI.log.diff.
 ```{r}
 #| warning: false
 #| eval: false
-run_arima <- function(estimation_data, fname_suffix = "") {
+run_arima <- function(estimation_data) {
   ## 1. Expenditure
   m_table <- estimation_data |>
               model(
@@ -202,7 +200,7 @@ run_arima <- function(estimation_data, fname_suffix = "") {
                   rrsfs5 = ARIMA(rrsfs5)
               )
 
-  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_rrsfs{fname_suffix}_results.csv"))
+  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_rrsfs_results.csv"))
 
   ## 2. Unemployment
   m_table <- estimation_data |> 
@@ -214,7 +212,7 @@ run_arima <- function(estimation_data, fname_suffix = "") {
                   unrate5 = ARIMA(unrate5)
               )
 
-  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_unrate{fname_suffix}_results.csv"))
+  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_unrate_results.csv"))
 
   ## 3.1 Debt Consumer
   m_table <- estimation_data |>
@@ -226,7 +224,7 @@ run_arima <- function(estimation_data, fname_suffix = "") {
                   debt5 = ARIMA(debt5)
               )
 
-  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_debt{fname_suffix}_results.csv"))
+  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_debt_results.csv"))
 
   ## 3.2 Debt Household
   m_table <- estimation_data |>
@@ -238,7 +236,7 @@ run_arima <- function(estimation_data, fname_suffix = "") {
                   debth5 = ARIMA(debth5)
               )
 
-  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_debth{fname_suffix}_results.csv"))
+  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_debth_results.csv"))
 
   ## 4. Portfolio
   m_table <- estimation_data |> 
@@ -246,11 +244,21 @@ run_arima <- function(estimation_data, fname_suffix = "") {
                   portfolio1 = ARIMA(portfolio1),
                   portfolio2= ARIMA(portfolio2),
                   portfolio3= ARIMA(portfolio3),
+                  portfolio4= ARIMA(portfolio4),
               )
 
-  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_portfolio{fname_suffix}_results.csv"))
+  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_portfolio_results.csv"))
 
-  ## 5. Combinations
+  ## 5. Group
+  m_table <- estimation_data |> 
+              model(
+                  group1 = ARIMA(group1),
+                  group2= ARIMA(group2)
+              )
+
+  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_group_results.csv"))
+
+  ## 6. Combinations
   m_table <- estimation_data |> 
               model(
                   comb1= ARIMA(comb1),
@@ -260,9 +268,9 @@ run_arima <- function(estimation_data, fname_suffix = "") {
                   comb5= ARIMA(comb5)
               )
 
-  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_other{fname_suffix}_results.csv"))
+  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_other_results.csv"))
 
-  ## 6. Manual
+  ## 7. Manual
   m_table <- estimation_data |> 
               model(
                   manual1= ARIMA(manual1),
@@ -276,7 +284,7 @@ run_arima <- function(estimation_data, fname_suffix = "") {
                   manual9= ARIMA(manual9)
               )
 
-  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_manual{fname_suffix}_results.csv"))
+  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_manual_results.csv"))
 }
 
 run_arima(estimation_data)
@@ -553,39 +561,6 @@ comb |> group_by(.type) |>
 #| fig-keep: all
 #| label: fig-pred-observed
 #| fig-cap: "Prediction vs. Observed Event"
-
-plot_prediction <- function(Bank, Partner, bank_fcasts, all_data) {
-    fcast_data <- bank_fcasts |> filter(BankName == Bank, Partner == Partner) |> head(8) 
-    est_data <- all_data |> filter(BankName == Bank, is.na(!!as.name(Partner)))
-    est_data_trunc <- est_data |> tail(ifelse(nrow(est_data)<11,nrow(est_data),11))
-    event_data <- all_data |> filter(BankName == Bank, !!as.name(Partner) >=0) |> head(8) 
-    comb_data <- bind_rows(est_data_trunc,event_data)
-
-    fcast_data |> 
-    ggplot()  + 
-    geom_line(aes(x = Quarter, y=predicted), color= "red") +
-    geom_line(aes(x = Quarter, y=UBPRE524.Value), data = comb_data, color='darkslategrey',linetype = "longdash") + 
-    labs(title = Bank, subtitle = glue("{Partner}"), y = glue("{target_label}"))    
-}
-
-original_scale <- function(fcast_bank_data, all_data) {
-  keys <- key_vars(fcast_bank_data)
-  result <- fcast_bank_data
-  bank_name <- fcast_bank_data[[1,"BankName"]]
-  if ("UBPRE524.diff" %in% names(fcast_bank_data) & class(fcast_bank_data[[1, "UBPRE524.diff"]])[1] != "numeric") {
-      print(paste("Bank uses Diff", bank_name))
-      quarter0 <- fcast_bank_data[[1,"Quarter"]] - 1      
-      value0 <- all_data |> 
-                  filter(BankName == bank_name, 
-                          Quarter == quarter0) |> pull(UBPRE524.Value)
-      result <- fcast_bank_data |> mutate(predicted = value0 + cumsum(.mean))                  
-  } else {
-    print(paste("Bank uses Value", bank_name))
-    result <- result |> rename(predicted = .mean)
-  }
-  result |> as_tsibble() |> select(all_of(c(keys,"predicted")))
-}
-
 get_prediction <- function(Bank, Partner, all_data, models) {
   tryCatch({
     bank_data <- all_data |> filter(BankName == Bank)
@@ -604,21 +579,28 @@ get_prediction <- function(Bank, Partner, all_data, models) {
 }
 
 result <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, data, best_bank_models) |>
-            list_rbind() |> left_join(data |> select(observed = UBPRE524.Value, Partner),by = join_by(IDRSSD, BankName, BankType, Quarter) ) |> as_tibble() |> select(Partner,BankName, Quarter, observed, predicted) |> mutate(AR = abs(observed) -abs(predicted))
+            list_rbind() |> left_join(data |> select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter) ) |> as_tibble() |> select(Partner,BankName, Quarter, observed, predicted) |> mutate(AR = abs(observed) -abs(predicted))
 
 map2(partner_banks$Bank, partner_banks$Partner, plot_prediction, result, data) 
 
-result |> group_by(Partner,BankName) |> mutate(Period = row_number()) |> summarise(mean_ar = mean(AR, na.rm=TRUE))
-
-
-result |> group_by(Partner,BankName) |> mutate(Period = row_number()) |> mutate(cum_mean = cummean(AR))
-
-result |> group_by(Partner,BankName) |> mutate(Period = row_number()) |> mutate(cum_sum = cumsum(AR)) 
-
-
-result |> group_by(Partner,BankName) |> mutate(Period = row_number()) |> 
-filter(Period==2) |> summarise(mean_ar = mean(AR, na.rm=TRUE))
+```
+```{r}
+#| warning: false
+#| label: tbl-abnormal-arima
+#| tbl-cap: "Credit Card Plans-30-89 DAYS P/D %: Abnormal Returns (original scale)"
+#| tbl-subcap: 
+#| - "Costco (Old) - AMERICAN EXPRESS NATIONAL BANK (1394676)"
+#| - "Costco (New) - CITIBANK, N.A. (476810)"
+#| - "Walmart (Old) - SYNCHRONY BANK (1216022)"
+#| - "Walmart (New) - CAPITAL ONE, NATIONAL ASSOCIATION (112837)"
+#| - "GAP (Old) - SYNCHRONY BANK (1216022)"
+#| - "GAP (New) - BARCLAYS BANK DELAWARE (2980209)"
+print_ar(result, "Costco", "AMERICAN EXPRESS NATIONAL BANK (1394676)")
+print_ar(result, "Costco", "CITIBANK, N.A. (476810)")
+print_ar(result, "Walmart", "SYNCHRONY BANK (1216022)")
+print_ar(result, "Walmart", "CAPITAL ONE, NATIONAL ASSOCIATION (112837)")
+print_ar(result, "GAP", "SYNCHRONY BANK (1216022)")
+print_ar(result, "GAP", "BARCLAYS BANK DELAWARE (2980209)")
 
 ```
-
 ## References

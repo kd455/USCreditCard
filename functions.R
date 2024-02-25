@@ -2,7 +2,7 @@ library(tidyverse)
 #using the https://tidyverts.org/ world
 library(fable)
 library(caret)
-#library(lmer4)
+library(lmer4)
 library(feasts)
 library(tsibble)
 library(glue)
@@ -228,40 +228,6 @@ us_economy.confidence <- function() {
     na.omit()
 }
 
-# over_30_89_days <- function(threshold_pct = 25) {
-#   #select firms that have non-zero values for UBPRE524
-#   all_measures <- credit.tsibble()
-#   select_firms <-  all_measures |>
-#     filter(Measure == "UBPRE524") |>
-#     group_by(BankName) |>
-#     summarise(Avg = mean(Value)) |>
-#     filter(Avg != 0) |> 
-#     distinct(BankName)  
-  
-#   #select firms that have % of their loans in credit cards
-#   select_firms <- all_measures |>
-#     filter(Measure == "UBPRE425", BankName %in% select_firms$BankName) |>
-#     group_by(BankName) |>
-#     filter(Value >= threshold_pct) |>
-#     distinct(BankName) 
-  
-#   #return 30-89 overdue  
-#   all_measures |>
-#     filter(Measure == "UBPRE524", BankName %in% select_firms$BankName)
-# }
-
-# white.noise.sample <- function() {
-#   tsibble(Period = 1:100, Value = rnorm(100), index = Period)
-# }
-
-# white.noise.plot <- function() {
-#   white.noise.sample() |> 
-#     ggplot(aes(x = Period, y = Value)) +
-#     geom_line(linewidth = .2) +
-#     labs(title="White noise")
-  
-# }
-
 credit_card.partnerships <- function() {
   tibble::tibble_row(Partner = "Costco",
                 Old="AMERICAN EXPRESS NATIONAL BANK (1394676)", 
@@ -278,6 +244,13 @@ credit_card.partnerships <- function() {
                 New="BARCLAYS BANK DELAWARE (2980209)",
                 Acquired = "2022-05-01",
                 Available = "2022-06-20")
+}
+
+credit_card.partnerships.long <- function() {
+  credit_card.partnerships() |> 
+    pivot_longer(cols = c(Old, New), names_to = "Type", values_to = "Bank") |>
+    mutate(Acquired = as.Date(Acquired),
+           Available = as.Date(Available))
 }
 
 credit_card.partnerships.all <- function() {
@@ -742,7 +715,7 @@ get_hierarchy_model_data <- function() {
     mutate(Quarter = yearquarter(Quarter))      
 }
 
-get_model_data <- function() {
+.read_model_data <- function() {
   file_loc <- "data/final_model_data_wpartner.csv"
   if (!file.exists(file_loc)) {
     .model_data_with_partnerships()
@@ -750,6 +723,28 @@ get_model_data <- function() {
   read_csv("data/final_model_data_wpartner.csv", show_col_types = FALSE) |> 
     mutate(Quarter = yearquarter(Quarter)) |>
      as_tsibble(index = Quarter, key = c(IDRSSD, BankName, BankType))
+}
+
+get_model_data <- function() {
+  all_data <- .read_model_data() |>
+                mutate(Qtr = as.factor(Qtr),
+                       IDRSSD = as.factor(IDRSSD),
+                       BankType = as.factor(BankType), 
+                       BankName = as.factor(BankName)) |>
+                       relocate(Qtr)
+
+  estimation_data <- all_data |> 
+                      filter(is.na(Partnership)) |> 
+                        select(-c(Partnership:last_col())) |>
+                          drop_na() #|> tsibble::fill_gaps()
+  
+  observation_data <- all_data |> 
+                        filter(!is.na(Partnership))
+  #consistent levels
+  observation_data$BankName <- factor(observation_data$BankName , levels = levels(estimation_data$BankName))
+  observation_data$IDRSSD <- factor(observation_data$IDRSSD , levels = levels(estimation_data$IDRSSD))
+
+  list(all_data = all_data, estimation_data = estimation_data, observation_data = observation_data)
 }
 
 run_timeseries_cv <- function(data, formula_string, model_func = TSLM, predict_func= predict, initial_window = 9, horizon = 1, dependent_var = "UBPRE524.diff", fixedWindow = TRUE) {
@@ -831,83 +826,54 @@ read_tscv_results <- function(model_type = "arima") {
     map(read_csv, show_col_types = FALSE) |> list_rbind()
 }
 
-plot_prediction <- function(bank_name, partner_name, estimation_data, observation_data, models) {
-  est_data <- estimation_data |> filter(BankName == bank_name)
-  est_data_trunc <- est_data |> tail(ifelse(nrow(est_data)<11,nrow(est_data),11))
-  event_data <- observation_data |> filter(BankName == bank_name) |> head(5)
-  comb_data <- bind_rows(est_data_trunc, event_data)
+plot_prediction <- function(bank, partner, bank_fcasts, all_data) {
+    bank_fcast_data <- bank_fcasts |> filter(BankName == bank)
+    bank_data <- all_data |> filter(BankName == bank)
 
-  models |>
-    filter(BankName == bank_name)  |>
-    forecast(new_data= event_data) |>
-    filter(.model=='tslm') |> 
-    autoplot()  + 
-    geom_line(aes(x = Quarter, y=UBPRE524.Value), data = comb_data, colour='darkslategrey',linetype = "longdash") +
-    labs(title = bank_name, subtitle = partner_name, y = glue("{target_label} (differenced)"))
+    fcast_data <- bank_fcast_data |> filter(Partner == partner) |> head(8) 
+    est_data <- bank_data |> filter(is.na(!!as.name(partner)))
+    est_data_trunc <- est_data |> tail(ifelse(nrow(est_data)<11,nrow(est_data),11))
+    event_data <- bank_data |> filter(!!as.name(partner) >=0) |> head(8) 
+    comb_data <- bind_rows(est_data_trunc,event_data)
+    min_qtr <- event_data |> filter(Quarter == min(Quarter)) |> pull(Quarter)
+
+    fcast_data |> 
+    ggplot()  + 
+    geom_line(aes(x = Quarter, y=predicted), color= "red") +
+    geom_line(aes(x = Quarter, y=UBPRE524.Value), data = comb_data, color='darkslategrey',linetype = "longdash") + 
+    geom_vline(xintercept = as.Date(min_qtr) , linetype=1,color="grey") +
+    labs(title = bank, subtitle = partner, y = credit_card.target_label())    
 }
-# run_timeseries_cv_multiple_firms <- function(data, formula_string, model_func = lm, predict_func= predict, initial_window = 3, horizon = 1, dependent_var = "value_diff") {
-#     # Split the data by firm
-#     firm_data_list <- split(data, data$IDRSSD)
 
-#     # Perform cross-validation for each firm and calculate mean RMSE per firm
-#     cv_results <- map(firm_data_list, ~time_series_cv_per_firm(.x, formula_string, model_func, predict_func, initial_window, horizon, dependent_var)) |>
-#                   map_df(~mutate(.x, MeanRMSE = mean(RMSE)), .id = "IDRSSD")
+original_scale <- function(fcast_bank_data, all_data) {
+  keys <- key_vars(fcast_bank_data)
+  result <- fcast_bank_data
+  bank_name <- fcast_bank_data[[1,"BankName"]]
+  if ("UBPRE524.diff" %in% names(fcast_bank_data) & class(fcast_bank_data[[1, "UBPRE524.diff"]])[1] != "numeric") {
+      print(paste("Bank uses Diff", bank_name))
+      quarter0 <- fcast_bank_data[[1,"Quarter"]] - 1      
+      value0 <- all_data |> 
+                  filter(BankName == bank_name, 
+                          Quarter == quarter0) |> pull(UBPRE524.Value)
+      result <- fcast_bank_data |> mutate(predicted = value0 + cumsum(.mean))                  
+  } else {
+    print(paste("Bank uses Value", bank_name))
+    result <- result |> rename(predicted = .mean)
+  }
+  result |> as_tsibble() |> select(all_of(c(keys,"predicted")))
+}
 
-#     # Calculate the overall mean RMSE across all firms
-#     overall_mean_rmse <- mean(cv_results$MeanRMSE)
-
-#     return(list(PerFirmRMSE = cv_results, OverallMeanRMSE = overall_mean_rmse))
-# }
-
-
-# time_series_cv_per_firm <- function(data, formula_string, model_func=lm, predict_func = predict, initial_window = 3, horizon = 1, dependent_var = "value_diff") {
-#   total_points <- nrow(data)
-#   results <- tibble()
-
-#   for (start_idx in 1:(total_points - initial_window - horizon + 1)) {
-#     end_idx <- start_idx + initial_window - 1 + horizon
-#     if (end_idx > total_points) {
-#       break
-#     }
-
-#     training_set <- data[start_idx:(end_idx - horizon), ]
-#     validation_set <- data[(end_idx - horizon + 1):end_idx, ]
-
-#     model <- model_func(formula_string, data = training_set)
-#     validation_preds <- predict_func(model, newdata = validation_set)
-
-#     rmse_value <- Metrics::rmse(validation_set[[dependent_var]], validation_preds)
-
-#     results <- rbind(results, tibble(Start = start_idx, RMSE = rmse_value))
-#   }
-
-#   return(results)
-# }
-
-# run_kfold_validation <- function(fitted_model, data, predict_func = predict) {
-#     set.seed(123)  # For reproducibility
-#     folds <- caret::createFolds(data$IDRSSD, k = 5)
-#     results <- data.frame()  # Data frame to store results
-    
-#     for(i in 1:length(folds)) {
-#         # Split the data into training and validation sets
-#         training_set <- data[-folds[[i]], ]
-#         validation_set <- data[folds[[i]], ]
-        
-#         # Predict on the validation set
-#         validation_preds <- predict_func(fitted_model, newdata = validation_set)
-
-#         # Evaluate the model (using an appropriate metric like RMSE)
-#         rmse_value <- rmse(validation_set$UBPRE524.diff, validation_preds)
-#         mae_value <- mae(validation_set$UBPRE524.diff, validation_preds)
-#         # Store the results
-#         results <- rbind(results, data.frame(Fold = i, RMSE = rmse_value))
-#     }
-
-#     return(list(PerFirmRMSE = cv_results, OverallMeanRMSE = overall_mean_rmse))
-
-#     # Calculate the average performance across all folds
-#     average_performance <- mean(results$RMSE)
-#     return(average_performance)
-# }
+print_ar <- function(prediction_result, partner, bank) {
+  prediction_result |> filter(Partner == partner, BankName == bank) |>
+  group_by(Partner,BankName) |> 
+  mutate(AR = observed - predicted,
+         Period = row_number(),
+         cum_mean = cummean(AR),
+         cum_sum = cumsum(AR)) |> as_tibble() |>
+    select(Period, observed, predicted, AR, 
+              `Cumulative Mean AR` = cum_mean,
+              `Cumulative AR` = cum_sum) |> 
+      mutate(across(where(is.numeric), \(x) round(x,2))) |>               
+      rmarkdown::paged_table(options = list(rows.print = 16))
+}
 

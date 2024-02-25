@@ -15,26 +15,25 @@ library(caret)
 library(patchwork)
 set.seed(42)
 
-model_data <- get_model_data() |> 
-                mutate(Qtr = as.factor(Qtr), BankType = as.factor(BankType), BankName = as.factor(BankName)) |> relocate(Qtr) |> as_tibble()
+model_data <- get_model_data()
+data <- model_data$all_data |> as_tibble()           
+partner_banks <- credit_card.partnerships.long()
 
-log_change_cols <- model_data |> select(contains(".log.diff")) |> 
-                    select(-starts_with("UBPRE524.log.diff")) |> 
-                      select(-c(starts_with("UBPRE524.group"), starts_with("UBPRE524.all"))) |>
-                        names()                    
+log_change_cols <- data |>
+                    select(contains(".log.diff")) |> 
+                    select(-c(starts_with("UBPRE524.log.diff"),
+                                starts_with("UBPRE524.group"), 
+                                starts_with("UBPRE524.all"))) |> names() 
 
-est_data_wQuarter <- model_data |> filter(is.na(Partnership)) |>
-                              select(c(Quarter, UBPRE524.diff, BankName, BankType, log_change_cols, Qtr)) |>
-                              drop_na()
+est_data_wQuarter <- model_data$estimation_data |> as_tibble() |>
+                      select(c(Quarter, UBPRE524.Value,UBPRE524.diff, BankName, BankType, all_of(log_change_cols), Qtr))
 
-estimation_data <- est_data_wQuarter |> select(-Quarter)
+estimation_data <- est_data_wQuarter |> select(-c(Quarter, UBPRE524.Value)) 
 
-observation_data <- model_data |> filter(!is.na(Partnership)) |>
-                      select(c(UBPRE524.diff, BankName, BankType, log_change_cols, Qtr)) |> 
-                        drop_na()
+obs_data_wQuarter <- model_data$observation_data |> as_tibble()
 
-#need to have consistent factors
-observation_data$BankName <- factor(observation_data$BankName , levels = levels(estimation_data$BankName))
+observation_data <- obs_data_wQuarter|> 
+                      select(c(UBPRE524.diff, BankName, BankType, all_of(log_change_cols), Qtr))
 
 s <- createDataPartition(estimation_data$UBPRE524.diff, p = 0.70, list=FALSE)
 training <- estimation_data[s,]
@@ -357,6 +356,8 @@ comb |> group_by(.type) |>
 
 ```{r}
 #| warning: false
+#| results: hide
+#|
 # Convert the data to matrix and assign output variable
 estimation.outcome <- estimation_data$UBPRE524.diff
 estimation.predictors <- sparse.model.matrix(UBPRE524.diff ~ .-1, data = estimation_data)
@@ -371,11 +372,47 @@ dObs <- xgb.DMatrix(observation.predictors, label = observation.outcome)
 m <- xgboost(booster = "gbtree", data = dEst, params= params, nrounds=params$nrounds)
 #predit
 predictions <- predict(m, dObs)
+obs_data_wQuarter$prediction <- predictions
+
+map_prediction_to_partner <- function(Bank, Partner, obs_data_w_qtr, all_data) {
+  event_data <- obs_data_w_qtr |> 
+                  filter(BankName == Bank) |> 
+                    filter(!!as.name(Partner) >=0) |> head(8) 
+
+  min_qtr <- event_data |> filter(Quarter == min(Quarter)) |> pull(Quarter)
+  value0 <- all_data |> filter(BankName == Bank, Quarter == (min_qtr - 1)) |> pull(UBPRE524.Value)
+  
+  event_data |> 
+    mutate(observed = UBPRE524.Value, predicted = value0 + cumsum(prediction))|> 
+      add_column(Partner = Partner)
+}
+
+result <- map2(partner_banks$Bank, partner_banks$Partner,map_prediction_to_partner, obs_data_wQuarter, data) |>
+            list_rbind()
 
 
-#xgb.dump(m, with_stats = TRUE)[0:10]
 ```
 
+
+```{r}
+#| warning: false
+#| label: tbl-abnormal-xgboost
+#| tbl-cap: "Credit Card Plans-30-89 DAYS P/D %: Abnormal Returns (original scale)"
+#| tbl-subcap: 
+#| - "Costco (Old) - AMERICAN EXPRESS NATIONAL BANK (1394676)"
+#| - "Costco (New) - CITIBANK, N.A. (476810)"
+#| - "Walmart (Old) - SYNCHRONY BANK (1216022)"
+#| - "Walmart (New) - CAPITAL ONE, NATIONAL ASSOCIATION (112837)"
+#| - "GAP (Old) - SYNCHRONY BANK (1216022)"
+#| - "GAP (New) - BARCLAYS BANK DELAWARE (2980209)"
+print_ar(result, "Costco", "AMERICAN EXPRESS NATIONAL BANK (1394676)")
+print_ar(result, "Costco", "CITIBANK, N.A. (476810)")
+print_ar(result, "Walmart", "SYNCHRONY BANK (1216022)")
+print_ar(result, "Walmart", "CAPITAL ONE, NATIONAL ASSOCIATION (112837)")
+print_ar(result, "GAP", "SYNCHRONY BANK (1216022)")
+print_ar(result, "GAP", "BARCLAYS BANK DELAWARE (2980209)")
+
+```
 
 ```{r}
 #| eval: false

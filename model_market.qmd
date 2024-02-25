@@ -35,13 +35,14 @@ $\varepsilon_{it}$ is the error term for $i$ at time $t$.
 
 ```{r}
 #| warning: false
-data <- get_model_data() |> drop_na(UBPRE524.diff)
-
-estimation_data <- data |> filter(is.na(Partnership)) |> fill_gaps()
-observation_data <- data |> filter(!is.na(Partnership)) 
+model_data <- get_model_data()
+data <- model_data$all_data
+estimation_data <- model_data$estimation_data
+observation_data <- model_data$observation_data
+partner_banks <- credit_card.partnerships.long()
 
 market_formula <- "UBPRE524.diff ~ UBPRE524.group.diff"
-m_table <- estimation_data |> fabletools::model(tslm = TSLM(as.formula(market_formula)))
+m_table <- estimation_data |> fill_gaps() |> fabletools::model(tslm = TSLM(as.formula(market_formula)))
 augmented_data <- m_table |> augment()
 ```
 
@@ -237,72 +238,40 @@ comb |> group_by(.type) |>
 #| fig-keep: all
 #| label: fig-pred-observed
 #| fig-cap: "Prediction vs. Observed Event"
-
-plot_prediction <- function(Bank, Partner, bank_fcasts, all_data) {
-    fcast_data <- bank_fcasts |> filter(BankName == Bank, Partner == Partner) |> head(8) 
-    est_data <- all_data |> filter(BankName == Bank, is.na(!!as.name(Partner)))
-    est_data_trunc <- est_data |> tail(ifelse(nrow(est_data)<11,nrow(est_data),11))
-    quarter_prior <- all_data |> filter(BankName == Bank, !!as.name(Partner) ==-1)
-    event_data <- all_data |> filter(BankName == Bank, !!as.name(Partner) >=0) |> head(8) 
-    comb_data <- bind_rows(est_data_trunc,quarter_prior,event_data)
-
-    fcast_data |> 
-    ggplot()  + 
-    geom_line(aes(x = Quarter, y=predicted), color= "red") +
-    geom_line(aes(x = Quarter, y=UBPRE524.Value), data = comb_data, color='darkslategrey',linetype = "longdash") + 
-    labs(title = Bank, subtitle = glue("{Partner}"), y = glue("{target_label}"))    
-}
-
-original_scale <- function(fcast_bank_data, all_data) {
-  keys <- key_vars(fcast_bank_data)
-  result <- fcast_bank_data
-  bank_name <- fcast_bank_data[[1,"BankName"]]
-  if ("UBPRE524.diff" %in% names(fcast_bank_data) & class(fcast_bank_data[[1, "UBPRE524.diff"]])[1] != "numeric") {
-      print(paste("Bank uses Diff", bank_name))
-      quarter0 <- fcast_bank_data[[1,"Quarter"]] - 1      
-      value0 <- all_data |> 
-                  filter(BankName == bank_name, 
-                          Quarter == quarter0) |> pull(UBPRE524.Value)
-      result <- fcast_bank_data |> mutate(predicted = value0 + cumsum(.mean))                  
-  } else {
-    print(paste("Bank uses Value", bank_name))
-    result <- result |> rename(predicted = .mean)
-  }
-  result |> as_tsibble() |> select(all_of(c(keys,"predicted")))
-}
-
-
-get_prediction <- function(Bank, Partner, all_data, models) {
-  bank_data <- all_data |> filter(BankName == Bank)
-  event_data <- bank_data |> filter(!!as.name(Partner) >=0) |> head(8) 
- 
+get_prediction <- function(bank, partner, all_data, models) {
+  bank_data <- all_data |> filter(BankName == bank)
+  event_data <- bank_data |> filter(!!as.name(partner) >=0) |> head(8) 
   fcast <- models |>
-    filter(BankName == Bank)  |>
+    filter(BankName == bank)  |>
     forecast(new_data= event_data, bootstrap=TRUE, times = 100)
 
-  original_scale(fcast, all_data) |> add_column(Partner = Partner)
+  original_scale(fcast, all_data) |> add_column(Partner = partner)
 }
 
-partner_banks <- credit_card.partnerships() |> 
-                  pivot_longer(cols = c("Old","New")) |> 
-                      distinct(Bank = value, Partner)
 
 result <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, data, m_table)  |> 
-  list_rbind() |> left_join(data |> select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter) ) |> as_tibble() |> select(Partner, BankName, Quarter, observed, predicted) |> mutate(AR = abs(observed) - abs(predicted))
-
+  list_rbind() |> left_join(data |> select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter) ) |> as_tibble() |> select(Partner, BankName, Quarter, observed, predicted) 
 
 map2(partner_banks$Bank, partner_banks$Partner, plot_prediction, result, data) 
+```
 
-result |> group_by(Partner,BankName) |> mutate(Period = row_number()) |> summarise(mean_ar = mean(AR, na.rm=TRUE))
-
-
-result |> group_by(Partner,BankName) |> mutate(Period = row_number()) |> mutate(cum_mean = cummean(AR)) |> View()
-
-result |> group_by(Partner,BankName) |> mutate(Period = row_number()) |> mutate(cum_sum = cumsum(AR)) |> View()
-
-
-result |> group_by(Partner,BankName) |> mutate(Period = row_number()) |> 
-filter(Period==2) |> summarise(mean_ar = mean(AR, na.rm=TRUE))
+```{r}
+#| warning: false
+#| label: tbl-abnormal-market
+#| tbl-cap: "Credit Card Plans-30-89 DAYS P/D %: Abnormal Returns (original scale)"
+#| tbl-subcap: 
+#| - "Costco (Old) - AMERICAN EXPRESS NATIONAL BANK (1394676)"
+#| - "Costco (New) - CITIBANK, N.A. (476810)"
+#| - "Walmart (Old) - SYNCHRONY BANK (1216022)"
+#| - "Walmart (New) - CAPITAL ONE, NATIONAL ASSOCIATION (112837)"
+#| - "GAP (Old) - SYNCHRONY BANK (1216022)"
+#| - "GAP (New) - BARCLAYS BANK DELAWARE (2980209)"
+print_ar(result, "Costco", "AMERICAN EXPRESS NATIONAL BANK (1394676)")
+print_ar(result, "Costco", "CITIBANK, N.A. (476810)")
+print_ar(result, "Walmart", "SYNCHRONY BANK (1216022)")
+print_ar(result, "Walmart", "CAPITAL ONE, NATIONAL ASSOCIATION (112837)")
+print_ar(result, "GAP", "SYNCHRONY BANK (1216022)")
+print_ar(result, "GAP", "BARCLAYS BANK DELAWARE (2980209)")
 
 ```
 
