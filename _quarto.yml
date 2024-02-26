@@ -18,6 +18,7 @@ book:
         - model_event.qmd   
         - model_market.qmd 
         - model_arima.qmd 
+        - model_hierarchy_event.qmd
         - model_ml.qmd
     - references.qmd   
     - part: "Appendix"

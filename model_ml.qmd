@@ -20,20 +20,20 @@ data <- model_data$all_data |> as_tibble()
 partner_banks <- credit_card.partnerships.long()
 
 log_change_cols <- data |>
-                    select(contains(".log.diff")) |> 
-                    select(-c(starts_with("UBPRE524.log.diff"),
-                                starts_with("UBPRE524.group"), 
-                                starts_with("UBPRE524.all"))) |> names() 
+                    dplyr::select(contains(".log.diff")) |> 
+                    dplyr::select(-c(starts_with("UBPRE524.log.diff"))) |> names() 
+                               # starts_with("UBPRE524.group"), 
+                               # starts_with("UBPRE524.all"))) 
 
 est_data_wQuarter <- model_data$estimation_data |> as_tibble() |>
-                      select(c(Quarter, UBPRE524.Value,UBPRE524.diff, BankName, BankType, all_of(log_change_cols), Qtr))
+                      dplyr::select(c(Quarter, UBPRE524.Value,UBPRE524.diff, BankName, BankType, all_of(log_change_cols), Qtr))
 
-estimation_data <- est_data_wQuarter |> select(-c(Quarter, UBPRE524.Value)) 
+estimation_data <- est_data_wQuarter |> dplyr::select(-c(Quarter, UBPRE524.Value)) 
 
 obs_data_wQuarter <- model_data$observation_data |> as_tibble()
 
 observation_data <- obs_data_wQuarter|> 
-                      select(c(UBPRE524.diff, BankName, BankType, all_of(log_change_cols), Qtr))
+                      dplyr::select(c(UBPRE524.diff, BankName, BankType, all_of(log_change_cols), Qtr))
 
 s <- createDataPartition(estimation_data$UBPRE524.diff, p = 0.70, list=FALSE)
 training <- estimation_data[s,]
@@ -204,11 +204,11 @@ bank_data_test <- est_data_wQuarter[-s,]
 bank_data_pred$train_pred <- train_predictions
 bank_data_test$test_pred <- test_predictions
 bank_results <- bind_rows(bank_data_test, bank_data_pred) |> 
-                mutate(resid = UBPRE524.diff - coalesce(test_pred,train_pred)) |>
-                select(Quarter, BankName, BankType,UBPRE524.diff,train_pred,test_pred, resid) 
+                mutate(.resid = UBPRE524.diff - coalesce(test_pred,train_pred)) |>
+                dplyr::select(Quarter, BankName, BankType,UBPRE524.diff,train_pred,test_pred, .resid) 
                   
 bank_results |> 
-  filter(BankName %in% observation_data$BankName) |> select(-resid) |>
+  filter(BankName %in% observation_data$BankName) |> dplyr::select(-.resid) |>
     pivot_longer(cols = where(is.numeric))|> 
       ggplot(aes(x=Quarter, y = value, color=name)) + geom_line() + geom_point()+
       facet_wrap(~BankType+BankName, ncol = 1) + 
@@ -220,30 +220,18 @@ bank_results |>
 ```
 ### Residual diagnostics {#sec-residual-check-xgboost}
 
+XGBoost, as with other machine learning models, do not make assumptions about the distribution of residuals. But it is still worth inspecting the residuals to assess whether the model is adequately capturing the underlying patterns in the data. 
+
 ::: {#fig-xgboost-checks .panel-tabset}
 
-```{r}
-#| warning: false
-plot_xgboost_residual <- function(fuzzy_bankname, data) {
-  bank_data <- data |> filter(grepl(fuzzy_bankname,BankName))
 
-  plot1 <- bank_data |> ggplot(aes(x = Quarter, y = resid)) + geom_line() + geom_point() 
-  plot2 <- acf(bank_data$resid,plot = FALSE) %>% forecast::autoplot() + labs(title = element_blank())
-  plot3 <- bank_data |> ggplot(aes(x = resid)) + geom_histogram(bins = 10) 
-  plot_layout <- plot1 / 
-               (plot2 | plot3) + 
-               plot_layout(widths = c(7, 3)) # This sets the widths for plots 2 and 3
-  plot_layout              
-}
-
-```
 ### CITIBANK
 ```{r}
 #| warning: false
 #| label: fig-res-citi-xgboost
-#| fig-cap: "XGBoost Residuals"
+#| fig-cap: "XGBoost residuals"
 bank <- "CITIBANK"
-plot_xgboost_residual(bank, bank_results)
+plot_bank_residual(bank, bank_results)
 
 ```
 
@@ -251,27 +239,27 @@ plot_xgboost_residual(bank, bank_results)
 ```{r}
 #| warning: false
 #| label: fig-res-sync-xgboost
-#| fig-cap: "Best Bank Model Residuals"
+#| fig-cap: "Best Bank Model residuals"
 bank <- "SYNCHRONY"
-plot_xgboost_residual(bank, bank_results)
+plot_bank_residual(bank, bank_results)
 ```
 
 ### BARCLAYS
 ```{r}
 #| warning: false
 #| label: fig-res-bar-xgboost
-#| fig-cap: "Model Residuals"
+#| fig-cap: "Model residuals"
 bank <- "BARCLAYS"
-plot_xgboost_residual(bank, bank_results)
+plot_bank_residual(bank, bank_results)
 ```
 
 ### AMERICAN EXPRESS
 ```{r}
 #| warning: false
 #| label: fig-res-ae-xgboost
-#| fig-cap: "Model Residuals"
+#| fig-cap: "Model residuals"
 bank <- "AMERICAN EXPRESS"
-plot_xgboost_residual(bank, bank_results)
+plot_bank_residual(bank, bank_results)
 ```
 
 ### CAPITAL ONE
@@ -279,14 +267,16 @@ plot_xgboost_residual(bank, bank_results)
 ```{r}
 #| warning: false
 #| label: fig-res-cap-xgboost
-#| fig-cap: "Model Residuals"
+#| fig-cap: "Model residuals"
 bank <-  "CAPITAL ONE"
-plot_xgboost_residual(bank, bank_results)
+plot_bank_residual(bank, bank_results)
 ```
 
 :::
 
-### Residuals White Noise
+### residuals White Noise
+
+XGBoost is not inherently designed for time series analysis, but can expose where the model has missed temporal structure or seasonality.
 
 The sub-set of banks analysed in @sec-residual-check-xgboost did not exhibit significant autocorrelation.
 
@@ -298,9 +288,9 @@ Banks not listed have residuals that are indistinguishable from a white noise se
 #| label: tbl-lb-xgboost
 #| tbl-cap: Ljung–Box results where P-value < Significance Level of 0.05
 bank_results |>
- as_tsibble(index = Quarter, key = BankName) |> features(resid, ljung_box) |> 
+ as_tsibble(index = Quarter, key = BankName) |> features(.resid, ljung_box) |> 
   mutate(across(where(is.numeric), \(x) round(x,4))) |> 
-    filter(lb_pvalue <= 0.05)|> select(BankName,lb_stat,lb_pvalue) |>
+    filter(lb_pvalue <= 0.05)|> dplyr::select(BankName,lb_stat,lb_pvalue) |>
       rmarkdown::paged_table()
 ```
 
@@ -338,17 +328,20 @@ results_test <- unique(estimation_data$BankName) |>
                        
 
 comb <- bind_rows(results_est, results_test) |>
-          mutate(across(where(is.numeric), \(x) round(x,4))) |> 
-            select(BankName, .type, RMSE, MAE, Rsquared)
+          dplyr::select(BankName, .type, RMSE, MAE, Rsquared)
 
-comb |> filter(BankName %in% observation_data$BankName) |> arrange(BankName,.type) |> rmarkdown::paged_table()     
+comb |> 
+  filter(BankName %in% observation_data$BankName) |> 
+    arrange(BankName,.type) |> mutate(across(where(is.numeric), \(x) round(x,3))) |> rmarkdown::paged_table()     
 
 comb |> filter(BankName %in% observation_data$BankName) |> 
   group_by(.type) |> summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |>
+   mutate(across(where(is.numeric), \(x) round(x,3))) |> 
     rmarkdown::paged_table()  
 
 comb |> group_by(.type) |> 
   summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
+   mutate(across(where(is.numeric), \(x) round(x,3))) |> 
     rmarkdown::paged_table()   
 
 ```
@@ -411,19 +404,20 @@ print_ar(result, "Walmart", "SYNCHRONY BANK (1216022)")
 print_ar(result, "Walmart", "CAPITAL ONE, NATIONAL ASSOCIATION (112837)")
 print_ar(result, "GAP", "SYNCHRONY BANK (1216022)")
 print_ar(result, "GAP", "BARCLAYS BANK DELAWARE (2980209)")
-
 ```
 
 ```{r}
 #| eval: false
+#| warning: false
+#| echo: false
+
+
 # Examine feature importance
-#cols <- names(training[, -which(names(training) == "UBPRE524.diff")])
 importance_matrix <- xgb.importance(model = m)
 print(importance_matrix)
 xgb.plot.importance(importance_matrix = importance_matrix)
 importance_matrix |> write_csv("data/results/xgbTree_importance_matrix.csv")
 
-library(shapviz)
 save_sv_dependence <- function(shp, feature, colour_var) {
   tryCatch({
   # Start PNG device
@@ -440,17 +434,31 @@ save_sv_dependence <- function(shp, feature, colour_var) {
   })
 }
 
-
-shp <- shapviz(m,X_pred = dtrain,X=data.matrix(train.predictors))
-shapviz::sv_importance(shp, kind = "bar", show_numbers = TRUE)
-
-names(estimation_data) |> walk(\(x) save_sv_dependence(shp, x, NULL))
-
-
-sv_dependence(shp, "UBPRE524.group.log.diff", color_var = NULL)
-sv_dependence(shp, "UBPRE263.log.diff.lag1", color_var = NULL)
-sv_dependence(shp, "UBPRB538.log.diff", color_var = NULL)
-sv_dependence(shp, "UBPR3815.log.diff", color_var = NULL)
-sv_force(shp, row_id = 1)
-sv_waterfall(shp, row_id = 1)
 ```
+```{r}
+#| warning: false
+#| eval: false
+#| 
+#The chart helps us understand which features are most important for a particular prediction and how they interact to produce the final outcome
+library(shapviz)
+shp <- shapviz(m,X_pred = dEst,X=data.matrix(estimation.predictors))
+png(glue("images/estimation_postgroup_importance.png"), width = 800, height = 600)
+shapviz::sv_importance(shp, kind = "beeswarm", show_numbers = TRUE)
+dev.off()
+
+png(glue("images/estimation_postgroup_waterfall.png"), width = 800, height = 600)
+sv_waterfall(shp)
+dev.off()
+
+shp <- shapviz(m,X_pred = dObs,X=data.matrix(observation.predictors))
+png(glue("images/obs_postgroup_importance.png"), width = 800, height = 600)
+shapviz::sv_importance(shp, kind = "beeswarm", show_numbers = TRUE)
+dev.off()
+png(glue("images/obs_postgroup_waterfall.png"), width = 800, height = 600)
+sv_waterfall(shp)
+dev.off()
+
+```
+
+![Caption](images/estimation_postgroup_waterfall.png){#fig-shap-fall-post}
+![Post](images/estimation_pregroup_waterfall.png){#fig-shap-fall-pre}

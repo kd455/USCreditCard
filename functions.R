@@ -2,12 +2,11 @@ library(tidyverse)
 #using the https://tidyverts.org/ world
 library(fable)
 library(caret)
-library(lmer4)
+library(lme4)
 library(feasts)
 library(tsibble)
 library(glue)
 library(arrow)
-library(dplyr)
 library(tidyr)
 library(readr)
 library(memoise)
@@ -19,6 +18,11 @@ library(lmtest)
 library(ggthemes)
 library(Metrics)
 library(ggtext)
+library(lme4)
+library(broom.mixed)
+library(MuMIn)
+library(merTools)
+library(dplyr)
 #set seed for reproducibility
 set.seed(42)
 
@@ -36,13 +40,13 @@ get_features <- function(data, ftags, value_name = "Value") {
     
     #find columns that are zero or constant
     zero_const <- stat_features |> 
-                    select(-key_vars(data)) |>
+                    dplyr::select(-key_vars(data)) |>
                     summarise(across(everything(), sd)) |>   #calcuate standard deviation of each column
                     select_if(~.x == 0 | is.na(.)) |> names() #select columns that are zero or NA
       
     stat_features |>
-        select(!all_of(zero_const))
-        #  select(-key_vars(data)) |> 
+        dplyr::select(!all_of(zero_const))
+        #  dplyr::select(-key_vars(data)) |> 
         # prcomp(scale = TRUE) |>
         # broom::augment(data)
 }
@@ -62,7 +66,7 @@ matrix.to.tstibble <- function(matrix, names_to = "Path", values_to = "Value") {
     rename(BankName = "Financial Institution Name", Value = Numeric_Value) |>
     mutate(BankName = paste0(BankName, " (", IDRSSD, ")"),
            Quarter = yearquarter(ReportingPeriod)) |>
-    select(-ReportingPeriod) |>
+    dplyr::select(-ReportingPeriod) |>
     as_tsibble(key = c(BankName,Measure), index = Quarter) 
 }
 
@@ -218,13 +222,13 @@ us_economy.recession <- memoise(function() {
 
 us_economy.psavert <- function() {
   us_economy() |>
-    select(PSAVERT) |>
+    dplyr::select(PSAVERT) |>
       na.omit()
 }
 
 us_economy.confidence <- function() {
   us_economy() |>
-    select(CSCICP03USM665S) |>
+    dplyr::select(CSCICP03USM665S) |>
     na.omit()
 }
 
@@ -332,7 +336,7 @@ feature_prcomp <- function(f_data) {
   
   data|>
     na.omit() |> 
-    select(-c(IDRSSD,BankName, Measure, Label, Description, BankType)) |>
+    dplyr::select(-c(IDRSSD,BankName, Measure, Label, Description, BankType)) |>
     prcomp(scale = TRUE) |> 
     broom::augment(data)
 }
@@ -365,7 +369,7 @@ outlier.plot <- function(data, pca_output, P1_lower, P1_upper, P2_lower, P2_uppe
                         (.fittedPC2 > P2_upper) | 
                         (.fittedPC1 < P1_lower) |
                         (.fittedPC1 > P1_upper)) |>
-                select(IDRSSD) 
+                dplyr::select(IDRSSD) 
 
   if (!purrr::is_empty(outliers))  {
     data |>
@@ -486,7 +490,7 @@ min_tstibble <- function(data) {
     ts_index <- data |> index_var()
     data |> 
         as_tibble()  |>
-        select(-all_of(ts_index)) |>
+        dplyr::select(-all_of(ts_index)) |>
         summarise(across(where(is.numeric), \(x) min(x, na.rm = TRUE))) |> min()
 }
 
@@ -494,7 +498,7 @@ max_tstibble <- function(data) {
     ts_index <- data |> index_var()
     data |> 
         as_tibble()  |>
-        select(-all_of(ts_index)) |>
+        dplyr::select(-all_of(ts_index)) |>
         summarise(across(where(is.numeric), \(x) max(x, na.rm = TRUE))) |> max()
 }
 
@@ -541,7 +545,7 @@ us_economy.quarterly_selected <- function() {
     mutate(PCE.Pop.CPI = PCE/POPTHM/PCEPI) |>
     mutate(RRSFS.Pop = RRSFS/POPTHM) |> 
     mutate(A229RC0.CPI = A229RC0/PCEPI) |> 
-    select(-c(RRSFS,A229RC0,CPILFESL,CPIAUCSL,DSPI,DSPIC96,B069RC1,PCEDG,PCE,POPTHM,PCEPI)) |>
+    dplyr::select(-c(RRSFS,A229RC0,CPILFESL,CPIAUCSL,DSPI,DSPIC96,B069RC1,PCEDG,PCE,POPTHM,PCEPI)) |>
     mutate(Quarter = yearquarter(Month)) |>
     index_by(Quarter) |>
     summarise(across(!Month, \(x) mean(x, na.rm = TRUE))) |> drop_na()  
@@ -552,7 +556,7 @@ generate_model_data <- function() {
   cc_data <- credit_card(apply_bank_filters = TRUE, post_regulation = FALSE) |>
               filter(Measure %in% useful_cc_measures) |> 
               as_tibble() |> 
-              select(Quarter,IDRSSD, BankName, BankType, Measure, Value) |> 
+              dplyr::select(Quarter,IDRSSD, BankName, BankType, Measure, Value) |> 
               group_by(Measure, IDRSSD) |>
               mutate(diff = difference(Value),
                     log = log(Value),
@@ -647,24 +651,24 @@ generate_model_data <- function() {
                         pivot_longer(cols = c(New,Old), names_to = "Partnership", values_to = "BankName") |> filter(!is.na(BankName))
 
   new_partnerships <- partnerships |> filter(Partnership == "New")|>
-                        select(Partner, BankName) |>
+                        dplyr::select(Partner, BankName) |>
                         cross_join(
                           tibble(
                             Quarter = seq(as.Date("2010-01-01"), as.Date("2024-01-01"), by = "quarter")                        
                           )
                         ) |> mutate(Quarter = yearquarter(Quarter)) |> left_join(partnerships, by = join_by(Quarter == Acquired, BankName, Partner)) |> 
                         group_by(Partner, BankName) |>
-                        tidyr::fill(Partnership,.direction = "down") |>  mutate(HasPartner = if_else(is.na(Partnership), 0, 1)) |> select(-c(Available, Partnership)) |> ungroup()
+                        tidyr::fill(Partnership,.direction = "down") |>  mutate(HasPartner = if_else(is.na(Partnership), 0, 1)) |> dplyr::select(-c(Available, Partnership)) |> ungroup()
 
   old_partnerships <- partnerships |> filter(Partnership == "Old")|>
-                        select(Partner, BankName) |>
+                        dplyr::select(Partner, BankName) |>
                         cross_join(
                           tibble(
                             Quarter = seq(as.Date("2010-01-01"), as.Date("2024-01-01"), by = "quarter")                        
                           )
                         ) |> mutate(Quarter = yearquarter(Quarter)) |> left_join(partnerships, by = join_by(Quarter == Acquired, BankName, Partner)) |> 
                         group_by(Partner, BankName) |>
-                        tidyr::fill(Partnership,.direction = "up") |>  mutate(HasPartner = if_else(is.na(Partnership), 0, 1)) |> select(-c(Available, Partnership))|> ungroup()
+                        tidyr::fill(Partnership,.direction = "up") |>  mutate(HasPartner = if_else(is.na(Partnership), 0, 1)) |> dplyr::select(-c(Available, Partnership))|> ungroup()
   
   #have all the data for partnerships. As a bank can be involved in multiple partnerships we have to ensure the data is repeated per partner
   all_partnerships <- bind_rows(new_partnerships, old_partnerships) |> left_join(model_data, by = join_by(Quarter, BankName)) |> filter(!is.na(IDRSSD))       
@@ -683,13 +687,13 @@ generate_model_data <- function() {
                             PeriodStart = yearquarter(Acquired),
                             PeriodEnd = yearquarter(today()))  |> 
                     pivot_longer(cols = c(New,Old), names_to = "Partnership", values_to = "BankName")|>                             
-                    select(Partner, PeriodStart, PeriodEnd, BankName, Partnership) |> 
+                    dplyr::select(Partner, PeriodStart, PeriodEnd, BankName, Partnership) |> 
                     pivot_longer(cols = starts_with("Period"), names_to = "PeriodName", values_to = "Quarter")|> 
                     as_tsibble(index=Quarter, key=c(BankName,Partner)) |>
                     group_by_key() |>
                     fill_gaps() |> tidyr::fill(Partnership,.direction = "down") |> 
                       mutate(Period = row_number()-1) |>
-                    select(-PeriodName) |> pivot_wider(names_from = "Partner", values_from=Period)
+                    dplyr::select(-PeriodName) |> pivot_wider(names_from = "Partner", values_from=Period)
   
   .read_all_model_data() |> left_join(partnerships,by = join_by(Quarter, BankName)) |>
     drop_na(UBPRE524.diff)|> 
@@ -735,7 +739,7 @@ get_model_data <- function() {
 
   estimation_data <- all_data |> 
                       filter(is.na(Partnership)) |> 
-                        select(-c(Partnership:last_col())) |>
+                        dplyr::select(-c(Partnership:last_col())) |>
                           drop_na() #|> tsibble::fill_gaps()
   
   observation_data <- all_data |> 
@@ -747,44 +751,44 @@ get_model_data <- function() {
   list(all_data = all_data, estimation_data = estimation_data, observation_data = observation_data)
 }
 
-run_timeseries_cv <- function(data, formula_string, model_func = TSLM, predict_func= predict, initial_window = 9, horizon = 1, dependent_var = "UBPRE524.diff", fixedWindow = TRUE) {
-    set.seed(123)  # For reproducibility
-    # Create 5-fold cross-validation indices
-    slices <- caret::createTimeSlices(1:nrow(data), initial_window, horizon, fixedWindow = fixedWindow)
-    results <- list()
+# run_timeseries_cv <- function(data, formula_string, model_func = TSLM, predict_func= predict, initial_window = 9, horizon = 1, dependent_var = "UBPRE524.diff", fixedWindow = TRUE) {
+#     set.seed(123)  # For reproducibility
+#     # Create 5-fold cross-validation indices
+#     slices <- caret::createTimeSlices(1:nrow(data), initial_window, horizon, fixedWindow = fixedWindow)
+#     results <- list()
 
-    for(i in 1:length(slices$train)) {
-        # Extract training and testing data using the indices
-        training_indices <- slices$train[[i]]
-        validation_indices <- slices$test[[i]]
-        training_set <- data |> filter(Quarter %in% data$Quarter[training_indices])
-        validation_set <- data |> filter(Quarter %in% data$Quarter[validation_indices])
+#     for(i in 1:length(slices$train)) {
+#         # Extract training and testing data using the indices
+#         training_indices <- slices$train[[i]]
+#         validation_indices <- slices$test[[i]]
+#         training_set <- data |> filter(Quarter %in% data$Quarter[training_indices])
+#         validation_set <- data |> filter(Quarter %in% data$Quarter[validation_indices])
 
-        # Skip if validation set contains FirmID levels not present in training set
-        if(any(!(validation_set$IDRSSD %in% training_set$IDRSSD))) {
-          next
-        }
-        # Fit model on the training data
-        model <- training_set |> fabletools::model(m = model_func(as.formula(formula_string)))
+#         # Skip if validation set contains FirmID levels not present in training set
+#         if(any(!(validation_set$IDRSSD %in% training_set$IDRSSD))) {
+#           next
+#         }
+#         # Fit model on the training data
+#         model <- training_set |> fabletools::model(m = model_func(as.formula(formula_string)))
 
-        # Predict on the validation data
-        predictions <- predict_func(model, newdata = validation_set)
+#         # Predict on the validation data
+#         predictions <- predict_func(model, newdata = validation_set)
         
-        # Evaluate the model (you can choose your evaluation metric, e.g., RMSE)
-        rmse_value <- Metrics::rmse(validation_set[[dependent_var]], predictions)
+#         # Evaluate the model (you can choose your evaluation metric, e.g., RMSE)
+#         rmse_value <- Metrics::rmse(validation_set[[dependent_var]], predictions)
 
-        # Store the results
-        results[[i]] <- rmse_value
-    }
+#         # Store the results
+#         results[[i]] <- rmse_value
+#     }
 
-    # Calculate the average performance across all slices
-    average_performance <- mean(unlist(results))
-    average_performance
-}
+#     # Calculate the average performance across all slices
+#     average_performance <- mean(unlist(results))
+#     average_performance
+# }
 
 plot_cc_measures <- function(bank_fuzzy, data, ubpr_labels) {
   data |> filter(grepl(bank_fuzzy,BankName)) |> 
-  select(UBPRE524 = UBPRE524.Value, UBPRE263 = UBPRE263.Value, UBPRE425 = UBPRE425.Value, UBPRB538 = UBPRB538.Value) |> 
+  dplyr::select(UBPRE524 = UBPRE524.Value, UBPRE263 = UBPRE263.Value, UBPRE425 = UBPRE425.Value, UBPRB538 = UBPRB538.Value) |> 
    pivot_longer(cols= -Quarter, names_to = "UBPR_Code") |> 
    mutate(display_order = case_when(
                           UBPR_Code == "UBPRE524" ~ "(a)",
@@ -807,6 +811,16 @@ plot_model_fit <- function (data, target_name) {
         geom_line(aes(y = .fitted, color = "#D55E00")) + facet_wrap(~BankName+BankType+.model, ncol = 1) +
         labs(title = "<span style='color:#D55E00'>Fitted</span> vs. <span style='color:darkgrey'>Observed</span>") +
         theme(legend.position = "none", plot.title = element_markdown(),plot.subtitle = element_markdown())
+}
+
+plot_bank_residual <- function(fuzzy_bankname, data) {
+  bank_data <- data |> filter(grepl(fuzzy_bankname,BankName)) |> as_tibble()
+  
+  plot1 <- bank_data |> ggplot(aes(x = Quarter, y = .resid)) + geom_line() + geom_point()
+  plot2 <- acf(bank_data$.resid,plot = FALSE) %>% forecast::autoplot() + labs(title = element_blank())
+  plot3 <- bank_data |> ggplot(aes(x = .resid)) + geom_histogram(bins = 10)
+  resid_plot <- plot1 / (patchwork::wrap_elements(plot2) | plot3) + patchwork::plot_layout(widths = c(7, 3))
+  resid_plot       
 }
 
 save_arima_results <- function(table_results, model_cols, file_name) {
@@ -845,7 +859,7 @@ plot_prediction <- function(bank, partner, bank_fcasts, all_data) {
     labs(title = bank, subtitle = partner, y = credit_card.target_label())    
 }
 
-original_scale <- function(fcast_bank_data, all_data) {
+original_scale <- function(fcast_bank_data, all_data, col_name = ".mean") {
   keys <- key_vars(fcast_bank_data)
   result <- fcast_bank_data
   bank_name <- fcast_bank_data[[1,"BankName"]]
@@ -855,12 +869,12 @@ original_scale <- function(fcast_bank_data, all_data) {
       value0 <- all_data |> 
                   filter(BankName == bank_name, 
                           Quarter == quarter0) |> pull(UBPRE524.Value)
-      result <- fcast_bank_data |> mutate(predicted = value0 + cumsum(.mean))                  
+      result <- fcast_bank_data |> mutate(predicted = value0 + cumsum(!!col_name))                  
   } else {
     print(paste("Bank uses Value", bank_name))
-    result <- result |> rename(predicted = .mean)
+    result <- result |> rename(predicted = !!col_name)
   }
-  result |> as_tsibble() |> select(all_of(c(keys,"predicted")))
+  result |> as_tsibble() |> dplyr::select(all_of(c(keys,"predicted")))
 }
 
 print_ar <- function(prediction_result, partner, bank) {
@@ -870,7 +884,7 @@ print_ar <- function(prediction_result, partner, bank) {
          Period = row_number(),
          cum_mean = cummean(AR),
          cum_sum = cumsum(AR)) |> as_tibble() |>
-    select(Period, observed, predicted, AR, 
+    dplyr::select(Period, observed, predicted, AR, 
               `Cumulative Mean AR` = cum_mean,
               `Cumulative AR` = cum_sum) |> 
       mutate(across(where(is.numeric), \(x) round(x,2))) |>               

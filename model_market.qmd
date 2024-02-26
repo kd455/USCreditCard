@@ -67,7 +67,7 @@ augmented_data |> filter(BankName %in% unique(observation_data$BankName)) |>
 #| warning: false
 #| label: tbl-market-aicc
 #| tbl-cap: AICc Summary for sub-set of banks
-m_table |> filter(BankName %in% observation_data$BankName) |> glance() |> relocate(BankName, AICc, AIC) |> select(-IDRSSD)|>
+m_table |> filter(BankName %in% observation_data$BankName) |> glance() |> relocate(BankName, AICc, AIC) |> dplyr::select(-IDRSSD)|>
     mutate(across(where(is.numeric), \(x) round(x,4))) |>  
     rmarkdown::paged_table()  
 ```
@@ -76,7 +76,7 @@ m_table |> filter(BankName %in% observation_data$BankName) |> glance() |> reloca
 #| label: tbl-coef-market
 #| tbl-cap: "Intercept and coefficients"
 m_table |> filter(BankName %in% unique(observation_data$BankName)) |> 
-  tidy() |> select(BankName, term:last_col())|>
+  tidy() |> dplyr::select(BankName, term:last_col())|>
     mutate(across(where(is.numeric), \(x) round(x,4))) |>  
     rmarkdown::paged_table()
 ```
@@ -100,7 +100,7 @@ Residuals should have the following properties [@Hyndman2021, ch. 5.4]. Residual
 #|   - "Explaining the outlier: Deliquency dropped at a time when CITIBANK's credit card portfolio became a larger business concern (c). The borrowers added appear to be less risky as we see the unused proportion go from below 10% to over 40% in (b)"
 
 bank <- "CITIBANK"
-m_table |> filter(grepl(bank,BankName)) |> select(tslm) |> gg_tsresiduals()  
+m_table |> filter(grepl(bank,BankName)) |> dplyr::select(tslm) |> gg_tsresiduals()  
 plot_cc_measures(bank, estimation_data,ubpr_labels)
 ```
 
@@ -113,7 +113,7 @@ plot_cc_measures(bank, estimation_data,ubpr_labels)
 #|   - "Comparative credit card portfolio variables"
 
 bank <- "SYNCHRONY"
-m_table |> filter(grepl(bank,BankName)) |> select(tslm) |> gg_tsresiduals()  
+m_table |> filter(grepl(bank,BankName)) |> dplyr::select(tslm) |> gg_tsresiduals()  
 plot_cc_measures(bank, estimation_data,ubpr_labels)
 ```
 ### BARCLAYS
@@ -125,7 +125,7 @@ plot_cc_measures(bank, estimation_data,ubpr_labels)
 #| - "The time plot of the residuals shows that the variation of the residuals is relatively constant up until the onset of the COVID-19 pandemic in 2020; the model needs more information to account for this period. The acf shows residuals are uncorrelated"
 #| - "Comparative credit card portfolio variables"
 bank <- "BARCLAYS"
-m_table |> filter(grepl(bank,BankName)) |> select(tslm) |> gg_tsresiduals()  
+m_table |> filter(grepl(bank,BankName)) |> dplyr::select(tslm) |> gg_tsresiduals()  
 plot_cc_measures(bank, estimation_data,ubpr_labels)
 ```
 
@@ -138,7 +138,7 @@ plot_cc_measures(bank, estimation_data,ubpr_labels)
 #| - "Comparative credit card portfolio variables"
 
 bank <- "AMERICAN EXPRESS NATIONAL BANK"
-m_table |> filter(grepl(bank,BankName)) |> select(tslm) |> gg_tsresiduals()  
+m_table |> filter(grepl(bank,BankName)) |> dplyr::select(tslm) |> gg_tsresiduals()  
 plot_cc_measures(bank, estimation_data,ubpr_labels)
 
 ```
@@ -151,7 +151,7 @@ plot_cc_measures(bank, estimation_data,ubpr_labels)
 #|   - "Explaining the outlier: Deliquency dropped at a time when CAPITAL ONE's credit card portfolio became a larger business concern. The U shape for deliquency % indicates initial improvement in the portfolio's quality, however, by the end of the estimation period, the % is back up. This increase coincides with a decrease in unused commitments i.e. borrowers are putting more expenditures on their credit cards."
 
 bank <- "CAPITAL ONE"
-m_table |> filter(grepl(bank,BankName)) |> select(tslm) |> gg_tsresiduals()  
+m_table |> filter(grepl(bank,BankName)) |> dplyr::select(tslm) |> gg_tsresiduals()  
 plot_cc_measures(bank, estimation_data, ubpr_labels)
 ```
 :::
@@ -170,7 +170,7 @@ Banks not listed have residuals that are indistinguishable from a white noise se
 #| tbl-cap: Ljung–Box results where P-value < Significance Level of 0.05
 augmented_data  |>
   features(.innov, ljung_box) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> 
-    filter(lb_pvalue <= 0.05)|> select(BankName,lb_stat,lb_pvalue) |>
+    filter(lb_pvalue <= 0.05)|> dplyr::select(BankName,lb_stat,lb_pvalue) |>
       rmarkdown::paged_table()
 ```
 
@@ -208,13 +208,13 @@ est_data_tr |>
 #| - Accuracy Metrics on Training and Cross Validation data for sub-set of banks
 #| - Mean Accuracy Metrics for our sub-set of banks
 #| - Mean Accuracy Metrics across all banks
-cv_results_est <- readr::read_csv("data/results/estimate_market_metrics.csv",show_col_types = FALSE) |> select(-.model) |>
+cv_results_est <- readr::read_csv("data/results/estimate_market_metrics.csv",show_col_types = FALSE) |> dplyr::select(-.model) |>
   mutate(across(where(is.numeric), \(x) round(x,4))) |> 
-  select(BankName, .type, RMSE, MAE)
+  dplyr::select(BankName, .type, RMSE, MAE)
 
-cv_results_test <-readr::read_csv("data/results/estimate_tscv_market_metrics.csv",show_col_types = FALSE) |> select(-.model) |>
+cv_results_test <-readr::read_csv("data/results/estimate_tscv_market_metrics.csv",show_col_types = FALSE) |> dplyr::select(-.model) |>
   mutate(across(where(is.numeric), \(x) round(x,4))) |> 
-    select(BankName, .type, RMSE, MAE) |> mutate(.type = "CV")
+    dplyr::select(BankName, .type, RMSE, MAE) |> mutate(.type = "CV")
       
 comb <- bind_rows(cv_results_est, cv_results_test) 
 comb |> filter(BankName %in% observation_data$BankName) |> arrange(BankName,.type) |> rmarkdown::paged_table()     
@@ -250,7 +250,7 @@ get_prediction <- function(bank, partner, all_data, models) {
 
 
 result <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, data, m_table)  |> 
-  list_rbind() |> left_join(data |> select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter) ) |> as_tibble() |> select(Partner, BankName, Quarter, observed, predicted) 
+  list_rbind() |> left_join(data |> dplyr::select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter) ) |> as_tibble() |> dplyr::select(Partner, BankName, Quarter, observed, predicted) 
 
 map2(partner_banks$Bank, partner_banks$Partner, plot_prediction, result, data) 
 ```
