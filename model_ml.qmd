@@ -13,41 +13,50 @@ library(xgboost)
 library(Matrix)
 library(caret)
 library(patchwork)
+library(shapviz)
 set.seed(42)
 
 model_data <- get_model_data()
-data <- model_data$all_data |> as_tibble()           
+all_data <- model_data$all_data |> as_tibble()           
 partner_banks <- credit_card.partnerships.long()
+estimation_data <- model_data$estimation_data
+observation_data <- model_data$observation_data
 
-log_change_cols <- data |>
+log_cols_w_group <- all_data |>
                     dplyr::select(contains(".log.diff")) |> 
                     dplyr::select(-c(starts_with("UBPRE524.log.diff"))) |> names() 
-                               # starts_with("UBPRE524.group"), 
-                               # starts_with("UBPRE524.all"))) 
 
-est_data_wQuarter <- model_data$estimation_data |> as_tibble() |>
-                      dplyr::select(c(Quarter, UBPRE524.Value,UBPRE524.diff, BankName, BankType, all_of(log_change_cols), Qtr))
+log_cols_wo_group <- all_data |>
+                    dplyr::select(contains(".log.diff")) |> 
+                    dplyr::select(-c(starts_with("UBPRE524.log.diff"), 
+                                     starts_with("UBPRE524.group"), 
+                                     starts_with("UBPRE524.all")))  |> names() 
 
-estimation_data <- est_data_wQuarter |> dplyr::select(-c(Quarter, UBPRE524.Value)) 
 
-obs_data_wQuarter <- model_data$observation_data |> as_tibble()
+setup_train_test <- function(estimation_data, predictor_cols) {
+  data <- estimation_data |> as_tibble() |>
+            dplyr::select(c(UBPRE524.diff, BankName, BankType, all_of(predictor_cols), Qtr))  
 
-observation_data <- obs_data_wQuarter|> 
-                      dplyr::select(c(UBPRE524.diff, BankName, BankType, all_of(log_change_cols), Qtr))
+  s <- createDataPartition(data$UBPRE524.diff, p = 0.70, list=FALSE)
+  training <- data[s,]
+  test <- data[-s,]
 
-s <- createDataPartition(estimation_data$UBPRE524.diff, p = 0.70, list=FALSE)
-training <- estimation_data[s,]
-test <- estimation_data[-s,]
+  # Convert the data to matrix and assign output variable
+  train.outcome <- training$UBPRE524.diff
+  train.predictors <- sparse.model.matrix(UBPRE524.diff ~ .-1, data = training)
+  test.outcome <- test$UBPRE524.diff
+  test.predictors <- sparse.model.matrix(UBPRE524.diff ~ .-1, data = test)
 
-# Convert the data to matrix and assign output variable
-train.outcome <- training$UBPRE524.diff
-train.predictors <- sparse.model.matrix(UBPRE524.diff ~ .-1, data = training)
-test.outcome <- test$UBPRE524.diff
-test.predictors <- sparse.model.matrix(UBPRE524.diff ~ .-1, data = test)
+  # Convert the matrix objects to DMatrix objects
+  dtrain <- xgb.DMatrix(train.predictors, label = train.outcome)
+  dtest <- xgb.DMatrix(test.predictors, label = test.outcome)
 
-# Convert the matrix objects to DMatrix objects
-dtrain <- xgb.DMatrix(train.predictors, label = train.outcome)
-dtest <- xgb.DMatrix(test.predictors, label = test.outcome)
+  list(train = training, test = test, dtrain = dtrain, dtest = dtest, train.predictors = train.predictors, 
+       test.predictors = test.predictors, train.outcome = train.outcome, test.outcome = test.outcome)
+}
+
+model_w_group <- setup_train_test(estimation_data, log_cols_w_group)
+model_without_group <- setup_train_test(estimation_data, log_cols_wo_group)
 
 ```
 
@@ -101,7 +110,7 @@ run_xgb.cv <- function(dtrain) {
   best_model$params |> as.data.frame() |> readr::write_csv("data/results/xgboost_cv_params.csv")
 }
 
-run_xgb.caret.cv <- function(train.predictors, train.outcome, n_folds, n_repeats, method = "xgbTree", seeds) {
+run_xgb.caret.cv <- function(train.predictors, train.outcome, n_folds, n_repeats, model_name, method = "xgbTree", seeds) {
   
   if (method == "xgbTree") {
     grid <- expand.grid(eta = c(0.01, 0.1, 0.3),
@@ -131,14 +140,14 @@ run_xgb.caret.cv <- function(train.predictors, train.outcome, n_folds, n_repeats
                 metric = "RMSE")
 
   # Save the plot
-  png(glue("data/results/{method}_tuning_plot.png"), width = 800, height = 600)
+  png(glue("data/results/{method}_tuning_plot_{model_name}.png"), width = 800, height = 600)
   plot(model)
   dev.off() 
 
   #save tuning results
-  model$results  |> readr::write_csv(glue("data/results/{method}_tuning_results.csv"))
-  model$bestTune |> readr::write_csv(glue("data/results/{method}_best_tune.csv"))
-  xgb.save(model = model$finalModel, fname = glue("data/results/best_{method}_model.model"))
+  model$results  |> readr::write_csv(glue("data/results/{method}_tuning_results_{model_name}.csv"))
+  model$bestTune |> readr::write_csv(glue("data/results/{method}_best_tune_{model_name}.csv"))
+  xgb.save(model = model$finalModel, fname = glue("data/results/best_{method}_{model_name}.model"))
 }
 
 # Define the number of folds and repeats
@@ -147,7 +156,8 @@ n_repeats <- 3
 seeds <- lapply(1:(n_folds * n_repeats), function(x) sample.int(1000, 144))
 seeds[[length(seeds) + 1]] <- sample.int(1000, 1)  # The last seed for the final model
 
-run_xgb.caret.cv(train.predictors, train.outcome, n_folds, n_repeats, method = "xgbTree", seeds)
+run_xgb.caret.cv(model_w_group$train.predictors, model_w_group$train.outcome, n_folds, n_repeats, model_name= "model_w_group", method = "xgbTree", seeds)
+run_xgb.caret.cv(model_without_group$train.predictors, model_without_group$train.outcome, n_folds, n_repeats, model_name="model_without_group", method = "xgbTree", seeds)
 
 ```
 ## Model Selection
@@ -176,29 +186,150 @@ On estimation data
 ```{r}
 #| warning: false
 #| results: hide
-params <- read_csv("data/results/xgbTree_best_tune.csv",show_col_types = FALSE) |> as.list()
-
-#train model   
-m <- xgboost(booster = "gbtree", data = dtrain, params= params, nrounds=params$nrounds)
-#Training fit
-train_predictions <- predict(m, dtrain)
-# See Fit on unseen data: Generate Predictions
-test_predictions <- predict(m, dtest)
-
-
-```
-```{r}
-#| warning: false
 #| label: tbl-xgboost-param
 #| tbl-cap: Best model parameters 
-params |> as_tibble() |> pivot_longer(cols = everything()) |> rmarkdown::paged_table()   
+#| tbl-subcap: 
+#|  - With group parameters
+#|  - Without group parameters
+params_w_group <- read_csv("data/results/xgbTree_best_tune_model_w_group.csv",show_col_types = FALSE) |> as.list()
+params_w_group |> as_tibble() |> pivot_longer(cols = everything()) |> rmarkdown::paged_table()   
+
+params_wo_group <- read_csv("data/results/xgbTree_best_tune_model_without_group.csv",show_col_types = FALSE) |> as.list()
+params_wo_group |> as_tibble() |> pivot_longer(cols = everything()) |> rmarkdown::paged_table() 
 ```
+
+## Train/Test Split Validation
+
+```{r}
+#| warning: false
+#| results: hide
+#| label: tbl-xgboost-test
+#| tbl-cap: Comparing Accuracy Metrics for Training and Test data
+#| tbl-subcap:
+#| - "With Group: Accuracy Metrics on Training and Test data for sub-set of banks"
+#| - "With Group: Mean Accuracy Metrics for our sub-set of banks"
+#| - "With Group: Mean Accuracy Metrics across all banks"
+#| - "Without Group: Accuracy Metrics on Training and Test data for sub-set of banks"
+#| - "Without Group: Mean Accuracy Metrics for our sub-set of banks"
+#| - "Without Group: Mean Accuracy Metrics across all banks"
+
+bank_fit_result <- function(bankname, data, train_test = "Train", target_name = "UBPRE524.diff") {
+  tryCatch({
+    X_filtered <- data |> filter(BankName == bankname) |> pull(predictions)
+    Y_filtered <- data |> filter(BankName == bankname) |> pull(target_name)
+    caret::postResample(pred = X_filtered, obs = Y_filtered) |> t() |>as_tibble() |>
+      add_column(BankName = bankname,
+                 .type = train_test) |> relocate(BankName,.type)
+  }, error = function(e) {
+    print(glue::glue("metrics error for {bankname}: {e}"))
+  })
+}
+
+run_validation <- function(model, params, banks) {
+  m <- xgboost(booster = "gbtree", data = model$dtrain, params= params, nrounds=params$nrounds)
+
+  #Training fit
+  train_predictions <- predict(m, model$dtrain)
+  # See Fit on unseen data: Generate Predictions
+  test_predictions <- predict(m, model$dtest)
+
+  train_result <- model$train |> mutate(predictions = train_predictions)
+  test_result <- model$test |> mutate(predictions = test_predictions)
+
+  results_est <- unique(model$train$BankName) |> 
+                      map(bank_fit_result,train_result, "Train") |> list_rbind()
+
+  results_test <- unique(estimation_data$BankName) |> 
+                      map(bank_fit_result,test_result, "Test") |> list_rbind()
+                        
+
+  comb <- bind_rows(results_est, results_test) |>
+            dplyr::select(BankName, .type, RMSE, MAE, Rsquared)
+
+  summary_banks <- comb |> 
+                  filter(BankName %in% banks) |> 
+                    arrange(BankName,.type) |> mutate(across(where(is.numeric), \(x) round(x,3)))
+
+  summary_mean_banks <- comb |> filter(BankName %in% banks) |> 
+                          group_by(.type) |> summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |>
+                          mutate(across(where(is.numeric), \(x) round(x,3)))
+                            
+  summary_mean_all <- comb |> group_by(.type) |> 
+                        summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
+                        mutate(across(where(is.numeric), \(x) round(x,3)))
+
+  shap_train <- shapviz(m,X_pred = model$dtrain,X=data.matrix(model$train.predictors))
+  shap_test <- shapviz(m,X_pred = model$dtest,X=data.matrix(model$test.predictors))
+
+  list(tbl1= summary_banks, tbl2 = summary_mean_banks, tbl3 = summary_mean_all, shap_train = shap_train, shap_test = shap_test)
+}
+
+
+val_results <- run_validation(model_w_group, params_w_group, unique(observation_data$BankName))
+val_results$tbl1 |> rmarkdown::paged_table()
+val_results$tbl2 |> rmarkdown::paged_table()
+val_results$tbl3 |> rmarkdown::paged_table()
+
+wo_val_results <- run_validation(model_without_group, params_wo_group, unique(observation_data$BankName))
+wo_val_results$tbl1 |> rmarkdown::paged_table()
+wo_val_results$tbl2 |> rmarkdown::paged_table()
+wo_val_results$tbl3 |> rmarkdown::paged_table()
+```
+
+
+::: {#fig-xgboost-shap .panel-tabset}
+
+## Feature Importance
+```{r}
+#| eval: false
+#| warning: false
+#| label: fig-plot-shap-importance-xgboost
+#| fig-cap: Importance 
+#| fig-subcap:
+#|  - "Training with group"
+#|  - "Training without group"
+#|  - "Test with group"
+#|  - "Test without group"
+#| layout-ncol: 2
+
+shapviz::sv_importance(val_results$shap_train, kind = "beeswarm", show_numbers = TRUE)
+shapviz::sv_importance(wo_val_results$shap_train, kind = "beeswarm", show_numbers = TRUE)
+
+shapviz::sv_importance(val_results$shap_test, kind = "beeswarm", show_numbers = TRUE)
+shapviz::sv_importance(wo_val_results$shap_test, kind = "beeswarm", show_numbers = TRUE)
+
+```
+
+## Waterfall
+
+```{r}
+#| eval: false
+#| warning: false
+#| label: fig-plot-shap-waterfall-xgboost
+#| fig-cap: Waterfall
+#| fig-subcap:
+#|  - "Training with group"
+#|  - "Training without group"
+#|  - "Test with group"
+#|  - "Test without group"
+#| layout-ncol: 2
+sv_waterfall(val_results$shap_train)
+sv_waterfall(wo_val_results$shap_test)
+
+sv_waterfall(val_results$shap_test)
+sv_waterfall(wo_val_results$shap_test)
+```
+
+:::
+
 
 ```{r}
 #| warning: false
 #| label: fig-plot-fit-xgboost
 #| fig-cap: "Fitted vs. Observed for estimation data on sub-set of firms"
 #| fig-height: 10
+predictor_cols <- names(model_w_group$train)
+est_data_wQuarter <- estimation_data |> dplyr::select(c(all_of(predictor_cols), Quarter, UBPRE524.Value))
 bank_data_pred <- est_data_wQuarter[s,]
 bank_data_test <- est_data_wQuarter[-s,]
 bank_data_pred$train_pred <- train_predictions
@@ -294,57 +425,6 @@ bank_results |>
       rmarkdown::paged_table()
 ```
 
-## Train/Test Split Validation
-
-```{r}
-#| warning: false
-#| label: tbl-xgboost-test
-#| tbl-cap: Comparing Accuracy Metrics for Training and Test data
-#| tbl-subcap: 
-#| - Accuracy Metrics on Training and Test data for sub-set of banks
-#| - Mean Accuracy Metrics for our sub-set of banks
-#| - Mean Accuracy Metrics across all banks
-
-bank_fit_result <- function(bankname, data, train_test = "Train", target_name = "UBPRE524.diff") {
-  tryCatch({
-    X_filtered <- data |> filter(BankName == bankname) |> pull(predictions)
-    Y_filtered <- data |> filter(BankName == bankname) |> pull(target_name)
-    caret::postResample(pred = X_filtered, obs = Y_filtered) |> t() |>as_tibble() |>
-      add_column(BankName = bankname,
-                 .type = train_test) |> relocate(BankName,.type)
-  }, error = function(e) {
-    print(glue::glue("metrics error for {bankname}: {e}"))
-  })
-}
-
-train_result <- training |> mutate(predictions = train_predictions)
-test_result <- test |> mutate(predictions = test_predictions)
-
-results_est <- unique(estimation_data$BankName) |> 
-                    map(bank_fit_result,train_result, "Train") |> list_rbind()
-
-results_test <- unique(estimation_data$BankName) |> 
-                    map(bank_fit_result,test_result, "Test") |> list_rbind()
-                       
-
-comb <- bind_rows(results_est, results_test) |>
-          dplyr::select(BankName, .type, RMSE, MAE, Rsquared)
-
-comb |> 
-  filter(BankName %in% observation_data$BankName) |> 
-    arrange(BankName,.type) |> mutate(across(where(is.numeric), \(x) round(x,3))) |> rmarkdown::paged_table()     
-
-comb |> filter(BankName %in% observation_data$BankName) |> 
-  group_by(.type) |> summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |>
-   mutate(across(where(is.numeric), \(x) round(x,3))) |> 
-    rmarkdown::paged_table()  
-
-comb |> group_by(.type) |> 
-  summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
-   mutate(across(where(is.numeric), \(x) round(x,3))) |> 
-    rmarkdown::paged_table()   
-
-```
 ## Prediction 
 
 ```{r}
@@ -353,9 +433,9 @@ comb |> group_by(.type) |>
 #|
 # Convert the data to matrix and assign output variable
 estimation.outcome <- estimation_data$UBPRE524.diff
-estimation.predictors <- sparse.model.matrix(UBPRE524.diff ~ .-1, data = estimation_data)
+estimation.predictors <- sparse.model.matrix(UBPRE524.diff ~ .-1, data = estimation_data |> as_tibble() |> dplyr::select(predictor_cols))
 observation.outcome <- observation_data$UBPRE524.diff
-observation.predictors <- sparse.model.matrix(UBPRE524.diff ~ .-1, data = observation_data)
+observation.predictors <- sparse.model.matrix(UBPRE524.diff ~ .-1, data = observation_data  |> as_tibble() |> dplyr::select(predictor_cols))
 
 # Convert the matrix objects to DMatrix objects
 dEst <- xgb.DMatrix(estimation.predictors, label = estimation.outcome)
@@ -365,7 +445,7 @@ dObs <- xgb.DMatrix(observation.predictors, label = observation.outcome)
 m <- xgboost(booster = "gbtree", data = dEst, params= params, nrounds=params$nrounds)
 #predit
 predictions <- predict(m, dObs)
-obs_data_wQuarter$prediction <- predictions
+result_obs <- observation_data |> mutate(prediction = predictions)
 
 map_prediction_to_partner <- function(Bank, Partner, obs_data_w_qtr, all_data) {
   event_data <- obs_data_w_qtr |> 
@@ -380,7 +460,7 @@ map_prediction_to_partner <- function(Bank, Partner, obs_data_w_qtr, all_data) {
       add_column(Partner = Partner)
 }
 
-result <- map2(partner_banks$Bank, partner_banks$Partner,map_prediction_to_partner, obs_data_wQuarter, data) |>
+result <- map2(partner_banks$Bank, partner_banks$Partner,map_prediction_to_partner, result_obs, data) |>
             list_rbind()
 
 
@@ -410,7 +490,6 @@ print_ar(result, "GAP", "BARCLAYS BANK DELAWARE (2980209)")
 #| eval: false
 #| warning: false
 #| echo: false
-
 
 # Examine feature importance
 importance_matrix <- xgb.importance(model = m)
