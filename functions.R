@@ -891,3 +891,27 @@ print_ar <- function(prediction_result, partner, bank) {
       rmarkdown::paged_table(options = list(rows.print = 16))
 }
 
+nest_data_for_step_cv <- function(estimation_data) {
+    data <- estimation_data |> as_tibble() |>
+              mutate(Quarter = factor(Quarter, levels = unique(Quarter))) |>
+              arrange(Quarter) |>
+              mutate(Quarter_Index = as.integer(factor(Quarter))) |> 
+              relocate(Quarter_Index)
+
+    cumulative_data <- map(unique(data$Quarter_Index), ~ {
+                        data |>
+                            filter(Quarter_Index < .x)
+                        })
+
+    est_data_tr <- tibble(
+                    Quarter_Index = unique(data$Quarter_Index),
+                    data = cumulative_data
+                   )
+
+    step_data_tr <- data |> 
+                      group_by(Quarter_Index) |> 
+                      nest(new_data = -c(Quarter_Index))
+
+
+    est_data_tr |> left_join(step_data_tr) |> drop_na(new_data)
+}
