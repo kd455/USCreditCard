@@ -869,10 +869,10 @@ original_scale <- function(fcast_bank_data, all_data, col_name = ".mean") {
       value0 <- all_data |> 
                   filter(BankName == bank_name, 
                           Quarter == quarter0) |> pull(UBPRE524.Value)
-      result <- fcast_bank_data |> mutate(predicted = value0 + cumsum(!!col_name))                  
+      result <- fcast_bank_data |> mutate(predicted = value0 + cumsum(!!as.name(col_name)))                  
   } else {
     print(paste("Bank uses Value", bank_name))
-    result <- result |> rename(predicted = !!col_name)
+    result <- result |> rename(predicted = !!as.name(col_name))
   }
   result |> as_tsibble() |> dplyr::select(all_of(c(keys,"predicted")))
 }
@@ -891,27 +891,3 @@ print_ar <- function(prediction_result, partner, bank) {
       rmarkdown::paged_table(options = list(rows.print = 16))
 }
 
-nest_data_for_step_cv <- function(estimation_data) {
-    data <- estimation_data |> as_tibble() |>
-              mutate(Quarter = factor(Quarter, levels = unique(Quarter))) |>
-              arrange(Quarter) |>
-              mutate(Quarter_Index = as.integer(factor(Quarter))) |> 
-              relocate(Quarter_Index)
-      
-    cumulative_data <- map(unique(data$Quarter_Index), ~ {
-                        data |>
-                            filter(Quarter_Index < .x)
-                        })
-
-    est_data_tr <- tibble(
-                    Quarter_Index = unique(data$Quarter_Index),
-                    data = cumulative_data
-                   )
-
-    step_data_tr <- data |> 
-                      group_by(Quarter_Index) |> 
-                      nest(new_data = -c(Quarter_Index))
-
-
-    est_data_tr |> left_join(step_data_tr) |> drop_na(new_data)
-}

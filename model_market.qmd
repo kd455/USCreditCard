@@ -42,7 +42,8 @@ observation_data <- model_data$observation_data
 partner_banks <- credit_card.partnerships.long()
 
 market_formula <- "UBPRE524.diff ~ UBPRE524.group.diff"
-m_table <- estimation_data |> fill_gaps() |> fabletools::model(tslm = TSLM(as.formula(market_formula)))
+m_table <- estimation_data |> fill_gaps() |> model(tslm = TSLM(as.formula(market_formula)))
+
 augmented_data <- m_table |> augment()
 ```
 
@@ -67,7 +68,7 @@ augmented_data |> filter(BankName %in% unique(observation_data$BankName)) |>
 #| warning: false
 #| label: tbl-market-aicc
 #| tbl-cap: AICc Summary for sub-set of banks
-m_table |> filter(BankName %in% observation_data$BankName) |> glance() |> relocate(BankName, AICc, AIC) |> dplyr::select(-IDRSSD)|>
+m_table |> filter(BankName %in% observation_data$BankName) |> glance() |> relocate(BankName, AICc, AIC) |> dplyr::select(-c(IDRSSD,.model))|>
     mutate(across(where(is.numeric), \(x) round(x,4))) |>  
     rmarkdown::paged_table()  
 ```
@@ -245,14 +246,14 @@ get_prediction <- function(bank, partner, all_data, models) {
     filter(BankName == bank)  |>
     forecast(new_data= event_data, bootstrap=TRUE, times = 100)
 
-  original_scale(fcast, all_data) |> add_column(Partner = partner)
+  original_scale(fcast, all_data) |> add_column(Partner = partner)  
 }
-
 
 result <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, data, m_table)  |> 
   list_rbind() |> left_join(data |> dplyr::select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter) ) |> as_tibble() |> dplyr::select(Partner, BankName, Quarter, observed, predicted) 
 
 map2(partner_banks$Bank, partner_banks$Partner, plot_prediction, result, data) 
+
 ```
 
 ```{r}
@@ -273,6 +274,10 @@ print_ar(result, "Walmart", "CAPITAL ONE, NATIONAL ASSOCIATION (112837)")
 print_ar(result, "GAP", "SYNCHRONY BANK (1216022)")
 print_ar(result, "GAP", "BARCLAYS BANK DELAWARE (2980209)")
 
+```
+
+```{r}
+estimation_data
 ```
 
 ## References
