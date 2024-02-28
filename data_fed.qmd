@@ -17,7 +17,8 @@ This approach assumes that the broader "market" trend takes into account, to som
 
 US Federal Reserve Economic Data [@fred] provides macroeconomic data series; we can use past literature and new analysis to inform our choice of variables.
 
-@Agarwal2003, using proprietary credit card data of 700 thousand customers from 1995 to 2001, concluded that *unemployment* is a key determinant of consumer delinquency and bankruptcy. @GHJ2001 pointed to *consumer debt ratio* i.e. when debt payment obligations become too high relative to disposable income for the population as a whole, borrowers are unable to service their debts. @taghiyeh2021 explored 19 lagged macroeconomic variables and found the most significant to predict credit card loss was: previous quarter *Unemployment*, *Building permits* and *Initial unemployment insurance claims*; previous year's (lag 4) *Money stock* and *ISM Purchasing Mangers Index* and the current quarter's *Weekly hours worked by manufacturing workers*.
+@Agarwal2003, using proprietary credit card data of 700 thousand customers from 1995 to 2001, concluded that *unemployment* is a key determinant of consumer delinquency and bankruptcy. However, @taghiyeh2021 concluded that *unemployment* as the positive correlation between delinquency and unemployment hasn't continued; as unemployment decreased, deliquency increased.  to have been 
+explored 19 lagged macroeconomic variables and found the most significant to predict credit card loss was: previous quarter *Unemployment*, *Building permits* and *Initial unemployment insurance claims*; previous year's (lag 4) *Money stock* and *ISM Purchasing Mangers Index* and the current quarter's *Weekly hours worked by manufacturing workers*. @GHJ2001 pointed to *consumer debt ratio* i.e. when debt payment obligations become too high relative to disposable income for the population as a whole, borrowers are unable to service their debts. @taghiyeh2021 explored 19 lagged macroeconomic variables and found the most significant to predict credit card loss was: previous quarter *Unemployment*, *Building permits* and *Initial unemployment insurance claims*; previous year's (lag 4) *Money stock* and *ISM Purchasing Mangers Index* and the current quarter's *Weekly hours worked by manufacturing workers*.
 
 
 ```{r}
@@ -28,7 +29,7 @@ granger_test_permutations <- function(data, target_col_name = "value.mean", exog
     results <- list()
     for (lag in 1:max_lag) {
         results[[lag]] <- exog_names |>
-                            purrr::map(\(x) run_granger_test(data, target_col_name, x, lag)) |> list_rbind() |> arrange(`Pr(>F)`) |> filter(`Pr(>F)` <= 0.05) |> mutate(across(F:`Pr(>F)`, ~ round(.,3))) |> select(-Res.Df)       
+                            purrr::map(\(x) run_granger_test(data, target_col_name, x, lag)) |> list_rbind() |> arrange(`Pr(>F)`) |> filter(`Pr(>F)` <= 0.05) |> mutate(across(F:`Pr(>F)`, ~ round(.,3))) |> dplyr::select(-Res.Df)       
     } 
     results 
 }    
@@ -113,7 +114,7 @@ The tables presented below, show the macroeconomic variable and lag (Df column) 
 granger_test_permutations(data = overdue30to89.post |> left_join (us_measures_qtr,by = join_by(Quarter)), 
                             target_col_name = "value.all.median",
                             exog_names = names(us_measures_qtr),
-                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category)) |> rmarkdown::paged_table()
+                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> dplyr::select(-c(Formula, Category)) |> rmarkdown::paged_table()
 
 ```
 
@@ -130,7 +131,7 @@ granger_test_permutations(data = overdue30to89.post |> left_join (us_measures_qt
 granger_test_permutations(data = overdue30to89.post.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
                             target_col_name = "value.group.median",
                             exog_names = names(us_measures_qtr),
-                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category)) |> rmarkdown::paged_table()  
+                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> dplyr::select(-c(Formula, Category)) |> rmarkdown::paged_table()  
 
 ```
 ## Large Credit Card Bank
@@ -145,7 +146,7 @@ granger_test_permutations(data = overdue30to89.post.lbank |> left_join (us_measu
 granger_test_permutations(data = overdue30to89.post.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
                             target_col_name = "value.group.median",
                             exog_names = names(us_measures_qtr),
-                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> select(-c(Formula, Category)) |> rmarkdown::paged_table()  
+                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> dplyr::select(-c(Formula, Category)) |> rmarkdown::paged_table()  
 
 ```
 
@@ -286,7 +287,7 @@ run_ccf_test(data = us_measures_qtr,
 ```{r}
 #| warning: false
 #| echo: false
-ubpr_data <- get_model_data() |> select(dplyr::matches("UBPR.*.Value")) |> 
+ubpr_data <- get_model_data()$all_data |> dplyr::select(dplyr::matches("UBPR.*.Value")) |> 
                 rename_with(~str_remove(., '.Value')) |>
                 group_by(BankType) |>
                 summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE)))

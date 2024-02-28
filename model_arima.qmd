@@ -51,12 +51,12 @@ get_model_cols <-function(model_table, ignore_cols) {
 # print_top_group_model <-function(arima_results, bank_type, score_by = "AICc", n=10) {
 #   arima_results |> 
 #     filter(is.na(BankName), BankType == bank_type) |> 
-#       select(-BankType) |> relocate(.model, .model_spec, !!score_by) |> arrange(!!as.name(score_by)) |> head(n) |> mutate(across(where(is.numeric), \(x) round(x,2))) |>  rmarkdown::paged_table()
+#       dplyr::select(-BankType) |> relocate(.model, .model_spec, !!score_by) |> arrange(!!as.name(score_by)) |> head(n) |> mutate(across(where(is.numeric), \(x) round(x,2))) |>  rmarkdown::paged_table()
 # }
 
 print_top_bank_model <- function(fuzzy_bankname, arima_results, score_by = "AICc", n = 10) {
   arima_results |> 
-    filter(grepl(fuzzy_bankname,BankName)) |> select(-c(BankName,BankType,IDRSSD)) |> 
+    filter(grepl(fuzzy_bankname,BankName)) |> dplyr::select(-c(BankName,BankType,IDRSSD)) |> 
       relocate(.model, .model_spec, !!score_by) |> arrange(!!as.name(score_by)) |> head(n) |> 
         mutate(across(where(is.numeric), \(x) round(x,4))) |>  
           rmarkdown::paged_table()
@@ -68,7 +68,7 @@ diff_results <- function(data) {
         mutate(UBPRE524.diff = difference(UBPRE524.Value),
                 .fitted = difference(.fitted),
                 .resid = difference(.fitted)) |> drop_na(UBPRE524.diff) |> 
-          select(-UBPRE524.Value) |> relocate(UBPRE524.diff, .before = .fitted)
+          dplyr::select(-UBPRE524.Value) |> relocate(UBPRE524.diff, .before = .fitted)
   } else {
     data
   }
@@ -97,7 +97,7 @@ print_coeff <- function(fuzzy_bankname, bank_models) {
                   filter(grepl(fuzzy_bankname,bank)) |> pluck("model_details",1)
   
   bank_model$BankModel |> tidy() |> 
-    select(.model:last_col()) |> 
+    dplyr::select(.model:last_col()) |> 
       mutate(across(where(is.numeric), \(x) round(x,4))) |> rmarkdown::paged_table()
 }
 
@@ -303,7 +303,7 @@ best_bank_models <- tibble(bank = unique(estimation_data$BankName)) |>
 
 bank_aug_data <- best_bank_models |> 
                   mutate(augdata = map(model_details, ~ .x$Augmented)) |> unnest(augdata) |> 
-                    select(BankName:last_col()) 
+                    dplyr::select(BankName:last_col()) 
 
 bank_aug_data |> 
   filter(BankName %in% observation_data$BankName) |> 
@@ -463,7 +463,7 @@ Banks not listed have residuals that are indistinguishable from a white noise se
 #| tbl-cap: Ljung–Box results where P-value < Significance Level of 0.05
 bank_aug_data  |> as_tsibble(index=Quarter, key = BankName) |>
   features(.innov, ljung_box) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> 
-    filter(lb_pvalue <= 0.05)|> select(BankName,lb_stat,lb_pvalue) |>
+    filter(lb_pvalue <= 0.05)|> dplyr::select(BankName,lb_stat,lb_pvalue) |>
       rmarkdown::paged_table()
 ```
 
@@ -499,7 +499,7 @@ do_arima_cv <- function(bankname, formulas, estimation_data, init = 5) {
                       dplyr::slice(init+1:n()) |> mutate(.step = row_number()) |> 
                         relocate(.step) |>
                           group_by(.step) |> nest(data = -c(.step,UBPRE524.diff)) |> 
-                            rename("new_data" = "data") |> select(-UBPRE524.diff)
+                            rename("new_data" = "data") |> dplyr::select(-UBPRE524.diff)
 
 
     nested_data <- est_data_tr |>
@@ -509,7 +509,7 @@ do_arima_cv <- function(bankname, formulas, estimation_data, init = 5) {
   
     results <- nested_data |> 
                   mutate(model = map(data, ~model(.x, ARIMA(!!selected_formula))),
-                        forecast = map(model, forecast, new_data = new_data, bootstrap=TRUE, times=10))
+                        forecast = map(model, forecast, new_data = new_data, bootstrap=TRUE, times=100))
 
     results$forecast |> map(fabletools::accuracy, filtered_data) |> 
       list_rbind() |>  readr::write_csv(glue("data/results/tscv/estimate_tscv_arima_{bankname}.csv"))
@@ -532,12 +532,12 @@ unique(estimation_data$BankName) |> walk(\(x) do_arima_cv(x, bank_top_formulas, 
 #| - Mean Accuracy Metrics for our sub-set of banks
 #| - Mean Accuracy Metrics across all banks
 cv_results_est <- readr::read_csv("data/results/estimate_arima_metrics.csv",show_col_types = FALSE) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> 
-  select(BankName, .type, RMSE, MAE)
+  dplyr::select(BankName, .type, RMSE, MAE)
 
 cv_results_test <- read_tscv_results("arima") |> group_by(.type,BankName) |> 
   summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
   mutate(across(where(is.numeric), \(x) round(x,4))) |> 
-  select(BankName, .type, RMSE, MAE) |> mutate(.type = "CV") 
+  dplyr::select(BankName, .type, RMSE, MAE) |> mutate(.type = "CV") 
   
 comb <- bind_rows(cv_results_est, cv_results_test) 
 comb |> filter(BankName %in% observation_data$BankName) |> arrange(BankName,.type) |> rmarkdown::paged_table()     
@@ -579,7 +579,7 @@ get_prediction <- function(Bank, Partner, all_data, models) {
 }
 
 result <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, data, best_bank_models) |>
-            list_rbind() |> left_join(data |> select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter) ) |> as_tibble() |> select(Partner,BankName, Quarter, observed, predicted) |> mutate(AR = abs(observed) -abs(predicted))
+            list_rbind() |> left_join(data |> dplyr::select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter) ) |> as_tibble() |> dplyr::select(Partner,BankName, Quarter, observed, predicted) |> mutate(AR = abs(observed) -abs(predicted))
 
 map2(partner_banks$Bank, partner_banks$Partner, plot_prediction, result, data) 
 

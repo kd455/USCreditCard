@@ -915,3 +915,10 @@ nest_data_for_step_cv <- function(estimation_data) {
 
     est_data_tr |> left_join(step_data_tr) |> drop_na(new_data)
 }
+
+get_feature_labels <- function() {
+  bind_rows(
+    read_csv("data/UBPR_codes_descriptions.csv", col_select = c(1:2),show_col_types = FALSE, col_names = c("Code","Desc")),
+    read_csv("data/us_economy_labels.csv", col_select = c(1:2),show_col_types = FALSE,col_names = c("Code","Desc"))
+    )
+}
