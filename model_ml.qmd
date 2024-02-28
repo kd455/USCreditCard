@@ -177,7 +177,10 @@ This means you will perform a total of 15 train-test splits (3 repeats × 5 fold
 For each repeat, you calculate an average performance metric over its 5 folds, just like in the single round of 5-fold cross-validation.
 Finally, you might average the performance metrics across all 3 repeats to get an overall performance estimate, or you might assess the variability of the model performance across repeats.
 
-![Caption](images/xgbTree_tuning_plot.png){#fig-xgcv}
+
+![Parameter Tuning for model with group predictors](images/xgbTree_tuning_plot_model_w_group.png){#fig-xgcv-group}
+![Parameter Tuning for model without group predictors](images/xgbTree_tuning_plot_model_w_group.png){#fig-xgcv-wo-group}
+
 
 ## Model Results
 
@@ -185,17 +188,17 @@ On estimation data
 
 ```{r}
 #| warning: false
-#| results: hide
 #| label: tbl-xgboost-param
-#| tbl-cap: Best model parameters 
-#| tbl-subcap: 
-#|  - With group parameters
-#|  - Without group parameters
-params_w_group <- read_csv("data/results/xgbTree_best_tune_model_w_group.csv",show_col_types = FALSE) |> as.list()
-params_w_group |> as_tibble() |> pivot_longer(cols = everything()) |> rmarkdown::paged_table()   
+#| tbl-cap: Tuning model parameters 
+params_w_group <- read_csv("data/results/xgbTree_best_tune_model_w_group.csv",show_col_types = FALSE) |> 
+                    add_column(model = "With Group")|> as.list()
 
-params_wo_group <- read_csv("data/results/xgbTree_best_tune_model_without_group.csv",show_col_types = FALSE) |> as.list()
-params_wo_group |> as_tibble() |> pivot_longer(cols = everything()) |> rmarkdown::paged_table() 
+params_wo_group <- read_csv("data/results/xgbTree_best_tune_model_without_group.csv",show_col_types = FALSE) |>
+                    add_column(model = "Without Group") |> as.list()
+
+bind_rows(params_w_group, params_wo_group) |> 
+  pivot_longer(cols=c(-model)) |>
+  pivot_wider(names_from=c(model)) |> rmarkdown::paged_table()  
 ```
 
 ## Train/Test Split Validation
@@ -203,16 +206,7 @@ params_wo_group |> as_tibble() |> pivot_longer(cols = everything()) |> rmarkdown
 ```{r}
 #| warning: false
 #| results: hide
-#| label: tbl-xgboost-test
-#| tbl-cap: Comparing Accuracy Metrics for Training and Test data
-#| tbl-subcap:
-#| - "With Group: Accuracy Metrics on Training and Test data for sub-set of banks"
-#| - "With Group: Mean Accuracy Metrics for our sub-set of banks"
-#| - "With Group: Mean Accuracy Metrics across all banks"
-#| - "Without Group: Accuracy Metrics on Training and Test data for sub-set of banks"
-#| - "Without Group: Mean Accuracy Metrics for our sub-set of banks"
-#| - "Without Group: Mean Accuracy Metrics across all banks"
-
+#| eval: false
 bank_fit_result <- function(bankname, data, train_test = "Train", target_name = "UBPRE524.diff") {
   tryCatch({
     X_filtered <- data |> filter(BankName == bankname) |> pull(predictions)
@@ -225,7 +219,7 @@ bank_fit_result <- function(bankname, data, train_test = "Train", target_name = 
   })
 }
 
-run_validation <- function(model, params, banks) {
+run_validation <- function(model, params, model_name) {
   m <- xgboost(booster = "gbtree", data = model$dtrain, params= params, nrounds=params$nrounds)
 
   #Training fit
@@ -246,6 +240,50 @@ run_validation <- function(model, params, banks) {
   comb <- bind_rows(results_est, results_test) |>
             dplyr::select(BankName, .type, RMSE, MAE, Rsquared)
 
+  comb |> write_csv(glue("data/results/xgbTree_validation_{model_name}.csv"))  
+  
+  #save images
+  shap_train <- shapviz(m,X_pred = model$dtrain,X=data.matrix(model$train.predictors))
+  shap_test <- shapviz(m,X_pred = model$dtest,X=data.matrix(model$test.predictors))
+
+  png(glue("images/xgb_train_imp_{model_name}.png"), width = 800, height = 600)
+  sv_importance(shap_train, kind = "beeswarm", show_numbers = TRUE)
+  dev.off()
+
+  png(glue("images/xgb_test_imp_{model_name}.png"), width = 800, height = 600)
+  sv_importance(shap_test, kind = "beeswarm", show_numbers = TRUE)
+  dev.off()
+  
+  png(glue("images/xgb_train_water_{model_name}.png"), width = 800, height = 600)
+  sv_waterfall(shap_train)
+  dev.off()
+
+  png(glue("images/xgb_test_water_{model_name}.png"), width = 800, height = 600)
+  sv_waterfall(shap_test)
+  dev.off()
+}
+
+model = model_without_group
+params = params_wo_group
+model_name = "wo_group"
+
+run_validation(model_w_group, params_w_group,"w_group")
+run_validation(model_without_group, params_wo_group,"wo_group")
+
+```
+
+```{r}
+#| label: tbl-xgboost-test
+#| tbl-cap: Comparing Accuracy Metrics for Training and Test data
+#| tbl-subcap:
+#| - "With Group: Accuracy Metrics on Training and Test data for sub-set of banks"
+#| - "With Group: Mean Accuracy Metrics for our sub-set of banks"
+#| - "With Group: Mean Accuracy Metrics across all banks"
+#| - "Without Group: Accuracy Metrics on Training and Test data for sub-set of banks"
+#| - "Without Group: Mean Accuracy Metrics for our sub-set of banks"
+#| - "Without Group: Mean Accuracy Metrics across all banks"
+get_summary_validation <- function(model_name, banks) {
+  comb <- read_csv(glue("data/results/xgbTree_validation_{model_name}.csv"),show_col_types = FALSE)
   summary_banks <- comb |> 
                   filter(BankName %in% banks) |> 
                     arrange(BankName,.type) |> mutate(across(where(is.numeric), \(x) round(x,3)))
@@ -258,93 +296,88 @@ run_validation <- function(model, params, banks) {
                         summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
                         mutate(across(where(is.numeric), \(x) round(x,3)))
 
-  shap_train <- shapviz(m,X_pred = model$dtrain,X=data.matrix(model$train.predictors))
-  shap_test <- shapviz(m,X_pred = model$dtest,X=data.matrix(model$test.predictors))
-
-  list(tbl1= summary_banks, tbl2 = summary_mean_banks, tbl3 = summary_mean_all, shap_train = shap_train, shap_test = shap_test)
+  list(tbl1 = summary_banks, tbl2 = summary_mean_banks, tbl3 = summary_mean_all)
 }
-
-
-val_results <- run_validation(model_w_group, params_w_group, unique(observation_data$BankName))
+banks = unique(observation_data$BankName)
+val_results <- get_summary_validation("w_group", banks)
 val_results$tbl1 |> rmarkdown::paged_table()
 val_results$tbl2 |> rmarkdown::paged_table()
 val_results$tbl3 |> rmarkdown::paged_table()
 
-wo_val_results <- run_validation(model_without_group, params_wo_group, unique(observation_data$BankName))
-wo_val_results$tbl1 |> rmarkdown::paged_table()
-wo_val_results$tbl2 |> rmarkdown::paged_table()
-wo_val_results$tbl3 |> rmarkdown::paged_table()
-```
+val_wo_results <- get_summary_validation("wo_group", banks)
+val_wo_results$tbl1 |> rmarkdown::paged_table()
+val_wo_results$tbl2 |> rmarkdown::paged_table()
+val_wo_results$tbl3 |> rmarkdown::paged_table()
 
+```
 
 ::: {#fig-xgboost-shap .panel-tabset}
 
 ## Feature Importance
-```{r}
-#| eval: false
-#| warning: false
-#| label: fig-plot-shap-importance-xgboost
-#| fig-cap: Importance 
-#| fig-subcap:
-#|  - "Training with group"
-#|  - "Training without group"
-#|  - "Test with group"
-#|  - "Test without group"
-#| layout-ncol: 2
 
-shapviz::sv_importance(val_results$shap_train, kind = "beeswarm", show_numbers = TRUE)
-shapviz::sv_importance(wo_val_results$shap_train, kind = "beeswarm", show_numbers = TRUE)
+::: {#fig-importance}
 
-shapviz::sv_importance(val_results$shap_test, kind = "beeswarm", show_numbers = TRUE)
-shapviz::sv_importance(wo_val_results$shap_test, kind = "beeswarm", show_numbers = TRUE)
+![Training data with group](images/xgb_train_imp_w_group.png)
 
-```
+![Test data with group](images/xgb_test_imp_w_group.png)
+
+![Training data without group](images/xgb_train_imp_wo_group.png)
+
+![Test data without group](images/xgb_test_imp_wo_group.png)
+
+Feature Importance: SHAP values per feature for training and test dataset.
+:::
 
 ## Waterfall
 
-```{r}
-#| eval: false
-#| warning: false
-#| label: fig-plot-shap-waterfall-xgboost
-#| fig-cap: Waterfall
-#| fig-subcap:
-#|  - "Training with group"
-#|  - "Training without group"
-#|  - "Test with group"
-#|  - "Test without group"
-#| layout-ncol: 2
-sv_waterfall(val_results$shap_train)
-sv_waterfall(wo_val_results$shap_test)
+::: {#fig-waterfall}
 
-sv_waterfall(val_results$shap_test)
-sv_waterfall(wo_val_results$shap_test)
-```
+![Training data with group](images/xgb_train_water_w_group.png)
+
+![Test data with group](images/xgb_test_water_w_group.png)
+
+![Training data without group](images/xgb_train_water_wo_group.png)
+
+![Test data without group](images/xgb_test_water_wo_group.png)
+
+Waterfall: mean SHAP contribution of features for training and test dataset.
+:::
 
 :::
 
-
 ```{r}
 #| warning: false
+#| results: hide
+#| fig-keep: all
 #| label: fig-plot-fit-xgboost
 #| fig-cap: "Fitted vs. Observed for estimation data on sub-set of firms"
 #| fig-height: 10
+
 predictor_cols <- names(model_w_group$train)
-est_data_wQuarter <- estimation_data |> dplyr::select(c(all_of(predictor_cols), Quarter, UBPRE524.Value))
-bank_data_pred <- est_data_wQuarter[s,]
-bank_data_test <- est_data_wQuarter[-s,]
-bank_data_pred$train_pred <- train_predictions
-bank_data_test$test_pred <- test_predictions
-bank_results <- bind_rows(bank_data_test, bank_data_pred) |> 
-                mutate(.resid = UBPRE524.diff - coalesce(test_pred,train_pred)) |>
-                dplyr::select(Quarter, BankName, BankType,UBPRE524.diff,train_pred,test_pred, .resid) 
+est_data <- estimation_data |> as_tibble() |> dplyr::select(c(all_of(predictor_cols)))
+
+# Convert the data to matrix and assign output variable
+estimate.outcome <- est_data$UBPRE524.diff
+estimate.predictors <- sparse.model.matrix(UBPRE524.diff ~ .-1, data = est_data)
+
+# Convert the matrix objects to DMatrix objects
+dEst <- xgb.DMatrix(estimate.predictors, label = estimate.outcome)
+
+m <- xgboost(booster = "gbtree", data = dEst, params= params_w_group, nrounds=params_w_group$nrounds)
+
+#Estimation fit
+est_predictions <- predict(m, dEst)
+
+bank_results <- estimation_data |> mutate(.fitted = est_predictions,
+                                  .resid = UBPRE524.diff - est_predictions) |>
+                dplyr::select(Quarter, BankName, BankType,UBPRE524.diff,.fitted,.resid) 
                   
 bank_results |> 
   filter(BankName %in% observation_data$BankName) |> dplyr::select(-.resid) |>
     pivot_longer(cols = where(is.numeric))|> 
-      ggplot(aes(x=Quarter, y = value, color=name)) + geom_line() + geom_point()+
+      ggplot(aes(x=Quarter, y = value, color=name)) + geom_line() + 
       facet_wrap(~BankType+BankName, ncol = 1) + 
-      scale_colour_manual(values = c("train_pred" = "#1B9E77", 
-                                     "test_pred" = "#D55E00", 
+      scale_colour_manual(values = c(".fitted" = "#D55E00", 
                                       UBPRE524.diff = "darkgrey")) + 
       theme(legend.position = "top", legend.title = element_blank(), legend.direction = "vertical")
 
@@ -430,21 +463,15 @@ bank_results |>
 ```{r}
 #| warning: false
 #| results: hide
-#|
-# Convert the data to matrix and assign output variable
-estimation.outcome <- estimation_data$UBPRE524.diff
-estimation.predictors <- sparse.model.matrix(UBPRE524.diff ~ .-1, data = estimation_data |> as_tibble() |> dplyr::select(predictor_cols))
+#| fig-keep: all
+#| label: fig-pred-observed-xgboost
+#| fig-cap: "Prediction vs. Observed Event"
 observation.outcome <- observation_data$UBPRE524.diff
 observation.predictors <- sparse.model.matrix(UBPRE524.diff ~ .-1, data = observation_data  |> as_tibble() |> dplyr::select(predictor_cols))
 
-# Convert the matrix objects to DMatrix objects
-dEst <- xgb.DMatrix(estimation.predictors, label = estimation.outcome)
 dObs <- xgb.DMatrix(observation.predictors, label = observation.outcome)
-
-#train model   
-m <- xgboost(booster = "gbtree", data = dEst, params= params, nrounds=params$nrounds)
-#predit
 predictions <- predict(m, dObs)
+
 result_obs <- observation_data |> mutate(prediction = predictions)
 
 map_prediction_to_partner <- function(Bank, Partner, obs_data_w_qtr, all_data) {
@@ -460,13 +487,11 @@ map_prediction_to_partner <- function(Bank, Partner, obs_data_w_qtr, all_data) {
       add_column(Partner = Partner)
 }
 
-result <- map2(partner_banks$Bank, partner_banks$Partner,map_prediction_to_partner, result_obs, data) |>
+result <- map2(partner_banks$Bank, partner_banks$Partner,map_prediction_to_partner, result_obs, all_data) |>
             list_rbind()
 
-
+map2(partner_banks$Bank, partner_banks$Partner, plot_prediction, result, all_data) 
 ```
-
-
 ```{r}
 #| warning: false
 #| label: tbl-abnormal-xgboost
@@ -486,58 +511,4 @@ print_ar(result, "GAP", "SYNCHRONY BANK (1216022)")
 print_ar(result, "GAP", "BARCLAYS BANK DELAWARE (2980209)")
 ```
 
-```{r}
-#| eval: false
-#| warning: false
-#| echo: false
 
-# Examine feature importance
-importance_matrix <- xgb.importance(model = m)
-print(importance_matrix)
-xgb.plot.importance(importance_matrix = importance_matrix)
-importance_matrix |> write_csv("data/results/xgbTree_importance_matrix.csv")
-
-save_sv_dependence <- function(shp, feature, colour_var) {
-  tryCatch({
-  # Start PNG device
-  png(filename = glue::glue("data/results/sv_dependence/{feature}_plot.png"), width = 800, height = 600)
-  plot_obj <- sv_dependence(shp, feature, color_var)
-  print(plot_obj)
-  
-  # Turn off the device
-  dev.off()
-  }, error = function(e) {
-    # Handle errors
-    dev.off()
-    print(glue::glue("sv_dependence could not be plotted for {feature}"))
-  })
-}
-
-```
-```{r}
-#| warning: false
-#| eval: false
-#| 
-#The chart helps us understand which features are most important for a particular prediction and how they interact to produce the final outcome
-library(shapviz)
-shp <- shapviz(m,X_pred = dEst,X=data.matrix(estimation.predictors))
-png(glue("images/estimation_postgroup_importance.png"), width = 800, height = 600)
-shapviz::sv_importance(shp, kind = "beeswarm", show_numbers = TRUE)
-dev.off()
-
-png(glue("images/estimation_postgroup_waterfall.png"), width = 800, height = 600)
-sv_waterfall(shp)
-dev.off()
-
-shp <- shapviz(m,X_pred = dObs,X=data.matrix(observation.predictors))
-png(glue("images/obs_postgroup_importance.png"), width = 800, height = 600)
-shapviz::sv_importance(shp, kind = "beeswarm", show_numbers = TRUE)
-dev.off()
-png(glue("images/obs_postgroup_waterfall.png"), width = 800, height = 600)
-sv_waterfall(shp)
-dev.off()
-
-```
-
-![Caption](images/estimation_postgroup_waterfall.png){#fig-shap-fall-post}
-![Post](images/estimation_pregroup_waterfall.png){#fig-shap-fall-pre}

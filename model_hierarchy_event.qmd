@@ -59,8 +59,6 @@ model_comparison |> as.data.frame() |> rownames_to_column(var = "Model")|>
          dplyr::select(Model, df, logLik, AICc, delta, weight) |>
             rmarkdown::paged_table()  
 
-m8.9  <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff + UBPRE524.log.diff.lag1 | BankName/Qtr) + UBPRE524.group.log.diff + TDSP.log.diff + TDSP.log.diff.lag1, data = estimation_data, REML = TRUE)
-
 ```
 
 
@@ -79,13 +77,39 @@ model_comparison |> as.data.frame() |> rownames_to_column(var = "Model")|>
 ```
 Set REML to true. 
 
+
+
+### Variance Inflation Factors
+
+Inspecting the correlation matrix shows that there is correlation between group and all. This is supported by calculating the variance inflation factor (VIF). VIF is a measure of how much the variance of the estimated regression coefficient $𝛽𝑘$ is inflated by the existence of correlation among the features. A high VIF indicates that the feature shares a lot of information with other features. The general rule of thumb is that VIFs exceeding 4 warrant further investigation, while VIFs exceeding 10 are signs of serious multicollinearity requiring correction. (R-project, 2020). From Table 5, there are three features that we must address.
+
+```{r}
+```{r}
+#| warning: false
+#| label: tbl-corr-hier
+#| tbl-subcap:
+#|  - Correlation of Fixed Effects for model 8.8
+#|  - VIF 
+model_name <- "m8.8"
+top_model <- lmer(formula(eval(as.name(model_name))), data = estimation_data, REML = TRUE)
+
+cov2cor(vcov(top_model)) |> as.matrix() |> as.data.frame() |>
+    mutate(across(where(is.numeric), \(x) round(x,2))) |>  
+    rmarkdown::paged_table() 
+
+car::vif(top_model,type="predictor") |> as.data.frame() |> rmarkdown::paged_table() 
+
+#change top model
+model_name <- "m8.7"
+top_model <- lmer(formula(eval(as.name(model_name))), data = estimation_data, REML = TRUE)
+
+```
+
 ```{r}
 #| warning: false
 #| label: fig-plot-fit-hier
 #| fig-cap: "Fitted vs. Observed for estimation data on sub-set of firms"
 #| fig-height: 10
-top_model <- m8.8
-model_name <- "m8.8"
 augmented_data <- augment(top_model) |> 
                     mutate(Quarter = estimation_data$Quarter,
                         BankType = estimation_data$BankType) |>
@@ -95,8 +119,8 @@ augmented_data <- augment(top_model) |>
 augmented_data |> 
     filter(BankName %in% unique(observation_data$BankName)) |>
     plot_model_fit("UBPRE524.diff")
-
 ```
+
 ```{r}
 #| warning: false
 #| label: tbl-coef-hier
@@ -120,7 +144,6 @@ plotFEsim(feEx) +
                     x = "Median Effect Estimate", y = glue("{target_label} (difference)"))
 
 ```
-
 ::: {#fig-random-effects .panel-tabset}
 
 ## Random Effects Plot
@@ -241,34 +264,11 @@ metrics |> dplyr::select(BankName, BankType, .model, .type, RMSE, MAE) |>
 #| warning: false
 #| output: false
 #| eval: false
-do_hier_cv <- function(estimation_data, init = 5) {      
-    data <- estimation_data |> as_tibble() |>
-        mutate(Quarter = factor(Quarter, levels = unique(Quarter)))
-    
-    data <- data |>
-            arrange(Quarter) |>
-            mutate(Quarter_Index = as.integer(factor(Quarter))) |> 
-            relocate(Quarter_Index)
-    
-    cumulative_data <- map(unique(data$Quarter_Index), ~ {
-        data |>
-            filter(Quarter_Index < .x)
-        })
 
-    est_data_tr <- tibble(
-                    Quarter_Index = unique(data$Quarter_Index),
-                    data = cumulative_data
-                   )
+do_hier_cv <- function(estimation_data, init = 5) {       
+    nested_data <- nest_data_for_step_cv(estimation_data)
 
-    step_data_tr <- data |> 
-                      group_by(Quarter_Index) |> 
-                      nest(new_data = -c(Quarter_Index))
-
-
-    nested_data <- est_data_tr |> left_join(step_data_tr) |>
-                        drop_na(new_data)
-  
-    results <- nested_data |> filter(Quarter_Index>init & Quarter_Index != max(Quarter_Index)) |>
+    results <- nested_data |> filter(Quarter_Index > init & Quarter_Index != max(Quarter_Index)) |>
                  mutate(model = map(data, ~ lmer(formula = formula(top_model), data = .x, REML = TRUE)),         
                         augmented_data = map2(model, new_data, ~ tryCatch({
                                             augment(.x, newdata = .y, allow.new.levels = TRUE)
