@@ -18,17 +18,17 @@ $$
 D_{it} = \alpha_i + \beta_i D_{gt} + \epsilon_{it}
 $$
 
-And the AR is 
+And the AR is the Observed Return - Predicted Return
 $$
 AR_{it} = D_{it} – (\alpha_i + \beta_i D_{gt})
 $$
 
 Where:
 
-$D_{it}$ is *`r target_label`* (differenced) $i$ at time $t$, \
+$D_{it}$ is *`r target_label`* $i$ at time $t$, \
 $\alpha_i$ is the firm-specific intercept, \
-$\beta_i$ is the sensitivity of firm value $i$ to the group $g$,\
-$D_{gt}$ is the group *`r target_label`* (differenced) at time $t$, and \
+$\beta_i$ is the coefficient measuring the sensitivity of firm value $i$ to the group $g$,\
+$D_{gt}$ is the group *`r target_label`* at time $t$, and \
 $\varepsilon_{it}$ is the error term for $i$ at time $t$.
 
 ## Model Results
@@ -41,7 +41,8 @@ estimation_data <- model_data$estimation_data
 observation_data <- model_data$observation_data
 partner_banks <- credit_card.partnerships.long()
 
-market_formula <- "UBPRE524.diff ~ UBPRE524.group.diff"
+market_formula <- "UBPRE524.diff ~ UBPRE524.group.log.diff"
+#market_formula <- "UBPRE524.diff ~ UBPRE524.group.log.diff + UBPRE524.all.log.diff"
 m_table <- estimation_data |> fill_gaps() |> model(tslm = TSLM(as.formula(market_formula)))
 
 augmented_data <- m_table |> augment()
@@ -182,21 +183,48 @@ One approach to evaluate the predictive performance of our model is to use One-s
 ```{r}
 #| warning: false
 #| output: false
-#| eval: false
+
 
 m_table |> fabletools::accuracy()|> readr::write_csv("data/results/estimate_market_metrics.csv")
 
-# Timeseries CV 
-est_data_tr <- estimation_data |>
-                    stretch_tsibble(.init = 3, .step = 1) |>
-                    relocate( .id)
+# # Timeseries CV 
+# est_data_tr <- estimation_data |>
+#                     stretch_tsibble(.init = 3, .step = 1) |>
+#                     relocate( .id)
 
-# TSCV accuracy
-est_data_tr |>
-  model(tslm = TSLM(as.formula(market_formula))) |>
-  forecast(new_data = est_data_tr) |>
-  fabletools::accuracy(estimation_data)|> 
-  readr::write_csv("data/results/estimate_tscv_market_metrics.csv")
+init = 13
+model_name = "tslm"
+
+nested_data <- nest_data_for_step_cv(estimation_data)
+
+results <- nested_data |> filter(Quarter_Index > init & Quarter_Index != max(Quarter_Index)) |>
+                 mutate(model = map(data, ~ lm(formula = as.formula(market_formula), data = .x, REML = TRUE)),         
+                        augmented_data = map2(model, new_data, ~ tryCatch({
+                                            augment(.x, newdata = .y, allow.new.levels = TRUE)
+                                            }, error = function(e) {
+                                                message("Error in augment function: ", e$message)
+                                                NULL 
+                                            })))
+
+unnested_results <- results |> 
+                        unnest(augmented_data) |> 
+                        dplyr::select(BankName:last_col()) |> 
+                        dplyr::group_by(BankName, BankType) |> 
+                        mutate(RMSE = Metrics::rmse(UBPRE524.diff, .fitted),
+                        MAE = Metrics::mae(UBPRE524.diff, .fitted)) |>
+                        summarise(RMSE = mean(RMSE,na.rm = TRUE),
+                                  MAE = mean(MAE,na.rm = TRUE)) |>
+                        add_column(.type = "CV", .model = model_name)     
+
+unnested_results |> dplyr::select(BankName, BankType, .model, .type, RMSE, MAE) |> 
+    readr::write_csv(glue("data/results/tscv/estimate_tscv_market_metrics.csv"))
+
+# # TSCV accuracy
+# est_data_tr |>
+#   model(tslm = TSLM(as.formula(market_formula))) |>
+#   forecast(new_data = est_data_tr) |>
+#   fabletools::accuracy(estimation_data)|> 
+#   readr::write_csv("data/results/estimate_tscv_market_metrics.csv")
 
 ```
 
@@ -274,10 +302,6 @@ print_ar(result, "Walmart", "CAPITAL ONE, NATIONAL ASSOCIATION (112837)")
 print_ar(result, "GAP", "SYNCHRONY BANK (1216022)")
 print_ar(result, "GAP", "BARCLAYS BANK DELAWARE (2980209)")
 
-```
-
-```{r}
-estimation_data
 ```
 
 ## References

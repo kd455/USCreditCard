@@ -35,7 +35,6 @@ m6 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + RRSFS.P
 m7 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + TDSP.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 , data = estimation_data, REML = FALSE)
 m8 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + UBPRE524.all.log.diff + UBPRE524.group.log.diff,data = estimation_data, REML = FALSE)
 
-m8 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + UBPRE524.all.log.diff + UBPRE524.group.log.diff,data = estimation_data, REML = FALSE)
 m8.1 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + UBPRE524.all.log.diff + UBPRE524.group.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 ,data = estimation_data, REML = FALSE)
 m8.2 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + UBPRE524.all.log.diff + UBPRE524.group.log.diff + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1,data = estimation_data, REML = FALSE)
 m8.3 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + UBPRE524.group.log.diff+ TDSP.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 ,data = estimation_data, REML = FALSE)
@@ -44,6 +43,7 @@ m8.5 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff | BankTy
 m8.6 <-  lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff.lag3 + UBPR3815.log.diff | BankType/BankName) + UBPRE524.group.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 + Qtr ,data = estimation_data, REML = FALSE)
 m8.7 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff | BankName/Qtr) + UBPRE524.group.log.diff + TDSP.log.diff + TDSP.log.diff.lag1, data = estimation_data, REML = FALSE)
 m8.8 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff | BankName/Qtr) + UBPRE524.group.log.diff + UBPRE524.all.log.diff + TDSP.log.diff + TDSP.log.diff.lag1, data = estimation_data, REML = FALSE)
+m8.9 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff | BankName/Qtr) + UBPRE524.group.log.diff, data = estimation_data, REML = FALSE)
 
 #https://statisticalhorizons.com/lagged-dependent-variables/
 ```
@@ -66,7 +66,7 @@ model_comparison |> as.data.frame() |> rownames_to_column(var = "Model")|>
 #| warning: false
 #| label: tbl-hier2-aicc
 #| tbl-cap: AICc Summary - refinement of model selection. 
-model_comparison <- model.sel( m8, m8.1, m8.2, m8.3, m8.4, m8.5, m8.6, m8.7, m8.8, rank = "AICc")
+model_comparison <- model.sel( m8, m8.1, m8.2, m8.3, m8.4, m8.5, m8.6, m8.7, m8.8, m8.9, rank = "AICc")
 
 model_comparison |> as.data.frame() |> rownames_to_column(var = "Model")|> 
     mutate(across(where(is.numeric), \(x) round(x,2))) |> 
