@@ -2,16 +2,28 @@
 title: "Event study"
 format: html
 ---
+$$
+Y_{it} = \alpha + \beta X_{it} + \gamma D_{it} + \mu_i + \epsilon_{it}
+$$
+In this representation:
+
+$Y_{it}$ is the dependent variable for entity $i$ at time $t$.
+$X_{it}$ represents the independent variable(s) for entity $i$ at time $t$.
+$D_{it}$ is the dummy variable for the event (1 after the event, 0 before).
+$\alpha$ is the constant term.
+$\beta$ is the coefficient for the independent variable(s).
+$\gamma$ is the coefficient for the dummy variable.
+$\mu_i$ represents the entity-specific fixed effect.
+$\epsilon_{it}$ is the error term.
+
+The coefficient $\gamma$ on the dummy variable indicates the average change in the target variable associated with the event, controlling for other factors.
+
+By including this dummy variable, you can directly estimate the impact of the event on the intercept (baseline level) of the dependent variable
 
 ```{r}
 #| warning: false
 #| echo: false
 source('functions.R')
-```
-
-```{r}
-#| warning: false
-
 data <- get_hierarchy_model_data() |> drop_na(UBPRE524.diff.lag4) |> 
         mutate(BankType = as.factor(BankType),
          BankName = as.factor(BankName),
@@ -23,6 +35,10 @@ library(lme4)
 #             Estimate Std. Error t value
 #HasPartner   0.02334    0.02475   0.943
 m <- lmer(UBPRE524.diff ~ HasPartner + (1 + HasPartner | BankType/BankName/Partner), data = data, REML = TRUE)
+
+predict(m, )
+
+
 summary(m)
 coef(m)
 #                       Estimate Std. Error t value

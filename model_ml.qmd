@@ -383,7 +383,7 @@ run_xgb.caret.cv(model_select$train.predictors, model_select$train.outcome, cv_p
 #| warning: false
 params_select <- read_csv("data/results/xgbTree_best_tune_model_select.csv", show_col_types = FALSE) |> as.list()
 ```
-![Parameter Tuning for model with selected predictors](images/xgbTree_tuning_plot_model_selected.png){#fig-xgcv-selected}
+![Parameter Tuning for model with selected predictors](images/xgbTree_tuning_plot_model_select.png){#fig-xgcv-selected}
 
 ```{r}
 #| warning: false
