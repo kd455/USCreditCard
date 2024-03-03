@@ -7,13 +7,6 @@ format: html
 #| warning: false
 #| echo: false
 source('functions.R')
-```
-The ARIMA models treat each series in isolation, capturing series-specific dynamics without considering potential cross-series information. The hierarchical model, on the other hand, leverages the entire dataset to estimate both global parameters (common to all series) and series-specific parameters, potentially offering a richer, more nuanced understanding of the data
-
-while a hierarchical model can provide insights into the shared dynamics across series and how individual firms deviate from this common pattern
-
-```{r}
-#| warning: false
 model_data <- get_model_data()
 all_data <- model_data$all_data
 estimation_data <- model_data$estimation_data
@@ -21,6 +14,26 @@ observation_data <- model_data$observation_data
 partner_banks <- credit_card.partnerships.long()
 target_label <- credit_card.target_label()
 ```
+
+
+We know from the market model that the group trend is informative. We can take this idea further and instead of treating each bank's time series in isolation, we can instead develop a hierarchical model to provide insights into the shared dynamics across series and how individual firms deviate from group patterns.
+
+For example: 
+$$
+UBPRE524.diff = (1 + UBPRB538.log.diff | BankType/BankName) + UNRATE.log.diff
+$$
+
+* Random Intercept: Each BankType and BankName combination can have its own Intercept i.e. each bank starts from a different baseline value of our target variable.
+
+* Random Slopes: The model allows the effect of bank specific portfolio variables to vary by each BankType/BankName combination. 
+  + UBPRB538: Loans to Individuals for Household, Family, and Other Personal Expenditures:Credit Cards
+  + UBPR3815: Unused Commitments on Credit Cards
+
+* Fixed Effects: Unemployment (UNRATE) is assumed to have the same effect across all banks. 
+
+Various models are tested to identify which achieves the lowest AICc value.
+
+## Models
 
 ```{r}
 #| warning: false
@@ -34,18 +47,6 @@ m5 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + RRSFS.P
 m6 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 , data = estimation_data, REML = FALSE)
 m7 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + TDSP.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 , data = estimation_data, REML = FALSE)
 m8 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + UBPRE524.all.log.diff + UBPRE524.group.log.diff,data = estimation_data, REML = FALSE)
-
-m8.1 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + UBPRE524.all.log.diff + UBPRE524.group.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 ,data = estimation_data, REML = FALSE)
-m8.2 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + UBPRE524.all.log.diff + UBPRE524.group.log.diff + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1,data = estimation_data, REML = FALSE)
-m8.3 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + UBPRE524.group.log.diff+ TDSP.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 ,data = estimation_data, REML = FALSE)
-m8.4 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff | BankType/BankName) + UBPRE524.all.log.diff + UBPRE524.group.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 ,data = estimation_data, REML = FALSE)
-m8.5 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff | BankType/BankName) + UBPRE524.group.log.diff + TDSP.log.diff + TDSP.log.diff.lag1 ,data = estimation_data, REML = FALSE)
-m8.6 <-  lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff.lag3 + UBPR3815.log.diff | BankType/BankName) + UBPRE524.group.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 + Qtr ,data = estimation_data, REML = FALSE)
-m8.7 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff | BankName/Qtr) + UBPRE524.group.log.diff + TDSP.log.diff + TDSP.log.diff.lag1, data = estimation_data, REML = FALSE)
-m8.8 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff | BankName/Qtr) + UBPRE524.group.log.diff + UBPRE524.all.log.diff + TDSP.log.diff + TDSP.log.diff.lag1, data = estimation_data, REML = FALSE)
-m8.9 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff | BankName/Qtr) + UBPRE524.group.log.diff, data = estimation_data, REML = FALSE)
-
-#https://statisticalhorizons.com/lagged-dependent-variables/
 ```
 ```{r}
 #| warning: false
@@ -61,7 +62,26 @@ model_comparison |> as.data.frame() |> rownames_to_column(var = "Model")|>
 
 ```
 
+### Model Choice
+The best model includes aggregated values for `r credit_card.target_label()`. This allows us to control for the impact of the group trends on the individual banks.
 
+Focusing in on model 8 - we can test variations of this model. Notably, changing the grouping from BankType/BankName to BankName/Qtr improved the model. Qtr is a factor 1 to 4.
+
+```{r}
+#| warning: false
+#| code-fold: false
+#| eval: true
+m8.1 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + UBPRE524.all.log.diff + UBPRE524.group.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 ,data = estimation_data, REML = FALSE)
+m8.2 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + UBPRE524.all.log.diff + UBPRE524.group.log.diff + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1,data = estimation_data, REML = FALSE)
+m8.3 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + UBPRE524.group.log.diff+ TDSP.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 ,data = estimation_data, REML = FALSE)
+m8.4 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff | BankType/BankName) + UBPRE524.all.log.diff + UBPRE524.group.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 ,data = estimation_data, REML = FALSE)
+m8.5 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff | BankType/BankName) + UBPRE524.group.log.diff + TDSP.log.diff + TDSP.log.diff.lag1 ,data = estimation_data, REML = FALSE)
+m8.6 <-  lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff.lag3 + UBPR3815.log.diff | BankType/BankName) + UBPRE524.group.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 + Qtr ,data = estimation_data, REML = FALSE)
+m8.7 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff | BankName/Qtr) + UBPRE524.group.log.diff + TDSP.log.diff + TDSP.log.diff.lag1, data = estimation_data, REML = FALSE)
+m8.8 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff | BankName/Qtr) + UBPRE524.group.log.diff + UBPRE524.all.log.diff + TDSP.log.diff + TDSP.log.diff.lag1, data = estimation_data, REML = FALSE)
+m8.9 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff | BankName/Qtr) + UBPRE524.group.log.diff, data = estimation_data, REML = FALSE)
+
+```
 ```{r}
 #| warning: false
 #| label: tbl-hier2-aicc
@@ -75,18 +95,18 @@ model_comparison |> as.data.frame() |> rownames_to_column(var = "Model")|>
                 rmarkdown::paged_table()  
 
 ```
-Set REML to true. 
 
+#### Variance Inflation Factors
 
+Analysis of the correlation matrix @tbl-corr-hier-1 reveals a notable correlation of -0.87	between UBPRE524.group.log.diff and UBPRE524.all.log.diff. This is corroborated by the Variance Inflation Factor (VIF) analysis @tbl-corr-hier-2. VIF quantifies the extent to which the variance of an estimated regression coefficient increases due to multicollinearity among the predictors. A high VIF signifies that a predictor shares a substantial amount of information with other predictors in the model, potentially distorting the regression coefficients and their interpretability. According to @rproject, VIF values above 4 warrant further investigation, while VIFs exceeding 10 are signs of serious multicollinearity requiring correction.
 
-### Variance Inflation Factors
-
-Inspecting the correlation matrix shows that there is correlation between group and all. This is supported by calculating the variance inflation factor (VIF). VIF is a measure of how much the variance of the estimated regression coefficient $𝛽𝑘$ is inflated by the existence of correlation among the features. A high VIF indicates that the feature shares a lot of information with other features. The general rule of thumb is that VIFs exceeding 4 warrant further investigation, while VIFs exceeding 10 are signs of serious multicollinearity requiring correction. (R-project, 2020). From Table 5, there are three features that we must address.
+Considering the AICc values, Model **8.7**, which excludes UBPRE524.all.log.diff, demonstrates comparable performance. This suggests that Model 8.7 is a good alternative, allowing us to mitigate this multicollinearity concern.
 
 ```{r}
 ```{r}
 #| warning: false
 #| label: tbl-corr-hier
+#| tbl-cap: "Assessing model 8.8"
 #| tbl-subcap:
 #|  - Correlation of Fixed Effects for model 8.8
 #|  - VIF 
@@ -97,14 +117,16 @@ cov2cor(vcov(top_model)) |> as.matrix() |> as.data.frame() |>
     mutate(across(where(is.numeric), \(x) round(x,2))) |>  
     rmarkdown::paged_table() 
 
-car::vif(top_model,type="predictor") |> as.data.frame() |> rmarkdown::paged_table() 
+vif_df <- car::vif(top_model,type="predictor") |> as.data.frame() 
+colnames(vif_df) <- "VIF"
+vif_df |> rmarkdown::paged_table() 
 
 #change top model
 model_name <- "m8.7"
 top_model <- lmer(formula(eval(as.name(model_name))), data = estimation_data, REML = TRUE)
 
 ```
-
+### Estimated Fit
 ```{r}
 #| warning: false
 #| label: fig-plot-fit-hier
@@ -121,14 +143,33 @@ augmented_data |>
     plot_model_fit("UBPRE524.diff")
 ```
 
+### Fixed Effects
+
+::: {#panel-random-effects .panel-tabset}
+
+### Plot
 ```{r}
 #| warning: false
-#| label: tbl-coef-hier
-#| tbl-cap: "Intercept and coefficients"
+#| label: fig-coef-hier-plot
+#| fig-cap: "Plot of simulated fixed effects"
+#| results: hide
+#| fig-keep: all
+feEx <- FEsim(top_model, 1000)
+plotFEsim(feEx) +
+  theme_bw() + labs(title = "Coefficient Plot",
+                    x = "Median Effect Estimate", y = glue("{target_label} (difference)"))
+
+```
+
+### Coefficients and Correlation Data
+
+```{r}
+#| warning: false
+#| label: tbl-coef-hier-data
+#| tbl-cap: "Coefficients and Correlation of Fixed Effects"
 #| tbl-subcap:
-#|  - "Fixed Effects"
+#|  - "Coefficients"
 #|  - "Correlation of Fixed Effects"
-#|  - " Plot the simulated fixed effects"
 tidy(top_model, effects = "fixed") |>
     mutate(across(where(is.numeric), \(x) round(x,2))) |>  
     dplyr::select(-effect) |>
@@ -138,15 +179,18 @@ cov2cor(vcov(top_model)) |> as.matrix() |> as.data.frame() |>
     mutate(across(where(is.numeric), \(x) round(x,2))) |>  
     rmarkdown::paged_table() 
 
-feEx <- FEsim(top_model, 1000)
-plotFEsim(feEx) +
-  theme_bw() + labs(title = "Coefficient Plot",
-                    x = "Median Effect Estimate", y = glue("{target_label} (difference)"))
-
 ```
-::: {#fig-random-effects .panel-tabset}
+:::
 
-## Random Effects Plot
+The high t-statistic for UBPRE524.group.log.diff indicates that the effect is quite precise and the likelihood that this finding is due to chance is very small.
+
+Based on the t-statistics, TDSP.log.diff.lag1 appears to be a more statistically significant predictor than TDSP.log.diff. TDSP is *Household Debt Service Payments as a Percent of Disposable Personal Income*.
+
+### Random Effects
+
+::: {#sec-random-effects .panel-tabset}
+
+### Plot
 ```{r}
 #| warning: false
 #| results: hide
@@ -155,9 +199,11 @@ plotFEsim(feEx) +
 #| fig-cap: "Random Effects"
 reEx <- REsim(top_model)
 plotREsim(reEx)      
-```
 
-## Random Effects Data
+```
+The red line indicates no effect (zero), and the dots represent the random effect estimates with their confidence intervals. Points that are distinguishable from zero (i.e. the confidence band based on 'level' does not cross the red line) are highlighted as black dots, whereas the confidence band cross the red line for grey dots.
+
+### Data
 ```{r}
 #| warning: false
 #| label: tbl-coef-random
@@ -178,6 +224,7 @@ ranef(top_model, condVar = FALSE)$`Qtr:BankName` |> as.data.frame() |>
 ```
 :::
 
+From @fig-random-effect we can see that the random effect of *Unused Commitments on Credit Cards* (UBPR3815) in particular varies widely across banks and quarters.
 
 ### Residual diagnostics {#sec-residual-check-hier}
 
@@ -232,6 +279,8 @@ plot_bank_residual(bank, augmented_data)
 
 :::
 
+#### Residuals White Noise
+
 ```{r}
 #| warning: false
 #| label: tbl-lb-hier
@@ -244,6 +293,8 @@ augmented_data  |>
 
 
 ## Time Series Cross-Validation
+
+We use one-step ahead cross-validation to assess model 8.7's performance on unseen data. The outcomes, detailed in @tbl-hier-cv, reveal that the model performance is comparable to the Market model (see @tbl-market-cv). The results show that the RMSE and MAE of the cross-validated models (CV) closely matches the RMSE and MAE observed in the initial model evaluation (Training). This indicates that the model is generalising well to unseen data and not overfitting.
 
 ```{r}
 #| warning: false
@@ -258,12 +309,6 @@ metrics <- augmented_data |> as_tibble() |>
 
 metrics |> dplyr::select(BankName, BankType, .model, .type, RMSE, MAE) |> 
     readr::write_csv("data/results/estimate_hier_metrics.csv")
-
-```
-```{r}
-#| warning: false
-#| output: false
-#| eval: false
 
 do_hier_cv <- function(estimation_data, init = 5) {       
     nested_data <- nest_data_for_step_cv(estimation_data)
@@ -329,17 +374,25 @@ comb |> group_by(.type) |>
 #| results: hide
 #| fig-keep: all
 #| label: fig-pred-observed-hier
-#| fig-cap: "Prediction vs. Observed Event"
 get_prediction <- function(bank, partner, all_data, model) {
-  bank_data <- all_data |> filter(BankName == bank)
-  event_data <- bank_data |> filter(!!as.name(partner) >=0) |> head(8) 
-  fcast <- augment(model, newdata= event_data) |> as_tsibble(index = Quarter, key=c(BankName, BankType))
+  selected_qtrs <- all_data |> filter(!!as.name(partner) >=0) |> head(8) |> dplyr::select(Quarter)
+  event_data <- all_data |> inner_join(selected_qtrs) 
+  first_qtr <- selected_qtrs[[1,"Quarter"]]-1
+  est_data <- all_data |> filter_index(~ format(first_qtr, format = "%Y Q%q") )  
+   
+  #re-do estimate to avoid data leakage
+  m <- lmer(formula(top_model), data = est_data, REML = TRUE)
+  
+  #forecast
+  fcast <- broom::augment(m, newdata= event_data, allow.new.levels = TRUE) |> 
+    filter(BankName == bank) |> 
+    as_tsibble(index = Quarter, key=c(BankName, BankType))
 
-  original_scale(fcast, all_data, ".fitted") |> add_column(Partner = partner)
+  original_scale_diff(fcast |> filter(BankName == bank), all_data, bank, ".fitted") |> add_column(Partner = partner)
 }
 
 result <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, all_data, top_model)  |> 
-  list_rbind() |> left_join(all_data |> dplyr::select(observed = UBPRE524.Value),by = join_by(BankName, BankType, Quarter) ) |> as_tibble() |> dplyr::select(Partner, BankName, Quarter, observed, predicted) 
+  list_rbind() |> as_tibble() |> left_join(all_data |> dplyr::select(observed = UBPRE524.Value),by = join_by(BankName, BankType, Quarter) ) |> dplyr::select(Partner, BankName, Quarter, observed, predicted) 
 
 map2(partner_banks$Bank, partner_banks$Partner, plot_prediction, result, all_data) 
 ```
@@ -363,5 +416,3 @@ print_ar(result, "GAP", "SYNCHRONY BANK (1216022)")
 print_ar(result, "GAP", "BARCLAYS BANK DELAWARE (2980209)")
 
 ```
-
-## References

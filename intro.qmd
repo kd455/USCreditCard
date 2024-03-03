@@ -11,12 +11,10 @@ Structurally, the US credit card market is split between 'bank branded'
 Cosco, GAP, American Airlines etc. typically reward borrowers with
 benefits such as points, services and discounts.
 
-Each partnership card has a minimum FICO® Score cutoff for applicants.
-FICO® is a US credit Card scoring system; low scores indicate increased
-likelihood of a borrowers defaulting on their credit card loan.
-
 -   **Hypotheses 1**: Adding a partnership with lower FICO® Score
     cutoff reduces the Bank's overall credit card portfolio quality.
+
+    Each partnership card has a minimum FICO® Score cutoff for applicants. FICO® is a US credit Card scoring system; low scores indicate increased likelihood of a borrowers defaulting on their credit card loan.
 
 -   **Hypotheses 2**: The sector e.g., retail, energy, airline, of a
     partnership card is a determinant of the partnership quality.

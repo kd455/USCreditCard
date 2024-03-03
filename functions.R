@@ -856,7 +856,7 @@ plot_prediction <- function(bank, partner, bank_fcasts, all_data) {
     geom_line(aes(x = Quarter, y=predicted), color= "red") +
     geom_line(aes(x = Quarter, y=UBPRE524.Value), data = comb_data, color='darkslategrey',linetype = "longdash") + 
     geom_vline(xintercept = as.Date(min_qtr) , linetype=1,color="grey") +
-    labs(title = bank, subtitle = partner, y = credit_card.target_label())    
+    labs(title = bank, subtitle = partner, y = credit_card.target_label())   
 }
 
 original_scale <- function(fcast_bank_data, all_data, col_name = ".mean") {
@@ -865,16 +865,20 @@ original_scale <- function(fcast_bank_data, all_data, col_name = ".mean") {
   bank_name <- fcast_bank_data[[1,"BankName"]]
   if ("UBPRE524.diff" %in% names(fcast_bank_data) & class(fcast_bank_data[[1, "UBPRE524.diff"]])[1] != "numeric") {
       print(paste("Bank uses Diff", bank_name))
-      quarter0 <- fcast_bank_data[[1,"Quarter"]] - 1      
-      value0 <- all_data |> 
-                  filter(BankName == bank_name, 
-                          Quarter == quarter0) |> pull(UBPRE524.Value)
-      result <- fcast_bank_data |> mutate(predicted = value0 + cumsum(!!as.name(col_name)))                  
+      result <- result |> original_scale_diff(fcast_bank_data,all_data, bank_name,col_name)       
   } else {
     print(paste("Bank uses Value", bank_name))
     result <- result |> rename(predicted = !!as.name(col_name))
   }
   result |> as_tsibble() |> dplyr::select(all_of(c(keys,"predicted")))
+}
+
+original_scale_diff <- function(fcast_bank_data, all_data, bank_name, col_name = ".fitted") {
+  quarter0 <- fcast_bank_data[[1,"Quarter"]] - 1      
+  value0 <- all_data |> 
+              filter(BankName == bank_name, 
+                      Quarter == quarter0) |> pull(UBPRE524.Value)
+  fcast_bank_data |> mutate(predicted = value0 + cumsum(!!as.name(col_name)))    
 }
 
 print_ar <- function(prediction_result, partner, bank) {

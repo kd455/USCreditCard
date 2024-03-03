@@ -110,7 +110,7 @@ Depending on the relative quality of the partnership portfolio we may see `r tar
 * Both portfolios improve / degrade
 * One improves the other degrades.
 
-For the GAP and Costco partnerships we can see that the portfolio quality degrades i.e. *`r target_label`* shows increased delinquency, in both the *old* and *new* bank during the transitional period (between acquisition and card availability). This may suggest the partnership portfolio adds riskier borrowers relative to the *new* bank's existing portfolio and removes less risky borrowers relative to the *old* bank's remaining portfolio. This assertion is questionable as the increase we are seeing may just be the trend, shown in grey (calculated as the median across all peer Banks), which also increases. 
+For the GAP and Costco partnerships we can see that the portfolio quality degrades i.e. *`r target_label`* shows increased delinquency, in both the *old* and *new* bank during the transitional period (between acquisition and card availability). This may suggest the partnership portfolio has added riskier borrowers relative to the *new* bank's existing portfolio and removed less risky borrowers relative to the *old* bank's remaining portfolio. However, this assertion is questionable as the increase we are seeing may just be the trend, shown in grey (calculated as the median across all peer Banks), which also increased during this period. 
 
 Another factor, as we saw in @fig-lfeature-6, was a tendency for short term reversal, or a reversion to a mean. This may be a factor of banks enacting policies to keep delinquency within their risk tolerance levels. Consequently, where we see an increase after a decrease it may be due in part to this data characteristic.
 

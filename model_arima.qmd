@@ -1,40 +1,8 @@
 ---
-title: "ARIMA Model"
+title: "Linear Regression with AR Errors"
 format: html
 ---
 
-Seasonal Autoregressive Integrated Moving Average, extends the ARIMA model by adding seasonal terms. It is denoted as ARIMA(p,d,q)(P,D,Q)[s], where:
-
-* p,d,q are the non-seasonal components (autoregressive order, differencing order, and moving average order, respectively),
-* P,D,Q are the seasonal components of the model, with similar definitions but applied on a seasonal cycle, and 
-* s is the length of the seasonal cycle in time units (=4
-quarterly data with an annual cycle).
-
-ARIMA is focused on modeling time series data without external predictors, aiming to forecast future values based on its own past values.
-
-We compare with SARIMA model
-
-Linear Regression with AR Errors:
-The primary focus here is on understanding the relationship between the dependent variable and other explanatory variables, with the addition of modeling the time series nature of the residuals to account for autocorrelation that might not be explained by the independent variables alone
-
-This approach is particularly useful when you have both time series data and external predictors affecting the dependent variable, and you are interested in quantifying the impact of these predictors while also accounting for the autocorrelation in the errors
-
-p, d, and q which are non-negative integers that refer to the order of the autoregressive, integrated, and moving average parts of the model respectively.
-
-auto.arima for the automatic selection of exponential and ARIMA models.R uses a combination of unit root tests, minimization of the AIC and MLE to obtain an ARIMA model
-
-The p,d, and q are then chosen by minimizing the AICc. The algorithm uses a stepwise search to traverse the model space to select the best model with smallest AICc
-
-learnt from our analysis so far.
-manual - i've differenced the values but 
-
-Auto ARIMA (Automatic ARIMA) to model a non-stationary time series, the algorithm attempts to identify the best combination of ARIMA parameters (p, d, q) that minimizes a given criterion, usually the AIC (Akaike Information Criterion), BIC (Bayesian Information Criterion), or similar. The 
-�
-d parameter represents the order of differencing needed to make the series stationary. Ideally, if your series is non-stationary, you might expect Auto ARIMA to suggest differencing it at least once (
-�
-=
-1
-d=1) to achieve stationarity.
 
 ```{r}
 #| warning: false
@@ -47,12 +15,6 @@ get_model_cols <-function(model_table, ignore_cols) {
   model_cols <- model_table |> names()
   model_cols[!names(model_table) %in% ignore_cols]
 }
-
-# print_top_group_model <-function(arima_results, bank_type, score_by = "AICc", n=10) {
-#   arima_results |> 
-#     filter(is.na(BankName), BankType == bank_type) |> 
-#       dplyr::select(-BankType) |> relocate(.model, .model_spec, !!score_by) |> arrange(!!as.name(score_by)) |> head(n) |> mutate(across(where(is.numeric), \(x) round(x,2))) |>  rmarkdown::paged_table()
-# }
 
 print_top_bank_model <- function(fuzzy_bankname, arima_results, score_by = "AICc", n = 10) {
   arima_results |> 
@@ -110,20 +72,32 @@ plot_bank_residuals <- function(fuzzy_bankname, bank_models) {
 
 model_data <- get_model_data()
 data <- model_data$all_data
-estimation_data <- model_data$estimation_data
+estimation_data <- model_data$estimation_data |> tsibble::fill_gaps()
 observation_data <- model_data$observation_data
 partner_banks <- credit_card.partnerships.long()
 
 ```
 
 
-To determine the normal return we can adopt a ARIMA model [@Hyndman2021 ch.9]
+We will use the Auto ARIMA (Automatic ARIMA) tool from the R 'forecast' package to determine the optimal set of parameters ($p$, $d$, $q$)($P$,$D$,$Q$)[$s$] for our model. Auto ARIMA streamlines the process by using a stepwise search to navigate through the model space, aiming to identify the model that achieves the lowest AICc value. The AICc, or Akaike Information Criterion corrected, is a metric that evaluates the fit of a model by balancing its likelihood against its complexity, with adjustments for smaller sample sizes.
 
-Information criteria are likelihood-based measures of model fit that include a penalty for complexity
+Where:
+
+* $p$,$d$,$q$ are the non-seasonal components (autoregressive order, differencing order, and moving average order, respectively),
+* $P$,$D$,$Q$ are the seasonal components of the model, with similar definitions but applied on a seasonal cycle, and 
+* $s$ is the length of the seasonal cycle in time units. Quarterly data with an annual cycle have 's=4'.
+
+Our approach begins with basic ARIMA modeling to predict future values solely based on historical data without explanatory variables.
+
+Next, to see if we can improve the models (one model for each bank series), we introduce explanatory variables, while also correcting for autocorrelation within the error terms. This transforms the models into a Linear Regression with AR Errors. 
+
+We examine the AICc values of models across various categories of explanatory variables, including Expenditure, Unemployment, Consumer and Household Debt, Portfolio, and Group Trend. This analysis aims to identify explanatory variables that we can combine. This also takes into consideration insights from the data exploratory phase, as well as insights from other modeling techniques such as XGBoost Factor Analysis (see @fig-importance).
 
 ## Model selection {#sec-model-arima}
 
-Using auto.arima and AIC for model selection. Unlike the Market model we are using the undifferenced value for `r credit_card.target_label()` as the auto.arima process will perform the differencing if optimal.
+Note: using the undifferenced value for `r target_label` as the Auto Arima process will perform the differencing if optimal. 
+
+### Models
 
 ```{r}
 #| warning: false
@@ -166,32 +140,35 @@ portfolio2 <- as.formula("UBPRE524.Value ~ UBPRB538.log.diff + UBPRB538.log.diff
 portfolio3 <- as.formula("UBPRE524.Value ~ UBPRB538.log.diff + UBPRB538.log.diff.lag1 + UBPR3815.log.diff")
 portfolio4 <- as.formula("UBPRE524.Value ~ UBPRB538.log.diff + UBPR3815.log.diff")
 
+#Group Trend
 group1 <- as.formula("UBPRE524.Value ~ UBPRE524.all.log.diff + UBPRE524.group.log.diff")
 group2 <- as.formula("UBPRE524.Value ~ UBPRE524.group.log.diff")
 
+# Combinations (use Auto ARIMA)
 comb1 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1")
 comb2 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UNRATE.log.diff + UNRATE.log.diff.lag1")
 comb3 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UNRATE.log.diff + UNRATE.log.diff.lag1 + UNRATE.log.diff.lag2")
-comb4 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.pct_change")
-comb5 <- as.formula("UBPRE524.Value ~ CDSP.log.diff + CDSP.log.diff.lag1 + UBPRB538.pct_change")
+comb4 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.log.diff")
+comb5 <- as.formula("UBPRE524.Value ~ CDSP.log.diff + CDSP.log.diff.lag1 + UBPRB538.log.diff")
 
-manual1 <- as.formula("UBPRE524.diff ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(0,0,0)")
-manual2 <- as.formula("UBPRE524.diff ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(1,0,0)")
-manual3 <- as.formula("UBPRE524.diff ~ UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(0,0,0)")
-manual4 <- as.formula("UBPRE524.diff ~ UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(1,0,0)")
-manual5 <- as.formula("UBPRE524.diff ~ CDSP.log.diff + CDSP.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(0,0,0)")
-manual6 <- as.formula("UBPRE524.diff ~ CDSP.log.diff + CDSP.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(1,0,0)")
-manual7 <- as.formula("UBPRE524.diff ~ RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(0,0,0)")
-manual8 <- as.formula("UBPRE524.diff ~ RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.pct_change + pdq(1, 0, 0) + PDQ(1,0,0)")
-manual9 <- as.formula("UBPRE524.diff ~ TDSP.log.diff + B069RC1.Pop.CPI.log.diff.lag1 + UBPRB538.log.diff.lag2 + UBPRB538.log.diff.lag3 + UBPR3815.log.diff + RRSFS.Pop.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)")
+# Combinations (don't use Auto ARIMA)
+manual1 <- as.formula("UBPRE524.diff ~ 1 + RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(0,0,0)")
+manual2 <- as.formula("UBPRE524.diff ~ 1 + RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)")
+manual3 <- as.formula("UBPRE524.diff ~ 1 + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(0,0,0)")
+manual4 <- as.formula("UBPRE524.diff ~ 1 + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)")
+manual5 <- as.formula("UBPRE524.diff ~ 1 + CDSP.log.diff + CDSP.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(0,0,0)")
+manual6 <- as.formula("UBPRE524.diff ~ 1 + CDSP.log.diff + CDSP.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)")
+manual7 <- as.formula("UBPRE524.diff ~ 1 + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(0,0,0)")
+manual8 <- as.formula("UBPRE524.diff ~ 1 + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)")
+manual9 <- as.formula("UBPRE524.diff ~ 1 + TDSP.log.diff + B069RC1.Pop.CPI.log.diff.lag1 + UBPRB538.log.diff.lag2 + UBPRB538.log.diff.lag3 + UBPR3815.log.diff + RRSFS.Pop.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)")
 ```
 ```{r}
 #| warning: false
 #| eval: false
 run_arima <- function(estimation_data) {
   ## 1. Expenditure
-  m_table <- estimation_data |>
-              model(
+  m_table1 <- estimation_data |>
+              fabletools::model(
                   arima = ARIMA(UBPRE524.Value),
                   rrsfs1 = ARIMA(rrsfs1),
                   rrsfs2 = ARIMA(rrsfs2),
@@ -200,10 +177,10 @@ run_arima <- function(estimation_data) {
                   rrsfs5 = ARIMA(rrsfs5)
               )
 
-  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_rrsfs_results.csv"))
+  save_arima_results(m_table1, get_model_cols(m_table1, key_vars(estimation_data)),glue("arima_rrsfs_results.csv"))
 
   ## 2. Unemployment
-  m_table <- estimation_data |> 
+  m_table2 <- estimation_data |> 
               model(
                   unrate1 = ARIMA(unrate1),
                   unrate2 = ARIMA(unrate2),
@@ -212,10 +189,10 @@ run_arima <- function(estimation_data) {
                   unrate5 = ARIMA(unrate5)
               )
 
-  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_unrate_results.csv"))
+  save_arima_results(m_table2, get_model_cols(m_table2, key_vars(estimation_data)),glue("arima_unrate_results.csv"))
 
   ## 3.1 Debt Consumer
-  m_table <- estimation_data |>
+  m_table3.1 <- estimation_data |>
               model(
                   debt1 = ARIMA(debt1),
                   debt2 = ARIMA(debt2),
@@ -224,10 +201,10 @@ run_arima <- function(estimation_data) {
                   debt5 = ARIMA(debt5)
               )
 
-  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_debt_results.csv"))
+  save_arima_results(m_table3.1, get_model_cols(m_table3.1, key_vars(estimation_data)),glue("arima_debt_results.csv"))
 
   ## 3.2 Debt Household
-  m_table <- estimation_data |>
+  m_table3.2 <- estimation_data |>
               model(
                   debth1 = ARIMA(debth1),
                   debth2 = ARIMA(debth2),
@@ -236,10 +213,10 @@ run_arima <- function(estimation_data) {
                   debth5 = ARIMA(debth5)
               )
 
-  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_debth_results.csv"))
+  save_arima_results(m_table3.2, get_model_cols(m_table3.2, key_vars(estimation_data)),glue("arima_debth_results.csv"))
 
   ## 4. Portfolio
-  m_table <- estimation_data |> 
+  m_table4 <- estimation_data |> 
               model(
                   portfolio1 = ARIMA(portfolio1),
                   portfolio2= ARIMA(portfolio2),
@@ -247,19 +224,19 @@ run_arima <- function(estimation_data) {
                   portfolio4= ARIMA(portfolio4),
               )
 
-  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_portfolio_results.csv"))
+  save_arima_results(m_table4, get_model_cols(m_table4, key_vars(estimation_data)),glue("arima_portfolio_results.csv"))
 
   ## 5. Group
-  m_table <- estimation_data |> 
+  m_table5 <- estimation_data |> 
               model(
                   group1 = ARIMA(group1),
                   group2= ARIMA(group2)
               )
 
-  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_group_results.csv"))
+  save_arima_results(m_table5, get_model_cols(m_table5, key_vars(estimation_data)),glue("arima_group_results.csv"))
 
   ## 6. Combinations
-  m_table <- estimation_data |> 
+  m_table6 <- estimation_data |> 
               model(
                   comb1= ARIMA(comb1),
                   comb2= ARIMA(comb2),
@@ -268,10 +245,10 @@ run_arima <- function(estimation_data) {
                   comb5= ARIMA(comb5)
               )
 
-  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_other_results.csv"))
+  save_arima_results(m_table6, get_model_cols(m_table6, key_vars(estimation_data)),glue("arima_other_results.csv"))
 
   ## 7. Manual
-  m_table <- estimation_data |> 
+  m_table7 <- estimation_data |> 
               model(
                   manual1= ARIMA(manual1),
                   manual2= ARIMA(manual2),
@@ -284,39 +261,32 @@ run_arima <- function(estimation_data) {
                   manual9= ARIMA(manual9)
               )
 
-  save_arima_results(m_table, get_model_cols(m_table, key_vars(estimation_data)),glue("arima_manual_results.csv"))
+  save_arima_results(m_table7, get_model_cols(m_table7, key_vars(estimation_data)),glue("arima_manual_results.csv"))
 }
 
 run_arima(estimation_data)
 
 ```
 
-```{r}
-#| warning: false
-#| label: fig-plot-fit-arima
-#| fig-cap: "Fitted vs. Observed for estimation data on sub-set of firms"
-#| fig-height: 10
-arima_results <- read_arima_results() 
+### Results
 
-best_bank_models <- tibble(bank = unique(estimation_data$BankName)) |> 
-                      mutate(model_details = lapply(bank, best_bank_model, estimation_data, arima_results))
+We can see that for our sub-set of banks the top models are very different. 
 
-bank_aug_data <- best_bank_models |> 
-                  mutate(augdata = map(model_details, ~ .x$Augmented)) |> unnest(augdata) |> 
-                    dplyr::select(BankName:last_col()) 
+* Capital One's model has no AR errors and is equivalent to the Market model.
+* American Express's model does not have any AR coefficients but is sentitive to seasonal AR errors.
+* The ar1 Error for Barclays and Citibank have a high level of uncertainty (std.error). The p.value (P>0.05) indicating ar1 is not significant.
 
-bank_aug_data |> 
-  filter(BankName %in% observation_data$BankName) |> 
-    as_tsibble(index = Quarter, key=c(BankName)) |> plot_model_fit("UBPRE524.diff")
-             
-```
-::: {#fig-arima-aic .panel-tabset}
+::: {#sec-arima-aic .panel-tabset}
 
 ### CITIBANK
 ```{r}
 #| warning: false
 #| label: tbl-arima-citi-aic
 #| tbl-cap: "Ordered Top 10 Best-Worst model by AICc"
+arima_results <- read_arima_results() 
+best_bank_models <- tibble(bank = unique(estimation_data$BankName)) |> 
+                      mutate(model_details = lapply(bank, best_bank_model, estimation_data, arima_results))
+                      
 bank = "CITIBANK"
 print_top_bank_model(bank, arima_results)
 ```
@@ -390,6 +360,23 @@ print_coeff(bank, best_bank_models)
 ```
 ::: 
 
+### Top Model Estimated Fit
+
+```{r}
+#| warning: false
+#| label: fig-plot-fit-arima
+#| fig-cap: "Fitted vs. Observed for estimation data on sub-set of firms"
+#| fig-height: 10
+bank_aug_data <- best_bank_models |> 
+                  mutate(augdata = map(model_details, ~ .x$Augmented)) |> unnest(augdata) |> 
+                    dplyr::select(BankName:last_col()) 
+
+bank_aug_data |> 
+  filter(BankName %in% observation_data$BankName) |> 
+    as_tsibble(index = Quarter, key=c(BankName)) |> plot_model_fit("UBPRE524.diff")
+             
+```
+
 ### Residual diagnostics {#sec-residual-check-arima}
 
 Residuals should have the following properties [@Hyndman2021, ch. 5.4]. Residuals:
@@ -450,7 +437,7 @@ plot_bank_residuals(bank, best_bank_models)
 
 :::
 
-### Residuals White Noise
+#### Residuals White Noise
 
 The sub-set of banks analysed in @sec-residual-check-arima did not exhibit significant autocorrelation.
 
@@ -469,6 +456,8 @@ bank_aug_data  |> as_tsibble(index=Quarter, key = BankName) |>
 
 
 ## Time Series Cross-Validation
+
+Selecting the best model for each bank, we use one-step ahead cross-validation to assess their performance on unseen data. The outcomes, detailed in @tbl-arima-cv, reveal that, with the exception of Capital One, the models underperform compared to the Market model (see @tbl-market-cv). This discrepancy suggests that the models are overfitting, meaning they have learned the training data too well, capturing noise rather than the underlying signal, which diminishes their predictive accuracy on new, unseen data. To reduce overfitting we may have to look at simpler models i.e. those with higher AICc but fewer parameters.
 
 ```{r}
 #| warning: false
@@ -557,10 +546,7 @@ comb |> group_by(.type) |>
 ```{r}
 #| warning: false
 #| echo: false
-#| results: hide
-#| fig-keep: all
-#| label: fig-pred-observed
-#| fig-cap: "Prediction vs. Observed Event"
+#| label: fig-pred-observed-arima
 get_prediction <- function(Bank, Partner, all_data, models) {
   tryCatch({
     bank_data <- all_data |> filter(BankName == Bank)
@@ -569,7 +555,7 @@ get_prediction <- function(Bank, Partner, all_data, models) {
                     filter(bank == Bank)|> pluck("model_details",1)
   
     forecasts <- bank_model$BankModel |>
-      forecast(new_data = event_data, bootstrap=TRUE, times = 100)
+      forecast(new_data = event_data, bootstrap=TRUE, times = 1000)
 
     original_scale(forecasts, all_data) |> add_column(Partner = Partner)
   }, error = function(e) {
@@ -603,4 +589,3 @@ print_ar(result, "GAP", "SYNCHRONY BANK (1216022)")
 print_ar(result, "GAP", "BARCLAYS BANK DELAWARE (2980209)")
 
 ```
-## References
