@@ -1,0 +1,59 @@
+---
+title: "Collated Results"
+format: html
+---
+
+
+```{r}
+#| warning: false
+#| label: tbl-cv-train-diff
+#| tbl-cap: Comparing all model accuracy RMSE
+#| tbl-subcap: 
+#| - RMSE on Training and Cross Validation (Test for xgboost), data for sub-set of banks
+#| - Mean RMSE for our sub-set of banks
+#| - Mean RMSE by BankType
+#| - Mean RMSE across all banks
+source('functions.R')
+
+cv_train_difference <- function(data, include_type = FALSE, include_bank = FALSE) {
+    selected <- c("Model",".type","RMSE")
+    if (include_bank) {
+        selected <- c(selected, "BankName")
+    }
+    if (include_type) {
+        selected <- c(selected, "BankType")
+    }
+    
+    data |> mutate(.type = if_else(.type %in% c("Test", "CV"), "CV/Test", .type),
+            .type = if_else(.type == "Training", "Train", .type)) |>
+    dplyr::select(all_of(selected)) |>
+    pivot_wider(names_from = .type, values_from = RMSE) |>
+    mutate(Difference = `CV/Test` - Train)
+}
+
+model_data <- get_model_data()
+all_data <- model_data$all_data
+estimation_data <- model_data$estimation_data
+observation_data <- model_data$observation_data
+
+banks = unique(observation_data$BankName)
+xg_results <- get_summary_validation.xgboost("model_select", banks, TRUE)
+arima_results <- get_summary_validation.arima(banks, TRUE)
+market_results <- get_summary_validation.market(banks, TRUE)
+hier_results <- get_summary_validation.hierarchy(banks, TRUE)
+
+bind_rows(xg_results$tbl1, arima_results$tbl1, market_results$tbl1, hier_results$tbl1) |>
+    cv_train_difference(include_type = FALSE, include_bank = TRUE) |> arrange(BankName) |> 
+    relocate(BankName) |> rmarkdown::paged_table()
+  
+bind_rows(xg_results$tbl2, arima_results$tbl2, market_results$tbl2, hier_results$tbl2) |>
+    cv_train_difference() |> rmarkdown::paged_table()
+
+bind_rows(xg_results$tbl4, arima_results$tbl4, market_results$tbl4, hier_results$tbl4) |>
+    arrange(BankType) |> 
+    cv_train_difference(include_type = FALSE, include_bank = FALSE) |> rmarkdown::paged_table()
+
+bind_rows(xg_results$tbl3, arima_results$tbl3, market_results$tbl3, hier_results$tbl3) |>
+    cv_train_difference() |> rmarkdown::paged_table()
+
+```

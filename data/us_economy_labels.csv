@@ -10,3 +10,17 @@ A229RC0.CPI,Real Disposable Personal Income per capita,A229RC0/PCEPI,Income & Sa
 PSAVE.Pop.CPI,Real US Personal Savings per capita,PSAVE/POPTHM/PCEPI,Income & Savings
 CDSP,Consumer Debt Service Payments as a Percent of Disposable Personal Income,CDSP,Debt
 TDSP,Household Debt Service Payments as a Percent of Disposable Personal Income,TDSP,Debt
+PCEPI ,Personal Consumption Expenditures: Chain-type Price Index,,
+CPIAUCSL ,Consumer Price Index for All Urban Consumers: All Items,,
+CPILFESL , Consumer Price Index for All Urban Consumers: All Items Less Food & Energy,,
+MEHOI , Real Median Household Income in the United States (yearly) MEHOI as it's yearly,,
+DSPIC96 ,Real Disposable Personal Income,,
+DSPI ,Disposable personal income,,
+PCE ,Personal Consumption Expenditures,,
+PCEDG ,Personal Consumption Expenditures: Durable Goods,,
+RRSFS ,Real Retail and Food Services Sales,,
+A229RC0 ,Disposable Personal Income: Per capita: Current dollars,,
+B069RC1 ,Personal interest payments ,,
+POPTHM ,"Population, Total",,
+PSAVE,Quarterly Personal Saving ,,
+    ,,,

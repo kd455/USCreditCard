@@ -3,8 +3,7 @@ title: "XGBoost Model"
 format: html
 ---
 
-Look-Ahead Bias: If data from after the test period is included in the training set, the model may inadvertently learn information from the future (known as "look-ahead bias"). This makes the model unrealistic and potentially over-optimistic in its predictive performance
-
+## Data Preparation {#sec-xgboost-data}
 ```{r}
 #| warning: false
 source("functions.R")
@@ -15,6 +14,8 @@ library(caret)
 library(patchwork)
 library(shapviz)
 set.seed(42)
+
+target_label <- credit_card.target_label()
 
 run_xgb.cv <- function(dtrain) {
   param_grid <- expand.grid(
@@ -126,6 +127,8 @@ bank_fit_result <- function(bankname, data, train_test = "Train", target_name = 
 run_validation <- function(model, params, model_name) {
   m <- xgboost(booster = "gbtree", data = model$dtrain, params= params, nrounds=params$nrounds)
 
+  bank_types <-  model$train |> distinct(BankName, BankType)
+
   #Training fit
   train_predictions <- predict(m, model$dtrain)
   # See Fit on unseen data: Generate Predictions
@@ -137,11 +140,11 @@ run_validation <- function(model, params, model_name) {
   results_est <- unique(model$train$BankName) |> 
                       map(bank_fit_result,train_result, "Train") |> list_rbind()
 
-  results_test <- unique(estimation_data$BankName) |> 
+  results_test <- unique(model$train$BankName) |> 
                       map(bank_fit_result,test_result, "Test") |> list_rbind()
                         
-  comb <- bind_rows(results_est, results_test) |>
-            dplyr::select(BankName, .type, RMSE, MAE, Rsquared)
+  comb <- bind_rows(results_est, results_test) |> left_join(bank_types, by = join_by(BankName)) |>
+            dplyr::select(BankName, BankType, .type, RMSE, MAE, Rsquared)
 
   comb |> write_csv(glue("data/results/xgbTree_validation_{model_name}.csv"))  
   
@@ -168,24 +171,7 @@ run_validation <- function(model, params, model_name) {
   sv_waterfall(shap_test)
   dev.off()
 }
-
-get_summary_validation <- function(model_name, banks) {
-  comb <- read_csv(glue("data/results/xgbTree_validation_{model_name}.csv"),show_col_types = FALSE)
-  summary_banks <- comb |> 
-                  filter(BankName %in% banks) |> 
-                    arrange(BankName,.type) |> mutate(across(where(is.numeric), \(x) round(x,3)))
-
-  summary_mean_banks <- comb |> filter(BankName %in% banks) |> 
-                          group_by(.type) |> summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |>
-                          mutate(across(where(is.numeric), \(x) round(x,3)))
-                            
-  summary_mean_all <- comb |> group_by(.type) |> 
-                        summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
-                        mutate(across(where(is.numeric), \(x) round(x,3)))
-
-  list(tbl1 = summary_banks, tbl2 = summary_mean_banks, tbl3 = summary_mean_all)
-}
-
+  
 map_prediction_to_partner <- function(Bank, Partner, obs_data_w_qtr, all_data) {
   event_data <- obs_data_w_qtr |> 
                   filter(BankName == Bank) |> 
@@ -200,6 +186,27 @@ map_prediction_to_partner <- function(Bank, Partner, obs_data_w_qtr, all_data) {
 }
 
 ```
+
+In our previous models, we utilised a panel dataset that captured temporal dynamics. However, machine learning algorithms require a dataset structured to reflect a single timeframe. Consequently, we need to transform our panel data into a cross-sectional format.
+
+This entailed:
+
+* Removing time-related factor 'Quarter' (for example, '2020 Q1').
+
+* Excluding lagged values of the `r target_label` to prevent look-ahead bias. This ensures that our model does not inadvertently learn from future information which could result in overfitting.
+
+* Excluding variables that are close proxies for `r target_label`, as listed in @tbl-xgboost-bias. These variables are closely tied to the target variable as they reflect ongoing delinquency beyond a 30-day period. This means that the model can indirectly learn future information which could result in overfitting.
+
+```{r}
+#| warning: false
+#| label: tbl-xgboost-bias
+#| tbl-cap: "Removed 'proxy' features"
+get_ubpr_labels() |>
+filter(Code %in% c("UBPRE411", "UBPRE523", "UBPRE521")) |> 
+  dplyr::select(Code, Description = Desc) |>
+    knitr::kable(format = "html")
+```
+
 ```{r}
 #| warning: false
 model_data <- get_model_data()
@@ -256,45 +263,52 @@ run_xgb.caret.cv(model_w_group$train.predictors, model_w_group$train.outcome, cv
 run_xgb.caret.cv(model_without_group$train.predictors, model_without_group$train.outcome, cv_param$n_folds, cv_param$n_repeats, model_name="model_without_group", method = "xgbTree", cv_param$seeds)
 
 ```
-## Model Selection
-5-Fold Cross-Validation:
 
-regularise the model
+3 datasets were tested:
 
-The dataset is divided into 5 equal (or nearly equal) parts, or "folds".
-For each fold:
-The fold is temporarily held out as the test set.
-The model is trained on the remaining 4 folds combined.
-The trained model is then tested on the held-out fold to evaluate its performance.
-This process is repeated 5 times, once for each fold, ensuring that every data point is used exactly once as part of the test set.
-The 5 performance metrics (e.g., accuracy, MSE) obtained from each fold are typically averaged to get a single performance estimate for the model.
-Repeating the Process 3 Times:
+* *All data* including aggregated `r target_label` features.
+* *Without Group* - All Data with group `r target_label` features removed.
+* *Selected features*. To see if a simpler model would generalise better on unseen test data, a dataset of the top 10 important features from the *All data* model was selected (see @sec-xgboost-feature).
 
-After completing the 5-fold cross-validation once, you repeat the entire process 2 more times, each time with a different random division of the dataset into 5 folds.
-This means you will perform a total of 15 train-test splits (3 repeats × 5 folds).
-For each repeat, you calculate an average performance metric over its 5 folds, just like in the single round of 5-fold cross-validation.
-Finally, you might average the performance metrics across all 3 repeats to get an overall performance estimate, or you might assess the variability of the model performance across repeats.
+Furthermore, the seasonal factor *Qtr* (ranging from 1 to 4) was added to all datasets. Initial model testing revealed distinct seasonal trends in the residuals, as identified in the Autocorrelation Function (ACF) plots. Introducing *Qtr* attempts to help the model account for these seasonal patterns. An alternative approach could have involved de-seasonalising the data.
 
+## Model Hyperparameter Tuning
 
-![Parameter Tuning for model with group predictors](images/xgbTree_tuning_plot_model_w_group.png){#fig-xgcv-group}
-![Parameter Tuning for model without group predictors](images/xgbTree_tuning_plot_model_w_group.png){#fig-xgcv-wo-group}
+In XGBoost we can tune the model hyperparameters e.g., maximum tree depth, to regularise the model so it does not overfit the training data.
 
+We use Cross Validation to explore the hyperparameter space. This process helps identify the combination of parameters that best balance between overfitting (by avoiding too high variance) and underfitting (by avoiding too high bias).
 
-## Model Results
+We used 5-Fold Cross-Validation, repeated 3 times - each time with a different random division of the dataset into 5 folds. This means cross validation was performed a total of 15 train-test splits (3 repeats × 5 folds) to get an overall performance estimate.
 
-On estimation data
+We can see from @fig-xgcv-group that changes to the ETA hyperparameter, in particular, impacted the RMSE metric. ETA (value between 0 and 1) determines the weight of each tree's contribution to the final model. A smaller ETA means making smaller updates so the model is less likely to make large adjustments based on any single observation or pattern in the data i.e. it reduces the impact of outliers or noise. An eta of 0.1 for all datasets (see @tbl-xgboost-param) was selected. 
+
+::: {#panel-xgtuning .panel-tabset}
+
+### All Data
+![Parameter Tuning for model with group features](images/xgbTree_tuning_plot_model_w_group.png){#fig-xgcv-group}
+
+### Without Group
+![Parameter Tuning for model without group features](images/xgbTree_tuning_plot_model_w_group.png){#fig-xgcv-wo-group}
+
+### Selected Features
+![Parameter Tuning for model with selected features](images/xgbTree_tuning_plot_model_select.png){#fig-xgcv-selected}
+
+:::
 
 ```{r}
 #| warning: false
 #| label: tbl-xgboost-param
-#| tbl-cap: Tuning model parameters 
+#| tbl-cap: Optimal tuning model parameters for each dataset
 params_w_group <- read_csv("data/results/xgbTree_best_tune_model_w_group.csv",show_col_types = FALSE) |> 
                     add_column(model = "With Group")|> as.list()
 
 params_wo_group <- read_csv("data/results/xgbTree_best_tune_model_without_group.csv",show_col_types = FALSE) |>
                     add_column(model = "Without Group") |> as.list()
 
-bind_rows(params_w_group, params_wo_group) |> 
+params_select_group <- read_csv("data/results/xgbTree_best_tune_model_select.csv",show_col_types = FALSE) |>
+                    add_column(model = "Selected") |> as.list()
+
+bind_rows(params_w_group, params_wo_group,params_select_group) |> 
   pivot_longer(cols=c(-model)) |>
   pivot_wider(names_from=c(model)) |> rmarkdown::paged_table()  
 ```
@@ -307,147 +321,159 @@ bind_rows(params_w_group, params_wo_group) |>
 #| eval: false
 run_validation(model_w_group, params_w_group,"w_group")
 run_validation(model_without_group, params_wo_group,"wo_group")
-
 ```
 
+The results in @tbl-xgtest-group show that the *Without Group* dataset has the largest discrepancy for RMSE and MAE between the Train and Test dataset. Similarly, the *All Data* dataset displays some overfitting in the results for all banks (@tbl-xgtest-all-3). The *Selected Feature* dataset across all banks (@tbl-xgtest-select-3) performed well and had the least discrepancy in our metrics.
+
+
+::: {#panel-xgboost-test .panel-tabset}
+
+### All Data
 ```{r}
-#| label: tbl-xgboost-test
+#| warning: false
+#| label: tbl-xgtest-all
 #| tbl-cap: Comparing Accuracy Metrics for Training and Test data
 #| tbl-subcap:
-#| - "With Group: Accuracy Metrics on Training and Test data for sub-set of banks"
-#| - "With Group: Mean Accuracy Metrics for our sub-set of banks"
-#| - "With Group: Mean Accuracy Metrics across all banks"
-#| - "Without Group: Accuracy Metrics on Training and Test data for sub-set of banks"
-#| - "Without Group: Mean Accuracy Metrics for our sub-set of banks"
-#| - "Without Group: Mean Accuracy Metrics across all banks"
+#| - "Accuracy Metrics on Training and Test data for sub-set of banks"
+#| - "Mean Accuracy Metrics for our sub-set of banks"
+#| - "Mean Accuracy Metrics across all banks"
 
 banks = unique(observation_data$BankName)
-val_results <- get_summary_validation("w_group", banks)
+val_results <- get_summary_validation.xgboost("w_group", banks)
 val_results$tbl1 |> rmarkdown::paged_table()
 val_results$tbl2 |> rmarkdown::paged_table()
 val_results$tbl3 |> rmarkdown::paged_table()
+```
 
-val_wo_results <- get_summary_validation("wo_group", banks)
+### Without Group
+```{r}
+#| warning: false
+#| label: tbl-xgtest-group
+#| tbl-cap: Comparing Accuracy Metrics for Training and Test data#| 
+#| tbl-subcap:
+#| - "Accuracy Metrics on Training and Test data for sub-set of banks"
+#| - "Mean Accuracy Metrics for our sub-set of banks"
+#| - "Mean Accuracy Metrics across all banks"
+val_wo_results <- get_summary_validation.xgboost("wo_group", banks)
 val_wo_results$tbl1 |> rmarkdown::paged_table()
 val_wo_results$tbl2 |> rmarkdown::paged_table()
 val_wo_results$tbl3 |> rmarkdown::paged_table()
-
 ```
-
-Overfitted. Reduce Features?
-::: {#fig-xgboost-importance .panel-tabset}
-
-## Feature Importance by Gain
+### Selected Features
 
 ```{r}
 #| warning: false
+#| label: tbl-xgtest-select
+#| tbl-cap: Comparing Accuracy Metrics for Training and Test data
+#| tbl-subcap:
+#| - "Accuracy Metrics on Training and Test data for sub-set of banks"
+#| - "Mean Accuracy Metrics for our sub-set of banks"
+#| - "Mean Accuracy Metrics across all banks"
+val_results <- get_summary_validation.xgboost("model_select", banks)
+val_results$tbl1 |> rmarkdown::paged_table()
+val_results$tbl2 |> rmarkdown::paged_table()
+val_results$tbl3 |> rmarkdown::paged_table()
+```
 
-importance_matrix <- read_csv("data/results/xgbTree_importmatrix_w_group.csv",show_col_types = FALSE)
+:::
+
+## Feature Selection {#sec-xgboost-feature}
+
+The plots below show the Gain (the improvement in accuracy the model gains from including a feature) and Frequency (how often each feature is split on across all boosting tree) of each feature relative to the first feature.
+
+Notably the group aggregation of `r target_label` is the most important feature. Without it, we can see from  @fig-gain-wo that the model uses Household Debt Ratio (TDSP). Generally, portfolio features like *Unused Commitments on Credit Cards* were more important than exogenous economic measures.
+
+::: {#fig-xgboost-importance .panel-tabset}
+
+### All Data - Gain
+
+```{r}
+#| fig-height: 8
+#| label: fig-gain-all
+#| fig-cap: Feature importance using Gain 
+importance_matrix_grp <- read_csv("data/results/xgbTree_importmatrix_w_group.csv",show_col_types = FALSE)
 
 feature_desc <- get_feature_labels()
 
-importance_matrix_lab <- importance_matrix |> 
+importance_matrix_lab <- importance_matrix_grp |> 
                           mutate(Code = stringr::str_split_i(Feature,"\\.",1)) |> 
                             left_join(feature_desc,by = join_by(Code)) |> 
                               mutate(Feature = paste(Feature, coalesce(Desc,""), sep = "\n")) |> data.table()
 
-xgb.plot.importance(importance_matrix_lab, rel_to_first = TRUE, xlab = "Relative importance", top_n = 12,left_margin = 30)
-
+xgb.plot.importance(importance_matrix_lab, measure = "Gain", xlab = "Relative importance",top_n = 15,left_margin = 30,rel_to_first = TRUE)
 ```
-## Feature Importance by Frequency
+
+### All Data - Frequency
 
 ```{r}
-xgb.ggplot.importance(importance_matrix_lab, measure = "Frequency", rel_to_first = TRUE,top_n = 12,left_margin = 30) + ylab("Freqency")
+#| warning: false
+#| fig-height: 8
+#| label: fig-freq-all
+#| fig-cap: Feature importance using Frequency 
+xgb.ggplot.importance(importance_matrix_lab, measure = "Frequency", rel_to_first = TRUE,top_n = 15,left_margin = 30) + ylab("Freqency") + theme(legend.position = "none")
+
+```
+
+### Without Group - Gain
+
+```{r}
+#| fig-height: 8
+#| label: fig-gain-wo
+#| fig-cap: Feature importance using Gain 
+importance_matrix_wo <- read_csv("data/results/xgbTree_importmatrix_wo_group.csv",show_col_types = FALSE)
+
+feature_desc <- get_feature_labels()
+
+importance_matrix_lab <- importance_matrix_wo |> 
+                          mutate(Code = stringr::str_split_i(Feature,"\\.",1)) |> 
+                            left_join(feature_desc,by = join_by(Code)) |> 
+                              mutate(Feature = paste(Feature, coalesce(Desc,""), sep = "\n")) |> data.table()
+
+xgb.plot.importance(importance_matrix_lab, measure = "Gain", xlab = "Relative importance", top_n = 15,left_margin = 30, rel_to_first = TRUE)
+```
+
+### Without Group - Frequency
+
+```{r}
+#| warning: false
+#| label: fig-freq-wo
+#| fig-cap: Feature importance using 
+#| fig-height: 8
+xgb.ggplot.importance(importance_matrix_lab, measure = "Frequency", rel_to_first = TRUE,top_n = 15,left_margin = 30) + ylab("Freqency") + theme(legend.position = "none")
+
 ```
 
 :::
 
 ```{r}
 #| warning: false
-selected_features <- importance_matrix |> 
+selected_features <- importance_matrix_grp |> 
                       dplyr::select(Feature) |> 
-                        filter(!grepl("BankName", Feature)) |> top_n(15) |> as.list()
+                        filter(!grepl("BankName", Feature)) |> 
+                         top_n(10) |> add_row(Feature="Qtr") |> as.list()
 
 cv_param <- get_cv_params()
 
 model_select <- setup_train_test(estimation_data, selected_features$Feature)
 ```
-
 ```{r}
-#| eval: false
 #| warning: false
+#| eval: false
 run_xgb.caret.cv(model_select$train.predictors, model_select$train.outcome, cv_param$n_folds, cv_param$n_repeats, model_name= "model_select", method = "xgbTree", cv_param$seeds)
-```
 
-```{r}
-#| warning: false
 params_select <- read_csv("data/results/xgbTree_best_tune_model_select.csv", show_col_types = FALSE) |> as.list()
-```
-![Parameter Tuning for model with selected predictors](images/xgbTree_tuning_plot_model_select.png){#fig-xgcv-selected}
 
-```{r}
-#| warning: false
-#| eval: false
 run_validation(model_select, params_select,"model_select")
 ```
-
-```{r}
-banks = unique(observation_data$BankName)
-val_results <- get_summary_validation("model_select", banks)
-val_results$tbl1 |> rmarkdown::paged_table()
-val_results$tbl2 |> rmarkdown::paged_table()
-val_results$tbl3 |> rmarkdown::paged_table()
-```
-
-::: {#fig-xgboost-shap .panel-tabset}
-
-## Feature Importance
-
-::: {#fig-importance}
-
-![Training data with group](images/xgb_train_imp_w_group.png)
-
-![Test data with group](images/xgb_test_imp_w_group.png)
-
-![Training data without group](images/xgb_train_imp_wo_group.png)
-
-![Test data without group](images/xgb_test_imp_wo_group.png)
-
-![Training data selected features](images/xgb_train_imp_model_select.png)
-
-![Test data selected features](images/xgb_test_imp_model_select.png)
-
-Feature Importance: SHAP values per feature for training and test dataset.
-:::
-
-## Waterfall
-
-::: {#fig-waterfall}
-
-![Training data with group](images/xgb_train_water_w_group.png)
-
-![Test data with group](images/xgb_test_water_w_group.png)
-
-![Training data without group](images/xgb_train_water_wo_group.png)
-
-![Test data without group](images/xgb_test_water_wo_group.png)
-
-![Training data selected features](images/xgb_train_water_model_select.png)
-
-![Test data selected features](images/xgb_test_water_model_select.png)
-
-Waterfall: mean SHAP contribution of features for training and test dataset.
-:::
-
-:::
-
+## Estimated Fit
 ```{r}
 #| warning: false
 #| results: hide
 #| fig-keep: all
 #| label: fig-plot-fit-xgboost
-#| fig-cap: "Fitted vs. Observed for estimation data on sub-set of firms"
+#| fig-cap: "Fitted vs. Observed for estimation data on sub-set of firms for model using *Selected Features*"
 #| fig-height: 10
+params_select <- read_csv("data/results/xgbTree_best_tune_model_select.csv", show_col_types = FALSE) |> as.list()
 
 predictor_cols <- names(model_select$train)
 est_data <- estimation_data |> as_tibble() |> dplyr::select(c(all_of(predictor_cols)))
@@ -478,12 +504,54 @@ bank_results |>
       theme(legend.position = "top", legend.title = element_blank(), legend.direction = "vertical")
 
 ```
+
+
+## Shapley
+
+Shapley additive explanations (SHAP) provide insights into how each feature influences the model's predictions. It's commonly used to interpret  predictions rather than regularisation [@Holzinger2022]. SHAP values can be averaged to assess overall feature importance across a dataset, while waterfall plots detail the feature contributions. Generally you would look at SHAP values for specific predictions, here we have averaged SHAP values for the training and test datasets.
+
+::: {#fig-xgboost-shap .panel-tabset}
+
+## Feature Importance - Test 
+
+![Test data with group](images/xgb_test_imp_w_group.png)
+
+![Test data without group](images/xgb_test_imp_wo_group.png)
+
+![Test data selected features](images/xgb_test_imp_model_select.png)
+
+## Feature Importance - Training
+
+![Training data with group](images/xgb_train_imp_w_group.png)
+
+![Training data without group](images/xgb_train_imp_wo_group.png)
+
+![Training data selected features](images/xgb_train_imp_model_select.png)
+
+## Waterfall - Test
+
+![Test data without group](images/xgb_test_water_wo_group.png)
+
+![Test data with group](images/xgb_test_water_w_group.png)
+
+![Test data selected features](images/xgb_test_water_model_select.png)
+
+## Waterfall - Training
+
+![Training data with group](images/xgb_train_water_w_group.png)
+
+![Training data selected features](images/xgb_train_water_model_select.png)
+
+![Training data without group](images/xgb_train_water_wo_group.png)
+
+:::
+
+
 ### Residual diagnostics {#sec-residual-check-xgboost}
 
-XGBoost, as with other machine learning models, do not make assumptions about the distribution of residuals. But it is still worth inspecting the residuals to assess whether the model is adequately capturing the underlying patterns in the data. 
+XGBoost, as with other machine learning models, do not make assumptions about the distribution of residuals. But it is still worth inspecting the residuals to assess whether the model is adequately capturing the underlying patterns in the data. As discussed in @sec-xgboost-data the feature *Qtr* was added as the ACF plots were showing distinct seasonal patterns. Though improved, the ACF still show seasonality for some banks.
 
-::: {#fig-xgboost-checks .panel-tabset}
-
+::: {#panel-xgboost-checks .panel-tabset}
 
 ### CITIBANK
 ```{r}
@@ -534,26 +602,6 @@ plot_bank_residual(bank, bank_results)
 
 :::
 
-### residuals White Noise
-
-XGBoost is not inherently designed for time series analysis, but can expose where the model has missed temporal structure or seasonality.
-
-The sub-set of banks analysed in @sec-residual-check-xgboost did not exhibit significant autocorrelation.
-
-@tbl-lb-xgboost lists banks where we reject the null hypothesis of the Ljung–Box test, indicating the presence of significant autocorrelation in the residuals. 
-
-Banks not listed have residuals that are indistinguishable from a white noise series i.e. have uncorrelated observations and with constant variance.
-```{r}
-#| warning: false
-#| label: tbl-lb-xgboost
-#| tbl-cap: Ljung–Box results where P-value < Significance Level of 0.05
-bank_results |>
- as_tsibble(index = Quarter, key = BankName) |> features(.resid, ljung_box) |> 
-  mutate(across(where(is.numeric), \(x) round(x,4))) |> 
-    filter(lb_pvalue <= 0.05)|> dplyr::select(BankName,lb_stat,lb_pvalue) |>
-      rmarkdown::paged_table()
-```
-
 ## Prediction 
 
 ```{r}
@@ -574,6 +622,7 @@ result <- map2(partner_banks$Bank, partner_banks$Partner,map_prediction_to_partn
 
 map2(partner_banks$Bank, partner_banks$Partner, plot_prediction, result, all_data) 
 ```
+## Abnormal Results
 ```{r}
 #| warning: false
 #| label: tbl-abnormal-xgboost
@@ -592,5 +641,4 @@ print_ar(result, "Walmart", "CAPITAL ONE, NATIONAL ASSOCIATION (112837)")
 print_ar(result, "GAP", "SYNCHRONY BANK (1216022)")
 print_ar(result, "GAP", "BARCLAYS BANK DELAWARE (2980209)")
 ```
-
 

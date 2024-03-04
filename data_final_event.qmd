@@ -1,0 +1,36 @@
+---
+title: "Event Study Dataset"
+format: html
+---
+
+[Download All](/data/final_model_data_wpartner.csv)
+
+Sources: 
+
+* US Federal Financial Institutions Examination Council [-@ffiec] 
+* US Federal Reserve Economic Data [-@fred]
+
+```{r}
+#| warning: false
+#| echo: false
+#| label: tbl-features
+#| tbl-cap: Final Dataset 
+#| tbl-subcap: 
+#| -    Data glimpse (10 rows)
+#| -    Feature Descriptions
+source('functions.R')
+
+all_data <- get_model_data()
+observation_data <- all_data$observation_data
+
+observation_data |> dplyr::slice_head(n=10) |> relocate(Qtr, .after = BankType) |> rmarkdown::paged_table()
+
+all_cols <- tibble(Feature = names(observation_data))
+feature_desc <- get_feature_labels()
+
+all_cols |> mutate(Code = stringr::str_split_i(Feature,"\\.",1)) |> 
+    left_join(feature_desc,by = join_by(Code)) |> 
+    dplyr::select(Feature, Code, Source, Desc) |>
+    dplyr::arrange(!is.na(Desc), Code) |> knitr::kable()
+
+``` 

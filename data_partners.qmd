@@ -16,7 +16,7 @@ target_label <- credit_card.target_label()
 
 Using three partnership events as case studies, we can visualise *`r target_label`* to see if we can observe any changes around the partnership event. There are two dates of interest; the official date of acquisition and the date when cards become available for use. For example, Barclays's acquisition of GAP Inc. was on May 1, 2022 but it wasn't until June 20, 2022 that the old Synchrony borrowers could use their new Barclays partnership cards.
 
-As mentioned in @sec-intro-events we may not noticeably see the impact of a partnership event if it is not material to one or both of the Banks involved. To get a sense of the magnitude of the event we can look at the measures: *Loans to Individuals..Credit Cards* (UBPRB538) and *Unused commitments on Credit Credit Cards* (UBPR3815). These measures tell us if borrowers utilise their partnership card; a new partnership that brings in a substantial number of new borrowers may not impact delinquency if the borrowers are not using the partnership card. 
+As mentioned in @sec-intro-events we may not noticeably see the impact of a partnership event if it is not material to one or both of the Banks involved. To get a sense of the magnitude of the event we can look at the measures: *Loans to Individuals..Credit Cards* (UBPRB538) and *Unused commitments on Credit Cards* (UBPR3815). These measures tell us if borrowers utilise their partnership card; a new partnership that brings in a substantial number of new borrowers may not impact delinquency if the borrowers are not using the partnership card. 
 
 ```{r}
 #| warning: false
@@ -145,9 +145,7 @@ Services,`Other Services`,Rewards,`Other Rewards`,`Website for Consumer`)
 
 The US uses the *North American Industry Classification System (NAICS)* [@naics] which we will utilise at the granularity that provides some grouping. For our use cases NAICS hierarchy level 5 looks promising.
 
-| Firm | NAICS | level 6 | level 5 | 
-|---------|:-----|------:|:------:|
-|Costco|455211|Warehouse Clubs and Supercenters|Department Stores
-|Walmart|455110|Department Stores|Department Stores
-|GAP|458110|Clothing and Clothing Accessories Retailers|Clothing and Clothing Accessories Retailers
-
+```{r}
+read_csv("data/Partner_NAICS.csv",show_col_types = FALSE)|>
+                rmarkdown::paged_table()  
+```

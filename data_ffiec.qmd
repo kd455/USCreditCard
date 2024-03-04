@@ -13,15 +13,15 @@ We are interested in measures that will provide insights to Bank's credit card b
 #| warning: false
 source('functions.R')
 
-credit_card() |> 
-    distinct(Measure, Description) |> 
-    filter(str_detect(Description, "Credit|90 days")) |> 
+get_ubpr_labels() |>
+filter(str_detect(Desc, "Credit|90 days")) |> 
+    dplyr::select(Code, Description = Desc) |>
     knitr::kable(format = "html")
 ```
 
 ## Measure of portfolio quality
 
-To measure quality we can use the proportion of credit cards that are delinquent in the portfolio. This is the sum of UBPRE523 and UBPRE524; accounts that are accruing payments but are overdue by 30 day+ or are in non-accrual status i.e. non-performing loans. 
+To measure quality, we can use the proportion of credit cards that are delinquent in the portfolio. This is the sum of UBPRE523 and UBPRE524; accounts that are accruing payments but are overdue by 30 days+ or are in non-accrual status i.e. non-performing loans. 
 
 However, given we are interested in the impact of a partnership, using measure **Credit Card Plans-30-89 DAYS P/D %** (UBPRE524) is ideal as it gives us the earliest indicator of delinquency.
 
@@ -31,7 +31,7 @@ The scope of Banks included in our analysis is not limited to the banks involved
 
 @tbl-peergrpcnt details 3 peer groups. National (US-wide) Credit card partnerships occur between banks in the **Large Bank** and **Large Credit Card Bank** groups. These peer groups are defined by FFIEC (see @sec-peers for full list of Banks in each peer group) [@ffiec].
 
-A Large Bank like CITIBANK will have a multiple businesses: household mortgages and credit cards; market trading; investment banking and more. In contrast, large credit card banks like BARCLAYS US specialise in credit cards only. Consequently, we expect to see the peer groups react differently to external factors, or exhibit different internal dynamics and risk profiles. 
+A Large Bank like CITIBANK will have multiple businesses: household mortgages and credit cards; market trading; investment banking and more. In contrast, large credit card banks like BARCLAYS US specialise in credit cards only. Consequently, we expect to see the peer groups react differently to external factors or exhibit different internal dynamics and risk profiles. 
 
 ```{r}
 #| tbl-cap: "Number of Banks in each peer group"
@@ -65,7 +65,7 @@ Regulation implemented in 2010 had a material impact on the credit card market [
 
 The regulations introduced were:
 
-1. Credit Card Accountability Responsibility and Disclosure (CARD) Act of 2009 which had a staggered implementation in February and August 2010. This Act requires Banks to assess whether a potential borrower has the means to repay. Additionally, high-risk borrowers like those under 21, have additional restrictions. This has led to stricter lending criteria e.g., income and credit history checks [@cfpb2013]. 
+1. Credit Card Accountability Responsibility and Disclosure (CARD) Act of 2009 which had a staggered implementation in February and August 2010. This Act requires Banks to assess whether a potential borrower has the means to repay. Additionally, high-risk borrowers like those under twenty-one, have additional restrictions. This has led to stricter lending criteria e.g., income and credit history checks [@cfpb2013]. 
 2. Regulation Z, or the Truth in Lending Act (TILA), focuses on ensuring transparency and fairness in lending practices. Banks have to provide full disclosure of the terms and conditions of a loan agreement [@cfpb2010z].
 
 We can see the impact in @fig-regulation which plots a linear trend for *`r target_label`* for each peer group. Based on @fig-regulation-3 there was increasing delinquency for Large Banks and Large Credit Card Banks before regulation, but post regulation the trend has reversed and is now trending down.
@@ -367,7 +367,7 @@ final_df |> na.omit() |> pull(value_diff) |> Box.test(lag = 10, type = "Ljung")
 
 7. @fig-lfeature-8 *Large Credit Card Banks* is not stationary i.e. the statistical properties of the time series changes, which makes it difficult to identify trends and patterns. Performing a difference i.e. to get the quarterly change in UBPRE524, makes the series stationary as shown in @fig-acf-2. This can be confirmed by performing an augmented Dickey–Fuller (ADF) test on the differenced value. We also see that, post differencing, there are autocorrelation coefficients above the significance threshold. This is likely due to seasonality as these are at regular intervals. The decreasing magnitude of these coefficients tell us the earlier lags have a stronger influence than values further in the past.
 
-Autocorrelation, the correlation between the timeseries and its own lagged values, can inform a AutoRegressive Moving Average (ARMA) Model. In @fig-acf we see a Seasonal-ARMA process in *Large Credit Card Banks* as both ACF and PACF are declining gradually around every 4th lag. This confirms what we saw in @fig-lfeature-3.
+Autocorrelation, the correlation between the timeseries and its own lagged values, can inform an AutoRegressive Moving Average (ARMA) Model. In @fig-acf we see a Seasonal-ARMA process in *Large Credit Card Banks* as both ACF and PACF are declining gradually around every 4th lag. This confirms what we saw in @fig-lfeature-3.
 
 ```{r}
 #| warning: false

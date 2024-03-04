@@ -87,11 +87,11 @@ Where:
 * $P$,$D$,$Q$ are the seasonal components of the model, with similar definitions but applied on a seasonal cycle, and 
 * $s$ is the length of the seasonal cycle in time units. Quarterly data with an annual cycle have 's=4'.
 
-Our approach begins with basic ARIMA modeling to predict future values solely based on historical data without explanatory variables.
+Our approach begins with basic ARIMA modelling to predict future values solely based on historical data without explanatory variables.
 
 Next, to see if we can improve the models (one model for each bank series), we introduce explanatory variables, while also correcting for autocorrelation within the error terms. This transforms the models into a Linear Regression with AR Errors. 
 
-We examine the AICc values of models across various categories of explanatory variables, including Expenditure, Unemployment, Consumer and Household Debt, Portfolio, and Group Trend. This analysis aims to identify explanatory variables that we can combine. This also takes into consideration insights from the data exploratory phase, as well as insights from other modeling techniques such as XGBoost Factor Analysis (see @fig-importance).
+We examine the AICc values of models across various categories of explanatory variables, including Expenditure, Unemployment, Consumer and Household Debt, Portfolio, and Group Trend. This analysis aims to identify explanatory variables that we can combine. This also takes into consideration insights from the data exploratory phase, as well as insights from other modelling techniques such as XGBoost Factor Analysis (see @fig-importance).
 
 ## Model selection {#sec-model-arima}
 
@@ -273,7 +273,7 @@ run_arima(estimation_data)
 We can see that for our sub-set of banks the top models are very different. 
 
 * Capital One's model has no AR errors and is equivalent to the Market model.
-* American Express's model does not have any AR coefficients but is sentitive to seasonal AR errors.
+* American Express's model does not have any AR coefficients but is sensitive to seasonal AR errors.
 * The ar1 Error for Barclays and Citibank have a high level of uncertainty (std.error). The p.value (P>0.05) indicating ar1 is not significant.
 
 ::: {#sec-arima-aic .panel-tabset}
@@ -520,24 +520,11 @@ unique(estimation_data$BankName) |> walk(\(x) do_arima_cv(x, bank_top_formulas, 
 #| - Accuracy Metrics on Training and Cross Validation data for sub-set of banks
 #| - Mean Accuracy Metrics for our sub-set of banks
 #| - Mean Accuracy Metrics across all banks
-cv_results_est <- readr::read_csv("data/results/estimate_arima_metrics.csv",show_col_types = FALSE) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> 
-  dplyr::select(BankName, .type, RMSE, MAE)
-
-cv_results_test <- read_tscv_results("arima") |> group_by(.type,BankName) |> 
-  summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
-  mutate(across(where(is.numeric), \(x) round(x,4))) |> 
-  dplyr::select(BankName, .type, RMSE, MAE) |> mutate(.type = "CV") 
-  
-comb <- bind_rows(cv_results_est, cv_results_test) 
-comb |> filter(BankName %in% observation_data$BankName) |> arrange(BankName,.type) |> rmarkdown::paged_table()     
-
-comb |> filter(BankName %in% observation_data$BankName) |> 
-  group_by(.type) |> summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |>
-    rmarkdown::paged_table()  
-
-comb |> group_by(.type) |> 
-  summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
-    rmarkdown::paged_table()     
+val_results <- get_summary_validation.arima(unique(observation_data$BankName))
+val_results$tbl1 |> rmarkdown::paged_table()
+val_results$tbl2 |> rmarkdown::paged_table()
+val_results$tbl3 |> rmarkdown::paged_table()
+ 
 ```
 
 
@@ -546,6 +533,8 @@ comb |> group_by(.type) |>
 ```{r}
 #| warning: false
 #| echo: false
+#| results: hide
+#| fig-keep: all
 #| label: fig-pred-observed-arima
 get_prediction <- function(Bank, Partner, all_data, models) {
   tryCatch({
@@ -570,6 +559,7 @@ result <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, data, 
 map2(partner_banks$Bank, partner_banks$Partner, plot_prediction, result, data) 
 
 ```
+## Abnormal Results
 ```{r}
 #| warning: false
 #| label: tbl-abnormal-arima

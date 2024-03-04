@@ -4,7 +4,7 @@ project:
 book:
   title: "US Credit Card Partnerships"
   author: "Kathryn Dobinson"
-  date: "18/12/2023"
+  date: "03/03/2024"
   chapters:
     - index.qmd
     - intro.qmd
@@ -20,10 +20,12 @@ book:
         - model_arima.qmd 
         - model_hierarchy_event.qmd
         - model_ml.qmd
+        - model_event_summary.qmd
     - references.qmd   
     - part: "Appendix"
       chapters:
         - data_banks.qmd
+        - data_final_event.qmd
 bibliography: references.bib
 
 format:

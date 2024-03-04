@@ -35,11 +35,11 @@ overdue30to89.post.lbank <-  credit_card.overdue30to89.agg.lbank(apply_bank_filt
 
 As discussed in @sec-trend-event the impact of the partnership event can be masked by trends and seasonality.
 
-The simplist model approach we look at is the Market model, see @sec-model-market, which involves adjusting each Bank's *`r credit_card.target_label()`* by removing the influence of the broader trend within its respective group (Large Banks or Large Credit Card Banks). We assume the residuals are due to the unique characteristics of each Bank's credit card portfolio. These characteristics might include the bank's specific credit policies, customer risk profiles, or portfolio management strategies.
+The simplest model approach we look at is the Market model, see @sec-model-market, which involves adjusting each Bank's *`r credit_card.target_label()`* by removing the influence of the broader trend within its respective group (Large Banks or Large Credit Card Banks). We assume the residuals are due to the unique characteristics of each Bank's credit card portfolio. These characteristics might include the bank's specific credit policies, customer risk profiles, or portfolio management strategies.
 
 This approach assumes that the broader "market" trend takes into account, to some extent, the impact of macroeconomic variables. However, we may want to include macroeconomic variables to improve the model's ability to explain credit card delinquencies that are not captured by the group trend alone.
 
-US Federal Reserve Economic Data [@fred] provides macroeconomic data series; we can use published literature and new analysis to inform our choice of variables.
+US Federal Reserve Economic Data [-@fred] provides macroeconomic data series; we can use published literature and new analysis to inform our choice of variables.
 
 The figures below plot data series related to consumer financial behaviour before and after the 2008 financial crisis and the enactment of the Credit Card Accountability Responsibility and Disclosure (CARD) Act in 2010 (see @sec-cardact). We can see that the onset of the COVID-19 pandemic marks a distinct phase of economic upheaval.
 
@@ -47,7 +47,7 @@ Each variable has been adjusted for population changes and inflation to ensure w
 
 @GHJ2001, over the period 1981 to 1999, found that delinquency is positively correlated with the *consumer debt service ratio*, which is the ability for borrowers to service their consumer loans relative to disposable income. Consumer loans include credit cards, other revolving credit and term loans. In the decade that ensued post 2008 crisis, there is a noticeable trend of increasing personal expenditures and although personal incomes also increase, their rate of increase does not match that of expenditures. This divergence results in a gradual rise in the consumer debt service ratio (CDSP), indicating an expanding gap between income and debt obligations. Notably, this isn't reflected in credit card delinquency rates which remain relatively stable suggesting consumer debt is no longer a strong determinant of delinquency by itself. The broader measure, household debt (TDSP), which is consumer debt plus mortgage loans, may be a more informative of measure of a household's overall financial health. We can see in @fig-econ-cat-comb-3 that household debt was decreasing while consumer debt increased. 
 
-@Agarwal2003, using proprietary credit card data of 700 thousand customers from 1995 to 2001, concluded that *unemployment* is a key determinant of consumer delinquency and bankruptcy. However, @taghiyeh2021 in their 2021 study concluded that unemployement is no longer sufficient. This can be seen in @fig-econ-cat-comb-4 where post 2008 financial crisis delinquency decreased as unemployment decreased but has since remained relatively stable as unemployment as decreased further. @taghiyeh2021 found the most significant variables to predict credit card loss was: previous quarter *Unemployment*, *Building permits* and *Initial unemployment insurance claims*; previous year's (lag 4) *Money stock* and *ISM Purchasing Mangers Index* and the current quarter's *Weekly hours worked by manufacturing workers*. 
+@Agarwal2003, using proprietary credit card data of 700 thousand customers from 1995 to 2001, concluded that *unemployment* is a key determinant of consumer delinquency and bankruptcy. However, @taghiyeh2021 in their 2021 study concluded that unemployment is no longer sufficient. This can be seen in @fig-econ-cat-comb-4 where post 2008 financial crisis delinquency decreased as unemployment decreased but has since remained relatively stable as unemployment as decreased further. @taghiyeh2021 found the most significant variables to predict credit card loss was: previous quarter *Unemployment*, *Building permits* and *Initial unemployment insurance claims*; previous year's (lag 4) *Money stock* and *ISM Purchasing Mangers Index* and the current quarter's *Weekly hours worked by manufacturing workers*. 
 
 ::: {#fig-usmeasures .panel-tabset}
 
@@ -318,7 +318,7 @@ run_ccf_test(data = us_measures_qtr,
 
 Banks have the capability to influence both the quantity and quality of their credit card portfolios. By adjusting their risk appetite, banks can navigate economic downturns more effectively; for instance, by tightening lending criteria.
 
-Similarly, borrowers' payment behaviours' can evolve. @Boston2016 monitored the same individuals' credit card usage and employment status over time, revealed that borrowers tend to reduce their reliance on credit cards when they are unemployed.
+Similarly, borrowers' payment behaviours can evolve. @Boston2016 monitored the same individuals' credit card usage and employment status over time, revealed that borrowers tend to reduce their reliance on credit cards when they are unemployed.
 
 To further understand delinquency, we can employ portfolio-level explanatory variables, such as unused credit commitments and the volume of credit card loans. For instance, an uptick in delinquency rates, absent any alterations in the portfolio, could signal macroeconomic factors affecting current borrowers. Conversely, changes within the portfolio might suggest different causes, such as a strategic decision to capture more market share by adding higher-risk borrowers - including via a partnership.
 

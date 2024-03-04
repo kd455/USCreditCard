@@ -13,7 +13,7 @@ Following the process described by @HuntingtonKlein [chap 17.2.1], we pick an "e
 
 The estimation period ends 1 quarter before the acquisition. This is to remove impacts of borrowers potentially anticipating the event. This possibility was speculated in @sec-partners as we saw some fluctuation in credit card measures before the acquisition. 
 
-The observation period chosen is the quarter of the event + 7 quarters after the event. Based on partnership agreement the portfolio can be transferred with deliquent borrowers on day one [e.g., @gap2021] or the impact may be some quarters after the acquisition as borrowers receive and start using their new partner cards. It will take least 30 days to determine if any of these borrowers are deliquent.
+The observation period chosen is the quarter of the event + 7 quarters after the event. Based on partnership agreement the portfolio can be transferred with delinquent borrowers on day one [e.g., @gap2021] or the impact may be some quarters after the acquisition as borrowers receive and start using their new partner cards. It will take least 30 days to determine if any of these borrowers are delinquent.
 
 ## Sense check
 

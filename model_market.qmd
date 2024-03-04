@@ -51,7 +51,7 @@ augmented_data <- m_table |> augment()
 
 As outlined in @sec-data-split, we have split our data into estimation and observation periods. For firms that do not have partnership events, the full data series is used in the estimation period. For firms with partnership events the estimation period is up to the quarter before each event. 
 
-If the market model demonstrates a robust fit with the estimation data, this instills confidence in our ability to forecast the "normal" return using the unseen data from the observation period.
+If the market model demonstrates a robust fit with the estimation data, this instils confidence in our ability to forecast the "normal" return using the unseen data from the observation period.
 
 @fig-plot-fit displays fitted vs actual results for a sub-set of firms. The Intercept and Coefficient is displayed in @tbl-coef-market. The model is   
 
@@ -101,7 +101,7 @@ Residuals should have the following properties [@Hyndman2021, ch. 5.4]. Residual
 #| label: fig-fit-citi
 #| fig-subcap: 
 #|   - "The time plot of the residuals shows that the variation of the residuals is relatively constant but with one significant outlier. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outlier." 
-#|   - "Explaining the outlier: Deliquency dropped at a time when CITIBANK's credit card portfolio became a larger business concern (c). The borrowers added appear to be less risky as we see the unused proportion go from below 10% to over 40% in (b)"
+#|   - "Explaining the outlier: Delinquency dropped at a time when CITIBANK's credit card portfolio became a larger business concern (c). The borrowers added appear to be less risky as we see the unused proportion go from below 10% to over 40% in (b)"
 
 bank <- "CITIBANK"
 m_table |> filter(grepl(bank,BankName)) |> dplyr::select(tslm) |> gg_tsresiduals()  
@@ -227,24 +227,10 @@ unnested_results |> dplyr::select(BankName, BankType, .model, .type, RMSE, MAE) 
 #| - Accuracy Metrics on Training and Cross Validation data for sub-set of banks
 #| - Mean Accuracy Metrics for our sub-set of banks
 #| - Mean Accuracy Metrics across all banks
-cv_results_est <- readr::read_csv("data/results/estimate_market_metrics.csv",show_col_types = FALSE) |> dplyr::select(-.model) |>
-  mutate(across(where(is.numeric), \(x) round(x,4))) |> 
-  dplyr::select(BankName, .type, RMSE, MAE)
-
-cv_results_test <-readr::read_csv("data/results/estimate_tscv_market_metrics.csv",show_col_types = FALSE) |> dplyr::select(-.model) |>
-  mutate(across(where(is.numeric), \(x) round(x,4))) |> 
-    dplyr::select(BankName, .type, RMSE, MAE) |> mutate(.type = "CV")
-      
-comb <- bind_rows(cv_results_est, cv_results_test) 
-comb |> filter(BankName %in% observation_data$BankName) |> arrange(BankName,.type) |> rmarkdown::paged_table()     
-
-comb |> filter(BankName %in% observation_data$BankName) |> 
-  group_by(.type) |> summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |>
-    rmarkdown::paged_table()  
-
-comb |> group_by(.type) |> 
-  summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
-    rmarkdown::paged_table()     
+val_results <- get_summary_validation.market(unique(observation_data$BankName))
+val_results$tbl1 |> rmarkdown::paged_table()
+val_results$tbl2 |> rmarkdown::paged_table()
+val_results$tbl3 |> rmarkdown::paged_table()
 
 ```
 
@@ -253,7 +239,10 @@ comb |> group_by(.type) |>
 ```{r}
 #| warning: false
 #| echo: false
+#| results: hide
+#| fig-keep: all
 #| label: fig-pred-observed-market
+#| fig-cap: "Prediction vs. Observed Event"
 get_prediction <- function(bank, partner, all_data, models) {
   bank_data <- all_data |> filter(BankName == bank)
   event_data <- bank_data |> filter(!!as.name(partner) >=0) |> head(8) 
@@ -261,7 +250,7 @@ get_prediction <- function(bank, partner, all_data, models) {
     filter(BankName == bank)  |>
     forecast(new_data= event_data, bootstrap=TRUE, times = 5000)
 
-  original_scale(fcast, all_data) |> add_column(Partner = partner)  
+  original_scale(fcast, all_data) |> add_column(Partner = partner)
 }
 
 result <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, data, m_table) |> 
@@ -270,7 +259,7 @@ result <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, data, 
 map2(partner_banks$Bank, partner_banks$Partner, plot_prediction, result, data) 
 
 ```
-
+## Abnormal Results 
 ```{r}
 #| warning: false
 #| label: tbl-abnormal-market

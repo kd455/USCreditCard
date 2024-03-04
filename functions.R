@@ -11,7 +11,6 @@ library(tidyr)
 library(readr)
 library(memoise)
 library(ggrepel)
-#library(prophet)
 library(broom)
 library(tseries)
 library(lmtest)
@@ -46,9 +45,6 @@ get_features <- function(data, ftags, value_name = "Value") {
       
     stat_features |>
         dplyr::select(!all_of(zero_const))
-        #  dplyr::select(-key_vars(data)) |> 
-        # prcomp(scale = TRUE) |>
-        # broom::augment(data)
 }
 
 
@@ -277,7 +273,7 @@ credit_card.partnerships.all <- function() {
                 Old="CAPITAL ONE, NATIONAL ASSOCIATION (112837)", 
                 New="GOLDMAN SACHS BANK USA (2182786)",
                 Acquired = "2022-01-01",
-                 Available = "2022-01-10") |>
+                Available = "2022-01-10") |>
                 tibble::add_row(Partner = "Apple",
                 Old="BARCLAYS BANK DELAWARE (2980209)", 
                 Acquired = "2020-09-15") |>
@@ -646,6 +642,9 @@ generate_model_data <- function() {
 
 .generate_model_hierachy_data <- function() {
   model_data <- .read_all_model_data()
+  partner_naics <- read_csv("data/Partner_NAICS.csv",show_col_types = FALSE) |> 
+                   dplyr::select(Partner, NAICS)
+                    
   partnerships <- credit_card.partnerships.all() |>
                         mutate(across(c("Acquired", "Available"), \(x) yearquarter(lubridate::ymd(x)))) |>
                         pivot_longer(cols = c(New,Old), names_to = "Partnership", values_to = "BankName") |> filter(!is.na(BankName))
@@ -671,10 +670,12 @@ generate_model_data <- function() {
                         tidyr::fill(Partnership,.direction = "up") |>  mutate(HasPartner = if_else(is.na(Partnership), 0, 1)) |> dplyr::select(-c(Available, Partnership))|> ungroup()
   
   #have all the data for partnerships. As a bank can be involved in multiple partnerships we have to ensure the data is repeated per partner
-  all_partnerships <- bind_rows(new_partnerships, old_partnerships) |> left_join(model_data, by = join_by(Quarter, BankName)) |> filter(!is.na(IDRSSD))       
+  all_partnerships <- bind_rows(new_partnerships, old_partnerships) |> 
+    left_join(model_data, by = join_by(Quarter, BankName)) |> filter(!is.na(IDRSSD))       
 
   final_data <- all_partnerships |> 
-                  add_row(model_data |> filter(!BankName %in% all_partnerships$BankName)) |> 
+                    left_join(partner_naics, by = join_by(Partner)) |> 
+                    add_row(model_data |> filter(!BankName %in% all_partnerships$BankName)) |> 
                     mutate(Partner = replace_na(Partner, "None"),
                            HasPartner = replace_na(HasPartner, 0))  
 
@@ -750,41 +751,6 @@ get_model_data <- function() {
 
   list(all_data = all_data, estimation_data = estimation_data, observation_data = observation_data)
 }
-
-# run_timeseries_cv <- function(data, formula_string, model_func = TSLM, predict_func= predict, initial_window = 9, horizon = 1, dependent_var = "UBPRE524.diff", fixedWindow = TRUE) {
-#     set.seed(123)  # For reproducibility
-#     # Create 5-fold cross-validation indices
-#     slices <- caret::createTimeSlices(1:nrow(data), initial_window, horizon, fixedWindow = fixedWindow)
-#     results <- list()
-
-#     for(i in 1:length(slices$train)) {
-#         # Extract training and testing data using the indices
-#         training_indices <- slices$train[[i]]
-#         validation_indices <- slices$test[[i]]
-#         training_set <- data |> filter(Quarter %in% data$Quarter[training_indices])
-#         validation_set <- data |> filter(Quarter %in% data$Quarter[validation_indices])
-
-#         # Skip if validation set contains FirmID levels not present in training set
-#         if(any(!(validation_set$IDRSSD %in% training_set$IDRSSD))) {
-#           next
-#         }
-#         # Fit model on the training data
-#         model <- training_set |> fabletools::model(m = model_func(as.formula(formula_string)))
-
-#         # Predict on the validation data
-#         predictions <- predict_func(model, newdata = validation_set)
-        
-#         # Evaluate the model (you can choose your evaluation metric, e.g., RMSE)
-#         rmse_value <- Metrics::rmse(validation_set[[dependent_var]], predictions)
-
-#         # Store the results
-#         results[[i]] <- rmse_value
-#     }
-
-#     # Calculate the average performance across all slices
-#     average_performance <- mean(unlist(results))
-#     average_performance
-# }
 
 plot_cc_measures <- function(bank_fuzzy, data, ubpr_labels) {
   data |> filter(grepl(bank_fuzzy,BankName)) |> 
@@ -865,7 +831,7 @@ original_scale <- function(fcast_bank_data, all_data, col_name = ".mean") {
   bank_name <- fcast_bank_data[[1,"BankName"]]
   if ("UBPRE524.diff" %in% names(fcast_bank_data) & class(fcast_bank_data[[1, "UBPRE524.diff"]])[1] != "numeric") {
       print(paste("Bank uses Diff", bank_name))
-      result <- result |> original_scale_diff(fcast_bank_data,all_data, bank_name,col_name)       
+      result <- result |> original_scale_diff(all_data, bank_name,col_name)       
   } else {
     print(paste("Bank uses Value", bank_name))
     result <- result |> rename(predicted = !!as.name(col_name))
@@ -920,9 +886,85 @@ nest_data_for_step_cv <- function(estimation_data) {
     est_data_tr |> left_join(step_data_tr) |> drop_na(new_data)
 }
 
+get_ubpr_labels <- function() {
+  read_csv("data/UBPR_codes_descriptions.csv", col_select = c(1:2),show_col_types = FALSE, col_names = c("Code","Desc")) |> add_column(Source = "FFIEC")
+}
+
 get_feature_labels <- function() {
   bind_rows(
-    read_csv("data/UBPR_codes_descriptions.csv", col_select = c(1:2),show_col_types = FALSE, col_names = c("Code","Desc")),
-    read_csv("data/us_economy_labels.csv", col_select = c(1:2),show_col_types = FALSE,col_names = c("Code","Desc"))
+    get_ubpr_labels(),
+    read_csv("data/us_economy_labels.csv", col_select = c(1:2),show_col_types = FALSE,col_names = c("Code","Desc")) |> add_column(Source = "FED")
     )
+}
+
+get_summary_validation.xgboost <- function(model_name, banks, include_model_name = FALSE) {
+  comb <- read_csv(glue("data/results/xgbTree_validation_{model_name}.csv"),show_col_types = FALSE)
+  get_summary_validation(comb, banks, "xgboost", include_model_name)
+}
+
+get_summary_validation.arima <- function(banks, include_model_name = FALSE) {
+  cv_results_est <- readr::read_csv("data/results/estimate_arima_metrics.csv",show_col_types = FALSE) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> 
+  dplyr::select(BankName, BankType, .type, RMSE, MAE)
+
+  cv_results_test <- read_tscv_results("arima") |> group_by(.type,BankName,BankType) |> 
+    summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
+    mutate(across(where(is.numeric), \(x) round(x,4))) |> 
+    dplyr::select(BankName, BankType, .type, RMSE, MAE) |> mutate(.type = "CV") 
+    
+  comb <- bind_rows(cv_results_est, cv_results_test) 
+  get_summary_validation(comb, banks, "arima", include_model_name)
+}
+
+get_summary_validation.market <- function(banks, include_model_name = FALSE) {
+  cv_results_est <- readr::read_csv("data/results/estimate_market_metrics.csv",show_col_types = FALSE) |> 
+  dplyr::select(-.model) |>
+  mutate(across(where(is.numeric), \(x) round(x,4))) |> 
+  dplyr::select(BankName, BankType, .type, RMSE, MAE)
+
+  cv_results_test <-readr::read_csv("data/results/estimate_tscv_market_metrics.csv",show_col_types = FALSE) |> 
+    dplyr::select(-.model) |>
+    mutate(across(where(is.numeric), \(x) round(x,4))) |> 
+      dplyr::select(BankName, BankType, .type, RMSE, MAE) |> mutate(.type = "CV")
+        
+  comb <- bind_rows(cv_results_est, cv_results_test) 
+  get_summary_validation(comb, banks, "market", include_model_name)
+}
+
+get_summary_validation.hierarchy <- function(banks, include_model_name = FALSE) {
+  cv_results_est <- readr::read_csv("data/results/estimate_hier_metrics.csv",show_col_types = FALSE) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> 
+  dplyr::select(BankName, BankType, .type, RMSE, MAE)
+
+  cv_results_test <- read_tscv_results("hier") |> group_by(.type,BankName, BankType) |> 
+    summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
+    mutate(across(where(is.numeric), \(x) round(x,4))) |> 
+    dplyr::select(BankName, BankType, .type, RMSE, MAE) |> mutate(.type = "CV") 
+    
+  comb <- bind_rows(cv_results_est, cv_results_test) 
+  get_summary_validation(comb, banks, "hierarchy", include_model_name)
+}
+
+get_summary_validation <- function(data, banks, model_name, include_model_name = FALSE) {
+  summary_banks <- data |> 
+                    filter(!is.null(banks) & BankName %in% banks) |> 
+                    arrange(BankName,.type) |> mutate(across(where(is.numeric), \(x) round(x,3)))
+
+  summary_mean_banks <- data |> filter(!is.null(banks) &BankName %in% banks) |> 
+                          group_by(.type) |> summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |>
+                          mutate(across(where(is.numeric), \(x) round(x,3)))
+                            
+  summary_mean_all <- data |> group_by(.type) |> 
+                        summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
+                        mutate(across(where(is.numeric), \(x) round(x,3)))
+
+  summary_mean_type <- data |> group_by(BankType, .type) |> 
+                        summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
+                        mutate(across(where(is.numeric), \(x) round(x,3)))
+
+  if (include_model_name) {
+    summary_banks <- summary_banks |> mutate(Model = model_name)
+    summary_mean_banks <- summary_mean_banks |> mutate(Model = model_name)
+    summary_mean_all <- summary_mean_all |> mutate(Model = model_name)
+    summary_mean_type <- summary_mean_type |> mutate(Model = model_name)
+  }
+  list(tbl1 = summary_banks, tbl2 = summary_mean_banks, tbl3 = summary_mean_all, tbl4 = summary_mean_type)
 }
