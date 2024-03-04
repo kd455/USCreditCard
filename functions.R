@@ -806,11 +806,10 @@ read_tscv_results <- function(model_type = "arima") {
     map(read_csv, show_col_types = FALSE) |> list_rbind()
 }
 
-plot_prediction <- function(bank, partner, bank_fcasts, all_data) {
-    bank_fcast_data <- bank_fcasts |> filter(BankName == bank)
+plot_prediction <- function(bank, partner, fcasts, all_data) {
+    fcast_data <- fcasts |> filter(BankName == bank) |> filter(Partner == partner) |> head(8) 
     bank_data <- all_data |> filter(BankName == bank)
 
-    fcast_data <- bank_fcast_data |> filter(Partner == partner) |> head(8) 
     est_data <- bank_data |> filter(is.na(!!as.name(partner)))
     est_data_trunc <- est_data |> tail(ifelse(nrow(est_data)<11,nrow(est_data),11))
     event_data <- bank_data |> filter(!!as.name(partner) >=0) |> head(8) 
@@ -823,6 +822,13 @@ plot_prediction <- function(bank, partner, bank_fcasts, all_data) {
     geom_line(aes(x = Quarter, y=UBPRE524.Value), data = comb_data, color='darkslategrey',linetype = "longdash") + 
     geom_vline(xintercept = as.Date(min_qtr) , linetype=1,color="grey") +
     labs(title = bank, subtitle = partner, y = credit_card.target_label())   
+}
+
+plot_prediction_and_history <- function(bank, partner, fcasts, hcasts, all_data) {
+  bank_hcast_data <- hcasts |> filter(BankName == bank) |> filter(Partner == partner) 
+  
+  plot_prediction(bank, partner, fcasts, all_data) + 
+    geom_line(aes(x = Quarter, y=predicted), data = bank_hcast_data, color= "darkblue")
 }
 
 original_scale <- function(fcast_bank_data, all_data, col_name = ".mean") {

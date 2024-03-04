@@ -259,6 +259,41 @@ result <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, data, 
 map2(partner_banks$Bank, partner_banks$Partner, plot_prediction, result, data) 
 
 ```
+```{r}
+#| warning: false
+#| echo: false
+#| results: hide
+#| fig-keep: all
+#| label: fig-pred-past
+#| fig-cap: "Prediction vs. Observed Event"
+get_pre_prediction <- function(bank, partner, all_data, augmented_data) {
+  bank_data <- all_data |> filter(BankName == bank)
+  event_qtr <- bank_data |> filter(!!as.name(partner) == 0) |> pull(Quarter)
+  bank_data |> filter_index(~ format(event_qtr, format = "%Y Q%q")) |> tail(8)
+  
+  
+  fcast <- bank_data |> model(market = TSLM(formula = as.formula(market_formula))) |> augment()
+                              
+  fcast$Quarter
+  
+  quarter0 <- fcast[[1,"Quarter"]] - 1      
+  value0 <- all_data |> as_tibble() |>
+              filter(BankName == bank, 
+                      Quarter == quarter0) |> pull(UBPRE524.Value)
+  
+  fcast_bank_data |> mutate(predicted = value0 + cumsum(!!as.name(col_name)))  
+  
+  original_scale_diff(fcast, all_data, bank) |> add_column(Partner = partner)
+}
+
+
+history_result <- map2(partner_banks$Bank, partner_banks$Partner, get_pre_prediction, data, augmented_data) |> 
+          list_rbind()
+
+
+map2(partner_banks$Bank, partner_banks$Partner, plot_prediction_and_history, result,history_result, data) 
+
+```
 ## Abnormal Results 
 ```{r}
 #| warning: false
