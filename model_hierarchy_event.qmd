@@ -7,6 +7,8 @@ format: html
 #| warning: false
 #| echo: false
 source('functions.R')
+library(car)
+
 model_data <- get_model_data()
 all_data <- model_data$all_data
 estimation_data <- model_data$estimation_data
@@ -83,6 +85,7 @@ m8.8 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff + Qtr | 
 m8.9 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff + Qtr | BankName) + UBPRE524.group.log.diff, data = estimation_data, REML = FALSE)
 
 ```
+
 ```{r}
 #| warning: false
 #| label: tbl-hier2-aicc
@@ -103,7 +106,7 @@ Analysis of the correlation matrix @tbl-corr-hier-1 reveals a notable correlatio
 
 Considering the AICc values, Model **8.7**, which excludes UBPRE524.all.log.diff, demonstrates comparable performance. This suggests that Model 8.7 is a good alternative, allowing us to mitigate this multicollinearity concern.
 
-```{r}
+
 ```{r}
 #| warning: false
 #| label: tbl-corr-hier

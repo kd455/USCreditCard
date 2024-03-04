@@ -26,8 +26,8 @@ bank_members <- credit_card.overdue_3089() |>
                 group_by(BankName,BankType) |> 
                 summarise(total_bal = sum(abs(Value),na.rm=T)) |>
                 filter(!(is.na(total_bal)|total_bal==0))
-knitr::kable(bank_members |> filter(BankType=="LargeBank") |> select(BankName)) 
-knitr::kable(bank_members |> filter(BankType=="LargeCreditCardBank") |> select(BankName))
-knitr::kable(bank_members |> filter(BankType=="OtherBank") |> select(BankName))
+knitr::kable(bank_members |> filter(BankType=="LargeBank") |> dplyr::select(BankName)) 
+knitr::kable(bank_members |> filter(BankType=="LargeCreditCardBank") |> dplyr::select(BankName))
+knitr::kable(bank_members |> filter(BankType=="OtherBank") |> dplyr::select(BankName))
 ```
 

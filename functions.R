@@ -863,7 +863,8 @@ print_ar <- function(prediction_result, partner, bank) {
 
 nest_data_for_step_cv <- function(estimation_data) {
     data <- estimation_data |> as_tibble() |>
-              mutate(Quarter = factor(Quarter, levels = unique(Quarter))) |>
+              mutate(Quarter = format(Quarter, format = "%Y Q%q"),
+                     Quarter = factor(Quarter, levels = unique(Quarter))) |> 
               arrange(Quarter) |>
               mutate(Quarter_Index = as.integer(factor(Quarter))) |> 
               relocate(Quarter_Index)
