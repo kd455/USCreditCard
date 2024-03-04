@@ -37,5 +37,26 @@
   },
   "data_outliers.qmd": {
     "data_outliers.html": "e3a7e6df"
+  },
+  "model_market.qmd": {
+    "model_market.html": "2fbc92ba"
+  },
+  "model_event.qmd": {
+    "model_event.html": "85b8a7a0"
+  },
+  "model_arima.qmd": {
+    "model_arima.html": "79d74325"
+  },
+  "model_ml.qmd": {
+    "model_ml.html": "3c229c88"
+  },
+  "model_hierarchy_event.qmd": {
+    "model_hierarchy_event.html": "7682f79c"
+  },
+  "data_final_event.qmd": {
+    "data_final_event.html": "9568c716"
+  },
+  "model_event_summary.qmd": {
+    "model_event_summary.html": "877fb949"
   }
 }

@@ -1,2 +1,4 @@
 /.quarto/
-/references/
+data/results/sv_dependence
+/_book/
+.quarto/
