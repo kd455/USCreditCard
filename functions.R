@@ -854,10 +854,18 @@ original_scale_diff <- function(fcast_bank_data, all_data, bank_name, col_name =
 }
 
 print_ar <- function(prediction_result, partner, bank) {
-  prediction_result |> filter(Partner == partner, BankName == bank) |>
-  group_by(Partner,BankName) |> 
+  df <- prediction_result |> 
+          filter(Partner == partner, BankName == bank) 
+  
+  df <- if (!"Period" %in% names(df)) {
+        df |>
+            mutate(Period = row_number())
+        } else {
+          df
+        }
+
+  df |> group_by(Partner,BankName) |> 
   mutate(AR = observed - predicted,
-         Period = row_number(),
          cum_mean = cummean(AR),
          cum_sum = cumsum(AR)) |> as_tibble() |>
     dplyr::select(Period, observed, predicted, AR, 

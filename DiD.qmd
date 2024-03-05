@@ -1,7 +1,0 @@
-# Introduction
-
-# Assumptions
-
-check parallel trends assumption with the treated group.
-
-The parallel trends assumption says that, if no treatment had occurred, the difference between the treated group and the untreated group would have stayed the same in the post-treatment period as it was in the pre-treatment period.

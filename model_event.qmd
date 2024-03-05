@@ -15,8 +15,4 @@ The estimation period ends 1 quarter before the acquisition. This is to remove i
 
 The observation period chosen is the quarter of the event + 7 quarters after the event. Based on partnership agreement the portfolio can be transferred with delinquent borrowers on day one [e.g., @gap2021] or the impact may be some quarters after the acquisition as borrowers receive and start using their new partner cards. It will take least 30 days to determine if any of these borrowers are delinquent.
 
-## Sense check
 
-The joint test problem arises because we are effectively testing two things: the counterfactual model and the event impact. Consequently, we need an approach to accurately evaluate if our counterfactual model results are credible. One approach suggested by @HuntingtonKlein is to test using observations where we expect no effect; if there were resulting "abnormal returns" this would point to an issue with the model.
-
-This is in addition to visual, cross-validation and statistical checks on model fit.

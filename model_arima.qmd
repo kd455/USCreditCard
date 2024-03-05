@@ -91,7 +91,7 @@ Our approach begins with basic ARIMA modelling to predict future values solely b
 
 Next, to see if we can improve the models (one model for each bank series), we introduce explanatory variables, while also correcting for autocorrelation within the error terms. This transforms the models into a Linear Regression with AR Errors. 
 
-We examine the AICc values of models across various categories of explanatory variables, including Expenditure, Unemployment, Consumer and Household Debt, Portfolio, and Group Trend. This analysis aims to identify explanatory variables that we can combine. This also takes into consideration insights from the data exploratory phase, as well as insights from other modelling techniques such as XGBoost Factor Analysis (see @fig-importance).
+We examine the AICc values of models across various categories of explanatory variables, including Expenditure, Unemployment, Consumer and Household Debt, Portfolio, and Group Trend. This analysis aims to identify explanatory variables that we can combine. This also takes into consideration insights from the data exploratory phase, as well as insights from other modelling techniques such as XGBoost Factor Analysis (see @fig-gain-all).
 
 ## Model selection {#sec-model-arima}
 
@@ -536,6 +536,7 @@ val_results$tbl3 |> rmarkdown::paged_table()
 #| results: hide
 #| fig-keep: all
 #| label: fig-pred-observed-arima
+#| fig-cap: "Prediction vs. Observed Event"
 get_prediction <- function(Bank, Partner, all_data, models) {
   tryCatch({
     bank_data <- all_data |> filter(BankName == Bank)

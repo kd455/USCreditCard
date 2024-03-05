@@ -1,9 +1,9 @@
 ---
-title: "Collated Results"
+title: "Overall Results"
 format: html
 ---
 
-
+## Comparative Model Accuracy
 ```{r}
 #| warning: false
 #| label: tbl-cv-train-diff
@@ -57,3 +57,134 @@ bind_rows(xg_results$tbl3, arima_results$tbl3, market_results$tbl3, hier_results
     cv_train_difference() |> rmarkdown::paged_table()
 
 ```
+
+
+## Prediction 
+
+The joint test problem arises because we are effectively testing two things: the counterfactual model and the event impact. Consequently, we need an approach to accurately evaluate if our counterfactual model results are credible. One approach suggested by @HuntingtonKlein is to test using observations where we expect no effect; if there were resulting "abnormal returns" this would point to an issue with the model.
+
+This is in addition to visual, cross-validation and statistical checks on model fit.
+
+```{r}
+#| warning: false
+#| echo: false
+#| results: hide
+#| fig-keep: all
+#| label: fig-pred-final-market
+#| fig-cap: "Prediction vs. Observed Event"
+get_prediction <- function(bank, partner, all_data, models) {
+  bank_data <- all_data |> filter(BankName == bank)
+  event_data <- bank_data |> filter(!!as.name(partner) >=0) |> head(8) 
+  fcast <- models |>
+    filter(BankName == bank)  |>
+    forecast(new_data= event_data) #, bootstrap=TRUE, times = 5000)
+
+  original_scale(fcast, all_data) |> add_column(Partner = partner)
+}
+
+get_pre_prediction <- function(bank, partner, all_data) {
+  bank_data <- all_data |> filter(BankName == bank)
+  event_qtr <- bank_data |> filter(!!as.name(partner) == 0) |> pull(Quarter)
+  
+  pre_event_data <- bank_data |> filter_index(~ format(event_qtr, format = "%Y Q%q")) |> 
+                      mutate(Period = -(n() - row_number() + 1)) |> relocate(Period) 
+  est_data <- pre_event_data |> filter(Period < -8)
+  obs_data <- pre_event_data |> filter(Period >= -8) 
+     
+  m <- est_data |> model(market = TSLM(formula = as.formula(market_formula))) 
+
+  fcast <- m |>
+    forecast(new_data= obs_data) #, bootstrap=TRUE, times = 5000)
+  
+  original_scale(fcast, all_data) |> add_column(Partner = partner) |> 
+    mutate(Period = -(n() - row_number() + 1))
+}
+
+partner_banks <- credit_card.partnerships.long()
+market_formula <- "UBPRE524.diff ~ UBPRE524.group.log.diff"
+m_table <- estimation_data |> fill_gaps() |> model(tslm = TSLM(as.formula(market_formula)))
+
+result <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, all_data, m_table) |> 
+          list_rbind() |> left_join(all_data |> dplyr::select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter) ) |> as_tibble() |> dplyr::select(Partner, BankName, Quarter, observed, predicted)    
+
+result_history <- map2(partner_banks$Bank, partner_banks$Partner, get_pre_prediction, all_data) |>
+          list_rbind() |> left_join( all_data |> dplyr::select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter) ) |> as_tibble() |> dplyr::select(Period, Partner, BankName, Quarter, observed, predicted)    
+          
+map2(partner_banks$Bank, partner_banks$Partner, plot_prediction_and_history, result,result_history, all_data) 
+
+```
+
+## Abnormal Results 
+
+### Costco - Old Partner AMERICAN EXPRESS NATIONAL BANK
+```{r}
+#| warning: false
+#| label: tbl-ar-market-costco-ar
+#| tbl-cap: "Credit Card Plans-30-89 DAYS P/D %: Abnormal Returns (original scale)"
+#| tbl-subcap: 
+#| - "Pre Event"
+#| - "Post Event"
+print_ar(result_history, "Costco", "AMERICAN EXPRESS NATIONAL BANK (1394676)") 
+print_ar(result, "Costco", "AMERICAN EXPRESS NATIONAL BANK (1394676)")
+```
+
+
+### Costco - New Partner CITIBANK
+```{r}
+#| warning: false
+#| label: tbl-ar-market-costco-citi
+#| tbl-cap: "Credit Card Plans-30-89 DAYS P/D %: Abnormal Returns (original scale)"
+#| tbl-subcap: 
+#| - "Pre Event"
+#| - "Post Event"
+print_ar(result_history, "Costco", "CITIBANK, N.A. (476810)")
+print_ar(result, "Costco", "CITIBANK, N.A. (476810)")
+```
+
+### Walmart - Old Partner SYNCHRONY
+```{r}
+#| warning: false
+#| label: tbl-ar-market-walmart-sync
+#| tbl-cap: "Credit Card Plans-30-89 DAYS P/D %: Abnormal Returns (original scale)"
+#| tbl-subcap: 
+#| - "Pre Event"
+#| - "Post Event"
+print_ar(result_history, "Walmart", "SYNCHRONY BANK (1216022)")
+print_ar(result, "Walmart", "SYNCHRONY BANK (1216022)")
+```
+### Walmart - New Partner CAPITAL ONE
+```{r}
+#| warning: false
+#| label: tbl-ar-market-walmart-cap
+#| tbl-cap: "Credit Card Plans-30-89 DAYS P/D %: Abnormal Returns (original scale)"
+#| tbl-subcap: 
+#| - "Pre Event"
+#| - "Post Event"
+print_ar(result_history, "Walmart", "CAPITAL ONE, NATIONAL ASSOCIATION (112837)")
+print_ar(result, "Walmart", "CAPITAL ONE, NATIONAL ASSOCIATION (112837)")
+```
+
+### GAP - Old Partner SYNCHRONY 
+```{r}
+#| warning: false
+#| label: tbl-ar-market-gap-sync
+#| tbl-cap: "Credit Card Plans-30-89 DAYS P/D %: Abnormal Returns (original scale)"
+#| tbl-subcap: 
+#| - "Pre Event"
+#| - "Post Event"
+print_ar(result_history, "GAP", "SYNCHRONY BANK (1216022)")
+print_ar(result, "GAP", "SYNCHRONY BANK (1216022)")
+```
+
+### GAP - New Partner BARCLAYS BANK 
+```{r}
+#| warning: false
+#| label: tbl-ar-market-gap-bar
+#| tbl-cap: "Credit Card Plans-30-89 DAYS P/D %: Abnormal Returns (original scale)"
+#| tbl-subcap: 
+#| - "Pre Event"
+#| - "Post Event"
+print_ar(result_history, "GAP", "BARCLAYS BANK DELAWARE (2980209)")
+print_ar(result, "GAP", "BARCLAYS BANK DELAWARE (2980209)")
+```
+

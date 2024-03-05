@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>US Credit Card Partnerships - 6&nbsp; Market Model</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./model_arima.html" rel="next">
+<link href="./model_event.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./model_event.html">Event Study</a></li><li class="breadcrumb-item"><a href="./model_market.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Market Model</span></a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">US Credit Card Partnerships</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Data</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data_ffiec.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Bank Data</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data_partners.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Bank Partnerships</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data_fed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Explanatory Data</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text">Event Study</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model_event.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Event Studies</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model_market.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Market Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model_arima.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Linear Regression with AR Errors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model_hierarchy_event.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Hierarchical Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model_ml.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">XGBoost Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model_event_summary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Overall Results</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text">Appendix</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data_banks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bank Peer Groups</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data_final_event.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Event Study Dataset</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#sec-model-market" id="toc-sec-model-market" class="nav-link active" data-scroll-target="#sec-model-market"><span class="header-section-number">6.1</span> Specification</a></li>
+  <li><a href="#model-results" id="toc-model-results" class="nav-link" data-scroll-target="#model-results"><span class="header-section-number">6.2</span> Model Results</a>
+  <ul class="collapse">
+  <li><a href="#estimated-fit" id="toc-estimated-fit" class="nav-link" data-scroll-target="#estimated-fit"><span class="header-section-number">6.2.1</span> Estimated Fit</a></li>
+  <li><a href="#sec-residual-check" id="toc-sec-residual-check" class="nav-link" data-scroll-target="#sec-residual-check"><span class="header-section-number">6.2.2</span> Residual diagnostics</a></li>
+  <li><a href="#residuals-white-noise" id="toc-residuals-white-noise" class="nav-link" data-scroll-target="#residuals-white-noise"><span class="header-section-number">6.2.3</span> Residuals White Noise</a></li>
+  </ul></li>
+  <li><a href="#time-series-cross-validation" id="toc-time-series-cross-validation" class="nav-link" data-scroll-target="#time-series-cross-validation"><span class="header-section-number">6.3</span> Time Series Cross-Validation</a></li>
+  <li><a href="#prediction" id="toc-prediction" class="nav-link" data-scroll-target="#prediction"><span class="header-section-number">6.4</span> Prediction</a></li>
+  <li><a href="#abnormal-results" id="toc-abnormal-results" class="nav-link" data-scroll-target="#abnormal-results"><span class="header-section-number">6.5</span> Abnormal Results</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Market Model</span></h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="sec-model-market" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="sec-model-market"><span class="header-section-number">6.1</span> Specification</h2>
+<p>To determine the normal return we can adopt the market model <span class="citation" data-cites="MacKinlay1997">(<a href="references.html#ref-MacKinlay1997" role="doc-biblioref">MacKinlay 1997</a>)</span> <span class="math display">\[
+D_{it} = \alpha_i + \beta_i D_{gt} + \epsilon_{it}
+\]</span></p>
+<p>And the AR is the Observed Return - Predicted Return <span class="math display">\[
+AR_{it} = D_{it} – (\alpha_i + \beta_i D_{gt})
+\]</span></p>
+<p>Where:</p>
+<p><span class="math inline">\(D_{it}\)</span> is <em>Credit Card Plans-30-89 DAYS P/D %</em> <span class="math inline">\(i\)</span> at time <span class="math inline">\(t\)</span>,<br>
+<span class="math inline">\(\alpha_i\)</span> is the firm-specific intercept,<br>
+<span class="math inline">\(\beta_i\)</span> is the coefficient measuring the sensitivity of firm value <span class="math inline">\(i\)</span> to the group <span class="math inline">\(g\)</span>,<br>
+<span class="math inline">\(D_{gt}\)</span> is the group <em>Credit Card Plans-30-89 DAYS P/D %</em> at time <span class="math inline">\(t\)</span>, and<br>
+<span class="math inline">\(\varepsilon_{it}\)</span> is the error term for <span class="math inline">\(i\)</span> at time <span class="math inline">\(t\)</span>.</p>
+</section>
+<section id="model-results" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="model-results"><span class="header-section-number">6.2</span> Model Results</h2>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>model_data <span class="ot">&lt;-</span> <span class="fu">get_model_data</span>()</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> model_data<span class="sc">$</span>all_data</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>estimation_data <span class="ot">&lt;-</span> model_data<span class="sc">$</span>estimation_data</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>observation_data <span class="ot">&lt;-</span> model_data<span class="sc">$</span>observation_data</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>partner_banks <span class="ot">&lt;-</span> <span class="fu">credit_card.partnerships.long</span>()</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>market_formula <span class="ot">&lt;-</span> <span class="st">"UBPRE524.diff ~ UBPRE524.group.log.diff"</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>m_table <span class="ot">&lt;-</span> estimation_data <span class="sc">|&gt;</span> <span class="fu">fill_gaps</span>() <span class="sc">|&gt;</span> <span class="fu">model</span>(<span class="at">tslm =</span> <span class="fu">TSLM</span>(<span class="fu">as.formula</span>(market_formula)))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>augmented_data <span class="ot">&lt;-</span> m_table <span class="sc">|&gt;</span> <span class="fu">augment</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<section id="estimated-fit" class="level3" data-number="6.2.1">
+<h3 data-number="6.2.1" class="anchored" data-anchor-id="estimated-fit"><span class="header-section-number">6.2.1</span> Estimated Fit</h3>
+<p>As outlined in <a href="model_event.html#sec-data-split"><span>Section&nbsp;5.1</span></a>, we have split our data into estimation and observation periods. For firms that do not have partnership events, the full data series is used in the estimation period. For firms with partnership events the estimation period is up to the quarter before each event.</p>
+<p>If the market model demonstrates a robust fit with the estimation data, this instils confidence in our ability to forecast the “normal” return using the unseen data from the observation period.</p>
+<p><a href="#fig-plot-fit">Figure&nbsp;<span>6.1</span></a> displays fitted vs actual results for a sub-set of firms. The Intercept and Coefficient is displayed in <a href="#tbl-coef-market">Table&nbsp;<span>6.2</span></a>. The model is</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>augmented_data <span class="sc">|&gt;</span> <span class="fu">filter</span>(BankName <span class="sc">%in%</span> <span class="fu">unique</span>(observation_data<span class="sc">$</span>BankName)) <span class="sc">|&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>        <span class="fu">plot_model_fit</span>(<span class="st">"UBPRE524.diff"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-plot-fit" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="model_market_files/figure-html/fig-plot-fit-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.1: Fitted vs.&nbsp;Observed for estimation data on sub-set of firms</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>m_table <span class="sc">|&gt;</span> <span class="fu">filter</span>(BankName <span class="sc">%in%</span> observation_data<span class="sc">$</span>BankName) <span class="sc">|&gt;</span> <span class="fu">glance</span>() <span class="sc">|&gt;</span> <span class="fu">relocate</span>(BankName, AICc, AIC) <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(IDRSSD,.model))<span class="sc">|&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">4</span>))) <span class="sc">|&gt;</span>  </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="tbl-market-aicc" class="anchored">
+
+<div data-pagedtable="false"> <div class="table-caption">Table&nbsp;6.1:  <p>AICc Summary for sub-set of banks</p> </div>
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["BankName"],"name":[1],"type":["fct"],"align":["left"]},{"label":["AICc"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["AIC"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["BankType"],"name":[4],"type":["fct"],"align":["left"]},{"label":["r_squared"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["adj_r_squared"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["sigma2"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["statistic"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["p_value"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["log_lik"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["BIC"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["CV"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["deviance"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["df.residual"],"name":[15],"type":["dbl"],"align":["right"]},{"label":["rank"],"name":[16],"type":["dbl"],"align":["right"]}],"data":[{"1":"CAPITAL ONE, NATIONAL ASSOCIATION (112837)","2":"-117.9186","3":"-118.8786","4":"LargeBank","5":"0.3399","6":"0.3155","7":"0.0145","8":"13.9055","9":"0.0009","10":"2","11":"21.2901","12":"-114.7767","13":"0.0149","14":"0.3911","15":"27","16":"2"},{"1":"CITIBANK, N.A. (476810)","2":"-83.8497","3":"-84.9926","4":"LargeBank","5":"0.1325","6":"0.0948","7":"0.0285","8":"3.5138","9":"0.0736","10":"2","11":"10.0228","12":"-81.3360","13":"0.0293","14":"0.6565","15":"23","16":"2"},{"1":"SYNCHRONY BANK (1216022)","2":"-116.9123","3":"-118.1123","4":"LargeCreditCardBank","5":"0.8354","6":"0.8280","7":"0.0062","8":"111.6822","9":"0.0000","10":"2","11":"28.0016","12":"-114.5781","13":"0.0067","14":"0.1362","15":"22","16":"2"},{"1":"AMERICAN EXPRESS NATIONAL BANK (1394676)","2":"-108.4148","3":"-109.5577","4":"LargeCreditCardBank","5":"0.2330","6":"0.1996","7":"0.0107","8":"6.9863","9":"0.0145","10":"2","11":"22.3054","12":"-105.9011","13":"0.0117","14":"0.2458","15":"23","16":"2"},{"1":"BARCLAYS BANK DELAWARE (2980209)","2":"-225.4694","3":"-226.0028","4":"LargeCreditCardBank","5":"0.4813","6":"0.4703","7":"0.0092","8":"43.6101","9":"0.0000","10":"2","11":"46.4734","12":"-220.3273","13":"0.0096","14":"0.4304","15":"47","16":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</div>
+<p>In <a href="#tbl-coef-market">Table&nbsp;<span>6.2</span></a> we can see the standard error of <em>UBPRE524.group.log.diff</em> is small relative to its estimate indicating a precise estimate. A small p-value (typically &lt;0.05) suggests strong evidence against the null hypothesis, indicating that <em>UBPRE524.group.log.diff</em> is statistically significant.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>m_table <span class="sc">|&gt;</span> <span class="fu">filter</span>(BankName <span class="sc">%in%</span> <span class="fu">unique</span>(observation_data<span class="sc">$</span>BankName)) <span class="sc">|&gt;</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(BankName, term<span class="sc">:</span><span class="fu">last_col</span>())<span class="sc">|&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">4</span>))) <span class="sc">|&gt;</span>  </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="tbl-coef-market" class="anchored">
+
+<div data-pagedtable="false"> <div class="table-caption">Table&nbsp;6.2:  <p>Intercept and coefficients</p> </div>
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["BankName"],"name":[1],"type":["fct"],"align":["left"]},{"label":["term"],"name":[2],"type":["chr"],"align":["left"]},{"label":["estimate"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["std.error"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["statistic"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["p.value"],"name":[6],"type":["dbl"],"align":["right"]}],"data":[{"1":"CAPITAL ONE, NATIONAL ASSOCIATION (112837)","2":"(Intercept)","3":"0.0167","4":"0.0224","5":"0.7470","6":"0.4615"},{"1":"CAPITAL ONE, NATIONAL ASSOCIATION (112837)","2":"UBPRE524.group.log.diff","3":"1.3643","4":"0.3659","5":"3.7290","6":"0.0009"},{"1":"CITIBANK, N.A. (476810)","2":"(Intercept)","3":"-0.0564","4":"0.0383","5":"-1.4740","6":"0.1540"},{"1":"CITIBANK, N.A. (476810)","2":"UBPRE524.group.log.diff","3":"0.8817","4":"0.4704","5":"1.8745","6":"0.0736"},{"1":"SYNCHRONY BANK (1216022)","2":"(Intercept)","3":"-0.0052","4":"0.0161","5":"-0.3194","6":"0.7524"},{"1":"SYNCHRONY BANK (1216022)","2":"UBPRE524.group.log.diff","3":"2.3984","4":"0.2269","5":"10.5680","6":"0.0000"},{"1":"AMERICAN EXPRESS NATIONAL BANK (1394676)","2":"(Intercept)","3":"-0.0081","4":"0.0212","5":"-0.3816","6":"0.7063"},{"1":"AMERICAN EXPRESS NATIONAL BANK (1394676)","2":"UBPRE524.group.log.diff","3":"0.6121","4":"0.2316","5":"2.6432","6":"0.0145"},{"1":"BARCLAYS BANK DELAWARE (2980209)","2":"(Intercept)","3":"-0.0321","4":"0.0137","5":"-2.3377","6":"0.0237"},{"1":"BARCLAYS BANK DELAWARE (2980209)","2":"UBPRE524.group.log.diff","3":"0.8334","4":"0.1262","5":"6.6038","6":"0.0000"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="sec-residual-check" class="level3" data-number="6.2.2">
+<h3 data-number="6.2.2" class="anchored" data-anchor-id="sec-residual-check"><span class="header-section-number">6.2.2</span> Residual diagnostics</h3>
+<p>Residuals should have the following properties <span class="citation" data-cites="Hyndman2021">(<a href="references.html#ref-Hyndman2021" role="doc-biblioref">Hyndman and Athanasopoulos 2021</a>, ch.&nbsp;5.4)</span>. Residuals:</p>
+<ul>
+<li>Are uncorrelated. Correlations indicate that the model is missing information left in the residuals.</li>
+<li>Have zero mean. If they have a mean other than zero, then the forecasts are biased.</li>
+<li>Have constant variance i.e.&nbsp;does not violate “homoscedasticity” assumption.</li>
+<li>Are normally distributed.</li>
+</ul>
+<div class="tabset-margin-container"></div><div id="fig-market-checks" class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" aria-current="page">CITIBANK</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">SYNCHRONY</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">BARCLAYS</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">AMERICAN EXPRESS</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false">CAPITAL ONE</a></li></ul>
+<div id="fig-market-checks" class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>bank <span class="ot">&lt;-</span> <span class="st">"CITIBANK"</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>m_table <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="fu">grepl</span>(bank,BankName)) <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(tslm) <span class="sc">|&gt;</span> <span class="fu">gg_tsresiduals</span>()  </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_cc_measures</span>(bank, estimation_data,ubpr_labels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-fit-citi-1" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="model_market_files/figure-html/fig-fit-citi-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.2: The time plot of the residuals shows that the variation of the residuals is relatively constant but with one significant outlier. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outlier.</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div id="fig-fit-citi-2" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="model_market_files/figure-html/fig-fit-citi-2.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.3: Explaining the outlier: Delinquency dropped at a time when CITIBANK’s credit card portfolio became a larger business concern (c). The borrowers added appear to be less risky as we see the unused proportion go from below 10% to over 40% in (b)</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>bank <span class="ot">&lt;-</span> <span class="st">"SYNCHRONY"</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>m_table <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="fu">grepl</span>(bank,BankName)) <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(tslm) <span class="sc">|&gt;</span> <span class="fu">gg_tsresiduals</span>()  </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_cc_measures</span>(bank, estimation_data,ubpr_labels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-fit-sync-1" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="model_market_files/figure-html/fig-fit-sync-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.4: The time plot of the residuals shows a couple of outliers at the start of the time period and in 2018 Q1. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outliers.</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div id="fig-fit-sync-2" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="model_market_files/figure-html/fig-fit-sync-2.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.5: Comparative credit card portfolio variables</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>bank <span class="ot">&lt;-</span> <span class="st">"BARCLAYS"</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>m_table <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="fu">grepl</span>(bank,BankName)) <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(tslm) <span class="sc">|&gt;</span> <span class="fu">gg_tsresiduals</span>()  </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_cc_measures</span>(bank, estimation_data,ubpr_labels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-fit-bar-1" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="model_market_files/figure-html/fig-fit-bar-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.6: The time plot of the residuals shows that the variation of the residuals is relatively constant up until the onset of the COVID-19 pandemic in 2020; the model needs more information to account for this period. The acf shows residuals are uncorrelated</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div id="fig-fit-bar-2" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="model_market_files/figure-html/fig-fit-bar-2.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.7: Comparative credit card portfolio variables</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>bank <span class="ot">&lt;-</span> <span class="st">"AMERICAN EXPRESS NATIONAL BANK"</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>m_table <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="fu">grepl</span>(bank,BankName)) <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(tslm) <span class="sc">|&gt;</span> <span class="fu">gg_tsresiduals</span>()  </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_cc_measures</span>(bank, estimation_data,ubpr_labels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-fit-ae-1" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="model_market_files/figure-html/fig-fit-ae-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.8: The time plot of the residuals shows a couple of outliers at the start of the time period causing a left skew. The acf shows residuals are uncorrelated.</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div id="fig-fit-ae-2" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="model_market_files/figure-html/fig-fit-ae-2.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.9: Comparative credit card portfolio variables</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-5-tab">
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>bank <span class="ot">&lt;-</span> <span class="st">"CAPITAL ONE"</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>m_table <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="fu">grepl</span>(bank,BankName)) <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(tslm) <span class="sc">|&gt;</span> <span class="fu">gg_tsresiduals</span>()  </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_cc_measures</span>(bank, estimation_data, ubpr_labels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-fit-cap-1" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="model_market_files/figure-html/fig-fit-cap-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.10: The time plot of the residuals shows that the variation of the residuals is relatively constant but with two significant outliers at the start of the series. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outliers.</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div id="fig-fit-cap-2" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="model_market_files/figure-html/fig-fit-cap-2.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.11: Explaining the outlier: Deliquency dropped at a time when CAPITAL ONE’s credit card portfolio became a larger business concern. The U shape for deliquency % indicates initial improvement in the portfolio’s quality, however, by the end of the estimation period, the % is back up. This increase coincides with a decrease in unused commitments i.e.&nbsp;borrowers are putting more expenditures on their credit cards.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="residuals-white-noise" class="level3" data-number="6.2.3">
+<h3 data-number="6.2.3" class="anchored" data-anchor-id="residuals-white-noise"><span class="header-section-number">6.2.3</span> Residuals White Noise</h3>
+<p>The sub-set of banks analysed in <a href="#sec-residual-check"><span>Section&nbsp;6.2.2</span></a> did not exhibit significant autocorrelation.</p>
+<p><a href="#tbl-lb-market">Table&nbsp;<span>6.3</span></a> lists banks where we reject the null hypothesis of the Ljung–Box test, indicating the presence of significant autocorrelation in the residuals.</p>
+<p>Banks not listed have residuals that are indistinguishable from a white noise series i.e.&nbsp;have uncorrelated observations and with constant variance.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>augmented_data  <span class="sc">|&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">features</span>(.innov, ljung_box) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">4</span>))) <span class="sc">|&gt;</span> </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(lb_pvalue <span class="sc">&lt;=</span> <span class="fl">0.05</span>)<span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(BankName,lb_stat,lb_pvalue) <span class="sc">|&gt;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>      rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="tbl-lb-market" class="anchored">
+
+<div data-pagedtable="false"> <div class="table-caption">Table&nbsp;6.3:  <p>Ljung–Box results where P-value &lt; Significance Level of 0.05</p> </div>
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["BankName"],"name":[1],"type":["fct"],"align":["left"]},{"label":["lb_stat"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["lb_pvalue"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"DISCOVER BANK (30810)","2":"9.7749","3":"0.0018"},{"1":"BMO HARRIS BANK NATIONAL ASSOCIATION (75633)","2":"5.7543","3":"0.0164"},{"1":"KEYBANK NATIONAL ASSOCIATION (280110)","2":"4.1892","3":"0.0407"},{"1":"FIRST-CITIZENS BANK & TRUST COMPANY (491224)","2":"18.7667","3":"0.0000"},{"1":"TD BANK, N.A. (497404)","2":"11.0332","3":"0.0009"},{"1":"MANUFACTURERS AND TRADERS TRUST COMPANY (501105)","2":"7.6097","3":"0.0058"},{"1":"SANTANDER BANK, NATIONAL ASSOCIATION (722777)","2":"5.0075","3":"0.0252"},{"1":"PNC BANK, NATIONAL ASSOCIATION (817824)","2":"5.3187","3":"0.0211"},{"1":"UBS BANK USA (3212149)","2":"16.7008","3":"0.0000"},{"1":"CITIZENS BANK, NATIONAL ASSOCIATION (3303298)","2":"4.8842","3":"0.0271"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="time-series-cross-validation" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="time-series-cross-validation"><span class="header-section-number">6.3</span> Time Series Cross-Validation</h2>
+<p>One approach to evaluate the predictive performance of our model is to use One-step ahead cross-validation, also known as walk-forward validation, which is specifically designed for time series. This approach involves progressively moving forward in time, making predictions one step ahead. To quantify the accuracy of predictions made during this process, the Root Mean Square Error (RMSE) and Mean Absolute Error (MAE) is commonly used. RMSE measures the average magnitude of the errors between the predicted and actual values, giving more weight to larger errors due to its squaring component. MAE is the average of the absolute differences between the predicted values and actual values so is not as sensitive to outliers.</p>
+<p>The results <a href="#tbl-market-cv">Table&nbsp;<span>6.4</span></a> show that the RMSE and MAE of the cross-validated models (CV) closely matches the RMSE and MAE observed in the initial model evaluation (Training). This indicates that the model is generalising well to unseen data and not overfitting.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>m_table <span class="sc">|&gt;</span> fabletools<span class="sc">::</span><span class="fu">accuracy</span>()<span class="sc">|&gt;</span> readr<span class="sc">::</span><span class="fu">write_csv</span>(<span class="st">"data/results/estimate_market_metrics.csv"</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>init <span class="ot">=</span> <span class="dv">13</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>model_name <span class="ot">=</span> <span class="st">"tslm"</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>nested_data <span class="ot">&lt;-</span> <span class="fu">nest_data_for_step_cv</span>(estimation_data)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> nested_data <span class="sc">|&gt;</span> <span class="fu">filter</span>(Quarter_Index <span class="sc">&gt;</span> init <span class="sc">&amp;</span> Quarter_Index <span class="sc">!=</span> <span class="fu">max</span>(Quarter_Index)) <span class="sc">|&gt;</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">mutate</span>(<span class="at">model =</span> <span class="fu">map</span>(data, <span class="sc">~</span> <span class="fu">lm</span>(<span class="at">formula =</span> <span class="fu">as.formula</span>(market_formula), <span class="at">data =</span> .x, <span class="at">REML =</span> <span class="cn">TRUE</span>)),         </span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>                        <span class="at">augmented_data =</span> <span class="fu">map2</span>(model, new_data, <span class="sc">~</span> <span class="fu">tryCatch</span>({</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>                                            <span class="fu">augment</span>(.x, <span class="at">newdata =</span> .y, <span class="at">allow.new.levels =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>                                            }, <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>                                                <span class="fu">message</span>(<span class="st">"Error in augment function: "</span>, e<span class="sc">$</span>message)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>                                                <span class="cn">NULL</span> </span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>                                            })))</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>unnested_results <span class="ot">&lt;-</span> results <span class="sc">|&gt;</span> </span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">unnest</span>(augmented_data) <span class="sc">|&gt;</span> </span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>                        dplyr<span class="sc">::</span><span class="fu">select</span>(BankName<span class="sc">:</span><span class="fu">last_col</span>()) <span class="sc">|&gt;</span> </span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>                        dplyr<span class="sc">::</span><span class="fu">group_by</span>(BankName, BankType) <span class="sc">|&gt;</span> </span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">mutate</span>(<span class="at">RMSE =</span> Metrics<span class="sc">::</span><span class="fu">rmse</span>(UBPRE524.diff, .fitted),</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>                        <span class="at">MAE =</span> Metrics<span class="sc">::</span><span class="fu">mae</span>(UBPRE524.diff, .fitted)) <span class="sc">|&gt;</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">summarise</span>(<span class="at">RMSE =</span> <span class="fu">mean</span>(RMSE,<span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">MAE =</span> <span class="fu">mean</span>(MAE,<span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">add_column</span>(<span class="at">.type =</span> <span class="st">"CV"</span>, <span class="at">.model =</span> model_name)     </span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>unnested_results <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(BankName, BankType, .model, .type, RMSE, MAE) <span class="sc">|&gt;</span> </span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>    readr<span class="sc">::</span><span class="fu">write_csv</span>(<span class="fu">glue</span>(<span class="st">"data/results/tscv/estimate_tscv_market_metrics.csv"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>val_results <span class="ot">&lt;-</span> <span class="fu">get_summary_validation.market</span>(<span class="fu">unique</span>(observation_data<span class="sc">$</span>BankName))</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>val_results<span class="sc">$</span>tbl1 <span class="sc">|&gt;</span> rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>val_results<span class="sc">$</span>tbl2 <span class="sc">|&gt;</span> rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>val_results<span class="sc">$</span>tbl3 <span class="sc">|&gt;</span> rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div id="tbl-market-cv" class="cell tbl-parent quarto-layout-panel anchored">
+<div class="panel-caption table-caption">
+<p>Table&nbsp;6.4: Comparing Accuracy Metrics for Training and Cross-Validation data</p>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div id="tbl-market-cv-1" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-market-cv" style="flex-basis: 100.0%;justify-content: center;">
+
+<div data-pagedtable="false"> <div class="table-caption">(a) <p>Accuracy Metrics on Training and Cross Validation data for sub-set of
+banks</p> </div>
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["BankName"],"name":[1],"type":["chr"],"align":["left"]},{"label":["BankType"],"name":[2],"type":["chr"],"align":["left"]},{"label":[".type"],"name":[3],"type":["chr"],"align":["left"]},{"label":["RMSE"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["MAE"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"AMERICAN EXPRESS NATIONAL BANK (1394676)","2":"LargeCreditCardBank","3":"CV","4":"0.108","5":"0.089"},{"1":"AMERICAN EXPRESS NATIONAL BANK (1394676)","2":"LargeCreditCardBank","3":"Training","4":"0.099","5":"0.078"},{"1":"BARCLAYS BANK DELAWARE (2980209)","2":"LargeCreditCardBank","3":"CV","4":"0.086","5":"0.076"},{"1":"BARCLAYS BANK DELAWARE (2980209)","2":"LargeCreditCardBank","3":"Training","4":"0.094","5":"0.081"},{"1":"CAPITAL ONE, NATIONAL ASSOCIATION (112837)","2":"LargeBank","3":"CV","4":"0.113","5":"0.094"},{"1":"CAPITAL ONE, NATIONAL ASSOCIATION (112837)","2":"LargeBank","3":"Training","4":"0.116","5":"0.092"},{"1":"CITIBANK, N.A. (476810)","2":"LargeBank","3":"CV","4":"0.182","5":"0.114"},{"1":"CITIBANK, N.A. (476810)","2":"LargeBank","3":"Training","4":"0.162","5":"0.105"},{"1":"SYNCHRONY BANK (1216022)","2":"LargeCreditCardBank","3":"CV","4":"0.062","5":"0.054"},{"1":"SYNCHRONY BANK (1216022)","2":"LargeCreditCardBank","3":"Training","4":"0.075","5":"0.066"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div id="tbl-market-cv-2" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-market-cv" style="flex-basis: 100.0%;justify-content: center;">
+
+<div data-pagedtable="false"> <div class="table-caption">(b) <p>Mean Accuracy Metrics for our sub-set of banks</p> </div>
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[".type"],"name":[1],"type":["chr"],"align":["left"]},{"label":["RMSE"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["MAE"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"CV","2":"0.110","3":"0.085"},{"1":"Training","2":"0.109","3":"0.085"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div id="tbl-market-cv-3" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-market-cv" style="flex-basis: 100.0%;justify-content: center;">
+
+<div data-pagedtable="false"> <div class="table-caption">(c) <p>Mean Accuracy Metrics across all banks</p> </div>
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[".type"],"name":[1],"type":["chr"],"align":["left"]},{"label":["RMSE"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["MAE"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"CV","2":"0.148","3":"0.105"},{"1":"Training","2":"0.140","3":"0.099"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="prediction" class="level2" data-number="6.4">
+<h2 data-number="6.4" class="anchored" data-anchor-id="prediction"><span class="header-section-number">6.4</span> Prediction</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pred-observed-market-1" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="model_market_files/figure-html/fig-pred-observed-market-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.12: Prediction vs.&nbsp;Observed Event</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div id="fig-pred-observed-market-2" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="model_market_files/figure-html/fig-pred-observed-market-2.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.13: Prediction vs.&nbsp;Observed Event</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div id="fig-pred-observed-market-3" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="model_market_files/figure-html/fig-pred-observed-market-3.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.14: Prediction vs.&nbsp;Observed Event</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div id="fig-pred-observed-market-4" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="model_market_files/figure-html/fig-pred-observed-market-4.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.15: Prediction vs.&nbsp;Observed Event</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div id="fig-pred-observed-market-5" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="model_market_files/figure-html/fig-pred-observed-market-5.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.16: Prediction vs.&nbsp;Observed Event</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div id="fig-pred-observed-market-6" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="model_market_files/figure-html/fig-pred-observed-market-6.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.17: Prediction vs.&nbsp;Observed Event</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="abnormal-results" class="level2" data-number="6.5">
+<h2 data-number="6.5" class="anchored" data-anchor-id="abnormal-results"><span class="header-section-number">6.5</span> Abnormal Results</h2>
+<div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"Costco"</span>, <span class="st">"AMERICAN EXPRESS NATIONAL BANK (1394676)"</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"Costco"</span>, <span class="st">"CITIBANK, N.A. (476810)"</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"Walmart"</span>, <span class="st">"SYNCHRONY BANK (1216022)"</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"Walmart"</span>, <span class="st">"CAPITAL ONE, NATIONAL ASSOCIATION (112837)"</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"GAP"</span>, <span class="st">"SYNCHRONY BANK (1216022)"</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"GAP"</span>, <span class="st">"BARCLAYS BANK DELAWARE (2980209)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div id="tbl-abnormal-market" class="cell tbl-parent quarto-layout-panel anchored">
+<div class="panel-caption table-caption">
+<p>Table&nbsp;6.5: Credit Card Plans-30-89 DAYS P/D %: Abnormal Returns (original scale)</p>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div id="tbl-abnormal-market-1" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-abnormal-market" style="flex-basis: 100.0%;justify-content: center;">
+
+<div data-pagedtable="false"> <div class="table-caption">(a) <p>Costco (Old) - AMERICAN EXPRESS NATIONAL BANK (1394676)</p> </div>
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Period"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["observed"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["predicted"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["AR"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Cumulative Mean AR"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["Cumulative AR"],"name":[6],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"0.62","3":"0.70","4":"-0.08","5":"-0.08","6":"-0.08"},{"1":"2","2":"0.74","3":"0.75","4":"-0.01","5":"-0.04","6":"-0.09"},{"1":"3","2":"0.71","3":"0.74","4":"-0.03","5":"-0.04","6":"-0.12"},{"1":"4","2":"0.78","3":"0.69","4":"0.09","5":"-0.01","6":"-0.03"},{"1":"5","2":"0.74","3":"0.75","4":"-0.01","5":"-0.01","6":"-0.04"},{"1":"6","2":"0.82","3":"0.77","4":"0.05","5":"0.00","6":"0.01"},{"1":"7","2":"0.69","3":"0.74","4":"-0.05","5":"-0.01","6":"-0.04"},{"1":"8","2":"0.69","3":"0.73","4":"-0.04","5":"-0.01","6":"-0.07"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[16],"max":[16]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div id="tbl-abnormal-market-2" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-abnormal-market" style="flex-basis: 100.0%;justify-content: center;">
+
+<div data-pagedtable="false"> <div class="table-caption">(b) <p>Costco (New) - CITIBANK, N.A. (476810)</p> </div>
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Period"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["observed"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["predicted"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["AR"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Cumulative Mean AR"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["Cumulative AR"],"name":[6],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"1.09","3":"1.14","4":"-0.05","5":"-0.05","6":"-0.05"},{"1":"2","2":"1.20","3":"1.17","4":"0.03","5":"-0.01","6":"-0.02"},{"1":"3","2":"1.12","3":"1.14","4":"-0.02","5":"-0.02","6":"-0.05"},{"1":"4","2":"1.09","3":"1.05","4":"0.04","5":"0.00","6":"0.00"},{"1":"5","2":"1.08","3":"0.99","4":"0.09","5":"0.02","6":"0.09"},{"1":"6","2":"1.19","3":"1.02","4":"0.17","5":"0.04","6":"0.26"},{"1":"7","2":"1.11","3":"0.94","4":"0.17","5":"0.06","6":"0.43"},{"1":"8","2":"1.14","3":"0.85","4":"0.29","5":"0.09","6":"0.72"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[16],"max":[16]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div id="tbl-abnormal-market-3" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-abnormal-market" style="flex-basis: 100.0%;justify-content: center;">
+
+<div data-pagedtable="false"> <div class="table-caption">(c) <p>Walmart (Old) - SYNCHRONY BANK (1216022)</p> </div>
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Period"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["observed"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["predicted"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["AR"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Cumulative Mean AR"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["Cumulative AR"],"name":[6],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"2.61","3":"2.61","4":"0.00","5":"0.00","6":"0.00"},{"1":"2","2":"2.39","3":"2.58","4":"-0.19","5":"-0.10","6":"-0.19"},{"1":"3","2":"2.22","3":"2.46","4":"-0.24","5":"-0.15","6":"-0.44"},{"1":"4","2":"1.39","3":"1.51","4":"-0.12","5":"-0.14","6":"-0.56"},{"1":"5","2":"1.50","3":"1.78","4":"-0.28","5":"-0.17","6":"-0.84"},{"1":"6","2":"1.75","3":"1.98","4":"-0.23","5":"-0.18","6":"-1.06"},{"1":"7","2":"1.35","3":"1.27","4":"0.08","5":"-0.14","6":"-0.98"},{"1":"8","2":"1.15","3":"1.10","4":"0.05","5":"-0.12","6":"-0.94"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[16],"max":[16]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div id="tbl-abnormal-market-4" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-abnormal-market" style="flex-basis: 100.0%;justify-content: center;">
+
+<div data-pagedtable="false"> <div class="table-caption">(d) <p>Walmart (New) - CAPITAL ONE, NATIONAL ASSOCIATION (112837)</p> </div>
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Period"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["observed"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["predicted"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["AR"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Cumulative Mean AR"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["Cumulative AR"],"name":[6],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"2.12","3":"2.13","4":"-0.01","5":"-0.01","6":"-0.01"},{"1":"2","2":"2.62","3":"2.16","4":"0.46","5":"0.22","6":"0.44"},{"1":"3","2":"2.35","3":"2.18","4":"0.17","5":"0.21","6":"0.62"},{"1":"4","2":"1.73","3":"1.93","4":"-0.20","5":"0.11","6":"0.42"},{"1":"5","2":"1.56","3":"1.86","4":"-0.30","5":"0.02","6":"0.12"},{"1":"6","2":"1.56","3":"2.02","4":"-0.46","5":"-0.06","6":"-0.33"},{"1":"7","2":"1.32","3":"1.74","4":"-0.42","5":"-0.11","6":"-0.75"},{"1":"8","2":"1.16","3":"1.56","4":"-0.40","5":"-0.14","6":"-1.15"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[16],"max":[16]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div id="tbl-abnormal-market-5" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-abnormal-market" style="flex-basis: 100.0%;justify-content: center;">
+
+<div data-pagedtable="false"> <div class="table-caption">(e) <p>GAP (Old) - SYNCHRONY BANK (1216022)</p> </div>
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Period"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["observed"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["predicted"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["AR"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Cumulative Mean AR"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["Cumulative AR"],"name":[6],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"1.57","3":"1.75","4":"-0.18","5":"-0.18","6":"-0.18"},{"1":"2","2":"1.90","3":"2.34","4":"-0.44","5":"-0.31","6":"-0.62"},{"1":"3","2":"2.01","3":"2.32","4":"-0.31","5":"-0.31","6":"-0.93"},{"1":"4","2":"1.98","3":"2.11","4":"-0.13","5":"-0.27","6":"-1.06"},{"1":"5","2":"2.13","3":"2.29","4":"-0.16","5":"-0.24","6":"-1.22"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[16],"max":[16]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div id="tbl-abnormal-market-6" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-abnormal-market" style="flex-basis: 100.0%;justify-content: center;">
+
+<div data-pagedtable="false"> <div class="table-caption">(f) <p>GAP (New) - BARCLAYS BANK DELAWARE (2980209)</p> </div>
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Period"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["observed"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["predicted"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["AR"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Cumulative Mean AR"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["Cumulative AR"],"name":[6],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"0.69","3":"0.81","4":"-0.12","5":"-0.12","6":"-0.12"},{"1":"2","2":"1.14","3":"0.98","4":"0.16","5":"0.02","6":"0.04"},{"1":"3","2":"1.05","3":"0.95","4":"0.10","5":"0.05","6":"0.14"},{"1":"4","2":"1.09","3":"0.85","4":"0.24","5":"0.10","6":"0.38"},{"1":"5","2":"1.13","3":"0.88","4":"0.25","5":"0.13","6":"0.63"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[16],"max":[16]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- -->
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-Hyndman2021" class="csl-entry" role="listitem">
+Hyndman, Rob J., and George Athanasopoulos. 2021. <em>Forecasting: Principles and Practice</em>. OTexts. <a href="https://otexts.com/fpp3/">https://otexts.com/fpp3/</a>.
+</div>
+<div id="ref-MacKinlay1997" class="csl-entry" role="listitem">
+MacKinlay, A. Craig. 1997. <span>“Event Studies in Economics and Finance.”</span> <em>Journal of Economic Literature</em> 35 (1): 13–39. <a href="https://uoelibrary.idm.oclc.org/login?url=https://www.proquest.com/scholarly-journals/event-studies-economics-finance/docview/213164851/se-2">https://uoelibrary.idm.oclc.org/login?url=https://www.proquest.com/scholarly-journals/event-studies-economics-finance/docview/213164851/se-2</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./model_event.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Event Studies</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./model_arima.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Linear Regression with AR Errors</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb14" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Market Model"</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">'functions.R'</span>)</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>target_label <span class="ot">=</span> <span class="fu">credit_card.target_label</span>()</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>ubpr_labels <span class="ot">=</span>  <span class="fu">credit_card.udpr</span>()</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="fu">## Specification {#sec-model-market}</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>To determine the normal return we can adopt the market model <span class="co">[</span><span class="ot">@MacKinlay1997</span><span class="co">]</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>D_{it} = \alpha_i + \beta_i D_{gt} + \epsilon_{it}</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>And the AR is the Observed Return - Predicted Return</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>AR_{it} = D_{it} – (\alpha_i + \beta_i D_{gt})</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>Where:</span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>$D_{it}$ is *`r target_label`* $i$ at time $t$, \</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>$\alpha_i$ is the firm-specific intercept, \</span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>$\beta_i$ is the coefficient measuring the sensitivity of firm value $i$ to the group $g$,\</span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>$D_{gt}$ is the group *`r target_label`* at time $t$, and \</span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>$\varepsilon_{it}$ is the error term for $i$ at time $t$.</span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a><span class="fu">## Model Results</span></span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a>model_data <span class="ot">&lt;-</span> <span class="fu">get_model_data</span>()</span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> model_data<span class="sc">$</span>all_data</span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a>estimation_data <span class="ot">&lt;-</span> model_data<span class="sc">$</span>estimation_data</span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a>observation_data <span class="ot">&lt;-</span> model_data<span class="sc">$</span>observation_data</span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a>partner_banks <span class="ot">&lt;-</span> <span class="fu">credit_card.partnerships.long</span>()</span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a>market_formula <span class="ot">&lt;-</span> <span class="st">"UBPRE524.diff ~ UBPRE524.group.log.diff"</span></span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a>m_table <span class="ot">&lt;-</span> estimation_data <span class="sc">|&gt;</span> <span class="fu">fill_gaps</span>() <span class="sc">|&gt;</span> <span class="fu">model</span>(<span class="at">tslm =</span> <span class="fu">TSLM</span>(<span class="fu">as.formula</span>(market_formula)))</span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a>augmented_data <span class="ot">&lt;-</span> m_table <span class="sc">|&gt;</span> <span class="fu">augment</span>()</span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a><span class="fu">### Estimated Fit</span></span>
+<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a>As outlined in @sec-data-split, we have split our data into estimation and observation periods. For firms that do not have partnership events, the full data series is used in the estimation period. For firms with partnership events the estimation period is up to the quarter before each event. </span>
+<span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-58"><a href="#cb14-58" aria-hidden="true" tabindex="-1"></a>If the market model demonstrates a robust fit with the estimation data, this instils confidence in our ability to forecast the "normal" return using the unseen data from the observation period.</span>
+<span id="cb14-59"><a href="#cb14-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-60"><a href="#cb14-60" aria-hidden="true" tabindex="-1"></a>@fig-plot-fit displays fitted vs actual results for a sub-set of firms. The Intercept and Coefficient is displayed in @tbl-coef-market. The model is   </span>
+<span id="cb14-61"><a href="#cb14-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-64"><a href="#cb14-64" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-65"><a href="#cb14-65" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-66"><a href="#cb14-66" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-plot-fit</span></span>
+<span id="cb14-67"><a href="#cb14-67" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Fitted vs. Observed for estimation data on sub-set of firms"</span></span>
+<span id="cb14-68"><a href="#cb14-68" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-height: 10</span></span>
+<span id="cb14-69"><a href="#cb14-69" aria-hidden="true" tabindex="-1"></a>augmented_data <span class="sc">|&gt;</span> <span class="fu">filter</span>(BankName <span class="sc">%in%</span> <span class="fu">unique</span>(observation_data<span class="sc">$</span>BankName)) <span class="sc">|&gt;</span></span>
+<span id="cb14-70"><a href="#cb14-70" aria-hidden="true" tabindex="-1"></a>        <span class="fu">plot_model_fit</span>(<span class="st">"UBPRE524.diff"</span>)</span>
+<span id="cb14-71"><a href="#cb14-71" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-72"><a href="#cb14-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-75"><a href="#cb14-75" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-76"><a href="#cb14-76" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-77"><a href="#cb14-77" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-market-aicc</span></span>
+<span id="cb14-78"><a href="#cb14-78" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: AICc Summary for sub-set of banks</span></span>
+<span id="cb14-79"><a href="#cb14-79" aria-hidden="true" tabindex="-1"></a>m_table <span class="sc">|&gt;</span> <span class="fu">filter</span>(BankName <span class="sc">%in%</span> observation_data<span class="sc">$</span>BankName) <span class="sc">|&gt;</span> <span class="fu">glance</span>() <span class="sc">|&gt;</span> <span class="fu">relocate</span>(BankName, AICc, AIC) <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(IDRSSD,.model))<span class="sc">|&gt;</span></span>
+<span id="cb14-80"><a href="#cb14-80" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">4</span>))) <span class="sc">|&gt;</span>  </span>
+<span id="cb14-81"><a href="#cb14-81" aria-hidden="true" tabindex="-1"></a>    rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()  </span>
+<span id="cb14-82"><a href="#cb14-82" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-83"><a href="#cb14-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-84"><a href="#cb14-84" aria-hidden="true" tabindex="-1"></a>In @tbl-coef-market we can see the standard error of *UBPRE524.group.log.diff* is small relative to its estimate indicating a precise estimate. A small p-value (typically &lt;0.05) suggests strong evidence against the null hypothesis, indicating that *UBPRE524.group.log.diff* is statistically significant.</span>
+<span id="cb14-85"><a href="#cb14-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-88"><a href="#cb14-88" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-89"><a href="#cb14-89" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-90"><a href="#cb14-90" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-coef-market</span></span>
+<span id="cb14-91"><a href="#cb14-91" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: "Intercept and coefficients"</span></span>
+<span id="cb14-92"><a href="#cb14-92" aria-hidden="true" tabindex="-1"></a>m_table <span class="sc">|&gt;</span> <span class="fu">filter</span>(BankName <span class="sc">%in%</span> <span class="fu">unique</span>(observation_data<span class="sc">$</span>BankName)) <span class="sc">|&gt;</span> </span>
+<span id="cb14-93"><a href="#cb14-93" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(BankName, term<span class="sc">:</span><span class="fu">last_col</span>())<span class="sc">|&gt;</span></span>
+<span id="cb14-94"><a href="#cb14-94" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">4</span>))) <span class="sc">|&gt;</span>  </span>
+<span id="cb14-95"><a href="#cb14-95" aria-hidden="true" tabindex="-1"></a>    rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span>
+<span id="cb14-96"><a href="#cb14-96" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-97"><a href="#cb14-97" aria-hidden="true" tabindex="-1"></a><span class="fu">### Residual diagnostics {#sec-residual-check}</span></span>
+<span id="cb14-98"><a href="#cb14-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-99"><a href="#cb14-99" aria-hidden="true" tabindex="-1"></a>Residuals should have the following properties <span class="co">[</span><span class="ot">@Hyndman2021, ch. 5.4</span><span class="co">]</span>. Residuals:</span>
+<span id="cb14-100"><a href="#cb14-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-101"><a href="#cb14-101" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>Are uncorrelated. Correlations indicate that the model is missing information left in the residuals.</span>
+<span id="cb14-102"><a href="#cb14-102" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>Have zero mean. If they have a mean other than zero, then the forecasts are biased.</span>
+<span id="cb14-103"><a href="#cb14-103" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>Have constant variance i.e. does not violate "homoscedasticity" assumption.</span>
+<span id="cb14-104"><a href="#cb14-104" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>Are normally distributed. </span>
+<span id="cb14-105"><a href="#cb14-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-106"><a href="#cb14-106" aria-hidden="true" tabindex="-1"></a>::: {#fig-market-checks .panel-tabset}</span>
+<span id="cb14-107"><a href="#cb14-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-108"><a href="#cb14-108" aria-hidden="true" tabindex="-1"></a><span class="fu">### CITIBANK</span></span>
+<span id="cb14-111"><a href="#cb14-111" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-112"><a href="#cb14-112" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-113"><a href="#cb14-113" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-fit-citi</span></span>
+<span id="cb14-114"><a href="#cb14-114" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap: </span></span>
+<span id="cb14-115"><a href="#cb14-115" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "The time plot of the residuals shows that the variation of the residuals is relatively constant but with one significant outlier. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outlier." </span></span>
+<span id="cb14-116"><a href="#cb14-116" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Explaining the outlier: Delinquency dropped at a time when CITIBANK's credit card portfolio became a larger business concern (c). The borrowers added appear to be less risky as we see the unused proportion go from below 10% to over 40% in (b)"</span></span>
+<span id="cb14-117"><a href="#cb14-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-118"><a href="#cb14-118" aria-hidden="true" tabindex="-1"></a>bank <span class="ot">&lt;-</span> <span class="st">"CITIBANK"</span></span>
+<span id="cb14-119"><a href="#cb14-119" aria-hidden="true" tabindex="-1"></a>m_table <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="fu">grepl</span>(bank,BankName)) <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(tslm) <span class="sc">|&gt;</span> <span class="fu">gg_tsresiduals</span>()  </span>
+<span id="cb14-120"><a href="#cb14-120" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_cc_measures</span>(bank, estimation_data,ubpr_labels)</span>
+<span id="cb14-121"><a href="#cb14-121" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-122"><a href="#cb14-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-123"><a href="#cb14-123" aria-hidden="true" tabindex="-1"></a><span class="fu">### SYNCHRONY</span></span>
+<span id="cb14-126"><a href="#cb14-126" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-127"><a href="#cb14-127" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-128"><a href="#cb14-128" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-fit-sync</span></span>
+<span id="cb14-129"><a href="#cb14-129" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap: </span></span>
+<span id="cb14-130"><a href="#cb14-130" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "The time plot of the residuals shows a couple of outliers at the start of the time period and in 2018 Q1. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outliers." </span></span>
+<span id="cb14-131"><a href="#cb14-131" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Comparative credit card portfolio variables"</span></span>
+<span id="cb14-132"><a href="#cb14-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-133"><a href="#cb14-133" aria-hidden="true" tabindex="-1"></a>bank <span class="ot">&lt;-</span> <span class="st">"SYNCHRONY"</span></span>
+<span id="cb14-134"><a href="#cb14-134" aria-hidden="true" tabindex="-1"></a>m_table <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="fu">grepl</span>(bank,BankName)) <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(tslm) <span class="sc">|&gt;</span> <span class="fu">gg_tsresiduals</span>()  </span>
+<span id="cb14-135"><a href="#cb14-135" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_cc_measures</span>(bank, estimation_data,ubpr_labels)</span>
+<span id="cb14-136"><a href="#cb14-136" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-137"><a href="#cb14-137" aria-hidden="true" tabindex="-1"></a><span class="fu">### BARCLAYS</span></span>
+<span id="cb14-138"><a href="#cb14-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-141"><a href="#cb14-141" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-142"><a href="#cb14-142" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-143"><a href="#cb14-143" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-fit-bar</span></span>
+<span id="cb14-144"><a href="#cb14-144" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap: </span></span>
+<span id="cb14-145"><a href="#cb14-145" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "The time plot of the residuals shows that the variation of the residuals is relatively constant up until the onset of the COVID-19 pandemic in 2020; the model needs more information to account for this period. The acf shows residuals are uncorrelated"</span></span>
+<span id="cb14-146"><a href="#cb14-146" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "Comparative credit card portfolio variables"</span></span>
+<span id="cb14-147"><a href="#cb14-147" aria-hidden="true" tabindex="-1"></a>bank <span class="ot">&lt;-</span> <span class="st">"BARCLAYS"</span></span>
+<span id="cb14-148"><a href="#cb14-148" aria-hidden="true" tabindex="-1"></a>m_table <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="fu">grepl</span>(bank,BankName)) <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(tslm) <span class="sc">|&gt;</span> <span class="fu">gg_tsresiduals</span>()  </span>
+<span id="cb14-149"><a href="#cb14-149" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_cc_measures</span>(bank, estimation_data,ubpr_labels)</span>
+<span id="cb14-150"><a href="#cb14-150" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-151"><a href="#cb14-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-152"><a href="#cb14-152" aria-hidden="true" tabindex="-1"></a><span class="fu">### AMERICAN EXPRESS</span></span>
+<span id="cb14-155"><a href="#cb14-155" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-156"><a href="#cb14-156" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-157"><a href="#cb14-157" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-fit-ae</span></span>
+<span id="cb14-158"><a href="#cb14-158" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap: </span></span>
+<span id="cb14-159"><a href="#cb14-159" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "The time plot of the residuals shows a couple of outliers at the start of the time period causing a left skew. The acf shows residuals are uncorrelated."</span></span>
+<span id="cb14-160"><a href="#cb14-160" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "Comparative credit card portfolio variables"</span></span>
+<span id="cb14-161"><a href="#cb14-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-162"><a href="#cb14-162" aria-hidden="true" tabindex="-1"></a>bank <span class="ot">&lt;-</span> <span class="st">"AMERICAN EXPRESS NATIONAL BANK"</span></span>
+<span id="cb14-163"><a href="#cb14-163" aria-hidden="true" tabindex="-1"></a>m_table <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="fu">grepl</span>(bank,BankName)) <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(tslm) <span class="sc">|&gt;</span> <span class="fu">gg_tsresiduals</span>()  </span>
+<span id="cb14-164"><a href="#cb14-164" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_cc_measures</span>(bank, estimation_data,ubpr_labels)</span>
+<span id="cb14-165"><a href="#cb14-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-166"><a href="#cb14-166" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-167"><a href="#cb14-167" aria-hidden="true" tabindex="-1"></a><span class="fu">### CAPITAL ONE</span></span>
+<span id="cb14-170"><a href="#cb14-170" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-171"><a href="#cb14-171" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-172"><a href="#cb14-172" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-fit-cap</span></span>
+<span id="cb14-173"><a href="#cb14-173" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap: </span></span>
+<span id="cb14-174"><a href="#cb14-174" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "The time plot of the residuals shows that the variation of the residuals is relatively constant but with two significant outliers at the start of the series. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outliers." </span></span>
+<span id="cb14-175"><a href="#cb14-175" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Explaining the outlier: Deliquency dropped at a time when CAPITAL ONE's credit card portfolio became a larger business concern. The U shape for deliquency % indicates initial improvement in the portfolio's quality, however, by the end of the estimation period, the % is back up. This increase coincides with a decrease in unused commitments i.e. borrowers are putting more expenditures on their credit cards."</span></span>
+<span id="cb14-176"><a href="#cb14-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-177"><a href="#cb14-177" aria-hidden="true" tabindex="-1"></a>bank <span class="ot">&lt;-</span> <span class="st">"CAPITAL ONE"</span></span>
+<span id="cb14-178"><a href="#cb14-178" aria-hidden="true" tabindex="-1"></a>m_table <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="fu">grepl</span>(bank,BankName)) <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(tslm) <span class="sc">|&gt;</span> <span class="fu">gg_tsresiduals</span>()  </span>
+<span id="cb14-179"><a href="#cb14-179" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_cc_measures</span>(bank, estimation_data, ubpr_labels)</span>
+<span id="cb14-180"><a href="#cb14-180" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-181"><a href="#cb14-181" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb14-182"><a href="#cb14-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-183"><a href="#cb14-183" aria-hidden="true" tabindex="-1"></a><span class="fu">### Residuals White Noise</span></span>
+<span id="cb14-184"><a href="#cb14-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-185"><a href="#cb14-185" aria-hidden="true" tabindex="-1"></a>The sub-set of banks analysed in @sec-residual-check did not exhibit significant autocorrelation.</span>
+<span id="cb14-186"><a href="#cb14-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-187"><a href="#cb14-187" aria-hidden="true" tabindex="-1"></a>@tbl-lb-market lists banks where we reject the null hypothesis of the Ljung–Box test, indicating the presence of significant autocorrelation in the residuals. </span>
+<span id="cb14-188"><a href="#cb14-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-189"><a href="#cb14-189" aria-hidden="true" tabindex="-1"></a>Banks not listed have residuals that are indistinguishable from a white noise series i.e. have uncorrelated observations and with constant variance.</span>
+<span id="cb14-190"><a href="#cb14-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-193"><a href="#cb14-193" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-194"><a href="#cb14-194" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-195"><a href="#cb14-195" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-lb-market</span></span>
+<span id="cb14-196"><a href="#cb14-196" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: Ljung–Box results where P-value &lt; Significance Level of 0.05</span></span>
+<span id="cb14-197"><a href="#cb14-197" aria-hidden="true" tabindex="-1"></a>augmented_data  <span class="sc">|&gt;</span></span>
+<span id="cb14-198"><a href="#cb14-198" aria-hidden="true" tabindex="-1"></a>  <span class="fu">features</span>(.innov, ljung_box) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">4</span>))) <span class="sc">|&gt;</span> </span>
+<span id="cb14-199"><a href="#cb14-199" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(lb_pvalue <span class="sc">&lt;=</span> <span class="fl">0.05</span>)<span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(BankName,lb_stat,lb_pvalue) <span class="sc">|&gt;</span></span>
+<span id="cb14-200"><a href="#cb14-200" aria-hidden="true" tabindex="-1"></a>      rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span>
+<span id="cb14-201"><a href="#cb14-201" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-202"><a href="#cb14-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-203"><a href="#cb14-203" aria-hidden="true" tabindex="-1"></a><span class="fu">## Time Series Cross-Validation</span></span>
+<span id="cb14-204"><a href="#cb14-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-205"><a href="#cb14-205" aria-hidden="true" tabindex="-1"></a>One approach to evaluate the predictive performance of our model is to use One-step ahead cross-validation, also known as walk-forward validation, which is specifically designed for time series. This approach involves progressively moving forward in time, making predictions one step ahead. To quantify the accuracy of predictions made during this process, the Root Mean Square Error (RMSE) and Mean Absolute Error (MAE) is commonly used. RMSE measures the average magnitude of the errors between the predicted and actual values, giving more weight to larger errors due to its squaring component. MAE is the average of the absolute differences between the predicted values and actual values so is not as sensitive to outliers.</span>
+<span id="cb14-206"><a href="#cb14-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-207"><a href="#cb14-207" aria-hidden="true" tabindex="-1"></a>The results @tbl-market-cv show that the RMSE and MAE of the cross-validated models (CV) closely matches the RMSE and MAE observed in the initial model evaluation (Training). This indicates that the model is generalising well to unseen data and not overfitting.</span>
+<span id="cb14-210"><a href="#cb14-210" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-211"><a href="#cb14-211" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-212"><a href="#cb14-212" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: false</span></span>
+<span id="cb14-213"><a href="#cb14-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-214"><a href="#cb14-214" aria-hidden="true" tabindex="-1"></a>m_table <span class="sc">|&gt;</span> fabletools<span class="sc">::</span><span class="fu">accuracy</span>()<span class="sc">|&gt;</span> readr<span class="sc">::</span><span class="fu">write_csv</span>(<span class="st">"data/results/estimate_market_metrics.csv"</span>)</span>
+<span id="cb14-215"><a href="#cb14-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-216"><a href="#cb14-216" aria-hidden="true" tabindex="-1"></a>init <span class="ot">=</span> <span class="dv">13</span></span>
+<span id="cb14-217"><a href="#cb14-217" aria-hidden="true" tabindex="-1"></a>model_name <span class="ot">=</span> <span class="st">"tslm"</span></span>
+<span id="cb14-218"><a href="#cb14-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-219"><a href="#cb14-219" aria-hidden="true" tabindex="-1"></a>nested_data <span class="ot">&lt;-</span> <span class="fu">nest_data_for_step_cv</span>(estimation_data)</span>
+<span id="cb14-220"><a href="#cb14-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-221"><a href="#cb14-221" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> nested_data <span class="sc">|&gt;</span> <span class="fu">filter</span>(Quarter_Index <span class="sc">&gt;</span> init <span class="sc">&amp;</span> Quarter_Index <span class="sc">!=</span> <span class="fu">max</span>(Quarter_Index)) <span class="sc">|&gt;</span></span>
+<span id="cb14-222"><a href="#cb14-222" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">mutate</span>(<span class="at">model =</span> <span class="fu">map</span>(data, <span class="sc">~</span> <span class="fu">lm</span>(<span class="at">formula =</span> <span class="fu">as.formula</span>(market_formula), <span class="at">data =</span> .x, <span class="at">REML =</span> <span class="cn">TRUE</span>)),         </span>
+<span id="cb14-223"><a href="#cb14-223" aria-hidden="true" tabindex="-1"></a>                        <span class="at">augmented_data =</span> <span class="fu">map2</span>(model, new_data, <span class="sc">~</span> <span class="fu">tryCatch</span>({</span>
+<span id="cb14-224"><a href="#cb14-224" aria-hidden="true" tabindex="-1"></a>                                            <span class="fu">augment</span>(.x, <span class="at">newdata =</span> .y, <span class="at">allow.new.levels =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb14-225"><a href="#cb14-225" aria-hidden="true" tabindex="-1"></a>                                            }, <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb14-226"><a href="#cb14-226" aria-hidden="true" tabindex="-1"></a>                                                <span class="fu">message</span>(<span class="st">"Error in augment function: "</span>, e<span class="sc">$</span>message)</span>
+<span id="cb14-227"><a href="#cb14-227" aria-hidden="true" tabindex="-1"></a>                                                <span class="cn">NULL</span> </span>
+<span id="cb14-228"><a href="#cb14-228" aria-hidden="true" tabindex="-1"></a>                                            })))</span>
+<span id="cb14-229"><a href="#cb14-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-230"><a href="#cb14-230" aria-hidden="true" tabindex="-1"></a>unnested_results <span class="ot">&lt;-</span> results <span class="sc">|&gt;</span> </span>
+<span id="cb14-231"><a href="#cb14-231" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">unnest</span>(augmented_data) <span class="sc">|&gt;</span> </span>
+<span id="cb14-232"><a href="#cb14-232" aria-hidden="true" tabindex="-1"></a>                        dplyr<span class="sc">::</span><span class="fu">select</span>(BankName<span class="sc">:</span><span class="fu">last_col</span>()) <span class="sc">|&gt;</span> </span>
+<span id="cb14-233"><a href="#cb14-233" aria-hidden="true" tabindex="-1"></a>                        dplyr<span class="sc">::</span><span class="fu">group_by</span>(BankName, BankType) <span class="sc">|&gt;</span> </span>
+<span id="cb14-234"><a href="#cb14-234" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">mutate</span>(<span class="at">RMSE =</span> Metrics<span class="sc">::</span><span class="fu">rmse</span>(UBPRE524.diff, .fitted),</span>
+<span id="cb14-235"><a href="#cb14-235" aria-hidden="true" tabindex="-1"></a>                        <span class="at">MAE =</span> Metrics<span class="sc">::</span><span class="fu">mae</span>(UBPRE524.diff, .fitted)) <span class="sc">|&gt;</span></span>
+<span id="cb14-236"><a href="#cb14-236" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">summarise</span>(<span class="at">RMSE =</span> <span class="fu">mean</span>(RMSE,<span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb14-237"><a href="#cb14-237" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">MAE =</span> <span class="fu">mean</span>(MAE,<span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb14-238"><a href="#cb14-238" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">add_column</span>(<span class="at">.type =</span> <span class="st">"CV"</span>, <span class="at">.model =</span> model_name)     </span>
+<span id="cb14-239"><a href="#cb14-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-240"><a href="#cb14-240" aria-hidden="true" tabindex="-1"></a>unnested_results <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(BankName, BankType, .model, .type, RMSE, MAE) <span class="sc">|&gt;</span> </span>
+<span id="cb14-241"><a href="#cb14-241" aria-hidden="true" tabindex="-1"></a>    readr<span class="sc">::</span><span class="fu">write_csv</span>(<span class="fu">glue</span>(<span class="st">"data/results/tscv/estimate_tscv_market_metrics.csv"</span>))</span>
+<span id="cb14-242"><a href="#cb14-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-243"><a href="#cb14-243" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-244"><a href="#cb14-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-245"><a href="#cb14-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-248"><a href="#cb14-248" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-249"><a href="#cb14-249" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-250"><a href="#cb14-250" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-market-cv</span></span>
+<span id="cb14-251"><a href="#cb14-251" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: Comparing Accuracy Metrics for Training and Cross-Validation data</span></span>
+<span id="cb14-252"><a href="#cb14-252" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-subcap: </span></span>
+<span id="cb14-253"><a href="#cb14-253" aria-hidden="true" tabindex="-1"></a><span class="co">#| - Accuracy Metrics on Training and Cross Validation data for sub-set of banks</span></span>
+<span id="cb14-254"><a href="#cb14-254" aria-hidden="true" tabindex="-1"></a><span class="co">#| - Mean Accuracy Metrics for our sub-set of banks</span></span>
+<span id="cb14-255"><a href="#cb14-255" aria-hidden="true" tabindex="-1"></a><span class="co">#| - Mean Accuracy Metrics across all banks</span></span>
+<span id="cb14-256"><a href="#cb14-256" aria-hidden="true" tabindex="-1"></a>val_results <span class="ot">&lt;-</span> <span class="fu">get_summary_validation.market</span>(<span class="fu">unique</span>(observation_data<span class="sc">$</span>BankName))</span>
+<span id="cb14-257"><a href="#cb14-257" aria-hidden="true" tabindex="-1"></a>val_results<span class="sc">$</span>tbl1 <span class="sc">|&gt;</span> rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span>
+<span id="cb14-258"><a href="#cb14-258" aria-hidden="true" tabindex="-1"></a>val_results<span class="sc">$</span>tbl2 <span class="sc">|&gt;</span> rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span>
+<span id="cb14-259"><a href="#cb14-259" aria-hidden="true" tabindex="-1"></a>val_results<span class="sc">$</span>tbl3 <span class="sc">|&gt;</span> rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span>
+<span id="cb14-260"><a href="#cb14-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-261"><a href="#cb14-261" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-262"><a href="#cb14-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-263"><a href="#cb14-263" aria-hidden="true" tabindex="-1"></a><span class="fu">## Prediction </span></span>
+<span id="cb14-264"><a href="#cb14-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-267"><a href="#cb14-267" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-268"><a href="#cb14-268" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-269"><a href="#cb14-269" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb14-270"><a href="#cb14-270" aria-hidden="true" tabindex="-1"></a><span class="co">#| results: hide</span></span>
+<span id="cb14-271"><a href="#cb14-271" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-keep: all</span></span>
+<span id="cb14-272"><a href="#cb14-272" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-pred-observed-market</span></span>
+<span id="cb14-273"><a href="#cb14-273" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Prediction vs. Observed Event"</span></span>
+<span id="cb14-274"><a href="#cb14-274" aria-hidden="true" tabindex="-1"></a>get_prediction <span class="ot">&lt;-</span> <span class="cf">function</span>(bank, partner, all_data, models) {</span>
+<span id="cb14-275"><a href="#cb14-275" aria-hidden="true" tabindex="-1"></a>  bank_data <span class="ot">&lt;-</span> all_data <span class="sc">|&gt;</span> <span class="fu">filter</span>(BankName <span class="sc">==</span> bank)</span>
+<span id="cb14-276"><a href="#cb14-276" aria-hidden="true" tabindex="-1"></a>  event_data <span class="ot">&lt;-</span> bank_data <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="sc">!!</span><span class="fu">as.name</span>(partner) <span class="sc">&gt;=</span><span class="dv">0</span>) <span class="sc">|&gt;</span> <span class="fu">head</span>(<span class="dv">8</span>) </span>
+<span id="cb14-277"><a href="#cb14-277" aria-hidden="true" tabindex="-1"></a>  fcast <span class="ot">&lt;-</span> models <span class="sc">|&gt;</span></span>
+<span id="cb14-278"><a href="#cb14-278" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(BankName <span class="sc">==</span> bank)  <span class="sc">|&gt;</span></span>
+<span id="cb14-279"><a href="#cb14-279" aria-hidden="true" tabindex="-1"></a>    <span class="fu">forecast</span>(<span class="at">new_data=</span> event_data, <span class="at">bootstrap=</span><span class="cn">TRUE</span>, <span class="at">times =</span> <span class="dv">5000</span>)</span>
+<span id="cb14-280"><a href="#cb14-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-281"><a href="#cb14-281" aria-hidden="true" tabindex="-1"></a>  <span class="fu">original_scale</span>(fcast, all_data) <span class="sc">|&gt;</span> <span class="fu">add_column</span>(<span class="at">Partner =</span> partner)</span>
+<span id="cb14-282"><a href="#cb14-282" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-283"><a href="#cb14-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-284"><a href="#cb14-284" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">map2</span>(partner_banks<span class="sc">$</span>Bank, partner_banks<span class="sc">$</span>Partner, get_prediction, data, m_table) <span class="sc">|&gt;</span> </span>
+<span id="cb14-285"><a href="#cb14-285" aria-hidden="true" tabindex="-1"></a>          <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span> <span class="fu">left_join</span>(data <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="at">observed =</span> UBPRE524.Value),<span class="at">by =</span> <span class="fu">join_by</span>(IDRSSD, BankName, BankType, Quarter) ) <span class="sc">|&gt;</span> <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(Partner, BankName, Quarter, observed, predicted)    </span>
+<span id="cb14-286"><a href="#cb14-286" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-287"><a href="#cb14-287" aria-hidden="true" tabindex="-1"></a><span class="fu">map2</span>(partner_banks<span class="sc">$</span>Bank, partner_banks<span class="sc">$</span>Partner, plot_prediction, result, data) </span>
+<span id="cb14-288"><a href="#cb14-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-289"><a href="#cb14-289" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-290"><a href="#cb14-290" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-291"><a href="#cb14-291" aria-hidden="true" tabindex="-1"></a><span class="fu">## Abnormal Results </span></span>
+<span id="cb14-294"><a href="#cb14-294" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-295"><a href="#cb14-295" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb14-296"><a href="#cb14-296" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-abnormal-market</span></span>
+<span id="cb14-297"><a href="#cb14-297" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: "Credit Card Plans-30-89 DAYS P/D %: Abnormal Returns (original scale)"</span></span>
+<span id="cb14-298"><a href="#cb14-298" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-subcap: </span></span>
+<span id="cb14-299"><a href="#cb14-299" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "Costco (Old) - AMERICAN EXPRESS NATIONAL BANK (1394676)"</span></span>
+<span id="cb14-300"><a href="#cb14-300" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "Costco (New) - CITIBANK, N.A. (476810)"</span></span>
+<span id="cb14-301"><a href="#cb14-301" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "Walmart (Old) - SYNCHRONY BANK (1216022)"</span></span>
+<span id="cb14-302"><a href="#cb14-302" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "Walmart (New) - CAPITAL ONE, NATIONAL ASSOCIATION (112837)"</span></span>
+<span id="cb14-303"><a href="#cb14-303" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "GAP (Old) - SYNCHRONY BANK (1216022)"</span></span>
+<span id="cb14-304"><a href="#cb14-304" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "GAP (New) - BARCLAYS BANK DELAWARE (2980209)"</span></span>
+<span id="cb14-305"><a href="#cb14-305" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"Costco"</span>, <span class="st">"AMERICAN EXPRESS NATIONAL BANK (1394676)"</span>)</span>
+<span id="cb14-306"><a href="#cb14-306" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"Costco"</span>, <span class="st">"CITIBANK, N.A. (476810)"</span>)</span>
+<span id="cb14-307"><a href="#cb14-307" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"Walmart"</span>, <span class="st">"SYNCHRONY BANK (1216022)"</span>)</span>
+<span id="cb14-308"><a href="#cb14-308" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"Walmart"</span>, <span class="st">"CAPITAL ONE, NATIONAL ASSOCIATION (112837)"</span>)</span>
+<span id="cb14-309"><a href="#cb14-309" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"GAP"</span>, <span class="st">"SYNCHRONY BANK (1216022)"</span>)</span>
+<span id="cb14-310"><a href="#cb14-310" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"GAP"</span>, <span class="st">"BARCLAYS BANK DELAWARE (2980209)"</span>)</span>
+<span id="cb14-311"><a href="#cb14-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-312"><a href="#cb14-312" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+</body></html>

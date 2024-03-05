@@ -1,6 +1,7 @@
 {
   "index.qmd": {
-    "index.html": "183880d1"
+    "index.html": "183880d1",
+    "index.tex": "facc861f"
   },
   "intro.qmd": {
     "intro.html": "8b57ac60"
@@ -58,5 +59,20 @@
   },
   "model_event_summary.qmd": {
     "model_event_summary.html": "877fb949"
+  },
+  "causal.qmd": {
+    "causal.html": "f4cec52f"
+  },
+  "DiD.qmd": {
+    "DiD.html": "b1c84b49"
+  },
+  "fixedeffect.qmd": {
+    "fixedeffect.html": "a7081211"
+  },
+  "model_hierarchy.qmd": {
+    "model_hierarchy.html": "86784be1"
+  },
+  "model_summary.qmd": {
+    "model_summary.html": "787b235b"
   }
 }
