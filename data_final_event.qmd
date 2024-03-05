@@ -21,7 +21,9 @@ Sources:
 source('functions.R')
 
 all_data <- get_model_data()
-observation_data <- all_data$observation_data
+observation_data <- all_data$observation_data |> 
+                        dplyr::select(matches(".log.diff|UBPRE524|Qtr|BankName|BankType|IDRSSD")) |> 
+                        dplyr::select(-c(starts_with("UBPRE524.log.diff"))) 
 
 observation_data |> dplyr::slice_head(n=10) |> relocate(Qtr, .after = BankType) |> rmarkdown::paged_table()
 
