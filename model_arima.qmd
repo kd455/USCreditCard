@@ -26,7 +26,7 @@ print_top_bank_model <- function(fuzzy_bankname, arima_results, score_by = "AICc
 
 print_coeff <- function(fuzzy_bankname, bank_models) {
   bank_model <- bank_models |> 
-                  filter(grepl(fuzzy_bankname,bank)) |> pluck("model_details",1)
+                  filter(grepl(fuzzy_bankname,Bank)) |> pluck("model_details",1)
   
   bank_model$BankModel |> tidy() |> 
     dplyr::select(.model:last_col()) |> 
@@ -34,7 +34,7 @@ print_coeff <- function(fuzzy_bankname, bank_models) {
 }
 
 plot_bank_residuals <- function(fuzzy_bankname, bank_models) {
-  bank_model <- bank_models |> filter(grepl(fuzzy_bankname,bank)) |> pluck("model_details",1)
+  bank_model <- bank_models |> filter(grepl(fuzzy_bankname,Bank)) |> pluck("model_details",1)
   bank_model$BankModel |> gg_tsresiduals()+ 
                       labs(title=glue("Model {bank_model$Name}, AIC: {bank_model$AICc}"),
                       subtitle = bank_model$Formula)
@@ -253,7 +253,7 @@ print_top_bank_model(bank, arima_results)
 #| warning: false
 #| label: tbl-arima-citi-coef
 #| tbl-cap: "Top Model coefficients"
-print_coeff(bank, best_bank_models)
+print_coeff(bank, best_bank_models)#| 
 ```
 
 ### SYNCHRONY

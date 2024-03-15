@@ -816,6 +816,7 @@ read_tscv_results <- function(model_type = "arima") {
 plot_prediction <- function(bank, partner, fcasts, all_data) {
     fcast_data <- fcasts |> filter(BankName == bank) |> filter(Partner == partner) |> head(8) 
     bank_data <- all_data |> filter(BankName == bank)
+    banktype <- bank_data |> pluck("BankType",1)    
 
     est_data <- bank_data |> filter(is.na(!!as.name(partner)))
     est_data_trunc <- est_data |> tail(ifelse(nrow(est_data)<11,nrow(est_data),11))
@@ -828,13 +829,13 @@ plot_prediction <- function(bank, partner, fcasts, all_data) {
     geom_line(aes(x = Quarter, y=predicted, color = "Post")) + facet_wrap(~.model) +
     geom_line(aes(x = Quarter, y=UBPRE524.Value), data = comb_data, color='darkslategrey',linetype = "longdash") + 
     geom_vline(xintercept = as.Date(min_qtr) , linetype=1,color="grey") +
-    labs(title = bank, subtitle = partner, y = credit_card.target_label())  +    
+    labs(title = paste(bank, "-", banktype), subtitle = glue("Partnership: {partner}"), y = credit_card.target_label())  +    
     theme_bw() + theme(legend.position = "none")
 }
 
 plot_prediction_and_history <- function(bank, partner, fcasts, hcasts, all_data) {
   bank_hcast_data <- hcasts |> filter(BankName == bank) |> filter(Partner == partner) 
-  
+
   plot_prediction(bank, partner, fcasts, all_data) + 
     geom_line(aes(x = Quarter, y=predicted, color = "Pre"), 
               data = bank_hcast_data) +

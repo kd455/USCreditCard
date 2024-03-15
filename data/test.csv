@@ -1,0 +1,9 @@
+BankType,Model,CV/Test,Train,Difference
+LargeBank,xgboost,0.109,0.091,0.018000000000000002
+LargeBank,arima,0.085,0.071,0.014000000000000012
+LargeBank,market,0.121,0.11,0.010999999999999996
+LargeBank,hierarchy,0.142,0.143,-0.0010000000000000009
+LargeCreditCardBank,xgboost,0.109,0.092,0.017
+LargeCreditCardBank,arima,0.098,0.063,0.035
+LargeCreditCardBank,market,0.108,0.084,0.023999999999999994
+LargeCreditCardBank,hierarchy,0.146,0.143,0.0030000000000000027

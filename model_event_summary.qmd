@@ -42,10 +42,19 @@ arima_results <- get_summary_validation.arima(banks, TRUE)
 market_results <- get_summary_validation.market(banks, TRUE)
 hier_results <- get_summary_validation.hierarchy(banks, TRUE)
 
-bind_rows(xg_results$tbl1, arima_results$tbl1, market_results$tbl1, hier_results$tbl1) |>
-    cv_train_difference(include_type = FALSE, include_bank = TRUE) |> arrange(BankName) |> 
-    relocate(BankName) |> 
-    rmarkdown::paged_table()
+selected_banks_data <- bind_rows(xg_results$tbl1, arima_results$tbl1, market_results$tbl1, hier_results$tbl1) |>
+        cv_train_difference(include_type = FALSE, include_bank = TRUE) |> arrange(BankName) |> 
+        relocate(BankName) 
+
+selected_banks_data |>        
+        rmarkdown::paged_table()
+
+# selected_banks_data |> mutate(Model = ifelse(Model=="arima", "linearAR", Model)) |>
+#   arrange(BankName, desc(`CV/Test`)) |>
+#     ggplot(aes(x = BankName, y = `CV/Test`, fill = Model)) +
+#     geom_bar(stat = "identity", position = "dodge") + coord_flip()+
+#         labs(y = "CV/Test Score", x = "Bank Name", fill = "Model") +
+#     ggtitle("Comparison of CV/Test Scores Across Banks and Models") + theme_bw() + theme(legend.position="top", legend.title = element_blank())+scale_fill_colorblind7()    
   
 bind_rows(xg_results$tbl2, arima_results$tbl2, market_results$tbl2, hier_results$tbl2) |>
     cv_train_difference() |> rmarkdown::paged_table()
@@ -120,10 +129,10 @@ models_pre_event <- partner_banks  |>
                       mutate(model_details = map2(Bank, Partner, best_arima_model, all_data, arima_results, -6))
 
 result_pre <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, all_data, models_pre_event, type="pre") |> 
-          list_rbind() |> as_tibble() |> left_join(all_data |> dplyr::select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter))  |> dplyr::select(Partner, BankName, Quarter, observed, predicted,.model) 
+          list_rbind() |> as_tibble() |> left_join(all_data |> dplyr::select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter))  |> dplyr::select(Partner, BankType, BankName, Quarter, observed, predicted,.model) 
 
-#### end get prediction for Period - 8 quarters before event ###################
-         
+#### end get prediction for Period - 8 quarters before event ###################      
+
 map2(partner_banks$Bank, partner_banks$Partner, plot_prediction_and_history, result_post,result_pre, all_data) 
 
 
