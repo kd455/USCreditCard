@@ -127,7 +127,8 @@ Increases in credit card loans in the *old* bank, as seen in GAP and Walmart, is
 Given our goal to generalise partnership impacts by FICO and/or Industry we need to use additional public data sources to provide this mapping. 
 
 ### FICO Score
-The *Terms of credit card plans (TCCP) survey* [@TCCP2022] provides credit card details including their target FICO Tiers and Annual Percentage Rate (APR). We can see from @tbl-tccp-apr that the APR is higher for partnership cards. @boston2000 found that banks faced an adverse selection problem whereby it was profitable to offer credit card deals with high APR that attracted risker borrowers even though there was evidence of higher delinquency. 
+The *Terms of credit card plans (TCCP) survey* [@TCCP2022] provides credit card details including their target FICO Tiers and Annual Percentage Rate (APR). @boston2000 found that banks faced an adverse selection problem whereby it was profitable to offer credit card deals with high APR that attracted risker borrowers even though there was evidence of higher delinquency. We can see from TCCP's 2022 survey in @tbl-tccp-apr that the APR does not differ between partnership and bank branded cards.
+
 
 [TCCP data download](data/cfpb_tccp-data_2022-07-01_2022_12-31.xlsx)
 
@@ -149,8 +150,36 @@ tccp |> filter(grepl("Walmart|GAP|Apple|Costco|Wayfair|Old Navy|GP", `Product Na
 #| warning: false
 #| label: tbl-tccp-apr
 #| tbl-cap: "Median summary APR for partnership cards vs. bank branded cards"
-tccp |> group_by(`Institution Name`, Partner) |> summarise(MaxAPR = median(MaxAPR, na.rm=TRUE)) |>
-group_by(Partner) |> summarise(MaxAPR = median(MaxAPR, na.rm=TRUE)) |> mutate(Partner = if_else(Partner == 1 , "Yes", "No"), MaxAPR = MaxAPR*100) |> dplyr::select(`Partnership card` = Partner, `Max APR (%)` = MaxAPR)
+
+peer_df <- dplyr::bind_rows(
+            readr::read_delim("data/CDR-UBPR_RT6_PEERGROUP_201_2023_12_31.txt", skip=5,show_col_types = FALSE) |> tibble::add_column(BankType = "LargeCreditCardBank"),
+            readr::read_delim("data/CDR-UBPR_RT6_PEERGROUP_1_2023_12_31.txt", skip=5,show_col_types = FALSE) |> tibble::add_column(BankType = "LargeBank")
+            ) |> mutate(Name = trimws(Name)) 
+
+tccp <- readxl::read_xlsx("data/cfpb_tccp-data_2022-07-01_2022_12-31.xlsx", skip = 9) |> mutate(BankName = trimws(`Institution Name`)) |> relocate(BankName) |>
+    mutate(BankName = case_when(
+                  BankName == "SYNCHRONY FINANCIAL" ~ "SYNCHRONY BANK",
+                  BankName == "MERRICK BANK CORPORATION" ~ "MERRICK BANK",
+                  BankName == "PNC Bank N.A." ~ "PNC BANK, NATIONAL ASSOCIATION",              
+                  BankName == "BMO HARRIS BANK NATIONAL ASSOCIATION" ~  "BMO BANK NATIONAL ASSOCIATION",   
+                  .default = BankName
+            ))
+
+final_tccp <- peer_df |> left_join(tccp, by = join_by(Name == BankName)) |> 
+                mutate(BankName = paste0(Name, " (", `ID RSSD`, ")") ) |> 
+                    relocate(BankName) |> 
+                    rename(TargetTiers = `Targeted Credit Tiers`) |>
+                        separate_wider_delim(TargetTiers," ",names = "LowestTier", too_many = "drop") 
+
+tccp_maxapr <- final_tccp |> 
+                dplyr::select(BankName, BankType, Partner, LowestTier, contains("Maximum APR")) |> rowwise() |>
+                mutate(MaxAPR=max(c_across(contains("Maximum APR")), na.rm = TRUE)) |> relocate(MaxAPR) |> group_by(BankName,BankType, Partner, LowestTier) |> summarise(MaxAPR = median(MaxAPR))
+
+tccp_maxapr |> 
+  group_by(BankType, Partner) |> 
+  summarise(MaxAPR = median(MaxAPR, na.rm=TRUE)) |> drop_na(Partner) |> mutate(Partner = if_else(Partner == 1 , "Yes", "No"), MaxAPR = MaxAPR*100) |> dplyr::select(`Partnership card` = Partner, `Max APR (%)` = MaxAPR)
+
+
 ```
 
 ### Industry Classification
