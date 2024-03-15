@@ -48,14 +48,13 @@ m4 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + RRSFS.P
 m5 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + RRSFS.Pop.log.diff + TDSP.log.diff + RRSFS.Pop.log.diff.lag1 , data = estimation_data, REML = FALSE)
 m6 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 , data = estimation_data, REML = FALSE)
 m7 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + TDSP.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 , data = estimation_data, REML = FALSE)
-m8 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + Qtr | BankType/BankName) + UBPRE524.all.log.diff + UBPRE524.group.log.diff,data = estimation_data, REML = FALSE)
-m9 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff | BankType/BankName) + UBPRE524.all.log.diff + UBPRE524.group.log.diff,data = estimation_data, REML = FALSE)
+m8 <- lmer(UBPRE524.diff ~ (1 + Qtr + UBPRB538.log.diff + UBPR3815.log.diff | BankType/BankName) + TDSP.log.diff, data = estimation_data, REML = FALSE)
 ```
 ```{r}
 #| warning: false
 #| label: tbl-hier-aicc
 #| tbl-cap: AICc Summary. The lower the AICc value, the better the balance between model complexity (number of parameters) and goodness of fit
-model_comparison <- model.sel( m1, m2, m3, m4, m5, m6, m7, m8, m9, rank = "AICc")
+model_comparison <- model.sel( m1, m2, m3, m4, m5, m6, m7, m8, rank = "AICc")
 
 model_comparison |> as.data.frame() |> rownames_to_column(var = "Model")|> 
     mutate(across(where(is.numeric), \(x) round(x,2))) |> 
@@ -66,31 +65,29 @@ model_comparison |> as.data.frame() |> rownames_to_column(var = "Model")|>
 ```
 
 ### Model Choice
-The best model includes aggregated values for `r credit_card.target_label()`. This allows us to control for the impact of the group trends on the individual banks.
-
-Focusing in on model 8 - we can test variations of this model. Notably, changing the grouping from BankType/BankName to BankName/Qtr improved the model. Qtr is a factor 1 to 4.
+Focusing in on model 8 - we can test variations of this model. 
 
 ```{r}
 #| warning: false
 #| code-fold: false
 #| eval: true
-m8.1 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + Qtr | BankType/BankName) + UBPRE524.all.log.diff + UBPRE524.group.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 ,data = estimation_data, REML = FALSE)
-m8.2 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + Qtr| BankType/BankName) + UBPRE524.all.log.diff + UBPRE524.group.log.diff + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1,data = estimation_data, REML = FALSE)
-m8.3 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + Qtr| BankType/BankName) + UBPRE524.group.log.diff+ TDSP.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 ,data = estimation_data, REML = FALSE)
-m8.4 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff + Qtr | BankType/BankName) + UBPRE524.all.log.diff + UBPRE524.group.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 ,data = estimation_data, REML = FALSE)
-m8.5 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff + Qtr | BankType/BankName) + UBPRE524.group.log.diff + TDSP.log.diff + TDSP.log.diff.lag1 ,data = estimation_data, REML = FALSE)
-m8.6 <-  lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff.lag3 + UBPR3815.log.diff + Qtr| BankType/BankName) + UBPRE524.group.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 + Qtr ,data = estimation_data, REML = FALSE)
-m8.7 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff + Qtr | BankName) + UBPRE524.group.log.diff + TDSP.log.diff + TDSP.log.diff.lag1, data = estimation_data, REML = FALSE)
-m8.8 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff + Qtr | BankName) + UBPRE524.group.log.diff + UBPRE524.all.log.diff + TDSP.log.diff + TDSP.log.diff.lag1, data = estimation_data, REML = FALSE)
-m8.9 <- lmer(UBPRE524.diff ~ (1 + UBPRB538.log.diff + UBPR3815.log.diff + Qtr | BankName) + UBPRE524.group.log.diff, data = estimation_data, REML = FALSE)
 
+m8.1 <- lmer(UBPRE524.diff ~ (1 + Qtr+ UBPRB538.log.diff + UBPR3815.log.diff | BankName) + TDSP.log.diff + RRSFS.Pop.log.diff + UNRATE.log.diff, data = estimation_data, REML = FALSE)
+m8.2 <- lmer(UBPRE524.diff ~ (1 + Qtr+ UBPRB538.log.diff + UBPR3815.log.diff | BankType/BankName) + TDSP.log.diff, data = estimation_data, REML = FALSE)
+m8.3 <- lmer(UBPRE524.diff ~ (1 + Qtr+ UBPRB538.log.diff + UBPR3815.log.diff | BankName) + TDSP.log.diff +  TDSP.log.diff.lag1 + RRSFS.Pop.log.diff + UNRATE.log.diff, data = estimation_data, REML = FALSE)
+m8.4 <- lmer(UBPRE524.diff ~ (1 + Qtr+ UBPRB538.log.diff + UBPR3815.log.diff | BankName) + TDSP.log.diff +  RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UNRATE.log.diff, data = estimation_data, REML = FALSE)
+m8.5 <- lmer(UBPRE524.diff ~ (1 + Qtr+ UBPRB538.log.diff + UBPR3815.log.diff | BankType/BankName) + TDSP.log.diff +  RRSFS.Pop.log.diff + UNRATE.log.diff.lag1 + UNRATE.log.diff, data = estimation_data, REML = FALSE)
+m8.6 <- lmer(UBPRE524.diff ~ (1 + Qtr+ UBPRB538.log.diff + UBPR3815.log.diff | BankName) + TDSP.log.diff +  RRSFS.Pop.log.diff + UNRATE.log.diff.lag2 + UNRATE.log.diff.lag1 + UNRATE.log.diff, data = estimation_data, REML = FALSE,control=lmerControl(optCtrl=list(maxfun=20000)))
+m8.7 <- lmer(UBPRE524.diff ~ (1 + Qtr+ UBPRB538.log.diff + UBPR3815.log.diff | BankName) + TDSP.log.diff +  RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UNRATE.log.diff.lag1 + UNRATE.log.diff, data = estimation_data, REML = FALSE)
+m8.8 <- lmer(UBPRE524.diff ~ (1 + Qtr+ UBPRB538.log.diff + UBPR3815.log.diff | BankName) + TDSP.log.diff  + RRSFS.Pop.log.diff.lag1 + UNRATE.log.diff.lag1 + UNRATE.log.diff, data = estimation_data, REML = FALSE)
+m8.9 <- lmer(UBPRE524.diff ~ Qtr+ (1 + UBPRB538.log.diff + UBPR3815.log.diff | BankName) + TDSP.log.diff +  RRSFS.Pop.log.diff + UNRATE.log.diff.lag2 + UNRATE.log.diff.lag1 + UNRATE.log.diff, data = estimation_data, REML = FALSE)
 ```
 
 ```{r}
 #| warning: false
 #| label: tbl-hier2-aicc
 #| tbl-cap: AICc Summary - refinement of model selection. 
-model_comparison <- model.sel( m8, m8.1, m8.2, m8.3, m8.4, m8.5, m8.6, m8.7, m8.8, m8.9, rank = "AICc")
+model_comparison <- model.sel( m8, m8.1, m8.2, m8.3, m8.4, m8.5, m8.6,m8.7,m8.8, m8.9, rank = "AICc")
 
 model_comparison |> as.data.frame() |> rownames_to_column(var = "Model")|> 
     mutate(across(where(is.numeric), \(x) round(x,2))) |> 
@@ -102,19 +99,17 @@ model_comparison |> as.data.frame() |> rownames_to_column(var = "Model")|>
 
 #### Variance Inflation Factors
 
-Analysis of the correlation matrix @tbl-corr-hier-1 reveals a notable correlation of -0.87	between UBPRE524.group.log.diff and UBPRE524.all.log.diff. This is corroborated by the Variance Inflation Factor (VIF) analysis @tbl-corr-hier-2. VIF quantifies the extent to which the variance of an estimated regression coefficient increases due to multicollinearity among the predictors. A high VIF signifies that a predictor shares a substantial amount of information with other predictors in the model, potentially distorting the regression coefficients and their interpretability. According to @rproject, VIF values above 4 warrant further investigation, while VIFs exceeding 10 are signs of serious multicollinearity requiring correction.
-
-Considering the AICc values, Model **8.7**, which excludes UBPRE524.all.log.diff, demonstrates comparable performance. This suggests that Model 8.7 is a good alternative, allowing us to mitigate this multicollinearity concern.
+The best model based on AICc is model **m8.6**. However, it fails to converge when we run again with  REML = TRUE and with 30000 iterations. Consequently we will select **m8.5**. Analysis of the correlation matrix @tbl-corr-hier-1 reveals the largest correlation of 0.68 and -0.68	between UNRATE.log.diff and UNRATE.log.diff.lag1 with RRSFS.Pop.log.diff. This aligns with what we found in Cross-Correlation Function (CCF) tests (see @fig-ccf-rrsfs-2). Table @tbl-corr-hier-2 looks at the Variance Inflation Factor (VIF) to quantifies the extent to which the variance of an estimated regression coefficient increases due to multicollinearity among the predictors. A high VIF signifies that a predictor shares a substantial amount of information with other predictors in the model, potentially distorting the regression coefficients and their interpretability. According to @rproject, VIF values above 4 warrant further investigation, while VIFs exceeding 10 are signs of serious multicollinearity requiring correction. Considering that VIF for RRSFS.Pop.log.diff is < 4 and the impact on AICc with RRSFS.Pop.log.diff removed, we will keep model **m8.5** as our selected model.
 
 
 ```{r}
 #| warning: false
 #| label: tbl-corr-hier
-#| tbl-cap: "Assessing model 8.8"
+#| tbl-cap: "Assessing model 8.5"
 #| tbl-subcap:
-#|  - Correlation of Fixed Effects for model 8.8
+#|  - Correlation of Fixed Effects for model 8.5
 #|  - VIF 
-model_name <- "m8.8"
+model_name <- "m8.5"
 top_model <- lmer(formula(eval(as.name(model_name))), data = estimation_data, REML = TRUE)
 
 cov2cor(vcov(top_model)) |> as.matrix() |> as.data.frame() |>
@@ -123,10 +118,8 @@ cov2cor(vcov(top_model)) |> as.matrix() |> as.data.frame() |>
 
 vif_df <- car::vif(top_model,type="predictor") |> as.data.frame() 
 colnames(vif_df) <- "VIF"
-vif_df |> rmarkdown::paged_table() 
+vif_df |> dplyr::select(VIF) |> rmarkdown::paged_table() 
 
-#change top model
-model_name <- "m8.7"
 top_model <- lmer(formula(eval(as.name(model_name))), data = estimation_data, REML = TRUE)
 
 ```
@@ -215,10 +208,10 @@ The red line indicates no effect (zero), and the dots represent the random effec
 #| tbl-cap: "Intercept and coefficients"
 #| tbl-subcap:
 #|  - "Random Effects for BankName (selected Banks)"
-selected_banks <- unique(observation_data$BankName)
-ranef(top_model, condVar = FALSE)$BankName |> as.data.frame() |> 
-    rownames_to_column(var = "BankName") |> 
-    filter(BankName %in% selected_banks) |>
+selected_banks <- unique(paste0(observation_data$BankName,":",observation_data$BankType))
+ranef(top_model, condVar = FALSE)$`BankName:BankType` |> as.data.frame() |> 
+    rownames_to_column(var = "Entity") |> 
+    filter(Entity %in% selected_banks) |>
     mutate(across(where(is.numeric), \(x) round(x,2))) |>  
         rmarkdown::paged_table()
 ```
@@ -335,7 +328,7 @@ do_hier_cv <- function(estimation_data, init = 5) {
     unnested_results |> dplyr::select(BankName, BankType, .model, .type, RMSE, MAE) |> 
         readr::write_csv(glue("data/results/tscv/estimate_tscv_hier.csv"))
 }
-do_hier_cv(estimation_data, init = 13)
+do_hier_cv(estimation_data, init = 7)
 
 ```
 
@@ -369,18 +362,18 @@ get_prediction <- function(bank, partner, all_data, model) {
   est_data <- all_data |> filter_index(~ format(first_qtr, format = "%Y Q%q") )  
    
   #re-do estimate to avoid data leakage
-  m <- lmer(formula(top_model), data = est_data, REML = TRUE)
+  m <- lmer(formula(model), data = est_data, REML = TRUE)
   
   #forecast
   fcast <- broom::augment(m, newdata= event_data, allow.new.levels = TRUE) |> 
     filter(BankName == bank) |> 
     as_tsibble(index = Quarter, key=c(BankName, BankType))
 
-  original_scale_diff(fcast |> filter(BankName == bank), all_data, bank, ".fitted") |> add_column(Partner = partner)
+  original_scale_diff(fcast |> filter(BankName == bank), all_data, bank, ".fitted") |> add_column(Partner = partner ) 
 }
 
 result <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, all_data, top_model)  |> 
-  list_rbind() |> as_tibble() |> left_join(all_data |> dplyr::select(observed = UBPRE524.Value),by = join_by(BankName, BankType, Quarter) ) |> dplyr::select(Partner, BankName, Quarter, observed, predicted) 
+  list_rbind() |> as_tibble() |> left_join(all_data |> dplyr::select(observed = UBPRE524.Value),by = join_by(BankName, BankType, Quarter) ) |> dplyr::select(Partner, BankName, Quarter, observed, predicted) |> add_column(.model = model_name) 
 
 map2(partner_banks$Bank, partner_banks$Partner, plot_prediction, result, all_data) 
 ```
