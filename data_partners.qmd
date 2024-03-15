@@ -127,18 +127,30 @@ Increases in credit card loans in the *old* bank, as seen in GAP and Walmart, is
 Given our goal to generalise partnership impacts by FICO and/or Industry we need to use additional public data sources to provide this mapping. 
 
 ### FICO Score
-The *Terms of credit card plans (TCCP) survey* [@TCCP2022] provides credit card details including their target FICO Tiers. For our case studies all the cards are available to individuals with minimum *Poor or fair credit (credit score 619 or less)*. We may not have enough partnerships with different FICO minimums to say whether FICO score has an impact. 
+The *Terms of credit card plans (TCCP) survey* [@TCCP2022] provides credit card details including their target FICO Tiers and Annual Percentage Rate (APR). We can see from @tbl-tccp-apr that the APR is higher for partnership cards. @boston2000 found that banks faced an adverse selection problem whereby it was profitable to offer credit card deals with high APR that attracted risker borrowers even though there was evidence of higher delinquency. 
+
+[TCCP data download](data/cfpb_tccp-data_2022-07-01_2022_12-31.xlsx)
 
 ```{r}
 #| warning: false
 #| label: tbl-tccp
 #| tbl-cap: "Subset of TCCP survey (2022)"
 
-readxl::read_excel("data/cfpb_tccp-data_2022-07-01_2022_12-31.xlsx", skip=9) |> filter(`Availability of Credit Card Plan` == "National",
-grepl("Walmart|GAP|Apple|Costco|Wayfair|GP", `Product Name`, ignore.case = TRUE)) |>
-dplyr::select(`Product Name`, `Institution Name`, `Targeted Credit Tiers`,
-Services,`Other Services`,Rewards,`Other Rewards`,`Website for Consumer`) 
+tccp <- readxl::read_excel("data/cfpb_tccp-data_2022-07-01_2022_12-31.xlsx", skip=9) |>
+filter(`Availability of Credit Card Plan` == "National") |> 
+dplyr::select(`Product Name`, Partner, `Institution Name`, `Targeted Credit Tiers`,
+Services,`Other Services`,Rewards,`Other Rewards`,`Website for Consumer`, MaxAPR = `Maximum APR...38`) 
 
+tccp |> filter(grepl("Walmart|GAP|Apple|Costco|Wayfair|Old Navy|GP", `Product Name`, ignore.case = TRUE)) 
+
+```
+
+```{r}
+#| warning: false
+#| label: tbl-tccp-apr
+#| tbl-cap: "Median summary APR for partnership cards vs. bank branded cards"
+tccp |> group_by(`Institution Name`, Partner) |> summarise(MaxAPR = median(MaxAPR, na.rm=TRUE)) |>
+group_by(Partner) |> summarise(MaxAPR = median(MaxAPR, na.rm=TRUE)) |> mutate(Partner = if_else(Partner == 1 , "Yes", "No"), MaxAPR = MaxAPR*100) |> dplyr::select(`Partnership card` = Partner, `Max APR (%)` = MaxAPR)
 ```
 
 ### Industry Classification

@@ -32,7 +32,8 @@ feature_desc <- get_feature_labels()
 
 all_cols |> mutate(Code = stringr::str_split_i(Feature,"\\.",1)) |> 
     left_join(feature_desc,by = join_by(Code)) |> 
-    dplyr::select(Feature, Code, Source, Desc) |>
-    dplyr::arrange(!is.na(Desc), Code) |> knitr::kable()
+    dplyr::select(Feature, Code, Source, Desc) |> mutate(Source = replace_na(Source, "FFIEC"))|>
+    dplyr::select(Source, Code, Desc) |> distinct() |>
+    dplyr::arrange( !is.na(Desc),Source,Code) |> knitr::kable()
 
 ``` 

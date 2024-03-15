@@ -189,7 +189,7 @@ The results @tbl-market-cv show that the RMSE and MAE of the cross-validated mod
 
 m_table |> fabletools::accuracy()|> readr::write_csv("data/results/estimate_market_metrics.csv")
 
-init = 13
+init = 8
 model_name = "tslm"
 
 nested_data <- nest_data_for_step_cv(estimation_data)
@@ -254,7 +254,7 @@ get_prediction <- function(bank, partner, all_data, models) {
 }
 
 result <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, data, m_table) |> 
-          list_rbind() |> left_join(data |> dplyr::select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter) ) |> as_tibble() |> dplyr::select(Partner, BankName, Quarter, observed, predicted)    
+          list_rbind() |> left_join(data |> dplyr::select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter) ) |> as_tibble() |> dplyr::select(Partner, BankName, Quarter, observed, predicted,.model)    
 
 map2(partner_banks$Bank, partner_banks$Partner, plot_prediction, result, data) 
 
