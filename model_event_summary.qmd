@@ -44,73 +44,89 @@ hier_results <- get_summary_validation.hierarchy(banks, TRUE)
 
 bind_rows(xg_results$tbl1, arima_results$tbl1, market_results$tbl1, hier_results$tbl1) |>
     cv_train_difference(include_type = FALSE, include_bank = TRUE) |> arrange(BankName) |> 
-    relocate(BankName) |> rmarkdown::paged_table()
+    relocate(BankName) |> 
+    rmarkdown::paged_table()
   
 bind_rows(xg_results$tbl2, arima_results$tbl2, market_results$tbl2, hier_results$tbl2) |>
     cv_train_difference() |> rmarkdown::paged_table()
 
 bind_rows(xg_results$tbl4, arima_results$tbl4, market_results$tbl4, hier_results$tbl4) |>
     arrange(BankType) |> 
-    cv_train_difference(include_type = FALSE, include_bank = FALSE) |> rmarkdown::paged_table()
+    cv_train_difference(include_type = FALSE, include_bank = FALSE)  |>   
+    rmarkdown::paged_table()
 
 bind_rows(xg_results$tbl3, arima_results$tbl3, market_results$tbl3, hier_results$tbl3) |>
-    cv_train_difference() |> rmarkdown::paged_table()
+    cv_train_difference() |>  
+    rmarkdown::paged_table()
 
 ```
-
-
 ## Prediction 
 
 The joint test problem arises because we are effectively testing two things: the counterfactual model and the event impact. Consequently, we need an approach to accurately evaluate if our counterfactual model results are credible. One approach suggested by @HuntingtonKlein is to test using observations where we expect no effect; if there were resulting "abnormal returns" this would point to an issue with the model.
-
-This is in addition to visual, cross-validation and statistical checks on model fit.
 
 ```{r}
 #| warning: false
 #| echo: false
 #| results: hide
 #| fig-keep: all
-#| label: fig-pred-final-market
+#| label: fig-pred-final-result
 #| fig-cap: "Prediction vs. Observed Event"
-get_prediction <- function(bank, partner, all_data, models) {
-  bank_data <- all_data |> filter(BankName == bank)
-  event_data <- bank_data |> filter(!!as.name(partner) >=0) |> head(8) 
-  fcast <- models |>
-    filter(BankName == bank)  |>
-    forecast(new_data= event_data) #, bootstrap=TRUE, times = 5000)
 
-  original_scale(fcast, all_data) |> add_column(Partner = partner)
-}
+get_prediction <- function(bankname, partner, all_data, models, type="post") {
+  tryCatch({
+    event_qtr <- all_data |>
+                    filter(BankName == bankname,
+                           !!as.name(partner) ==0) |> pull(Quarter)
+    bank_model <- models |> 
+                    filter(Bank == bankname,
+                           Partner == partner)|> pluck("model_details",1)
+    
+    trained_qtr <- bank_model$Augmented |> filter(Quarter == max(Quarter)) |> pull(Quarter)
 
-get_pre_prediction <- function(bank, partner, all_data) {
-  bank_data <- all_data |> filter(BankName == bank)
-  event_qtr <- bank_data |> filter(!!as.name(partner) == 0) |> pull(Quarter)
-  
-  pre_event_data <- bank_data |> filter_index(~ format(event_qtr, format = "%Y Q%q")) |> 
-                      mutate(Period = -(n() - row_number() + 1)) |> relocate(Period) 
-  est_data <- pre_event_data |> filter(Period < -8)
-  obs_data <- pre_event_data |> filter(Period >= -8) 
-     
-  m <- est_data |> model(market = TSLM(formula = as.formula(market_formula))) 
+    obs_data <- all_data |> filter(BankName == bankname, Quarter > trained_qtr)  
+    
+    #model trained on estimation data
+    forecasts <- bank_model$BankModel |>
+                  forecast(new_data = obs_data, bootstrap=TRUE, times = 5000)
 
-  fcast <- m |>
-    forecast(new_data= obs_data) #, bootstrap=TRUE, times = 5000)
-  
-  original_scale(fcast, all_data) |> add_column(Partner = partner) |> 
-    mutate(Period = -(n() - row_number() + 1))
+    final_df <- original_scale(forecasts, all_data) |> add_column(Partner = partner)
+    if (type == "post") {
+      final_df <- final_df |> filter(Quarter >= event_qtr & Quarter < event_qtr + 6) 
+    }
+    if (type == "pre") {
+      final_df <- final_df |> filter(Quarter < event_qtr) |> mutate(Period = -(n() - row_number() + 1)) 
+    }
+    final_df
+
+  }, error = function(e) {
+    print(glue::glue("prediction error for {bankname}: {e}"))
+    NULL
+  })
 }
 
 partner_banks <- credit_card.partnerships.long()
-market_formula <- "UBPRE524.diff ~ UBPRE524.group.log.diff"
-m_table <- estimation_data |> fill_gaps() |> model(tslm = TSLM(as.formula(market_formula)))
+arima_results <- read_arima_results() |> filter(BankName %in% unique(observation_data$BankName))
 
-result <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, all_data, m_table) |> 
-          list_rbind() |> left_join(all_data |> dplyr::select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter) ) |> as_tibble() |> dplyr::select(Partner, BankName, Quarter, observed, predicted)    
+###### get prediction for Period current + 8 quarters after event###################
+models_post_event <- partner_banks |> 
+                      mutate(model_details = map2(Bank, Partner, best_arima_model, all_data, arima_results))
 
-result_history <- map2(partner_banks$Bank, partner_banks$Partner, get_pre_prediction, all_data) |>
-          list_rbind() |> left_join( all_data |> dplyr::select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter) ) |> as_tibble() |> dplyr::select(Period, Partner, BankName, Quarter, observed, predicted)    
-          
-map2(partner_banks$Bank, partner_banks$Partner, plot_prediction_and_history, result,result_history, all_data) 
+result_post <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, all_data, models_post_event) |> 
+          list_rbind() |> as_tibble() |> left_join(all_data |> dplyr::select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter))  |> dplyr::select(Partner, BankName, Quarter, observed, predicted, .model)                         
+###### end get prediction for Period current + 6 quarters after event###################
+
+#### get prediction for Period - 6 quarters before event ###################|>filter(grepl("BARCLAY|CITIBANK", BankName))
+models_pre_event <- partner_banks  |>
+                      mutate(model_details = map2(Bank, Partner, best_arima_model, all_data, arima_results, -6))
+
+result_pre <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, all_data, models_pre_event, type="pre") |> 
+          list_rbind() |> as_tibble() |> left_join(all_data |> dplyr::select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter))  |> dplyr::select(Partner, BankName, Quarter, observed, predicted,.model) 
+
+#### end get prediction for Period - 8 quarters before event ###################
+         
+map2(partner_banks$Bank, partner_banks$Partner, plot_prediction_and_history, result_post,result_pre, all_data) 
+
+
 
 ```
 
@@ -124,8 +140,8 @@ map2(partner_banks$Bank, partner_banks$Partner, plot_prediction_and_history, res
 #| tbl-subcap: 
 #| - "Pre Event"
 #| - "Post Event"
-print_ar(result_history, "Costco", "AMERICAN EXPRESS NATIONAL BANK (1394676)") 
-print_ar(result, "Costco", "AMERICAN EXPRESS NATIONAL BANK (1394676)")
+print_ar(result_pre, "Costco", "AMERICAN EXPRESS NATIONAL BANK (1394676)") 
+print_ar(result_post, "Costco", "AMERICAN EXPRESS NATIONAL BANK (1394676)")
 ```
 
 
@@ -137,8 +153,8 @@ print_ar(result, "Costco", "AMERICAN EXPRESS NATIONAL BANK (1394676)")
 #| tbl-subcap: 
 #| - "Pre Event"
 #| - "Post Event"
-print_ar(result_history, "Costco", "CITIBANK, N.A. (476810)")
-print_ar(result, "Costco", "CITIBANK, N.A. (476810)")
+print_ar(result_pre, "Costco", "CITIBANK, N.A. (476810)")
+print_ar(result_post, "Costco", "CITIBANK, N.A. (476810)")
 ```
 
 ### Walmart - Old Partner SYNCHRONY
@@ -149,8 +165,8 @@ print_ar(result, "Costco", "CITIBANK, N.A. (476810)")
 #| tbl-subcap: 
 #| - "Pre Event"
 #| - "Post Event"
-print_ar(result_history, "Walmart", "SYNCHRONY BANK (1216022)")
-print_ar(result, "Walmart", "SYNCHRONY BANK (1216022)")
+print_ar(result_pre, "Walmart", "SYNCHRONY BANK (1216022)")
+print_ar(result_post, "Walmart", "SYNCHRONY BANK (1216022)")
 ```
 ### Walmart - New Partner CAPITAL ONE
 ```{r}
@@ -160,8 +176,8 @@ print_ar(result, "Walmart", "SYNCHRONY BANK (1216022)")
 #| tbl-subcap: 
 #| - "Pre Event"
 #| - "Post Event"
-print_ar(result_history, "Walmart", "CAPITAL ONE, NATIONAL ASSOCIATION (112837)")
-print_ar(result, "Walmart", "CAPITAL ONE, NATIONAL ASSOCIATION (112837)")
+print_ar(result_pre, "Walmart", "CAPITAL ONE, NATIONAL ASSOCIATION (112837)")
+print_ar(result_post, "Walmart", "CAPITAL ONE, NATIONAL ASSOCIATION (112837)")
 ```
 
 ### GAP - Old Partner SYNCHRONY 
@@ -172,8 +188,8 @@ print_ar(result, "Walmart", "CAPITAL ONE, NATIONAL ASSOCIATION (112837)")
 #| tbl-subcap: 
 #| - "Pre Event"
 #| - "Post Event"
-print_ar(result_history, "GAP", "SYNCHRONY BANK (1216022)")
-print_ar(result, "GAP", "SYNCHRONY BANK (1216022)")
+print_ar(result_pre, "GAP", "SYNCHRONY BANK (1216022)")
+print_ar(result_post, "GAP", "SYNCHRONY BANK (1216022)")
 ```
 
 ### GAP - New Partner BARCLAYS BANK 
@@ -184,7 +200,7 @@ print_ar(result, "GAP", "SYNCHRONY BANK (1216022)")
 #| tbl-subcap: 
 #| - "Pre Event"
 #| - "Post Event"
-print_ar(result_history, "GAP", "BARCLAYS BANK DELAWARE (2980209)")
-print_ar(result, "GAP", "BARCLAYS BANK DELAWARE (2980209)")
+print_ar(result_pre, "GAP", "BARCLAYS BANK DELAWARE (2980209)")
+print_ar(result_post, "GAP", "BARCLAYS BANK DELAWARE (2980209)")
 ```
 

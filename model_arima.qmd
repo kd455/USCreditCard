@@ -24,36 +24,6 @@ print_top_bank_model <- function(fuzzy_bankname, arima_results, score_by = "AICc
           rmarkdown::paged_table()
 }
 
-diff_results <- function(data) {
-  if("UBPRE524.Value" %in% names(data)) {
-    data |> 
-        mutate(UBPRE524.diff = difference(UBPRE524.Value),
-                .fitted = difference(.fitted),
-                .resid = difference(.fitted)) |> drop_na(UBPRE524.diff) |> 
-          dplyr::select(-UBPRE524.Value) |> relocate(UBPRE524.diff, .before = .fitted)
-  } else {
-    data
-  }
-}
-
-best_bank_model <- function(bankname, estimation_data, arima_results, score_by = "AICc") {
-  results <- arima_results |> filter(BankName == bankname) |> arrange(!!as.name(score_by))
-  aicc <- results |> pluck(score_by, 1) |> round(2)
-  model_name <- as.name(results$.model[1])
-  formula <- eval(as.name(results$.model[1]))
-  if (class(formula) == "character") {
-    formula <- as.name(formula)
-  }  
-  model <- estimation_data |> 
-            filter(BankName == bankname) |> 
-              drop_na(UNRATE.log.diff.lag1) |>
-                model(!!model_name := ARIMA(!!formula))
-
-  augmented_data <- model |> augment()|> diff_results() |> as_tibble()
-
-  list(Bank = bankname, BankModel = model, Name = model_name,  AICc = aicc, Formula = formula, Augmented = augmented_data)
-}  
-
 print_coeff <- function(fuzzy_bankname, bank_models) {
   bank_model <- bank_models |> 
                   filter(grepl(fuzzy_bankname,bank)) |> pluck("model_details",1)
@@ -75,6 +45,7 @@ data <- model_data$all_data
 estimation_data <- model_data$estimation_data |> tsibble::fill_gaps()
 observation_data <- model_data$observation_data
 partner_banks <- credit_card.partnerships.long()
+
 
 ```
 
@@ -139,10 +110,6 @@ portfolio1 <- as.formula("UBPRE524.Value ~ UBPRB538.pct_change + UBPRB538.pct_ch
 portfolio2 <- as.formula("UBPRE524.Value ~ UBPRB538.log.diff + UBPRB538.log.diff.lag1")
 portfolio3 <- as.formula("UBPRE524.Value ~ UBPRB538.log.diff + UBPRB538.log.diff.lag1 + UBPR3815.log.diff")
 portfolio4 <- as.formula("UBPRE524.Value ~ UBPRB538.log.diff + UBPR3815.log.diff")
-
-#Group Trend
-group1 <- as.formula("UBPRE524.Value ~ UBPRE524.all.log.diff + UBPRE524.group.log.diff")
-group2 <- as.formula("UBPRE524.Value ~ UBPRE524.group.log.diff")
 
 # Combinations (use Auto ARIMA)
 comb1 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1")
@@ -226,16 +193,8 @@ run_arima <- function(estimation_data) {
 
   save_arima_results(m_table4, get_model_cols(m_table4, key_vars(estimation_data)),glue("arima_portfolio_results.csv"))
 
-  ## 5. Group
-  m_table5 <- estimation_data |> 
-              model(
-                  group1 = ARIMA(group1),
-                  group2= ARIMA(group2)
-              )
-
-  save_arima_results(m_table5, get_model_cols(m_table5, key_vars(estimation_data)),glue("arima_group_results.csv"))
-
-  ## 6. Combinations
+ 
+  ## 5. Combinations
   m_table6 <- estimation_data |> 
               model(
                   comb1= ARIMA(comb1),
@@ -247,7 +206,7 @@ run_arima <- function(estimation_data) {
 
   save_arima_results(m_table6, get_model_cols(m_table6, key_vars(estimation_data)),glue("arima_other_results.csv"))
 
-  ## 7. Manual
+  ## 6. Manual
   m_table7 <- estimation_data |> 
               model(
                   manual1= ARIMA(manual1),
@@ -284,8 +243,8 @@ We can see that for our sub-set of banks the top models are very different.
 #| label: tbl-arima-citi-aic
 #| tbl-cap: "Ordered Top 10 Best-Worst model by AICc"
 arima_results <- read_arima_results() 
-best_bank_models <- tibble(bank = unique(estimation_data$BankName)) |> 
-                      mutate(model_details = lapply(bank, best_bank_model, estimation_data, arima_results))
+best_bank_models <- partner_banks  |>
+                      mutate(model_details = map2(Bank, Partner, best_arima_model, data, arima_results))
                       
 bank = "CITIBANK"
 print_top_bank_model(bank, arima_results)
@@ -369,11 +328,11 @@ print_coeff(bank, best_bank_models)
 #| fig-height: 10
 bank_aug_data <- best_bank_models |> 
                   mutate(augdata = map(model_details, ~ .x$Augmented)) |> unnest(augdata) |> 
-                    dplyr::select(BankName:last_col()) 
+                    dplyr::select(Partner, BankName:last_col()) 
 
 bank_aug_data |> 
   filter(BankName %in% observation_data$BankName) |> 
-    as_tsibble(index = Quarter, key=c(BankName)) |> plot_model_fit("UBPRE524.diff")
+    as_tsibble(index = Quarter, key=c(BankName, Partner)) |> plot_model_fit("UBPRE524.diff")
              
 ```
 
@@ -448,7 +407,7 @@ Banks not listed have residuals that are indistinguishable from a white noise se
 #| warning: false
 #| label: tbl-lb-arima
 #| tbl-cap: Ljung–Box results where P-value < Significance Level of 0.05
-bank_aug_data  |> as_tsibble(index=Quarter, key = BankName) |>
+bank_aug_data  |> as_tsibble(index=Quarter, key = c(BankName, Partner)) |>
   features(.innov, ljung_box) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> 
     filter(lb_pvalue <= 0.05)|> dplyr::select(BankName,lb_stat,lb_pvalue) |>
       rmarkdown::paged_table()
@@ -474,7 +433,7 @@ bank_models$model |> map(fabletools::accuracy) |> list_rbind() |> readr::write_c
 
 # Timeseries CV 
 
-do_arima_cv <- function(bankname, formulas, estimation_data, init = 5) {    
+do_arima_cv <- function(bankname, formulas, estimation_data, init = 7) {    
   tryCatch({  
     selected_formula <- formulas |> filter(bank == bankname) |> pluck("formula",1)
     
@@ -537,25 +496,33 @@ val_results$tbl3 |> rmarkdown::paged_table()
 #| fig-keep: all
 #| label: fig-pred-observed-arima
 #| fig-cap: "Prediction vs. Observed Event"
-get_prediction <- function(Bank, Partner, all_data, models) {
+get_prediction <- function(bankname, partner, all_data, models) {
   tryCatch({
-    bank_data <- all_data |> filter(BankName == Bank)
-    event_data <- bank_data |> filter(!!as.name(Partner) >=0) |> head(8)   
+    event_qtr <- all_data |>
+                    filter(BankName == bankname,
+                           !!as.name(partner) ==0) |> pull(Quarter)
     bank_model <- models |> 
-                    filter(bank == Bank)|> pluck("model_details",1)
-  
-    forecasts <- bank_model$BankModel |>
-      forecast(new_data = event_data, bootstrap=TRUE, times = 1000)
+                    filter(Bank == bankname,
+                           Partner == partner)|> pluck("model_details",1)
+    
+    trained_qtr <- bank_model$Augmented |> filter(Quarter == max(Quarter)) |> pull(Quarter)
 
-    original_scale(forecasts, all_data) |> add_column(Partner = Partner)
+    obs_data <- all_data |> filter(BankName == bankname, Quarter > trained_qtr)  
+    
+    #model trained on estimation data
+    forecasts <- bank_model$BankModel |>
+                  forecast(new_data = obs_data, bootstrap=TRUE, times = 5000)
+
+    original_scale(forecasts, all_data) |> add_column(Partner = partner) |> filter(Quarter >= event_qtr & Quarter < event_qtr + 7)    
+
   }, error = function(e) {
-    print(glue::glue("prediction error for {Bank}: {e}"))
+    print(glue::glue("prediction error for {bankname}: {e}"))
     NULL
   })
 }
 
 result <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, data, best_bank_models) |>
-            list_rbind() |> left_join(data |> dplyr::select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter) ) |> as_tibble() |> dplyr::select(Partner,BankName, Quarter, observed, predicted) |> mutate(AR = abs(observed) -abs(predicted))
+            list_rbind() |> left_join(data |> dplyr::select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter) ) |> as_tibble() |> dplyr::select(Partner,BankName, Quarter, observed, predicted, .model) |> mutate(AR = abs(observed) -abs(predicted))
 
 map2(partner_banks$Bank, partner_banks$Partner, plot_prediction, result, data) 
 

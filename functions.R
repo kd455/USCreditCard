@@ -312,13 +312,16 @@ bank_type.desc <- function() {
 bank_type.colours <- function() {
   c(LargeBank = "#1B9E77", 
                     "LargeBank/Before" = "#1B9E77", 
-                    "LargeBank/After" = "#1B9E77", 
+                    "LargeBank/After" = "#1B9E77",
+                    "LargeBank/Between" = "#1B9E77",
                     LargeCreditCardBank = "#D95F02",
                     "LargeCreditCardBank/Before" = "#D95F02", 
                     "LargeCreditCardBank/After" =  "#D95F02", 
+                    "LargeCreditCardBank/Between" =  "#D95F02", 
                     OtherBank = "#999999",
                     "OtherBank/Before" = "#999999",
-                    "OtherBank/After" = "#999999")
+                    "OtherBank/After" = "#999999",
+                    "OtherBank/Between" = "#999999")
 } 
 
 feature_data <- function(data, feature_names) {
@@ -341,11 +344,11 @@ feature_prcomp <- function(f_data) {
 pcs.plot <- function(pcs) {
   pcs |>
         ggplot(aes(x = .fittedPC1, y = .fittedPC2, colour = BankType)) +
-        geom_point(size = 5) +
+        geom_point(size = 5) +theme_bw() +
         theme(aspect.ratio = 1,plot.title = element_markdown()) +
         labs(subtitle = "US Credit Cards 30-89 days",
             x = "PC1",
-            y = "PC2")+ theme(legend.position="none")   + 
+            y = "PC2") +theme_bw() + theme(legend.position="none")   + 
         scale_colour_manual(values = bank_type.colours())
 }
 
@@ -353,7 +356,7 @@ features.plot_violin <-function(data, feature_name) {
   data |>
     ggplot(aes(x = BankType, y = !!as.name(feature_name))) +
                 geom_violin(trim = FALSE) +
-                geom_boxplot(width = 0.1, fill = "white") + 
+                geom_boxplot(width = 0.1, fill = "white") +theme_bw()+ 
                 theme_light() +
                 labs(x = "", y = "")
 }
@@ -372,7 +375,7 @@ outlier.plot <- function(data, pca_output, P1_lower, P1_upper, P2_lower, P2_uppe
       filter(IDRSSD %in% outliers$IDRSSD) |>
       ggplot(aes(x = Quarter, y = !!as.name(value_name), col = BankName)) +
       geom_line() +
-      facet_wrap(~BankName, ncol = 1) +
+      facet_wrap(~BankName, ncol = 1)+theme_bw() +
       theme(legend.position = "none")  +
       labs(subtitle = glue("Outliers: {P1_lower} < PC1 < {P1_upper}, {P2_lower} < PC2 < {P2_upper}"),
            y = paste0(credit_card.target_label(), "\n", value_name)) +
@@ -441,7 +444,7 @@ partnership.plot <- function(Partner, Old, New, Acquired, Available, selected_me
     filter_index(as.character(from_date) ~ as.character(to_date)) |>
     autoplot(!!as.name(value_name), aes(colour = group_column)) +
     scale_colour_manual(values = group.colours) +
-    facet_wrap(~ Description, scales = "free", ncol=1) +
+    facet_wrap(~ Description, scales = "free", ncol=1) +theme_bw() +
     theme(legend.position = "none",
           plot.title = element_markdown(),
           strip.text = element_text(size = 12))  +
@@ -514,7 +517,7 @@ plot_us_category <- function(category, measures, target_data, target_measure = "
         filter(Category == category) |>
         mutate(comb_label = paste(name, "-", Desc, "(", Formula, ")")) |>
         ggplot(aes(x = Quarter, y = value, colour = comb_label)) + 
-        geom_line() +
+        geom_line() +theme_bw() +
         theme(legend.direction = "vertical",legend.position = "top", legend.title=element_blank(),
               plot.title = element_markdown(size = 12),
               plot.subtitle = element_text(size = 9)) +
@@ -738,6 +741,8 @@ get_model_data <- function() {
                        BankName = as.factor(BankName)) |>
                        relocate(Qtr)
 
+  all_data <- all_data |> filter_index("2011 Q3" ~ .)
+
   estimation_data <- all_data |> 
                       filter(is.na(Partnership)) |> 
                         dplyr::select(-c(Partnership:last_col())) |>
@@ -766,7 +771,7 @@ plot_cc_measures <- function(bank_fuzzy, data, ubpr_labels) {
    mutate(Description = paste(display_order, Description)) |>
    ggplot(aes(x = Quarter, y =value, colour = UBPR_Code)) + 
    geom_line() + 
-   labs(y='') +
+   labs(y='') +theme_bw()+
    theme(legend.position = "none") +
    facet_wrap(~Description, scales = "free_y", ncol=1)
 }
@@ -774,8 +779,10 @@ plot_cc_measures <- function(bank_fuzzy, data, ubpr_labels) {
 plot_model_fit <- function (data, target_name) {
   data |>
     autoplot(!!as.name(target_name), color = "darkgrey") + 
-        geom_line(aes(y = .fitted, color = "#D55E00")) + facet_wrap(~BankName+BankType+.model, ncol = 1) +
-        labs(title = "<span style='color:#D55E00'>Fitted</span> vs. <span style='color:darkgrey'>Observed</span>") +
+        geom_line(aes(y = .fitted, color = "#D55E00")) + 
+        facet_wrap(~BankName+BankType+.model, ncol = 1) +
+        labs(title = "<span style='color:#D55E00'>Fitted</span> vs. <span style='color:darkgrey'>Observed</span>") + 
+        theme_bw() +
         theme(legend.position = "none", plot.title = element_markdown(),plot.subtitle = element_markdown())
 }
 
@@ -818,17 +825,23 @@ plot_prediction <- function(bank, partner, fcasts, all_data) {
 
     fcast_data |> 
     ggplot()  + 
-    geom_line(aes(x = Quarter, y=predicted), color= "red") +
+    geom_line(aes(x = Quarter, y=predicted, color = "Post")) + facet_wrap(~.model) +
     geom_line(aes(x = Quarter, y=UBPRE524.Value), data = comb_data, color='darkslategrey',linetype = "longdash") + 
     geom_vline(xintercept = as.Date(min_qtr) , linetype=1,color="grey") +
-    labs(title = bank, subtitle = partner, y = credit_card.target_label())   
+    labs(title = bank, subtitle = partner, y = credit_card.target_label())  +    
+    theme_bw() + theme(legend.position = "none")
 }
 
 plot_prediction_and_history <- function(bank, partner, fcasts, hcasts, all_data) {
   bank_hcast_data <- hcasts |> filter(BankName == bank) |> filter(Partner == partner) 
   
   plot_prediction(bank, partner, fcasts, all_data) + 
-    geom_line(aes(x = Quarter, y=predicted), data = bank_hcast_data, color= "darkblue")
+    geom_line(aes(x = Quarter, y=predicted, color = "Pre"), 
+              data = bank_hcast_data) +
+    scale_color_manual( 
+      values = c("Pre" = "blue", "Post" = "red"),
+      labels = c("Pre" = "Predictions Pre Event", "Post" = "Predictions Post Event")) +                  
+    theme(legend.direction = "vertical",legend.position = "top", legend.title = element_blank())
 }
 
 original_scale <- function(fcast_bank_data, all_data, col_name = ".mean") {
@@ -918,12 +931,13 @@ get_summary_validation.xgboost <- function(model_name, banks, include_model_name
 }
 
 get_summary_validation.arima <- function(banks, include_model_name = FALSE) {
-  cv_results_est <- readr::read_csv("data/results/estimate_arima_metrics.csv",show_col_types = FALSE) |> mutate(across(where(is.numeric), \(x) round(x,4))) |> 
-  dplyr::select(BankName, BankType, .type, RMSE, MAE)
+  cv_results_est <- readr::read_csv("data/results/estimate_arima_metrics.csv",show_col_types = FALSE) |> 
+    group_by(.type,BankName,BankType) |> 
+    summarise(across(where(is.numeric), \(x) median(x, na.rm = TRUE))) |> 
+    dplyr::select(BankName, BankType, .type, RMSE, MAE)
 
   cv_results_test <- read_tscv_results("arima") |> group_by(.type,BankName,BankType) |> 
-    summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
-    mutate(across(where(is.numeric), \(x) round(x,4))) |> 
+    summarise(across(where(is.numeric), \(x) median(x, na.rm = TRUE))) |> 
     dplyr::select(BankName, BankType, .type, RMSE, MAE) |> mutate(.type = "CV") 
     
   comb <- bind_rows(cv_results_est, cv_results_test) 
@@ -933,13 +947,11 @@ get_summary_validation.arima <- function(banks, include_model_name = FALSE) {
 get_summary_validation.market <- function(banks, include_model_name = FALSE) {
   cv_results_est <- readr::read_csv("data/results/estimate_market_metrics.csv",show_col_types = FALSE) |> 
   dplyr::select(-.model) |>
-  mutate(across(where(is.numeric), \(x) round(x,4))) |> 
   dplyr::select(BankName, BankType, .type, RMSE, MAE)
 
   cv_results_test <-readr::read_csv("data/results/estimate_tscv_market_metrics.csv",show_col_types = FALSE) |> 
     dplyr::select(-.model) |>
-    mutate(across(where(is.numeric), \(x) round(x,4))) |> 
-      dplyr::select(BankName, BankType, .type, RMSE, MAE) |> mutate(.type = "CV")
+    dplyr::select(BankName, BankType, .type, RMSE, MAE) |> mutate(.type = "CV")
         
   comb <- bind_rows(cv_results_est, cv_results_test) 
   get_summary_validation(comb, banks, "market", include_model_name)
@@ -950,7 +962,7 @@ get_summary_validation.hierarchy <- function(banks, include_model_name = FALSE) 
   dplyr::select(BankName, BankType, .type, RMSE, MAE)
 
   cv_results_test <- read_tscv_results("hier") |> group_by(.type,BankName, BankType) |> 
-    summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
+    summarise(across(where(is.numeric), \(x) median(x, na.rm = TRUE))) |> 
     mutate(across(where(is.numeric), \(x) round(x,4))) |> 
     dplyr::select(BankName, BankType, .type, RMSE, MAE) |> mutate(.type = "CV") 
     
@@ -964,15 +976,15 @@ get_summary_validation <- function(data, banks, model_name, include_model_name =
                     arrange(BankName,.type) |> mutate(across(where(is.numeric), \(x) round(x,3)))
 
   summary_mean_banks <- data |> filter(!is.null(banks) &BankName %in% banks) |> 
-                          group_by(.type) |> summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |>
+                          group_by(.type) |> summarise(across(where(is.numeric), \(x) median(x, na.rm = TRUE))) |>
                           mutate(across(where(is.numeric), \(x) round(x,3)))
                             
   summary_mean_all <- data |> group_by(.type) |> 
-                        summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
+                        summarise(across(where(is.numeric), \(x) median(x, na.rm = TRUE))) |> 
                         mutate(across(where(is.numeric), \(x) round(x,3)))
 
   summary_mean_type <- data |> group_by(BankType, .type) |> 
-                        summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) |> 
+                        summarise(across(where(is.numeric), \(x) median(x, na.rm = TRUE))) |> 
                         mutate(across(where(is.numeric), \(x) round(x,3)))
 
   if (include_model_name) {
@@ -983,3 +995,92 @@ get_summary_validation <- function(data, banks, model_name, include_model_name =
   }
   list(tbl1 = summary_banks, tbl2 = summary_mean_banks, tbl3 = summary_mean_all, tbl4 = summary_mean_type)
 }
+
+best_arima_model <- function(bankname, partner, all_data, arima_results, add_minus_qtr = 0, score_by = "AICc") {
+  results <- arima_results |> filter(BankName == bankname) |> arrange(!!as.name(score_by))
+  aicc <- results |> pluck(score_by, 1) |> round(2)
+  model_name <- as.name(results$.model[1])
+  formula <- eval(as.name(results$.model[1]))
+  if (class(formula) == "character") {
+    formula <- as.name(formula)
+  }  
+
+  estimation_data <- all_data |> 
+                      filter(BankName == bankname, 
+                            is.na(!!as.name(partner))) |>
+                        filter(Quarter <= max(Quarter) + add_minus_qtr) 
+  
+  model <- estimation_data |>              
+              model(!!model_name := ARIMA(!!formula))
+
+  augmented_data <- model |> augment()|> diff_arima_results() |> as_tibble()
+
+  list(Bank = bankname, Partner = partner, BankModel = model, Name = model_name,  AICc = aicc, Formula = formula, Augmented = augmented_data)
+}  
+
+diff_arima_results <- function(data) {
+  if("UBPRE524.Value" %in% names(data)) {
+    data |> 
+        mutate(UBPRE524.diff = difference(UBPRE524.Value),
+                .fitted = difference(.fitted),
+                .resid = difference(.fitted)) |> drop_na(UBPRE524.diff) |> 
+          dplyr::select(-UBPRE524.Value) |> relocate(UBPRE524.diff, .before = .fitted)
+  } else {
+    data
+  }
+}
+
+
+arima  <- "UBPRE524.Value"
+
+# Real Advance Retail and Food Services Sales per capita
+rrsfs1 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff")
+rrsfs2 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff.lag1")
+rrsfs3 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1")
+rrsfs4 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + RRSFS.Pop.log.diff.lag2")
+rrsfs5 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + RRSFS.Pop.log.diff.lag2 + RRSFS.Pop.log.diff.lag3")
+
+# Unemployment Rate
+unrate1 <- as.formula("UBPRE524.Value ~ UNRATE.log.diff")
+unrate2 <- as.formula("UBPRE524.Value ~ UNRATE.log.diff.lag1")
+unrate3 <- as.formula("UBPRE524.Value ~ UNRATE.log.diff + UNRATE.log.diff.lag1")
+unrate4 <- as.formula("UBPRE524.Value ~ UNRATE.log.diff + UNRATE.log.diff.lag1 + UNRATE.log.diff.lag2")
+unrate5 <- as.formula("UBPRE524.Value ~ UNRATE.log.diff + UNRATE.log.diff.lag1 + UNRATE.log.diff.lag2 + UNRATE.log.diff.lag3")
+
+# Consumer Debt Service Payments as a Percent of Disposable Personal Income
+debt1 <- as.formula("UBPRE524.Value ~ CDSP.log.diff")
+debt2 <- as.formula("UBPRE524.Value ~ CDSP.log.diff.lag1")
+debt3 <- as.formula("UBPRE524.Value ~ CDSP.log.diff + CDSP.log.diff.lag1")
+debt4 <- as.formula("UBPRE524.Value ~ CDSP.log.diff + CDSP.log.diff.lag1 + CDSP.log.diff.lag2")
+debt5 <- as.formula("UBPRE524.Value ~ CDSP.log.diff + CDSP.log.diff.lag1 + CDSP.log.diff.lag2 + CDSP.log.diff.lag3")
+
+# Household Debt Service Payments as a Percent of Disposable Personal Income
+debth1 <- as.formula("UBPRE524.Value ~ TDSP.log.diff")
+debth2 <- as.formula("UBPRE524.Value ~ TDSP.log.diff.lag1")
+debth3 <- as.formula("UBPRE524.Value ~ TDSP.log.diff + TDSP.log.diff.lag1")
+debth4 <- as.formula("UBPRE524.Value ~ TDSP.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2")
+debth5 <- as.formula("UBPRE524.Value ~ TDSP.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 + TDSP.log.diff.lag3")
+
+# Loans to Individuals for Household, Family, and Other Personal Expenditures:Credit Cards
+portfolio1 <- as.formula("UBPRE524.Value ~ UBPRB538.pct_change + UBPRB538.pct_change.lag1")
+portfolio2 <- as.formula("UBPRE524.Value ~ UBPRB538.log.diff + UBPRB538.log.diff.lag1")
+portfolio3 <- as.formula("UBPRE524.Value ~ UBPRB538.log.diff + UBPRB538.log.diff.lag1 + UBPR3815.log.diff")
+portfolio4 <- as.formula("UBPRE524.Value ~ UBPRB538.log.diff + UBPR3815.log.diff")
+
+# Combinations (use Auto ARIMA)
+comb1 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1")
+comb2 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UNRATE.log.diff + UNRATE.log.diff.lag1")
+comb3 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UNRATE.log.diff + UNRATE.log.diff.lag1 + UNRATE.log.diff.lag2")
+comb4 <- as.formula("UBPRE524.Value ~ RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.log.diff")
+comb5 <- as.formula("UBPRE524.Value ~ CDSP.log.diff + CDSP.log.diff.lag1 + UBPRB538.log.diff")
+
+# Combinations (don't use Auto ARIMA)
+manual1 <- as.formula("UBPRE524.diff ~ 1 + RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(0,0,0)")
+manual2 <- as.formula("UBPRE524.diff ~ 1 + RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)")
+manual3 <- as.formula("UBPRE524.diff ~ 1 + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(0,0,0)")
+manual4 <- as.formula("UBPRE524.diff ~ 1 + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)")
+manual5 <- as.formula("UBPRE524.diff ~ 1 + CDSP.log.diff + CDSP.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(0,0,0)")
+manual6 <- as.formula("UBPRE524.diff ~ 1 + CDSP.log.diff + CDSP.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)")
+manual7 <- as.formula("UBPRE524.diff ~ 1 + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(0,0,0)")
+manual8 <- as.formula("UBPRE524.diff ~ 1 + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)")
+manual9 <- as.formula("UBPRE524.diff ~ 1 + TDSP.log.diff + B069RC1.Pop.CPI.log.diff.lag1 + UBPRB538.log.diff.lag2 + UBPRB538.log.diff.lag3 + UBPR3815.log.diff + RRSFS.Pop.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)")

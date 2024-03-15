@@ -3,13 +3,9 @@
 
 ## Objectives {#objectives}
 
-This project focuses on the US credit card market and whether, using
-publicly available data, we can independently assess Bank's credit card partnership deals.
+This project focuses on the US credit card market and whether, using publicly available data, we can independently assess Bank's credit card partnership deals.
 
-Structurally, the US credit card market is split between 'bank branded'
-(\~60%) and partnership cards (\~40%). Partnership cards e.g., with
-Cosco, GAP, American Airlines etc. typically reward borrowers with
-benefits such as points, services and discounts.
+Structurally, the US credit card market is split between *bank branded* and *partnership cards* (also known as *co-branded* cards). Partnership cards e.g., with Cosco, GAP, American Airlines etc. typically reward borrowers with benefits such as points, services and discounts. Each credit card partnership is unique, for example, the card may be a general purpose credit or restricted to one retailer or retail group [@cfpb2021].
 
 -   **Hypotheses 1**: Adding a partnership with lower FICO® Score
     cutoff reduces the Bank's overall credit card portfolio quality.
