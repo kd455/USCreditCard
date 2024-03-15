@@ -1,0 +1,55 @@
+---
+title: "Untitled"
+format: html
+---
+
+```{r}
+source("functions.R")
+
+peer_df <- dplyr::bind_rows(
+            readr::read_delim("data/CDR-UBPR_RT6_PEERGROUP_201_2023_12_31.txt", skip=5,show_col_types = FALSE) |> tibble::add_column(Peer = 201),
+            readr::read_delim("data/CDR-UBPR_RT6_PEERGROUP_1_2023_12_31.txt", skip=5,show_col_types = FALSE) |> tibble::add_column(Peer = 201)
+            ) |> mutate(Name = trimws(Name)) 
+
+tccp <- readxl::read_xlsx("data/cfpb_tccp-data_2022-07-01_2022_12-31.xlsx", skip = 9) |> mutate(BankName = trimws(`Institution Name`)) |> relocate(BankName) |>
+    mutate(BankName = case_when(
+                  BankName == "SYNCHRONY FINANCIAL" ~ "SYNCHRONY BANK",
+                  BankName == "MERRICK BANK CORPORATION" ~ "MERRICK BANK",
+                  BankName == "PNC Bank N.A." ~ "PNC BANK, NATIONAL ASSOCIATION",              
+                  BankName == "BMO HARRIS BANK NATIONAL ASSOCIATION" ~  "BMO BANK NATIONAL ASSOCIATION",      
+                 .default = BankName
+            ))
+
+final_tccp <- peer_df |> left_join(tccp, by = join_by(Name == BankName)) |> 
+                mutate(BankName = paste0(Name, " (", `ID RSSD`, ")") ) |> 
+                    relocate(BankName) |> 
+                    rename(TargetTiers = `Targeted Credit Tiers`) |>
+                        separate_wider_delim(TargetTiers," ",names = "LowestTier", too_many = "drop") 
+
+tccp_maxapr <- final_tccp |> dplyr::select(BankName, Partner, LowestTier, contains("Maximum APR")) |> rowwise() %>%
+                mutate(MaxAPR=max(c_across(contains("Maximum APR")), na.rm = TRUE)) |> relocate(MaxAPR) |>
+                na.omit() |> group_by(BankName,Partner, LowestTier) |> summarise(MaxAPR = median(MaxAPR))
+
+model_data <- get_model_data()
+all_data <- model_data$all_data
+
+hier_data <- all_data |> filter_index("2022 Q4" ~ .) |> as_tibble() |> 
+                left_join(tccp_maxapr,by = join_by(BankName),relationship = "many-to-many") |> 
+                drop_na(UBPRE524.diff.lag4) |> 
+                mutate( BankType = as.factor(BankType),
+                        IDRSSD = as.factor(IDRSSD),
+                        BankName = as.factor(BankName),
+                        Qtr = as.factor(quarter(Quarter)),
+                        LowestTier = as.factor(LowestTier)) 
+
+str(hier_data)                        
+
+m <- lmer(UBPRE524.diff ~ Partner +  (1 + Partner | BankType), data = hier_data, REML = FALSE)
+summary(m)
+
+m <- lmer(UBPRE524.diff ~ Partner +  (1 + Partner + MaxAPR | BankType), data = hier_data, REML = FALSE)
+summary(m)
+
+m <- lmer(UBPRE524.diff ~ Partner  + (1  | BankType/LowestTier), data = hier_data, REML = FALSE)
+summary(m)
+```
