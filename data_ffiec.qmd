@@ -68,7 +68,7 @@ The regulations introduced were:
 1. Credit Card Accountability Responsibility and Disclosure (CARD) Act of 2009 which had a staggered implementation in February and August 2010. This Act requires Banks to assess whether a potential borrower has the means to repay. Additionally, high-risk borrowers like those under twenty-one, have additional restrictions. This has led to stricter lending criteria e.g., income and credit history checks [@cfpb2013]. 
 2. Regulation Z, or the Truth in Lending Act (TILA), focuses on ensuring transparency and fairness in lending practices. Banks have to provide full disclosure of the terms and conditions of a loan agreement [@cfpb2010z].
 
-We can see the impact in @fig-regulation which plots a linear trend for *`r target_label`* for each peer group. Based on @fig-regulation-3 there was increasing delinquency for Large Banks and Large Credit Card Banks before regulation, but post regulation the trend has reversed and is now trending down.
+We can see the impact in @fig-regulation which plots a linear trend for *`r target_label`* for each peer group. Based on @fig-regulation-3 there was increasing delinquency for Large Banks and Large Credit Card Banks before regulation, but post regulation the trend has reversed and is now trending down. It does appear that it took banks about a year for the regulatory changes to have an impact. If we take out staring point as 2011 Q3 as in @fig-regulation-4, then the deliquency trend for Large Credit Card Banks is increasing.
 
 For our analysis we will focus on credit card partnerships post regulation as this is more relevant for commenting on future partnership deals. 
 
@@ -80,6 +80,7 @@ For our analysis we will focus on credit card partnerships post regulation as th
 #|   - "Bank Type have different intercepts and data patterns"
 #|   - "Variance pre and post Regulation <br>(i) - CARD Act part 1 (ii) - Regulation Z and (iii) Card Act part 2 <br>The variance for Large Banks and Large Credit Card Banks have reduced post regulatory changes."
 #|   - "Linear trend pre and post Regulation."
+#|   - "Linear trend pre and post 2011 Q3. About a year after CARD Act part 2 was enacted."
 #| layout-ncol: 1
 reg_date_z <- as.Date("2010-07-01")
 reg_date_c1 <- as.Date("2010-02-22")
@@ -91,7 +92,7 @@ overdue30to89 |>
         summarise(val_mean = mean(Value, na.rm=T)) |> 
         autoplot(val_mean, aes(colour=BankType)) +
         geom_smooth(method = "lm", se = FALSE, show.legend = F, linewidth=.5) +    
-        scale_color_manual(values = bank_type.colours())+
+        scale_color_manual(values = bank_type.colours())+theme_bw() +
         theme(legend.position = "top",
                 legend.title=element_blank()) +
         labs(y=glue("{target_label} \n mean"), x="")
@@ -107,7 +108,7 @@ overdue30to89 |>
     geom_vline(xintercept = reg_date_c2,linetype=2,colour="red") +
     annotate("label",label="iii", x=reg_date_c2, y=16.0) +
     labs(y=glue("{target_label} \n variance"), x="") +
-    scale_color_manual(values = bank_type.colours())+
+    scale_color_manual(values = bank_type.colours())+ theme_bw() +
     theme(legend.position = "top", legend.title=element_blank()) 
 
 
@@ -121,8 +122,27 @@ overdue30to89 |>
         scale_color_manual(values = bank_type.colours(), breaks=c("LargeBank","LargeCreditCardBank","OtherBank"))+
         geom_vline(xintercept = reg_date_c1,linetype=2,colour="red")+
         annotate("label",label="CARD Act Part 1 comes into effect", x=reg_date_c1, y=3.5, hjust = - 0.05) +
-        labs(y=glue("{target_label} \n mean"), x="") +
+        labs(y=glue("{target_label} \n mean"), x="") +theme_bw() +
         theme(legend.position = "top", legend.title=element_blank())
+
+new_date <- as.Date("2011-09-30")
+overdue30to89 |> 
+    filter(value_diff <= 23) |>
+    mutate(regulation = case_when(
+                            as.Date(Quarter) < reg_date_c1 ~ 'Before',
+                            as.Date(Quarter) >= new_date ~ 'After', 
+                            .default = "Between" )) |> 
+        group_by(BankType, regulation) |>
+        summarise(val_mean = mean(Value, na.rm=T)) |> 
+        autoplot(val_mean, aes(colour=BankType)) +
+        geom_smooth(method = "lm", se = FALSE, show.legend = F,linewidth=.5) +    
+        scale_color_manual(values = bank_type.colours(), breaks=c("LargeBank","LargeCreditCardBank","OtherBank"))+
+        geom_vline(xintercept = reg_date_c1,linetype=2,colour="red")+
+        annotate("label",label="CARD Act Part 1 comes into effect", x=reg_date_c1, y=3.5, hjust = - 0.05) +
+        geom_vline(xintercept = new_date,linetype=2,colour="blue")+
+        annotate("label",label="+ 1 year after CARD Act Part 2", x=new_date, y=3.25, hjust = - 0.05) +
+        labs(y=glue("{target_label} \n mean"), x="") +theme_bw() +
+        theme(legend.position = "top", legend.title=element_blank())        
 ```
 ## Bank Outliers {#sec-outliers}
 
@@ -264,7 +284,7 @@ final_df <- df_alltypes |>
 #| fig-cap: "Density plot"
 ggplot(final_df, aes(x=Value, colour = BankType))+ 
     geom_density(alpha = .3) +
-    labs(x=target_label) +
+    labs(x=target_label) + theme_bw() +
     theme(legend.position="top",legend.title=element_blank()) +
     scale_color_manual(values = bank_type.colours())
 ```
@@ -410,7 +430,7 @@ In summary, based on exploration of the data we will prepare the data for modell
 
 1. Target measure: *`r target_label`* (UBPRE524).
 2. Banks: *Large Banks* and *Large Credit Card* Banks.
-3. Date Period: from 2010 Q2.
+3. Date Period: from 2010 Q2 or from 2010 Q3 year which is when we see more of a steady state post regulatory change.
 
 ***Removing:***
 
