@@ -66,6 +66,41 @@ plot_us_category("Expenditures",us_measures_qtr, overdue30to89.all, "value.all.m
 plot_us_category("Income & Savings",us_measures_qtr, overdue30to89.all, "value.all.median")
 plot_us_category("Debt",us_measures_qtr, overdue30to89.all, "value.all.median")
 plot_us_category("Economy",us_measures_qtr, overdue30to89.all, "value.all.median")
+
+
+    # measures = us_measures_qtr
+    # target_data = overdue30to89.all 
+    # target_measure = "value.all.median"
+
+    # target_label <-credit_card.target_label()
+    # index_var <- index_var(measures)
+    # recessions <- us_economy.recession() |> 
+    #                 filter(Flag == 1, 
+    #                        Month >= ym("1989-10"))
+    # data <- measures |> drop_na() |>
+    #           mutate(across(!as.name(index_var), scale))
+    # max_y <- max_tstibble(data)     
+
+    # data |>        
+    #     pivot_longer(cols = !Quarter) |>
+    #     left_join(us_economy.labels(), by = join_by(name==Name)) |>
+    #     filter(name %in% c("UNRATE", "TDSP","CDSP")) |>
+    #     mutate(comb_label = paste(name, "-", Desc, "(", Formula, ")")) |>
+    #     ggplot(aes(x = Quarter, y = value, colour = comb_label)) + 
+    #     geom_line() +theme_bw() +
+    #     theme(legend.direction = "vertical",legend.position = "top", legend.title=element_blank(),
+    #           plot.title = element_markdown(size = 12),
+    #           plot.subtitle = element_text(size = 9)) +
+    #     labs(y = "Normalised (Normal=0)",
+    #         title = glue("Macroeconomic measures against median <span style='color:darkred'>**{target_label}**</span>"),
+    #         subtitle = "Recessions shown in boxed area") +     
+    #     geom_rect(data = recessions,inherit.aes = FALSE, 
+    #               aes(xmin = Month, xmax = Month + 30, ymin = -Inf, ymax = Inf), fill = "lightgrey", alpha = 0.5) +
+    #     geom_line(mapping = aes(y = !!as.name(target_measure)), data = target_data,
+    #               colour = 'darkred') +
+    #     geom_vline(xintercept = as.numeric(yq(get_regulation_cutoff())), linetype=3,colour="darkred") +
+    #     annotate("text", x=as.numeric(yq(get_regulation_cutoff())), y=max_y-1, size = 9/.pt, label="Credit Card Regulations",vjust = 0.5, hjust = -0.15, colour = "black") +
+    #     scale_colour_colorblind7()          
 ```
 
 ## Large Bank
@@ -124,10 +159,19 @@ The tables presented below, show the macroeconomic variable and lag (Df column) 
 #| warning: false
 #| error: false
 #| label: tbl-granger-comb
-#| tbl-cap: "Granger Test at Lags 1 to 4 (post regulatory period)"
+#| tbl-cap: Granger Test at Lags 1 to 4
+#| tbl-subcap: 
+#|  - "Post regulatory period"
+#|  - "Pre-pandemic post regulatory period"
 #| layout-ncol: 1
 
 granger_test_permutations(data = overdue30to89.post |> left_join (us_measures_qtr,by = join_by(Quarter)), 
+                            target_col_name = "value.all.median",
+                            exog_names = names(us_measures_qtr),
+                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> dplyr::select(-c(Formula, Category)) |> rmarkdown::paged_table()
+
+
+granger_test_permutations(data = overdue30to89.post |> filter_index(~ "2020") |> left_join (us_measures_qtr,by = join_by(Quarter)), 
                             target_col_name = "value.all.median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> dplyr::select(-c(Formula, Category)) |> rmarkdown::paged_table()
@@ -141,14 +185,20 @@ granger_test_permutations(data = overdue30to89.post |> left_join (us_measures_qt
 #| warning: false
 #| error: false
 #| label: tbl-granger-lb
-#| tbl-cap: "Granger Test at Lags 1 to 4 (post regulatory period)"
-#| layout-ncol: 1
+#| tbl-cap: Granger Test at Lags 1 to 4
+#| tbl-subcap: 
+#|  - "Post regulatory period"
+#|  - "Pre-pandemic post regulatory period"
 
 granger_test_permutations(data = overdue30to89.post.lbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
                             target_col_name = "value.group.median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> dplyr::select(-c(Formula, Category)) |> rmarkdown::paged_table()  
 
+granger_test_permutations(data = overdue30to89.post.lbank |> filter_index(~ "2020") |> left_join (us_measures_qtr,by = join_by(Quarter)), 
+                            target_col_name = "value.group.median",
+                            exog_names = names(us_measures_qtr),
+                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> dplyr::select(-c(Formula, Category)) |> rmarkdown::paged_table()  
 ```
 ## Large Credit Card Bank
 
@@ -156,13 +206,20 @@ granger_test_permutations(data = overdue30to89.post.lbank |> left_join (us_measu
 #| warning: false
 #| error: false
 #| label: tbl-granger-lcb
-#| tbl-cap: "Granger Test at Lags 1 to 4 (post regulatory period)"
-#| layout-ncol: 1
+#| tbl-cap: Granger Test at Lags 1 to 4
+#| tbl-subcap: 
+#|  - "Post regulatory period"
+#|  - "Pre-pandemic post regulatory period"
 
 granger_test_permutations(data = overdue30to89.post.lcbank |> left_join (us_measures_qtr,by = join_by(Quarter)), 
                             target_col_name = "value.group.median",
                             exog_names = names(us_measures_qtr),
                             max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> dplyr::select(-c(Formula, Category)) |> rmarkdown::paged_table()  
+
+granger_test_permutations(data = overdue30to89.post.lcbank |> filter_index(~ "2020") |> left_join (us_measures_qtr,by = join_by(Quarter)), 
+                            target_col_name = "value.group.median",
+                            exog_names = names(us_measures_qtr),
+                            max_lag = 4) |> list_rbind() |> left_join(us_economy.labels(), join_by(exog_variable==Name)) |> dplyr::select(-c(Formula, Category)) |> rmarkdown::paged_table()                              
 
 ```
 
