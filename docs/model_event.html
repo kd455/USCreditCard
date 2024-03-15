@@ -235,7 +235,7 @@ div.csl-indent {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./model_event_summary.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Collated Results</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Overall Results</span></span></a>
   </div>
 </li>
       </ul>
@@ -280,7 +280,6 @@ div.csl-indent {
    
   <ul>
   <li><a href="#sec-data-split" id="toc-sec-data-split" class="nav-link active" data-scroll-target="#sec-data-split"><span class="header-section-number">5.1</span> Estimation and Observation Data</a></li>
-  <li><a href="#sense-check" id="toc-sense-check" class="nav-link" data-scroll-target="#sense-check"><span class="header-section-number">5.2</span> Sense check</a></li>
   </ul>
 </nav>
     </div>
@@ -309,13 +308,7 @@ div.csl-indent {
 <section id="sec-data-split" class="level2" data-number="5.1">
 <h2 data-number="5.1" class="anchored" data-anchor-id="sec-data-split"><span class="header-section-number">5.1</span> Estimation and Observation Data</h2>
 <p>Following the process described by <span class="citation" data-cites="HuntingtonKlein">Huntington-Klein (<a href="references.html#ref-HuntingtonKlein" role="doc-biblioref">2022</a>, chap 17.2.1)</span>, we pick an “estimation period” and an “observation period”.</p>
-<p>The estimation period ends 1 quarter before the acquisition. This is to remove impacts of borrowers potentially anticipating the event. This possibility was speculated in <a href="data_partners.html#sec-partners"><span>Section&nbsp;3.1</span></a> as we saw some fluctuation in credit card measures before the acquisition.</p>
 <p>The observation period chosen is the quarter of the event + 7 quarters after the event. Based on partnership agreement the portfolio can be transferred with delinquent borrowers on day one <span class="citation" data-cites="gap2021">(e.g., <a href="references.html#ref-gap2021" role="doc-biblioref">Barclays 2021</a>)</span> or the impact may be some quarters after the acquisition as borrowers receive and start using their new partner cards. It will take least 30 days to determine if any of these borrowers are delinquent.</p>
-</section>
-<section id="sense-check" class="level2" data-number="5.2">
-<h2 data-number="5.2" class="anchored" data-anchor-id="sense-check"><span class="header-section-number">5.2</span> Sense check</h2>
-<p>The joint test problem arises because we are effectively testing two things: the counterfactual model and the event impact. Consequently, we need an approach to accurately evaluate if our counterfactual model results are credible. One approach suggested by <span class="citation" data-cites="HuntingtonKlein">Huntington-Klein (<a href="references.html#ref-HuntingtonKlein" role="doc-biblioref">2022</a>)</span> is to test using observations where we expect no effect; if there were resulting “abnormal returns” this would point to an issue with the model.</p>
-<p>This is in addition to visual, cross-validation and statistical checks on model fit.</p>
 
 
 <!-- -->
@@ -640,15 +633,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>Following the process described by @HuntingtonKlein <span class="co">[</span><span class="ot">chap 17.2.1</span><span class="co">]</span>, we pick an "estimation period" and an "observation period".</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>The estimation period ends 1 quarter before the acquisition. This is to remove impacts of borrowers potentially anticipating the event. This possibility was speculated in @sec-partners as we saw some fluctuation in credit card measures before the acquisition. </span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>The observation period chosen is the quarter of the event + 7 quarters after the event. Based on partnership agreement the portfolio can be transferred with delinquent borrowers on day one <span class="co">[</span><span class="ot">e.g., @gap2021</span><span class="co">]</span> or the impact may be some quarters after the acquisition as borrowers receive and start using their new partner cards. It will take least 30 days to determine if any of these borrowers are delinquent.</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">## Sense check</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>The joint test problem arises because we are effectively testing two things: the counterfactual model and the event impact. Consequently, we need an approach to accurately evaluate if our counterfactual model results are credible. One approach suggested by @HuntingtonKlein is to test using observations where we expect no effect; if there were resulting "abnormal returns" this would point to an issue with the model.</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>This is in addition to visual, cross-validation and statistical checks on model fit.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>The observation period chosen is the quarter of the event + 7 quarters after the event. Based on partnership agreement the portfolio can be transferred with delinquent borrowers on day one <span class="co">[</span><span class="ot">e.g., @gap2021</span><span class="co">]</span> or the impact may be some quarters after the acquisition as borrowers receive and start using their new partner cards. It will take least 30 days to determine if any of these borrowers are delinquent.</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 

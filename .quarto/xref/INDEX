@@ -1,78 +1,44 @@
 {
   "index.qmd": {
-    "index.html": "183880d1",
-    "index.tex": "facc861f"
+    "index.html": "d7edc357"
   },
   "intro.qmd": {
-    "intro.html": "8b57ac60"
-  },
-  "summary.qmd": {
-    "summary.html": "eeb9a66b"
-  },
-  "references.qmd": {
-    "references.html": "f04167ab"
-  },
-  "simulation.qmd": {
-    "simulation.html": "13c5925e"
-  },
-  "data.qmd": {
-    "data.html": "10d8c9fb"
-  },
-  "Event.qmd": {
-    "Event.html": "a670c01e"
+    "intro.html": "d43c9322"
   },
   "data_ffiec.qmd": {
-    "data_ffiec.html": "eab0e346"
-  },
-  "data_fed.qmd": {
-    "data_fed.html": "c5f41de6"
-  },
-  "event.qmd": {
-    "event.html": "5ab00d1a"
-  },
-  "data_banks.qmd": {
-    "data_banks.html": "915ef759"
+    "data_ffiec.html": "fa528954"
   },
   "data_partners.qmd": {
-    "data_partners.html": "abfc5665"
+    "data_partners.html": "064b3f65"
   },
-  "data_outliers.qmd": {
-    "data_outliers.html": "e3a7e6df"
-  },
-  "model_market.qmd": {
-    "model_market.html": "2fbc92ba"
+  "data_fed.qmd": {
+    "data_fed.html": "c9222924"
   },
   "model_event.qmd": {
-    "model_event.html": "85b8a7a0"
+    "model_event.html": "69581a69"
+  },
+  "model_market.qmd": {
+    "model_market.html": "9cde81eb"
   },
   "model_arima.qmd": {
-    "model_arima.html": "79d74325"
-  },
-  "model_ml.qmd": {
-    "model_ml.html": "3c229c88"
+    "model_arima.html": "51cfb86e"
   },
   "model_hierarchy_event.qmd": {
-    "model_hierarchy_event.html": "7682f79c"
+    "model_hierarchy_event.html": "6367ff2d"
   },
-  "data_final_event.qmd": {
-    "data_final_event.html": "9568c716"
+  "model_ml.qmd": {
+    "model_ml.html": "a4e3af30"
   },
   "model_event_summary.qmd": {
-    "model_event_summary.html": "877fb949"
+    "model_event_summary.html": "19c7cf73"
   },
-  "causal.qmd": {
-    "causal.html": "f4cec52f"
+  "references.qmd": {
+    "references.html": "061864a7"
   },
-  "DiD.qmd": {
-    "DiD.html": "b1c84b49"
+  "data_banks.qmd": {
+    "data_banks.html": "7bfba3b9"
   },
-  "fixedeffect.qmd": {
-    "fixedeffect.html": "a7081211"
-  },
-  "model_hierarchy.qmd": {
-    "model_hierarchy.html": "86784be1"
-  },
-  "model_summary.qmd": {
-    "model_summary.html": "787b235b"
+  "data_final_event.qmd": {
+    "data_final_event.html": "6a727ea4"
   }
 }

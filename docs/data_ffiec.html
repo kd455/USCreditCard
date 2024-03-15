@@ -235,7 +235,7 @@ div.csl-indent {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./model_event_summary.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Collated Results</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Overall Results</span></span></a>
   </div>
 </li>
       </ul>
@@ -476,7 +476,7 @@ Note
 <li>Credit Card Accountability Responsibility and Disclosure (CARD) Act of 2009 which had a staggered implementation in February and August 2010. This Act requires Banks to assess whether a potential borrower has the means to repay. Additionally, high-risk borrowers like those under twenty-one, have additional restrictions. This has led to stricter lending criteria e.g., income and credit history checks <span class="citation" data-cites="cfpb2013">(<a href="references.html#ref-cfpb2013" role="doc-biblioref">CFPB 2013</a>)</span>.</li>
 <li>Regulation Z, or the Truth in Lending Act (TILA), focuses on ensuring transparency and fairness in lending practices. Banks have to provide full disclosure of the terms and conditions of a loan agreement <span class="citation" data-cites="cfpb2010z">(<a href="references.html#ref-cfpb2010z" role="doc-biblioref">CFPBb 2023</a>)</span>.</li>
 </ol>
-<p>We can see the impact in <a href="#fig-regulation">Figure&nbsp;<span>2.1</span></a> which plots a linear trend for <em>Credit Card Plans-30-89 DAYS P/D %</em> for each peer group. Based on <a href="#fig-regulation-3">Figure&nbsp;<span>2.1 (c)</span></a> there was increasing delinquency for Large Banks and Large Credit Card Banks before regulation, but post regulation the trend has reversed and is now trending down.</p>
+<p>We can see the impact in <a href="#fig-regulation">Figure&nbsp;<span>2.1</span></a> which plots a linear trend for <em>Credit Card Plans-30-89 DAYS P/D %</em> for each peer group. Based on <a href="#fig-regulation-3">Figure&nbsp;<span>2.1 (c)</span></a> there was increasing delinquency for Large Banks and Large Credit Card Banks before regulation, but post regulation the trend has reversed and is now trending down. It does appear that it took banks about a year for the regulatory changes to have an impact. If we take out staring point as 2011 Q3 as in <a href="#fig-regulation-4">Figure&nbsp;<span>2.1 (d)</span></a>, then the deliquency trend for Large Credit Card Banks is increasing.</p>
 <p>For our analysis we will focus on credit card partnerships post regulation as this is more relevant for commenting on future partnership deals.</p>
 <div>
 <details>
@@ -491,7 +491,7 @@ Note
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">summarise</span>(<span class="at">val_mean =</span> <span class="fu">mean</span>(Value, <span class="at">na.rm=</span>T)) <span class="sc">|&gt;</span> </span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">autoplot</span>(val_mean, <span class="fu">aes</span>(<span class="at">colour=</span>BankType)) <span class="sc">+</span></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">show.legend =</span> F, <span class="at">linewidth=</span>.<span class="dv">5</span>) <span class="sc">+</span>    </span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">bank_type.colours</span>())<span class="sc">+</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">bank_type.colours</span>())<span class="sc">+</span><span class="fu">theme_bw</span>() <span class="sc">+</span></span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>,</span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                <span class="at">legend.title=</span><span class="fu">element_blank</span>()) <span class="sc">+</span></span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">labs</span>(<span class="at">y=</span><span class="fu">glue</span>(<span class="st">"{target_label} </span><span class="sc">\n</span><span class="st"> mean"</span>), <span class="at">x=</span><span class="st">""</span>)</span>
@@ -507,7 +507,7 @@ Note
 <span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> reg_date_c2,<span class="at">linetype=</span><span class="dv">2</span>,<span class="at">colour=</span><span class="st">"red"</span>) <span class="sc">+</span></span>
 <span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">annotate</span>(<span class="st">"label"</span>,<span class="at">label=</span><span class="st">"iii"</span>, <span class="at">x=</span>reg_date_c2, <span class="at">y=</span><span class="fl">16.0</span>) <span class="sc">+</span></span>
 <span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">y=</span><span class="fu">glue</span>(<span class="st">"{target_label} </span><span class="sc">\n</span><span class="st"> variance"</span>), <span class="at">x=</span><span class="st">""</span>) <span class="sc">+</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">bank_type.colours</span>())<span class="sc">+</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">bank_type.colours</span>())<span class="sc">+</span> <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
 <span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>, <span class="at">legend.title=</span><span class="fu">element_blank</span>()) </span>
 <span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
@@ -521,8 +521,27 @@ Note
 <span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">bank_type.colours</span>(), <span class="at">breaks=</span><span class="fu">c</span>(<span class="st">"LargeBank"</span>,<span class="st">"LargeCreditCardBank"</span>,<span class="st">"OtherBank"</span>))<span class="sc">+</span></span>
 <span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> reg_date_c1,<span class="at">linetype=</span><span class="dv">2</span>,<span class="at">colour=</span><span class="st">"red"</span>)<span class="sc">+</span></span>
 <span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>        <span class="fu">annotate</span>(<span class="st">"label"</span>,<span class="at">label=</span><span class="st">"CARD Act Part 1 comes into effect"</span>, <span class="at">x=</span>reg_date_c1, <span class="at">y=</span><span class="fl">3.5</span>, <span class="at">hjust =</span> <span class="sc">-</span> <span class="fl">0.05</span>) <span class="sc">+</span></span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>        <span class="fu">labs</span>(<span class="at">y=</span><span class="fu">glue</span>(<span class="st">"{target_label} </span><span class="sc">\n</span><span class="st"> mean"</span>), <span class="at">x=</span><span class="st">""</span>) <span class="sc">+</span></span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>, <span class="at">legend.title=</span><span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>        <span class="fu">labs</span>(<span class="at">y=</span><span class="fu">glue</span>(<span class="st">"{target_label} </span><span class="sc">\n</span><span class="st"> mean"</span>), <span class="at">x=</span><span class="st">""</span>) <span class="sc">+</span><span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>, <span class="at">legend.title=</span><span class="fu">element_blank</span>())</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>new_date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2011-09-30"</span>)</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>overdue30to89 <span class="sc">|&gt;</span> </span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(value_diff <span class="sc">&lt;=</span> <span class="dv">23</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">regulation =</span> <span class="fu">case_when</span>(</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">as.Date</span>(Quarter) <span class="sc">&lt;</span> reg_date_c1 <span class="sc">~</span> <span class="st">'Before'</span>,</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">as.Date</span>(Quarter) <span class="sc">&gt;=</span> new_date <span class="sc">~</span> <span class="st">'After'</span>, </span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>                            <span class="at">.default =</span> <span class="st">"Between"</span> )) <span class="sc">|&gt;</span> </span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>        <span class="fu">group_by</span>(BankType, regulation) <span class="sc">|&gt;</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>        <span class="fu">summarise</span>(<span class="at">val_mean =</span> <span class="fu">mean</span>(Value, <span class="at">na.rm=</span>T)) <span class="sc">|&gt;</span> </span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>        <span class="fu">autoplot</span>(val_mean, <span class="fu">aes</span>(<span class="at">colour=</span>BankType)) <span class="sc">+</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">show.legend =</span> F,<span class="at">linewidth=</span>.<span class="dv">5</span>) <span class="sc">+</span>    </span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">bank_type.colours</span>(), <span class="at">breaks=</span><span class="fu">c</span>(<span class="st">"LargeBank"</span>,<span class="st">"LargeCreditCardBank"</span>,<span class="st">"OtherBank"</span>))<span class="sc">+</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> reg_date_c1,<span class="at">linetype=</span><span class="dv">2</span>,<span class="at">colour=</span><span class="st">"red"</span>)<span class="sc">+</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>        <span class="fu">annotate</span>(<span class="st">"label"</span>,<span class="at">label=</span><span class="st">"CARD Act Part 1 comes into effect"</span>, <span class="at">x=</span>reg_date_c1, <span class="at">y=</span><span class="fl">3.5</span>, <span class="at">hjust =</span> <span class="sc">-</span> <span class="fl">0.05</span>) <span class="sc">+</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> new_date,<span class="at">linetype=</span><span class="dv">2</span>,<span class="at">colour=</span><span class="st">"blue"</span>)<span class="sc">+</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>        <span class="fu">annotate</span>(<span class="st">"label"</span>,<span class="at">label=</span><span class="st">"+ 1 year after CARD Act Part 2"</span>, <span class="at">x=</span>new_date, <span class="at">y=</span><span class="fl">3.25</span>, <span class="at">hjust =</span> <span class="sc">-</span> <span class="fl">0.05</span>) <span class="sc">+</span></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>        <span class="fu">labs</span>(<span class="at">y=</span><span class="fu">glue</span>(<span class="st">"{target_label} </span><span class="sc">\n</span><span class="st"> mean"</span>), <span class="at">x=</span><span class="st">""</span>) <span class="sc">+</span><span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>, <span class="at">legend.title=</span><span class="fu">element_blank</span>())        </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div id="fig-regulation" class="cell quarto-layout-panel">
 <figure class="figure">
@@ -552,6 +571,16 @@ Note
 <figure class="figure">
 <p><img src="data_ffiec_files/figure-html/fig-regulation-3.png" class="img-fluid figure-img" data-ref-parent="fig-regulation" width="672"></p>
 <figcaption class="figure-caption">(c) Linear trend pre and post Regulation.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell quarto-layout-cell-subref" style="flex-basis: 100.0%;justify-content: center;">
+<div id="fig-regulation-4" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="data_ffiec_files/figure-html/fig-regulation-4.png" class="img-fluid figure-img" data-ref-parent="fig-regulation" width="672"></p>
+<figcaption class="figure-caption">(d) Linear trend pre and post 2011 Q3. About a year after CARD Act part 2 was enacted.</figcaption>
 </figure>
 </div>
 </div>
@@ -1551,7 +1580,7 @@ Note
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(final_df, <span class="fu">aes</span>(<span class="at">x=</span>Value, <span class="at">colour =</span> BankType))<span class="sc">+</span> </span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_density</span>(<span class="at">alpha =</span> .<span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x=</span>target_label) <span class="sc">+</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x=</span>target_label) <span class="sc">+</span> <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">"top"</span>,<span class="at">legend.title=</span><span class="fu">element_blank</span>()) <span class="sc">+</span></span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">bank_type.colours</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -2089,7 +2118,7 @@ alternative hypothesis: stationary</code></pre>
 <ol type="1">
 <li>Target measure: <em>Credit Card Plans-30-89 DAYS P/D %</em> (UBPRE524).</li>
 <li>Banks: <em>Large Banks</em> and <em>Large Credit Card</em> Banks.</li>
-<li>Date Period: from 2010 Q2.</li>
+<li>Date Period: from 2010 Q2 or from 2010 Q3 year which is when we see more of a steady state post regulatory change.</li>
 </ol>
 <p><strong><em>Removing:</em></strong></p>
 <ol start="4" type="1">
@@ -2495,7 +2524,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb20-72"><a href="#cb20-72" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Credit Card Accountability Responsibility and Disclosure (CARD) Act of 2009 which had a staggered implementation in February and August 2010. This Act requires Banks to assess whether a potential borrower has the means to repay. Additionally, high-risk borrowers like those under twenty-one, have additional restrictions. This has led to stricter lending criteria e.g., income and credit history checks <span class="co">[</span><span class="ot">@cfpb2013</span><span class="co">]</span>. </span>
 <span id="cb20-73"><a href="#cb20-73" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Regulation Z, or the Truth in Lending Act (TILA), focuses on ensuring transparency and fairness in lending practices. Banks have to provide full disclosure of the terms and conditions of a loan agreement <span class="co">[</span><span class="ot">@cfpb2010z</span><span class="co">]</span>.</span>
 <span id="cb20-74"><a href="#cb20-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-75"><a href="#cb20-75" aria-hidden="true" tabindex="-1"></a>We can see the impact in @fig-regulation which plots a linear trend for *`r target_label`* for each peer group. Based on @fig-regulation-3 there was increasing delinquency for Large Banks and Large Credit Card Banks before regulation, but post regulation the trend has reversed and is now trending down.</span>
+<span id="cb20-75"><a href="#cb20-75" aria-hidden="true" tabindex="-1"></a>We can see the impact in @fig-regulation which plots a linear trend for *`r target_label`* for each peer group. Based on @fig-regulation-3 there was increasing delinquency for Large Banks and Large Credit Card Banks before regulation, but post regulation the trend has reversed and is now trending down. It does appear that it took banks about a year for the regulatory changes to have an impact. If we take out staring point as 2011 Q3 as in @fig-regulation-4, then the deliquency trend for Large Credit Card Banks is increasing.</span>
 <span id="cb20-76"><a href="#cb20-76" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-77"><a href="#cb20-77" aria-hidden="true" tabindex="-1"></a>For our analysis we will focus on credit card partnerships post regulation as this is more relevant for commenting on future partnership deals. </span>
 <span id="cb20-78"><a href="#cb20-78" aria-hidden="true" tabindex="-1"></a></span>
@@ -2507,345 +2536,365 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb20-86"><a href="#cb20-86" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Bank Type have different intercepts and data patterns"</span></span>
 <span id="cb20-87"><a href="#cb20-87" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Variance pre and post Regulation &lt;br&gt;(i) - CARD Act part 1 (ii) - Regulation Z and (iii) Card Act part 2 &lt;br&gt;The variance for Large Banks and Large Credit Card Banks have reduced post regulatory changes."</span></span>
 <span id="cb20-88"><a href="#cb20-88" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Linear trend pre and post Regulation."</span></span>
-<span id="cb20-89"><a href="#cb20-89" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 1</span></span>
-<span id="cb20-90"><a href="#cb20-90" aria-hidden="true" tabindex="-1"></a>reg_date_z <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2010-07-01"</span>)</span>
-<span id="cb20-91"><a href="#cb20-91" aria-hidden="true" tabindex="-1"></a>reg_date_c1 <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2010-02-22"</span>)</span>
-<span id="cb20-92"><a href="#cb20-92" aria-hidden="true" tabindex="-1"></a>reg_date_c2 <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2010-08-22"</span>)</span>
-<span id="cb20-93"><a href="#cb20-93" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-94"><a href="#cb20-94" aria-hidden="true" tabindex="-1"></a>overdue30to89 <span class="sc">|&gt;</span> </span>
-<span id="cb20-95"><a href="#cb20-95" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(value_diff <span class="sc">&lt;=</span> <span class="dv">23</span>) <span class="sc">|&gt;</span></span>
-<span id="cb20-96"><a href="#cb20-96" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(BankType) <span class="sc">|&gt;</span></span>
-<span id="cb20-97"><a href="#cb20-97" aria-hidden="true" tabindex="-1"></a>        <span class="fu">summarise</span>(<span class="at">val_mean =</span> <span class="fu">mean</span>(Value, <span class="at">na.rm=</span>T)) <span class="sc">|&gt;</span> </span>
-<span id="cb20-98"><a href="#cb20-98" aria-hidden="true" tabindex="-1"></a>        <span class="fu">autoplot</span>(val_mean, <span class="fu">aes</span>(<span class="at">colour=</span>BankType)) <span class="sc">+</span></span>
-<span id="cb20-99"><a href="#cb20-99" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">show.legend =</span> F, <span class="at">linewidth=</span>.<span class="dv">5</span>) <span class="sc">+</span>    </span>
-<span id="cb20-100"><a href="#cb20-100" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">bank_type.colours</span>())<span class="sc">+</span></span>
-<span id="cb20-101"><a href="#cb20-101" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>,</span>
-<span id="cb20-102"><a href="#cb20-102" aria-hidden="true" tabindex="-1"></a>                <span class="at">legend.title=</span><span class="fu">element_blank</span>()) <span class="sc">+</span></span>
-<span id="cb20-103"><a href="#cb20-103" aria-hidden="true" tabindex="-1"></a>        <span class="fu">labs</span>(<span class="at">y=</span><span class="fu">glue</span>(<span class="st">"{target_label} </span><span class="sc">\n</span><span class="st"> mean"</span>), <span class="at">x=</span><span class="st">""</span>)</span>
-<span id="cb20-104"><a href="#cb20-104" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-105"><a href="#cb20-105" aria-hidden="true" tabindex="-1"></a>overdue30to89 <span class="sc">|&gt;</span> </span>
-<span id="cb20-106"><a href="#cb20-106" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(value_diff <span class="sc">&lt;=</span> <span class="dv">23</span>) <span class="sc">|&gt;</span></span>
-<span id="cb20-107"><a href="#cb20-107" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(BankType) <span class="sc">|&gt;</span> <span class="fu">summarise</span>(<span class="at">variance =</span> <span class="fu">var</span>(Value)) <span class="sc">|&gt;</span> </span>
-<span id="cb20-108"><a href="#cb20-108" aria-hidden="true" tabindex="-1"></a>    <span class="fu">autoplot</span>(variance) <span class="sc">+</span></span>
-<span id="cb20-109"><a href="#cb20-109" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> reg_date_c1,<span class="at">linetype=</span><span class="dv">2</span>,<span class="at">colour=</span><span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb20-110"><a href="#cb20-110" aria-hidden="true" tabindex="-1"></a>    <span class="fu">annotate</span>(<span class="st">"label"</span>,<span class="at">label=</span><span class="st">"i"</span>, <span class="at">x=</span>reg_date_c1, <span class="at">y=</span><span class="fl">20.0</span>) <span class="sc">+</span></span>
-<span id="cb20-111"><a href="#cb20-111" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> reg_date_z,<span class="at">linetype=</span><span class="dv">2</span>,<span class="at">colour=</span><span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb20-112"><a href="#cb20-112" aria-hidden="true" tabindex="-1"></a>    <span class="fu">annotate</span>(<span class="st">"label"</span>,<span class="at">label=</span><span class="st">"ii"</span>, <span class="at">x=</span>reg_date_z, <span class="at">y=</span><span class="fl">18.0</span>) <span class="sc">+</span></span>
-<span id="cb20-113"><a href="#cb20-113" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> reg_date_c2,<span class="at">linetype=</span><span class="dv">2</span>,<span class="at">colour=</span><span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb20-114"><a href="#cb20-114" aria-hidden="true" tabindex="-1"></a>    <span class="fu">annotate</span>(<span class="st">"label"</span>,<span class="at">label=</span><span class="st">"iii"</span>, <span class="at">x=</span>reg_date_c2, <span class="at">y=</span><span class="fl">16.0</span>) <span class="sc">+</span></span>
-<span id="cb20-115"><a href="#cb20-115" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">y=</span><span class="fu">glue</span>(<span class="st">"{target_label} </span><span class="sc">\n</span><span class="st"> variance"</span>), <span class="at">x=</span><span class="st">""</span>) <span class="sc">+</span></span>
-<span id="cb20-116"><a href="#cb20-116" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">bank_type.colours</span>())<span class="sc">+</span></span>
-<span id="cb20-117"><a href="#cb20-117" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>, <span class="at">legend.title=</span><span class="fu">element_blank</span>()) </span>
-<span id="cb20-118"><a href="#cb20-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-89"><a href="#cb20-89" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Linear trend pre and post 2011 Q3. About a year after CARD Act part 2 was enacted."</span></span>
+<span id="cb20-90"><a href="#cb20-90" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 1</span></span>
+<span id="cb20-91"><a href="#cb20-91" aria-hidden="true" tabindex="-1"></a>reg_date_z <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2010-07-01"</span>)</span>
+<span id="cb20-92"><a href="#cb20-92" aria-hidden="true" tabindex="-1"></a>reg_date_c1 <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2010-02-22"</span>)</span>
+<span id="cb20-93"><a href="#cb20-93" aria-hidden="true" tabindex="-1"></a>reg_date_c2 <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2010-08-22"</span>)</span>
+<span id="cb20-94"><a href="#cb20-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-95"><a href="#cb20-95" aria-hidden="true" tabindex="-1"></a>overdue30to89 <span class="sc">|&gt;</span> </span>
+<span id="cb20-96"><a href="#cb20-96" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(value_diff <span class="sc">&lt;=</span> <span class="dv">23</span>) <span class="sc">|&gt;</span></span>
+<span id="cb20-97"><a href="#cb20-97" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(BankType) <span class="sc">|&gt;</span></span>
+<span id="cb20-98"><a href="#cb20-98" aria-hidden="true" tabindex="-1"></a>        <span class="fu">summarise</span>(<span class="at">val_mean =</span> <span class="fu">mean</span>(Value, <span class="at">na.rm=</span>T)) <span class="sc">|&gt;</span> </span>
+<span id="cb20-99"><a href="#cb20-99" aria-hidden="true" tabindex="-1"></a>        <span class="fu">autoplot</span>(val_mean, <span class="fu">aes</span>(<span class="at">colour=</span>BankType)) <span class="sc">+</span></span>
+<span id="cb20-100"><a href="#cb20-100" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">show.legend =</span> F, <span class="at">linewidth=</span>.<span class="dv">5</span>) <span class="sc">+</span>    </span>
+<span id="cb20-101"><a href="#cb20-101" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">bank_type.colours</span>())<span class="sc">+</span><span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb20-102"><a href="#cb20-102" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>,</span>
+<span id="cb20-103"><a href="#cb20-103" aria-hidden="true" tabindex="-1"></a>                <span class="at">legend.title=</span><span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb20-104"><a href="#cb20-104" aria-hidden="true" tabindex="-1"></a>        <span class="fu">labs</span>(<span class="at">y=</span><span class="fu">glue</span>(<span class="st">"{target_label} </span><span class="sc">\n</span><span class="st"> mean"</span>), <span class="at">x=</span><span class="st">""</span>)</span>
+<span id="cb20-105"><a href="#cb20-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-106"><a href="#cb20-106" aria-hidden="true" tabindex="-1"></a>overdue30to89 <span class="sc">|&gt;</span> </span>
+<span id="cb20-107"><a href="#cb20-107" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(value_diff <span class="sc">&lt;=</span> <span class="dv">23</span>) <span class="sc">|&gt;</span></span>
+<span id="cb20-108"><a href="#cb20-108" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(BankType) <span class="sc">|&gt;</span> <span class="fu">summarise</span>(<span class="at">variance =</span> <span class="fu">var</span>(Value)) <span class="sc">|&gt;</span> </span>
+<span id="cb20-109"><a href="#cb20-109" aria-hidden="true" tabindex="-1"></a>    <span class="fu">autoplot</span>(variance) <span class="sc">+</span></span>
+<span id="cb20-110"><a href="#cb20-110" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> reg_date_c1,<span class="at">linetype=</span><span class="dv">2</span>,<span class="at">colour=</span><span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb20-111"><a href="#cb20-111" aria-hidden="true" tabindex="-1"></a>    <span class="fu">annotate</span>(<span class="st">"label"</span>,<span class="at">label=</span><span class="st">"i"</span>, <span class="at">x=</span>reg_date_c1, <span class="at">y=</span><span class="fl">20.0</span>) <span class="sc">+</span></span>
+<span id="cb20-112"><a href="#cb20-112" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> reg_date_z,<span class="at">linetype=</span><span class="dv">2</span>,<span class="at">colour=</span><span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb20-113"><a href="#cb20-113" aria-hidden="true" tabindex="-1"></a>    <span class="fu">annotate</span>(<span class="st">"label"</span>,<span class="at">label=</span><span class="st">"ii"</span>, <span class="at">x=</span>reg_date_z, <span class="at">y=</span><span class="fl">18.0</span>) <span class="sc">+</span></span>
+<span id="cb20-114"><a href="#cb20-114" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> reg_date_c2,<span class="at">linetype=</span><span class="dv">2</span>,<span class="at">colour=</span><span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb20-115"><a href="#cb20-115" aria-hidden="true" tabindex="-1"></a>    <span class="fu">annotate</span>(<span class="st">"label"</span>,<span class="at">label=</span><span class="st">"iii"</span>, <span class="at">x=</span>reg_date_c2, <span class="at">y=</span><span class="fl">16.0</span>) <span class="sc">+</span></span>
+<span id="cb20-116"><a href="#cb20-116" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">y=</span><span class="fu">glue</span>(<span class="st">"{target_label} </span><span class="sc">\n</span><span class="st"> variance"</span>), <span class="at">x=</span><span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb20-117"><a href="#cb20-117" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">bank_type.colours</span>())<span class="sc">+</span> <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb20-118"><a href="#cb20-118" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>, <span class="at">legend.title=</span><span class="fu">element_blank</span>()) </span>
 <span id="cb20-119"><a href="#cb20-119" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-120"><a href="#cb20-120" aria-hidden="true" tabindex="-1"></a>overdue30to89 <span class="sc">|&gt;</span> </span>
-<span id="cb20-121"><a href="#cb20-121" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(value_diff <span class="sc">&lt;=</span> <span class="dv">23</span>) <span class="sc">|&gt;</span></span>
-<span id="cb20-122"><a href="#cb20-122" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">regulation =</span> <span class="fu">ifelse</span>(<span class="fu">as.Date</span>(Quarter) <span class="sc">&lt;</span> reg_date_c1, <span class="st">'Before'</span>, <span class="st">'After'</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb20-123"><a href="#cb20-123" aria-hidden="true" tabindex="-1"></a>        <span class="fu">group_by</span>(BankType, regulation) <span class="sc">|&gt;</span></span>
-<span id="cb20-124"><a href="#cb20-124" aria-hidden="true" tabindex="-1"></a>        <span class="fu">summarise</span>(<span class="at">val_mean =</span> <span class="fu">mean</span>(Value, <span class="at">na.rm=</span>T)) <span class="sc">|&gt;</span> </span>
-<span id="cb20-125"><a href="#cb20-125" aria-hidden="true" tabindex="-1"></a>        <span class="fu">autoplot</span>(val_mean, <span class="fu">aes</span>(<span class="at">colour=</span>BankType)) <span class="sc">+</span></span>
-<span id="cb20-126"><a href="#cb20-126" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">show.legend =</span> F,<span class="at">linewidth=</span>.<span class="dv">5</span>) <span class="sc">+</span>    </span>
-<span id="cb20-127"><a href="#cb20-127" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">bank_type.colours</span>(), <span class="at">breaks=</span><span class="fu">c</span>(<span class="st">"LargeBank"</span>,<span class="st">"LargeCreditCardBank"</span>,<span class="st">"OtherBank"</span>))<span class="sc">+</span></span>
-<span id="cb20-128"><a href="#cb20-128" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> reg_date_c1,<span class="at">linetype=</span><span class="dv">2</span>,<span class="at">colour=</span><span class="st">"red"</span>)<span class="sc">+</span></span>
-<span id="cb20-129"><a href="#cb20-129" aria-hidden="true" tabindex="-1"></a>        <span class="fu">annotate</span>(<span class="st">"label"</span>,<span class="at">label=</span><span class="st">"CARD Act Part 1 comes into effect"</span>, <span class="at">x=</span>reg_date_c1, <span class="at">y=</span><span class="fl">3.5</span>, <span class="at">hjust =</span> <span class="sc">-</span> <span class="fl">0.05</span>) <span class="sc">+</span></span>
-<span id="cb20-130"><a href="#cb20-130" aria-hidden="true" tabindex="-1"></a>        <span class="fu">labs</span>(<span class="at">y=</span><span class="fu">glue</span>(<span class="st">"{target_label} </span><span class="sc">\n</span><span class="st"> mean"</span>), <span class="at">x=</span><span class="st">""</span>) <span class="sc">+</span></span>
-<span id="cb20-131"><a href="#cb20-131" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>, <span class="at">legend.title=</span><span class="fu">element_blank</span>())</span>
-<span id="cb20-132"><a href="#cb20-132" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-133"><a href="#cb20-133" aria-hidden="true" tabindex="-1"></a><span class="fu">## Bank Outliers {#sec-outliers}</span></span>
-<span id="cb20-134"><a href="#cb20-134" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-135"><a href="#cb20-135" aria-hidden="true" tabindex="-1"></a>In the context of time series data analysis, our objective is to identify banks that exhibit distinct characteristics across their series, rather than focusing on isolated data points. </span>
-<span id="cb20-136"><a href="#cb20-136" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-137"><a href="#cb20-137" aria-hidden="true" tabindex="-1"></a>Following the methodology proposed by @Hyndman2021, we can use Principal Components Analysis (PCA) across different statistical features or feature sets, to identify bank that diverge from its peers. </span>
-<span id="cb20-138"><a href="#cb20-138" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-139"><a href="#cb20-139" aria-hidden="true" tabindex="-1"></a>::: {#tbl-outliers .panel-tabset} </span>
-<span id="cb20-140"><a href="#cb20-140" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-143"><a href="#cb20-143" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-144"><a href="#cb20-144" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb20-145"><a href="#cb20-145" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
-<span id="cb20-146"><a href="#cb20-146" aria-hidden="true" tabindex="-1"></a>regulation_cutoff <span class="ot">&lt;-</span><span class="fu">get_regulation_cutoff</span>()</span>
-<span id="cb20-147"><a href="#cb20-147" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-148"><a href="#cb20-148" aria-hidden="true" tabindex="-1"></a>overdue30to89_post <span class="ot">&lt;-</span> overdue30to89 <span class="sc">|&gt;</span></span>
-<span id="cb20-149"><a href="#cb20-149" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">filter_index</span>(regulation_cutoff <span class="sc">~</span> .) </span>
-<span id="cb20-150"><a href="#cb20-150" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-151"><a href="#cb20-151" aria-hidden="true" tabindex="-1"></a>overdue30to89_lbanks <span class="ot">&lt;-</span> overdue30to89_post <span class="sc">|&gt;</span></span>
-<span id="cb20-152"><a href="#cb20-152" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">filter</span>(BankType <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"LargeBank"</span>, <span class="st">"LargeCreditCardBank"</span>))</span>
-<span id="cb20-153"><a href="#cb20-153" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb20-120"><a href="#cb20-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-121"><a href="#cb20-121" aria-hidden="true" tabindex="-1"></a>overdue30to89 <span class="sc">|&gt;</span> </span>
+<span id="cb20-122"><a href="#cb20-122" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(value_diff <span class="sc">&lt;=</span> <span class="dv">23</span>) <span class="sc">|&gt;</span></span>
+<span id="cb20-123"><a href="#cb20-123" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">regulation =</span> <span class="fu">ifelse</span>(<span class="fu">as.Date</span>(Quarter) <span class="sc">&lt;</span> reg_date_c1, <span class="st">'Before'</span>, <span class="st">'After'</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb20-124"><a href="#cb20-124" aria-hidden="true" tabindex="-1"></a>        <span class="fu">group_by</span>(BankType, regulation) <span class="sc">|&gt;</span></span>
+<span id="cb20-125"><a href="#cb20-125" aria-hidden="true" tabindex="-1"></a>        <span class="fu">summarise</span>(<span class="at">val_mean =</span> <span class="fu">mean</span>(Value, <span class="at">na.rm=</span>T)) <span class="sc">|&gt;</span> </span>
+<span id="cb20-126"><a href="#cb20-126" aria-hidden="true" tabindex="-1"></a>        <span class="fu">autoplot</span>(val_mean, <span class="fu">aes</span>(<span class="at">colour=</span>BankType)) <span class="sc">+</span></span>
+<span id="cb20-127"><a href="#cb20-127" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">show.legend =</span> F,<span class="at">linewidth=</span>.<span class="dv">5</span>) <span class="sc">+</span>    </span>
+<span id="cb20-128"><a href="#cb20-128" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">bank_type.colours</span>(), <span class="at">breaks=</span><span class="fu">c</span>(<span class="st">"LargeBank"</span>,<span class="st">"LargeCreditCardBank"</span>,<span class="st">"OtherBank"</span>))<span class="sc">+</span></span>
+<span id="cb20-129"><a href="#cb20-129" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> reg_date_c1,<span class="at">linetype=</span><span class="dv">2</span>,<span class="at">colour=</span><span class="st">"red"</span>)<span class="sc">+</span></span>
+<span id="cb20-130"><a href="#cb20-130" aria-hidden="true" tabindex="-1"></a>        <span class="fu">annotate</span>(<span class="st">"label"</span>,<span class="at">label=</span><span class="st">"CARD Act Part 1 comes into effect"</span>, <span class="at">x=</span>reg_date_c1, <span class="at">y=</span><span class="fl">3.5</span>, <span class="at">hjust =</span> <span class="sc">-</span> <span class="fl">0.05</span>) <span class="sc">+</span></span>
+<span id="cb20-131"><a href="#cb20-131" aria-hidden="true" tabindex="-1"></a>        <span class="fu">labs</span>(<span class="at">y=</span><span class="fu">glue</span>(<span class="st">"{target_label} </span><span class="sc">\n</span><span class="st"> mean"</span>), <span class="at">x=</span><span class="st">""</span>) <span class="sc">+</span><span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb20-132"><a href="#cb20-132" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>, <span class="at">legend.title=</span><span class="fu">element_blank</span>())</span>
+<span id="cb20-133"><a href="#cb20-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-134"><a href="#cb20-134" aria-hidden="true" tabindex="-1"></a>new_date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2011-09-30"</span>)</span>
+<span id="cb20-135"><a href="#cb20-135" aria-hidden="true" tabindex="-1"></a>overdue30to89 <span class="sc">|&gt;</span> </span>
+<span id="cb20-136"><a href="#cb20-136" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(value_diff <span class="sc">&lt;=</span> <span class="dv">23</span>) <span class="sc">|&gt;</span></span>
+<span id="cb20-137"><a href="#cb20-137" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">regulation =</span> <span class="fu">case_when</span>(</span>
+<span id="cb20-138"><a href="#cb20-138" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">as.Date</span>(Quarter) <span class="sc">&lt;</span> reg_date_c1 <span class="sc">~</span> <span class="st">'Before'</span>,</span>
+<span id="cb20-139"><a href="#cb20-139" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">as.Date</span>(Quarter) <span class="sc">&gt;=</span> new_date <span class="sc">~</span> <span class="st">'After'</span>, </span>
+<span id="cb20-140"><a href="#cb20-140" aria-hidden="true" tabindex="-1"></a>                            <span class="at">.default =</span> <span class="st">"Between"</span> )) <span class="sc">|&gt;</span> </span>
+<span id="cb20-141"><a href="#cb20-141" aria-hidden="true" tabindex="-1"></a>        <span class="fu">group_by</span>(BankType, regulation) <span class="sc">|&gt;</span></span>
+<span id="cb20-142"><a href="#cb20-142" aria-hidden="true" tabindex="-1"></a>        <span class="fu">summarise</span>(<span class="at">val_mean =</span> <span class="fu">mean</span>(Value, <span class="at">na.rm=</span>T)) <span class="sc">|&gt;</span> </span>
+<span id="cb20-143"><a href="#cb20-143" aria-hidden="true" tabindex="-1"></a>        <span class="fu">autoplot</span>(val_mean, <span class="fu">aes</span>(<span class="at">colour=</span>BankType)) <span class="sc">+</span></span>
+<span id="cb20-144"><a href="#cb20-144" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">show.legend =</span> F,<span class="at">linewidth=</span>.<span class="dv">5</span>) <span class="sc">+</span>    </span>
+<span id="cb20-145"><a href="#cb20-145" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">bank_type.colours</span>(), <span class="at">breaks=</span><span class="fu">c</span>(<span class="st">"LargeBank"</span>,<span class="st">"LargeCreditCardBank"</span>,<span class="st">"OtherBank"</span>))<span class="sc">+</span></span>
+<span id="cb20-146"><a href="#cb20-146" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> reg_date_c1,<span class="at">linetype=</span><span class="dv">2</span>,<span class="at">colour=</span><span class="st">"red"</span>)<span class="sc">+</span></span>
+<span id="cb20-147"><a href="#cb20-147" aria-hidden="true" tabindex="-1"></a>        <span class="fu">annotate</span>(<span class="st">"label"</span>,<span class="at">label=</span><span class="st">"CARD Act Part 1 comes into effect"</span>, <span class="at">x=</span>reg_date_c1, <span class="at">y=</span><span class="fl">3.5</span>, <span class="at">hjust =</span> <span class="sc">-</span> <span class="fl">0.05</span>) <span class="sc">+</span></span>
+<span id="cb20-148"><a href="#cb20-148" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> new_date,<span class="at">linetype=</span><span class="dv">2</span>,<span class="at">colour=</span><span class="st">"blue"</span>)<span class="sc">+</span></span>
+<span id="cb20-149"><a href="#cb20-149" aria-hidden="true" tabindex="-1"></a>        <span class="fu">annotate</span>(<span class="st">"label"</span>,<span class="at">label=</span><span class="st">"+ 1 year after CARD Act Part 2"</span>, <span class="at">x=</span>new_date, <span class="at">y=</span><span class="fl">3.25</span>, <span class="at">hjust =</span> <span class="sc">-</span> <span class="fl">0.05</span>) <span class="sc">+</span></span>
+<span id="cb20-150"><a href="#cb20-150" aria-hidden="true" tabindex="-1"></a>        <span class="fu">labs</span>(<span class="at">y=</span><span class="fu">glue</span>(<span class="st">"{target_label} </span><span class="sc">\n</span><span class="st"> mean"</span>), <span class="at">x=</span><span class="st">""</span>) <span class="sc">+</span><span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb20-151"><a href="#cb20-151" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>, <span class="at">legend.title=</span><span class="fu">element_blank</span>())        </span>
+<span id="cb20-152"><a href="#cb20-152" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb20-153"><a href="#cb20-153" aria-hidden="true" tabindex="-1"></a><span class="fu">## Bank Outliers {#sec-outliers}</span></span>
 <span id="cb20-154"><a href="#cb20-154" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-155"><a href="#cb20-155" aria-hidden="true" tabindex="-1"></a><span class="fu">## Lumpiness and Stability</span></span>
-<span id="cb20-158"><a href="#cb20-158" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-159"><a href="#cb20-159" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb20-160"><a href="#cb20-160" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
-<span id="cb20-161"><a href="#cb20-161" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-out-lump</span></span>
-<span id="cb20-162"><a href="#cb20-162" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Outlier Detection using PCA"</span></span>
-<span id="cb20-163"><a href="#cb20-163" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap:</span></span>
-<span id="cb20-164"><a href="#cb20-164" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "PCA for &lt;span style='color:#1B9E77'&gt;Large&lt;/span&gt; and &lt;span style='color:#D95F02'&gt;Large Credit Card&lt;/span&gt; Banks using features: lumpiness and stability"</span></span>
-<span id="cb20-165"><a href="#cb20-165" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Data series for Outlier Banks"</span></span>
-<span id="cb20-166"><a href="#cb20-166" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 1</span></span>
+<span id="cb20-155"><a href="#cb20-155" aria-hidden="true" tabindex="-1"></a>In the context of time series data analysis, our objective is to identify banks that exhibit distinct characteristics across their series, rather than focusing on isolated data points. </span>
+<span id="cb20-156"><a href="#cb20-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-157"><a href="#cb20-157" aria-hidden="true" tabindex="-1"></a>Following the methodology proposed by @Hyndman2021, we can use Principal Components Analysis (PCA) across different statistical features or feature sets, to identify bank that diverge from its peers. </span>
+<span id="cb20-158"><a href="#cb20-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-159"><a href="#cb20-159" aria-hidden="true" tabindex="-1"></a>::: {#tbl-outliers .panel-tabset} </span>
+<span id="cb20-160"><a href="#cb20-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-163"><a href="#cb20-163" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb20-164"><a href="#cb20-164" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb20-165"><a href="#cb20-165" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
+<span id="cb20-166"><a href="#cb20-166" aria-hidden="true" tabindex="-1"></a>regulation_cutoff <span class="ot">&lt;-</span><span class="fu">get_regulation_cutoff</span>()</span>
 <span id="cb20-167"><a href="#cb20-167" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-168"><a href="#cb20-168" aria-hidden="true" tabindex="-1"></a>pca_output <span class="ot">&lt;-</span> <span class="fu">feature_data</span>(overdue30to89_lbanks, <span class="fu">c</span>(<span class="st">"lumpiness"</span>,<span class="st">"stability"</span>)) <span class="sc">|&gt;</span> <span class="fu">feature_prcomp</span>()</span>
-<span id="cb20-169"><a href="#cb20-169" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-170"><a href="#cb20-170" aria-hidden="true" tabindex="-1"></a><span class="fu">pcs.plot</span>(pca_output)</span>
-<span id="cb20-171"><a href="#cb20-171" aria-hidden="true" tabindex="-1"></a><span class="fu">outlier.plot</span>(overdue30to89_lbanks, pca_output, <span class="sc">-</span><span class="dv">2</span>, <span class="dv">2</span>, <span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>)</span>
-<span id="cb20-172"><a href="#cb20-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-168"><a href="#cb20-168" aria-hidden="true" tabindex="-1"></a>overdue30to89_post <span class="ot">&lt;-</span> overdue30to89 <span class="sc">|&gt;</span></span>
+<span id="cb20-169"><a href="#cb20-169" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">filter_index</span>(regulation_cutoff <span class="sc">~</span> .) </span>
+<span id="cb20-170"><a href="#cb20-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-171"><a href="#cb20-171" aria-hidden="true" tabindex="-1"></a>overdue30to89_lbanks <span class="ot">&lt;-</span> overdue30to89_post <span class="sc">|&gt;</span></span>
+<span id="cb20-172"><a href="#cb20-172" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">filter</span>(BankType <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"LargeBank"</span>, <span class="st">"LargeCreditCardBank"</span>))</span>
 <span id="cb20-173"><a href="#cb20-173" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb20-174"><a href="#cb20-174" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-175"><a href="#cb20-175" aria-hidden="true" tabindex="-1"></a><span class="fu">## Seasonal</span></span>
+<span id="cb20-175"><a href="#cb20-175" aria-hidden="true" tabindex="-1"></a><span class="fu">## Lumpiness and Stability</span></span>
 <span id="cb20-178"><a href="#cb20-178" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb20-179"><a href="#cb20-179" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
 <span id="cb20-180"><a href="#cb20-180" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
-<span id="cb20-181"><a href="#cb20-181" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-out-season</span></span>
+<span id="cb20-181"><a href="#cb20-181" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-out-lump</span></span>
 <span id="cb20-182"><a href="#cb20-182" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Outlier Detection using PCA"</span></span>
 <span id="cb20-183"><a href="#cb20-183" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap:</span></span>
-<span id="cb20-184"><a href="#cb20-184" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "PCA for &lt;span style='color:#1B9E77'&gt;Large&lt;/span&gt; and &lt;span style='color:#D95F02'&gt;Large Credit Card&lt;/span&gt; Banks using features: seasonal"</span></span>
+<span id="cb20-184"><a href="#cb20-184" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "PCA for &lt;span style='color:#1B9E77'&gt;Large&lt;/span&gt; and &lt;span style='color:#D95F02'&gt;Large Credit Card&lt;/span&gt; Banks using features: lumpiness and stability"</span></span>
 <span id="cb20-185"><a href="#cb20-185" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Data series for Outlier Banks"</span></span>
 <span id="cb20-186"><a href="#cb20-186" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 1</span></span>
 <span id="cb20-187"><a href="#cb20-187" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-188"><a href="#cb20-188" aria-hidden="true" tabindex="-1"></a>pca_output <span class="ot">&lt;-</span> <span class="fu">feature_data</span>(overdue30to89_lbanks, <span class="st">"seasonal"</span>) <span class="sc">|&gt;</span> <span class="fu">feature_prcomp</span>()</span>
+<span id="cb20-188"><a href="#cb20-188" aria-hidden="true" tabindex="-1"></a>pca_output <span class="ot">&lt;-</span> <span class="fu">feature_data</span>(overdue30to89_lbanks, <span class="fu">c</span>(<span class="st">"lumpiness"</span>,<span class="st">"stability"</span>)) <span class="sc">|&gt;</span> <span class="fu">feature_prcomp</span>()</span>
 <span id="cb20-189"><a href="#cb20-189" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-190"><a href="#cb20-190" aria-hidden="true" tabindex="-1"></a><span class="fu">pcs.plot</span>(pca_output)</span>
-<span id="cb20-191"><a href="#cb20-191" aria-hidden="true" tabindex="-1"></a><span class="fu">outlier.plot</span>(overdue30to89_lbanks, pca_output, <span class="sc">-</span><span class="dv">4</span>, <span class="dv">4</span>, <span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>)</span>
+<span id="cb20-191"><a href="#cb20-191" aria-hidden="true" tabindex="-1"></a><span class="fu">outlier.plot</span>(overdue30to89_lbanks, pca_output, <span class="sc">-</span><span class="dv">2</span>, <span class="dv">2</span>, <span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>)</span>
 <span id="cb20-192"><a href="#cb20-192" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-193"><a href="#cb20-193" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-194"><a href="#cb20-194" aria-hidden="true" tabindex="-1"></a><span class="fu">## ACF</span></span>
-<span id="cb20-197"><a href="#cb20-197" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-198"><a href="#cb20-198" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb20-199"><a href="#cb20-199" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
-<span id="cb20-200"><a href="#cb20-200" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-out-acf</span></span>
-<span id="cb20-201"><a href="#cb20-201" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Outlier Detection using PCA"</span></span>
-<span id="cb20-202"><a href="#cb20-202" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap:</span></span>
-<span id="cb20-203"><a href="#cb20-203" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "PCA for &lt;span style='color:#1B9E77'&gt;Large&lt;/span&gt; and &lt;span style='color:#D95F02'&gt;Large Credit Card&lt;/span&gt; Banks using features: acf"</span></span>
-<span id="cb20-204"><a href="#cb20-204" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Data series for Outlier Banks"</span></span>
-<span id="cb20-205"><a href="#cb20-205" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 1</span></span>
-<span id="cb20-206"><a href="#cb20-206" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-207"><a href="#cb20-207" aria-hidden="true" tabindex="-1"></a>pca_output <span class="ot">&lt;-</span> <span class="fu">feature_data</span>(overdue30to89_lbanks, <span class="st">"acf"</span>) <span class="sc">|&gt;</span> <span class="fu">feature_prcomp</span>()</span>
-<span id="cb20-208"><a href="#cb20-208" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-209"><a href="#cb20-209" aria-hidden="true" tabindex="-1"></a><span class="fu">pcs.plot</span>(pca_output)</span>
-<span id="cb20-210"><a href="#cb20-210" aria-hidden="true" tabindex="-1"></a><span class="fu">outlier.plot</span>(overdue30to89_lbanks, pca_output, <span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>)</span>
-<span id="cb20-211"><a href="#cb20-211" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-212"><a href="#cb20-212" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-213"><a href="#cb20-213" aria-hidden="true" tabindex="-1"></a><span class="fu">## PACF</span></span>
-<span id="cb20-216"><a href="#cb20-216" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-217"><a href="#cb20-217" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb20-218"><a href="#cb20-218" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
-<span id="cb20-219"><a href="#cb20-219" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-out-pacf</span></span>
-<span id="cb20-220"><a href="#cb20-220" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Outlier Detection using PCA"</span></span>
-<span id="cb20-221"><a href="#cb20-221" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap:</span></span>
-<span id="cb20-222"><a href="#cb20-222" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "PCA for &lt;span style='color:#1B9E77'&gt;Large&lt;/span&gt; and &lt;span style='color:#D95F02'&gt;Large Credit Card&lt;/span&gt; Banks using features: pacf"</span></span>
-<span id="cb20-223"><a href="#cb20-223" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Data series for Outlier Banks"</span></span>
-<span id="cb20-224"><a href="#cb20-224" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 1</span></span>
-<span id="cb20-225"><a href="#cb20-225" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-226"><a href="#cb20-226" aria-hidden="true" tabindex="-1"></a>pca_output <span class="ot">&lt;-</span> <span class="fu">feature_data</span>(overdue30to89_lbanks, <span class="st">"pacf"</span>) <span class="sc">|&gt;</span> <span class="fu">feature_prcomp</span>()</span>
-<span id="cb20-227"><a href="#cb20-227" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-228"><a href="#cb20-228" aria-hidden="true" tabindex="-1"></a><span class="fu">pcs.plot</span>(pca_output)</span>
-<span id="cb20-229"><a href="#cb20-229" aria-hidden="true" tabindex="-1"></a><span class="fu">outlier.plot</span>(overdue30to89_lbanks, pca_output, <span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="sc">-</span><span class="dv">2</span>, <span class="dv">2</span>)</span>
-<span id="cb20-230"><a href="#cb20-230" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-231"><a href="#cb20-231" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-232"><a href="#cb20-232" aria-hidden="true" tabindex="-1"></a><span class="fu">## Data</span></span>
-<span id="cb20-235"><a href="#cb20-235" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-236"><a href="#cb20-236" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb20-237"><a href="#cb20-237" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
-<span id="cb20-238"><a href="#cb20-238" aria-hidden="true" tabindex="-1"></a>selected_feats <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"lumpiness"</span>,<span class="st">"stability"</span>,<span class="st">"seasonal"</span>, <span class="st">"pacf"</span>, <span class="st">"acf"</span>)</span>
-<span id="cb20-239"><a href="#cb20-239" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-240"><a href="#cb20-240" aria-hidden="true" tabindex="-1"></a><span class="fu">feature_data</span>(overdue30to89_lbanks,selected_feats) <span class="sc">|&gt;</span></span>
-<span id="cb20-241"><a href="#cb20-241" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(IDRSSD,Measure,Label,Description,BankType)) <span class="sc">|&gt;</span> </span>
-<span id="cb20-242"><a href="#cb20-242" aria-hidden="true" tabindex="-1"></a>        knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">format =</span> <span class="st">"html"</span>)    </span>
-<span id="cb20-243"><a href="#cb20-243" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-244"><a href="#cb20-244" aria-hidden="true" tabindex="-1"></a>::: </span>
+<span id="cb20-194"><a href="#cb20-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-195"><a href="#cb20-195" aria-hidden="true" tabindex="-1"></a><span class="fu">## Seasonal</span></span>
+<span id="cb20-198"><a href="#cb20-198" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb20-199"><a href="#cb20-199" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb20-200"><a href="#cb20-200" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
+<span id="cb20-201"><a href="#cb20-201" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-out-season</span></span>
+<span id="cb20-202"><a href="#cb20-202" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Outlier Detection using PCA"</span></span>
+<span id="cb20-203"><a href="#cb20-203" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap:</span></span>
+<span id="cb20-204"><a href="#cb20-204" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "PCA for &lt;span style='color:#1B9E77'&gt;Large&lt;/span&gt; and &lt;span style='color:#D95F02'&gt;Large Credit Card&lt;/span&gt; Banks using features: seasonal"</span></span>
+<span id="cb20-205"><a href="#cb20-205" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Data series for Outlier Banks"</span></span>
+<span id="cb20-206"><a href="#cb20-206" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 1</span></span>
+<span id="cb20-207"><a href="#cb20-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-208"><a href="#cb20-208" aria-hidden="true" tabindex="-1"></a>pca_output <span class="ot">&lt;-</span> <span class="fu">feature_data</span>(overdue30to89_lbanks, <span class="st">"seasonal"</span>) <span class="sc">|&gt;</span> <span class="fu">feature_prcomp</span>()</span>
+<span id="cb20-209"><a href="#cb20-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-210"><a href="#cb20-210" aria-hidden="true" tabindex="-1"></a><span class="fu">pcs.plot</span>(pca_output)</span>
+<span id="cb20-211"><a href="#cb20-211" aria-hidden="true" tabindex="-1"></a><span class="fu">outlier.plot</span>(overdue30to89_lbanks, pca_output, <span class="sc">-</span><span class="dv">4</span>, <span class="dv">4</span>, <span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>)</span>
+<span id="cb20-212"><a href="#cb20-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-213"><a href="#cb20-213" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb20-214"><a href="#cb20-214" aria-hidden="true" tabindex="-1"></a><span class="fu">## ACF</span></span>
+<span id="cb20-217"><a href="#cb20-217" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb20-218"><a href="#cb20-218" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb20-219"><a href="#cb20-219" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
+<span id="cb20-220"><a href="#cb20-220" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-out-acf</span></span>
+<span id="cb20-221"><a href="#cb20-221" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Outlier Detection using PCA"</span></span>
+<span id="cb20-222"><a href="#cb20-222" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap:</span></span>
+<span id="cb20-223"><a href="#cb20-223" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "PCA for &lt;span style='color:#1B9E77'&gt;Large&lt;/span&gt; and &lt;span style='color:#D95F02'&gt;Large Credit Card&lt;/span&gt; Banks using features: acf"</span></span>
+<span id="cb20-224"><a href="#cb20-224" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Data series for Outlier Banks"</span></span>
+<span id="cb20-225"><a href="#cb20-225" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 1</span></span>
+<span id="cb20-226"><a href="#cb20-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-227"><a href="#cb20-227" aria-hidden="true" tabindex="-1"></a>pca_output <span class="ot">&lt;-</span> <span class="fu">feature_data</span>(overdue30to89_lbanks, <span class="st">"acf"</span>) <span class="sc">|&gt;</span> <span class="fu">feature_prcomp</span>()</span>
+<span id="cb20-228"><a href="#cb20-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-229"><a href="#cb20-229" aria-hidden="true" tabindex="-1"></a><span class="fu">pcs.plot</span>(pca_output)</span>
+<span id="cb20-230"><a href="#cb20-230" aria-hidden="true" tabindex="-1"></a><span class="fu">outlier.plot</span>(overdue30to89_lbanks, pca_output, <span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>)</span>
+<span id="cb20-231"><a href="#cb20-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-232"><a href="#cb20-232" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb20-233"><a href="#cb20-233" aria-hidden="true" tabindex="-1"></a><span class="fu">## PACF</span></span>
+<span id="cb20-236"><a href="#cb20-236" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb20-237"><a href="#cb20-237" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb20-238"><a href="#cb20-238" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
+<span id="cb20-239"><a href="#cb20-239" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-out-pacf</span></span>
+<span id="cb20-240"><a href="#cb20-240" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Outlier Detection using PCA"</span></span>
+<span id="cb20-241"><a href="#cb20-241" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap:</span></span>
+<span id="cb20-242"><a href="#cb20-242" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "PCA for &lt;span style='color:#1B9E77'&gt;Large&lt;/span&gt; and &lt;span style='color:#D95F02'&gt;Large Credit Card&lt;/span&gt; Banks using features: pacf"</span></span>
+<span id="cb20-243"><a href="#cb20-243" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Data series for Outlier Banks"</span></span>
+<span id="cb20-244"><a href="#cb20-244" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 1</span></span>
 <span id="cb20-245"><a href="#cb20-245" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-246"><a href="#cb20-246" aria-hidden="true" tabindex="-1"></a>From these plots we can see that there are a few banks that started their credit card businesses after 2010 Q2 (or started reporting our target measure). These series begin at 0 and sharply increase after the first or second quarter. This pattern is expected considering it takes 30+ days for credit cards to become delinquent. However, for modelling we may want to drop the first few quarters to remove the impact of this initial sharp increase and reflect the ongoing state.</span>
+<span id="cb20-246"><a href="#cb20-246" aria-hidden="true" tabindex="-1"></a>pca_output <span class="ot">&lt;-</span> <span class="fu">feature_data</span>(overdue30to89_lbanks, <span class="st">"pacf"</span>) <span class="sc">|&gt;</span> <span class="fu">feature_prcomp</span>()</span>
 <span id="cb20-247"><a href="#cb20-247" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-250"><a href="#cb20-250" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-251"><a href="#cb20-251" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb20-252"><a href="#cb20-252" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
-<span id="cb20-253"><a href="#cb20-253" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-254"><a href="#cb20-254" aria-hidden="true" tabindex="-1"></a>selected_feats <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"lumpiness"</span>,<span class="st">"stability"</span>,<span class="st">"seasonal"</span>)</span>
-<span id="cb20-255"><a href="#cb20-255" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-256"><a href="#cb20-256" aria-hidden="true" tabindex="-1"></a><span class="co">#remove first 2 quarters (take from start of series)</span></span>
-<span id="cb20-257"><a href="#cb20-257" aria-hidden="true" tabindex="-1"></a>df_alltypes <span class="ot">&lt;-</span> overdue30to89 <span class="sc">|&gt;</span> </span>
-<span id="cb20-258"><a href="#cb20-258" aria-hidden="true" tabindex="-1"></a>                tsibble<span class="sc">::</span><span class="fu">group_by_key</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb20-259"><a href="#cb20-259" aria-hidden="true" tabindex="-1"></a>                <span class="fu">filter</span>(Value <span class="sc">!=</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
-<span id="cb20-260"><a href="#cb20-260" aria-hidden="true" tabindex="-1"></a>                <span class="fu">slice</span>(<span class="dv">3</span><span class="sc">:</span><span class="fu">n</span>()) <span class="sc">|&gt;</span></span>
-<span id="cb20-261"><a href="#cb20-261" aria-hidden="true" tabindex="-1"></a>                <span class="fu">filter_index</span>(regulation_cutoff <span class="sc">~</span> .) <span class="sc">|&gt;</span></span>
-<span id="cb20-262"><a href="#cb20-262" aria-hidden="true" tabindex="-1"></a>                <span class="fu">fill_gaps</span>()</span>
-<span id="cb20-263"><a href="#cb20-263" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-264"><a href="#cb20-264" aria-hidden="true" tabindex="-1"></a>all_ftbanks <span class="ot">&lt;-</span> df_alltypes <span class="sc">|&gt;</span> </span>
-<span id="cb20-265"><a href="#cb20-265" aria-hidden="true" tabindex="-1"></a>                <span class="fu">features</span>(Value, <span class="fu">feature_set</span>(<span class="at">tags =</span> selected_feats))</span>
-<span id="cb20-266"><a href="#cb20-266" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-267"><a href="#cb20-267" aria-hidden="true" tabindex="-1"></a>final_df <span class="ot">&lt;-</span> df_alltypes <span class="sc">|&gt;</span> </span>
-<span id="cb20-268"><a href="#cb20-268" aria-hidden="true" tabindex="-1"></a>                <span class="fu">filter</span>(BankType <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"LargeBank"</span>, <span class="st">"LargeCreditCardBank"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb20-269"><a href="#cb20-269" aria-hidden="true" tabindex="-1"></a>                <span class="fu">mutate</span>(<span class="at">value_diff =</span> <span class="fu">difference</span>(Value))</span>
-<span id="cb20-270"><a href="#cb20-270" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-271"><a href="#cb20-271" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-272"><a href="#cb20-272" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exploration of Statistical Features {#sec-feature-explore}</span></span>
+<span id="cb20-248"><a href="#cb20-248" aria-hidden="true" tabindex="-1"></a><span class="fu">pcs.plot</span>(pca_output)</span>
+<span id="cb20-249"><a href="#cb20-249" aria-hidden="true" tabindex="-1"></a><span class="fu">outlier.plot</span>(overdue30to89_lbanks, pca_output, <span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="sc">-</span><span class="dv">2</span>, <span class="dv">2</span>)</span>
+<span id="cb20-250"><a href="#cb20-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-251"><a href="#cb20-251" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb20-252"><a href="#cb20-252" aria-hidden="true" tabindex="-1"></a><span class="fu">## Data</span></span>
+<span id="cb20-255"><a href="#cb20-255" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb20-256"><a href="#cb20-256" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb20-257"><a href="#cb20-257" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
+<span id="cb20-258"><a href="#cb20-258" aria-hidden="true" tabindex="-1"></a>selected_feats <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"lumpiness"</span>,<span class="st">"stability"</span>,<span class="st">"seasonal"</span>, <span class="st">"pacf"</span>, <span class="st">"acf"</span>)</span>
+<span id="cb20-259"><a href="#cb20-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-260"><a href="#cb20-260" aria-hidden="true" tabindex="-1"></a><span class="fu">feature_data</span>(overdue30to89_lbanks,selected_feats) <span class="sc">|&gt;</span></span>
+<span id="cb20-261"><a href="#cb20-261" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(IDRSSD,Measure,Label,Description,BankType)) <span class="sc">|&gt;</span> </span>
+<span id="cb20-262"><a href="#cb20-262" aria-hidden="true" tabindex="-1"></a>        knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">format =</span> <span class="st">"html"</span>)    </span>
+<span id="cb20-263"><a href="#cb20-263" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb20-264"><a href="#cb20-264" aria-hidden="true" tabindex="-1"></a>::: </span>
+<span id="cb20-265"><a href="#cb20-265" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-266"><a href="#cb20-266" aria-hidden="true" tabindex="-1"></a>From these plots we can see that there are a few banks that started their credit card businesses after 2010 Q2 (or started reporting our target measure). These series begin at 0 and sharply increase after the first or second quarter. This pattern is expected considering it takes 30+ days for credit cards to become delinquent. However, for modelling we may want to drop the first few quarters to remove the impact of this initial sharp increase and reflect the ongoing state.</span>
+<span id="cb20-267"><a href="#cb20-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-270"><a href="#cb20-270" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb20-271"><a href="#cb20-271" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb20-272"><a href="#cb20-272" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
 <span id="cb20-273"><a href="#cb20-273" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-274"><a href="#cb20-274" aria-hidden="true" tabindex="-1"></a>@fig-quantile plots the distribution of <span class="in">`r target_label`</span>. We can see that there are two peaks for *Large Credit Card Banks*. There are <span class="in">`r bank_n |&gt; filter(BankType=="LargeCreditCardBank") |&gt; pull(Number)`</span> banks in the this peer group which may be too small to capture the true distribution effectively. However, it may also indicate that there are sub-groups within this peer group. For instance, the first peak could represent banks that have lower risk profiles, while the second represents banks that have a higher risk profiles.</span>
+<span id="cb20-274"><a href="#cb20-274" aria-hidden="true" tabindex="-1"></a>selected_feats <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"lumpiness"</span>,<span class="st">"stability"</span>,<span class="st">"seasonal"</span>)</span>
 <span id="cb20-275"><a href="#cb20-275" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-276"><a href="#cb20-276" aria-hidden="true" tabindex="-1"></a>::: {#tbl-quantile .panel-tabset}</span>
-<span id="cb20-277"><a href="#cb20-277" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-278"><a href="#cb20-278" aria-hidden="true" tabindex="-1"></a><span class="fu">## Distribution</span></span>
-<span id="cb20-281"><a href="#cb20-281" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-282"><a href="#cb20-282" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb20-283"><a href="#cb20-283" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
-<span id="cb20-284"><a href="#cb20-284" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-height: 4</span></span>
-<span id="cb20-285"><a href="#cb20-285" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-quantile</span></span>
-<span id="cb20-286"><a href="#cb20-286" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Density plot"</span></span>
-<span id="cb20-287"><a href="#cb20-287" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(final_df, <span class="fu">aes</span>(<span class="at">x=</span>Value, <span class="at">colour =</span> BankType))<span class="sc">+</span> </span>
-<span id="cb20-288"><a href="#cb20-288" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_density</span>(<span class="at">alpha =</span> .<span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb20-289"><a href="#cb20-289" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x=</span>target_label) <span class="sc">+</span></span>
-<span id="cb20-290"><a href="#cb20-290" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">"top"</span>,<span class="at">legend.title=</span><span class="fu">element_blank</span>()) <span class="sc">+</span></span>
-<span id="cb20-291"><a href="#cb20-291" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">bank_type.colours</span>())</span>
-<span id="cb20-292"><a href="#cb20-292" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb20-276"><a href="#cb20-276" aria-hidden="true" tabindex="-1"></a><span class="co">#remove first 2 quarters (take from start of series)</span></span>
+<span id="cb20-277"><a href="#cb20-277" aria-hidden="true" tabindex="-1"></a>df_alltypes <span class="ot">&lt;-</span> overdue30to89 <span class="sc">|&gt;</span> </span>
+<span id="cb20-278"><a href="#cb20-278" aria-hidden="true" tabindex="-1"></a>                tsibble<span class="sc">::</span><span class="fu">group_by_key</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb20-279"><a href="#cb20-279" aria-hidden="true" tabindex="-1"></a>                <span class="fu">filter</span>(Value <span class="sc">!=</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb20-280"><a href="#cb20-280" aria-hidden="true" tabindex="-1"></a>                <span class="fu">slice</span>(<span class="dv">3</span><span class="sc">:</span><span class="fu">n</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb20-281"><a href="#cb20-281" aria-hidden="true" tabindex="-1"></a>                <span class="fu">filter_index</span>(regulation_cutoff <span class="sc">~</span> .) <span class="sc">|&gt;</span></span>
+<span id="cb20-282"><a href="#cb20-282" aria-hidden="true" tabindex="-1"></a>                <span class="fu">fill_gaps</span>()</span>
+<span id="cb20-283"><a href="#cb20-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-284"><a href="#cb20-284" aria-hidden="true" tabindex="-1"></a>all_ftbanks <span class="ot">&lt;-</span> df_alltypes <span class="sc">|&gt;</span> </span>
+<span id="cb20-285"><a href="#cb20-285" aria-hidden="true" tabindex="-1"></a>                <span class="fu">features</span>(Value, <span class="fu">feature_set</span>(<span class="at">tags =</span> selected_feats))</span>
+<span id="cb20-286"><a href="#cb20-286" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-287"><a href="#cb20-287" aria-hidden="true" tabindex="-1"></a>final_df <span class="ot">&lt;-</span> df_alltypes <span class="sc">|&gt;</span> </span>
+<span id="cb20-288"><a href="#cb20-288" aria-hidden="true" tabindex="-1"></a>                <span class="fu">filter</span>(BankType <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"LargeBank"</span>, <span class="st">"LargeCreditCardBank"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb20-289"><a href="#cb20-289" aria-hidden="true" tabindex="-1"></a>                <span class="fu">mutate</span>(<span class="at">value_diff =</span> <span class="fu">difference</span>(Value))</span>
+<span id="cb20-290"><a href="#cb20-290" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-291"><a href="#cb20-291" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb20-292"><a href="#cb20-292" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exploration of Statistical Features {#sec-feature-explore}</span></span>
 <span id="cb20-293"><a href="#cb20-293" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-294"><a href="#cb20-294" aria-hidden="true" tabindex="-1"></a><span class="fu">## Quantiles - Large Credit Card Banks</span></span>
-<span id="cb20-297"><a href="#cb20-297" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-298"><a href="#cb20-298" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb20-299"><a href="#cb20-299" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
-<span id="cb20-300"><a href="#cb20-300" aria-hidden="true" tabindex="-1"></a>final_df <span class="sc">|&gt;</span> <span class="fu">na.omit</span>() <span class="sc">|&gt;</span></span>
-<span id="cb20-301"><a href="#cb20-301" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(BankType <span class="sc">==</span> <span class="st">"LargeCreditCardBank"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb20-302"><a href="#cb20-302" aria-hidden="true" tabindex="-1"></a>      <span class="fu">features</span>(Value, quantile)<span class="sc">|&gt;</span> </span>
-<span id="cb20-303"><a href="#cb20-303" aria-hidden="true" tabindex="-1"></a>        dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(IDRSSD,Measure,Label,Description,BankType)) <span class="sc">|&gt;</span></span>
-<span id="cb20-304"><a href="#cb20-304" aria-hidden="true" tabindex="-1"></a>        <span class="fu">arrange</span>(<span class="st">`</span><span class="at">100%</span><span class="st">`</span>)<span class="sc">|&gt;</span> </span>
-<span id="cb20-305"><a href="#cb20-305" aria-hidden="true" tabindex="-1"></a>        knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">format =</span> <span class="st">"html"</span>)        </span>
-<span id="cb20-306"><a href="#cb20-306" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-307"><a href="#cb20-307" aria-hidden="true" tabindex="-1"></a><span class="fu">## Quantiles - Large Banks</span></span>
-<span id="cb20-308"><a href="#cb20-308" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-311"><a href="#cb20-311" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-312"><a href="#cb20-312" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb20-313"><a href="#cb20-313" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
-<span id="cb20-314"><a href="#cb20-314" aria-hidden="true" tabindex="-1"></a>final_df <span class="sc">|&gt;</span> <span class="fu">na.omit</span>() <span class="sc">|&gt;</span></span>
-<span id="cb20-315"><a href="#cb20-315" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(BankType <span class="sc">==</span> <span class="st">"LargeBank"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb20-316"><a href="#cb20-316" aria-hidden="true" tabindex="-1"></a>      <span class="fu">features</span>(Value, quantile)<span class="sc">|&gt;</span> </span>
-<span id="cb20-317"><a href="#cb20-317" aria-hidden="true" tabindex="-1"></a>        dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(IDRSSD,Measure,Label,Description,BankType)) <span class="sc">|&gt;</span> </span>
-<span id="cb20-318"><a href="#cb20-318" aria-hidden="true" tabindex="-1"></a>        <span class="fu">arrange</span>(<span class="st">`</span><span class="at">100%</span><span class="st">`</span>)<span class="sc">|&gt;</span> </span>
-<span id="cb20-319"><a href="#cb20-319" aria-hidden="true" tabindex="-1"></a>        knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">format =</span> <span class="st">"html"</span>)</span>
-<span id="cb20-320"><a href="#cb20-320" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-321"><a href="#cb20-321" aria-hidden="true" tabindex="-1"></a>::: </span>
-<span id="cb20-322"><a href="#cb20-322" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-323"><a href="#cb20-323" aria-hidden="true" tabindex="-1"></a>@fig-lfeature shows the features from @sec-outliers that we can use to further explore the characteristics of each peer group (the calculations are documented in the tsfeatures R package by @tsfeatures). </span>
-<span id="cb20-324"><a href="#cb20-324" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-325"><a href="#cb20-325" aria-hidden="true" tabindex="-1"></a>The *Other Banks* peer group has been added for interest. </span>
-<span id="cb20-326"><a href="#cb20-326" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-329"><a href="#cb20-329" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-330"><a href="#cb20-330" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb20-331"><a href="#cb20-331" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
-<span id="cb20-332"><a href="#cb20-332" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-lfeature</span></span>
-<span id="cb20-333"><a href="#cb20-333" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Exploring Statistical Features (Post Regulatory environment)"</span></span>
-<span id="cb20-334"><a href="#cb20-334" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap:</span></span>
-<span id="cb20-335"><a href="#cb20-335" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Lumpiness - variance of the variances based on tiled yearly(non-overlapping) windows"</span></span>
-<span id="cb20-336"><a href="#cb20-336" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Stability - the variance of the means based on tiled yearly(non-overlapping) windows"</span></span>
-<span id="cb20-337"><a href="#cb20-337" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "STL decomposition Seasonal Strength - 0 is week (non-seasonal), 1 is strong"</span></span>
-<span id="cb20-338"><a href="#cb20-338" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "STL decomposition Trend Strength - 0 is week (no trend), 1 is strong"</span></span>
-<span id="cb20-339"><a href="#cb20-339" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Linearity -  values around 0 indicate the series is linear"</span></span>
-<span id="cb20-340"><a href="#cb20-340" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Autocorrelation - first autocorrelation coefficient"</span></span>
-<span id="cb20-341"><a href="#cb20-341" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Autocorrelation - 10th autocorrelation coefficient. In a completely random series (white noise), we would expect autocorrelation coefficients near zero for all lags"</span></span>
-<span id="cb20-342"><a href="#cb20-342" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Minimum number of differences necessary to obtain a stationary time series"</span></span>
-<span id="cb20-343"><a href="#cb20-343" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 2</span></span>
+<span id="cb20-294"><a href="#cb20-294" aria-hidden="true" tabindex="-1"></a>@fig-quantile plots the distribution of <span class="in">`r target_label`</span>. We can see that there are two peaks for *Large Credit Card Banks*. There are <span class="in">`r bank_n |&gt; filter(BankType=="LargeCreditCardBank") |&gt; pull(Number)`</span> banks in the this peer group which may be too small to capture the true distribution effectively. However, it may also indicate that there are sub-groups within this peer group. For instance, the first peak could represent banks that have lower risk profiles, while the second represents banks that have a higher risk profiles.</span>
+<span id="cb20-295"><a href="#cb20-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-296"><a href="#cb20-296" aria-hidden="true" tabindex="-1"></a>::: {#tbl-quantile .panel-tabset}</span>
+<span id="cb20-297"><a href="#cb20-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-298"><a href="#cb20-298" aria-hidden="true" tabindex="-1"></a><span class="fu">## Distribution</span></span>
+<span id="cb20-301"><a href="#cb20-301" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb20-302"><a href="#cb20-302" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb20-303"><a href="#cb20-303" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
+<span id="cb20-304"><a href="#cb20-304" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-height: 4</span></span>
+<span id="cb20-305"><a href="#cb20-305" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-quantile</span></span>
+<span id="cb20-306"><a href="#cb20-306" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Density plot"</span></span>
+<span id="cb20-307"><a href="#cb20-307" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(final_df, <span class="fu">aes</span>(<span class="at">x=</span>Value, <span class="at">colour =</span> BankType))<span class="sc">+</span> </span>
+<span id="cb20-308"><a href="#cb20-308" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_density</span>(<span class="at">alpha =</span> .<span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb20-309"><a href="#cb20-309" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x=</span>target_label) <span class="sc">+</span> <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb20-310"><a href="#cb20-310" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">"top"</span>,<span class="at">legend.title=</span><span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb20-311"><a href="#cb20-311" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">bank_type.colours</span>())</span>
+<span id="cb20-312"><a href="#cb20-312" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb20-313"><a href="#cb20-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-314"><a href="#cb20-314" aria-hidden="true" tabindex="-1"></a><span class="fu">## Quantiles - Large Credit Card Banks</span></span>
+<span id="cb20-317"><a href="#cb20-317" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb20-318"><a href="#cb20-318" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb20-319"><a href="#cb20-319" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
+<span id="cb20-320"><a href="#cb20-320" aria-hidden="true" tabindex="-1"></a>final_df <span class="sc">|&gt;</span> <span class="fu">na.omit</span>() <span class="sc">|&gt;</span></span>
+<span id="cb20-321"><a href="#cb20-321" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(BankType <span class="sc">==</span> <span class="st">"LargeCreditCardBank"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb20-322"><a href="#cb20-322" aria-hidden="true" tabindex="-1"></a>      <span class="fu">features</span>(Value, quantile)<span class="sc">|&gt;</span> </span>
+<span id="cb20-323"><a href="#cb20-323" aria-hidden="true" tabindex="-1"></a>        dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(IDRSSD,Measure,Label,Description,BankType)) <span class="sc">|&gt;</span></span>
+<span id="cb20-324"><a href="#cb20-324" aria-hidden="true" tabindex="-1"></a>        <span class="fu">arrange</span>(<span class="st">`</span><span class="at">100%</span><span class="st">`</span>)<span class="sc">|&gt;</span> </span>
+<span id="cb20-325"><a href="#cb20-325" aria-hidden="true" tabindex="-1"></a>        knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">format =</span> <span class="st">"html"</span>)        </span>
+<span id="cb20-326"><a href="#cb20-326" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb20-327"><a href="#cb20-327" aria-hidden="true" tabindex="-1"></a><span class="fu">## Quantiles - Large Banks</span></span>
+<span id="cb20-328"><a href="#cb20-328" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-331"><a href="#cb20-331" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb20-332"><a href="#cb20-332" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb20-333"><a href="#cb20-333" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
+<span id="cb20-334"><a href="#cb20-334" aria-hidden="true" tabindex="-1"></a>final_df <span class="sc">|&gt;</span> <span class="fu">na.omit</span>() <span class="sc">|&gt;</span></span>
+<span id="cb20-335"><a href="#cb20-335" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(BankType <span class="sc">==</span> <span class="st">"LargeBank"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb20-336"><a href="#cb20-336" aria-hidden="true" tabindex="-1"></a>      <span class="fu">features</span>(Value, quantile)<span class="sc">|&gt;</span> </span>
+<span id="cb20-337"><a href="#cb20-337" aria-hidden="true" tabindex="-1"></a>        dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(IDRSSD,Measure,Label,Description,BankType)) <span class="sc">|&gt;</span> </span>
+<span id="cb20-338"><a href="#cb20-338" aria-hidden="true" tabindex="-1"></a>        <span class="fu">arrange</span>(<span class="st">`</span><span class="at">100%</span><span class="st">`</span>)<span class="sc">|&gt;</span> </span>
+<span id="cb20-339"><a href="#cb20-339" aria-hidden="true" tabindex="-1"></a>        knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">format =</span> <span class="st">"html"</span>)</span>
+<span id="cb20-340"><a href="#cb20-340" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb20-341"><a href="#cb20-341" aria-hidden="true" tabindex="-1"></a>::: </span>
+<span id="cb20-342"><a href="#cb20-342" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-343"><a href="#cb20-343" aria-hidden="true" tabindex="-1"></a>@fig-lfeature shows the features from @sec-outliers that we can use to further explore the characteristics of each peer group (the calculations are documented in the tsfeatures R package by @tsfeatures). </span>
 <span id="cb20-344"><a href="#cb20-344" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-345"><a href="#cb20-345" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"var_tiled_var"</span>)</span>
+<span id="cb20-345"><a href="#cb20-345" aria-hidden="true" tabindex="-1"></a>The *Other Banks* peer group has been added for interest. </span>
 <span id="cb20-346"><a href="#cb20-346" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-347"><a href="#cb20-347" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"var_tiled_mean"</span>)</span>
-<span id="cb20-348"><a href="#cb20-348" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-349"><a href="#cb20-349" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"seasonal_strength_year"</span>)</span>
-<span id="cb20-350"><a href="#cb20-350" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-351"><a href="#cb20-351" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"trend_strength"</span>)</span>
-<span id="cb20-352"><a href="#cb20-352" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-353"><a href="#cb20-353" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"linearity"</span>)</span>
-<span id="cb20-354"><a href="#cb20-354" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-355"><a href="#cb20-355" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"stl_e_acf1"</span>)</span>
-<span id="cb20-356"><a href="#cb20-356" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-357"><a href="#cb20-357" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"stl_e_acf10"</span>)</span>
-<span id="cb20-358"><a href="#cb20-358" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-359"><a href="#cb20-359" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"nsdiffs"</span>)</span>
-<span id="cb20-360"><a href="#cb20-360" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-361"><a href="#cb20-361" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-362"><a href="#cb20-362" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-363"><a href="#cb20-363" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>@fig-lfeature-1: *Other Banks* are lumpy. Also we can see from @fig-regulation-2 that lumpiness continued post regulatory changes even though *Other Banks* are subject to the same regulation. </span>
-<span id="cb20-364"><a href="#cb20-364" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>@fig-lfeature-2: For *Large Banks* and *Large Credit Card Banks* the stability is ~0.8 indicating a degree of fluctuation in the data from one year to the next.</span>
-<span id="cb20-365"><a href="#cb20-365" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>@fig-lfeature-3 *Large Credit Card* Banks are seasonal. This can also be seen in the undulating shape in ACF plot (see @fig-acf-1). </span>
+<span id="cb20-349"><a href="#cb20-349" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb20-350"><a href="#cb20-350" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb20-351"><a href="#cb20-351" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
+<span id="cb20-352"><a href="#cb20-352" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-lfeature</span></span>
+<span id="cb20-353"><a href="#cb20-353" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Exploring Statistical Features (Post Regulatory environment)"</span></span>
+<span id="cb20-354"><a href="#cb20-354" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap:</span></span>
+<span id="cb20-355"><a href="#cb20-355" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Lumpiness - variance of the variances based on tiled yearly(non-overlapping) windows"</span></span>
+<span id="cb20-356"><a href="#cb20-356" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Stability - the variance of the means based on tiled yearly(non-overlapping) windows"</span></span>
+<span id="cb20-357"><a href="#cb20-357" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "STL decomposition Seasonal Strength - 0 is week (non-seasonal), 1 is strong"</span></span>
+<span id="cb20-358"><a href="#cb20-358" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "STL decomposition Trend Strength - 0 is week (no trend), 1 is strong"</span></span>
+<span id="cb20-359"><a href="#cb20-359" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Linearity -  values around 0 indicate the series is linear"</span></span>
+<span id="cb20-360"><a href="#cb20-360" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Autocorrelation - first autocorrelation coefficient"</span></span>
+<span id="cb20-361"><a href="#cb20-361" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Autocorrelation - 10th autocorrelation coefficient. In a completely random series (white noise), we would expect autocorrelation coefficients near zero for all lags"</span></span>
+<span id="cb20-362"><a href="#cb20-362" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Minimum number of differences necessary to obtain a stationary time series"</span></span>
+<span id="cb20-363"><a href="#cb20-363" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 2</span></span>
+<span id="cb20-364"><a href="#cb20-364" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-365"><a href="#cb20-365" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"var_tiled_var"</span>)</span>
 <span id="cb20-366"><a href="#cb20-366" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-367"><a href="#cb20-367" aria-hidden="true" tabindex="-1"></a>    @fig-season shows both *Large Banks* and *Large Credit Card Banks* peak in Q3. Given events like Black Friday, Thanksgiving and Christmas occur in Q4, we may have expected peak delinquency in Q4 or Q1. </span>
+<span id="cb20-367"><a href="#cb20-367" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"var_tiled_mean"</span>)</span>
 <span id="cb20-368"><a href="#cb20-368" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-371"><a href="#cb20-371" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-372"><a href="#cb20-372" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb20-373"><a href="#cb20-373" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
-<span id="cb20-374"><a href="#cb20-374" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-season</span></span>
-<span id="cb20-375"><a href="#cb20-375" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Quarterly Seasonal Subseries. The blue horizontal lines indicate the means for each quarter."</span></span>
-<span id="cb20-376"><a href="#cb20-376" aria-hidden="true" tabindex="-1"></a>df_alltypes <span class="sc">|&gt;</span> <span class="fu">group_by</span>(BankType) <span class="sc">|&gt;</span> </span>
-<span id="cb20-377"><a href="#cb20-377" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">mean =</span> <span class="fu">mean</span>(Value, <span class="at">na.rm=</span>T)) <span class="sc">|&gt;</span> </span>
-<span id="cb20-378"><a href="#cb20-378" aria-hidden="true" tabindex="-1"></a>        <span class="fu">gg_subseries</span>() <span class="sc">+</span></span>
-<span id="cb20-379"><a href="#cb20-379" aria-hidden="true" tabindex="-1"></a>        <span class="fu">labs</span>(<span class="at">y=</span><span class="fu">glue</span>(<span class="st">"{target_label} </span><span class="sc">\n</span><span class="st"> mean"</span>))</span>
-<span id="cb20-380"><a href="#cb20-380" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-381"><a href="#cb20-381" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-369"><a href="#cb20-369" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"seasonal_strength_year"</span>)</span>
+<span id="cb20-370"><a href="#cb20-370" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-371"><a href="#cb20-371" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"trend_strength"</span>)</span>
+<span id="cb20-372"><a href="#cb20-372" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-373"><a href="#cb20-373" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"linearity"</span>)</span>
+<span id="cb20-374"><a href="#cb20-374" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-375"><a href="#cb20-375" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"stl_e_acf1"</span>)</span>
+<span id="cb20-376"><a href="#cb20-376" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-377"><a href="#cb20-377" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"stl_e_acf10"</span>)</span>
+<span id="cb20-378"><a href="#cb20-378" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-379"><a href="#cb20-379" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"nsdiffs"</span>)</span>
+<span id="cb20-380"><a href="#cb20-380" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-381"><a href="#cb20-381" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb20-382"><a href="#cb20-382" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-383"><a href="#cb20-383" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-384"><a href="#cb20-384" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>@fig-lfeature-4 and @fig-lfeature-5 indicates a strong linear trend for *Large Banks* and *Large Credit Card Banks*.</span>
-<span id="cb20-385"><a href="#cb20-385" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>@fig-lfeature-6 the first autocorrelation coefficient is close to 0 which indicates a weak linear relationship between lagged values. Of note the coefficients are negative indicating a tendency for a short-term reversal. This can be seen in @fig-regulation-1 where the values oscillate.</span>
-<span id="cb20-386"><a href="#cb20-386" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>@fig-lfeature-7 the 10th autocorrelation coefficient. Checking overall autocorrelation using the Ljung-Box test proves autocorrelation i.e. data pattern is not due to chance.</span>
-<span id="cb20-387"><a href="#cb20-387" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-388"><a href="#cb20-388" aria-hidden="true" tabindex="-1"></a>**Ljung-Box test**</span>
-<span id="cb20-389"><a href="#cb20-389" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-390"><a href="#cb20-390" aria-hidden="true" tabindex="-1"></a>::: {.border}</span>
-<span id="cb20-393"><a href="#cb20-393" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-394"><a href="#cb20-394" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb20-395"><a href="#cb20-395" aria-hidden="true" tabindex="-1"></a>final_df <span class="sc">|&gt;</span> <span class="fu">na.omit</span>() <span class="sc">|&gt;</span> <span class="fu">pull</span>(value_diff) <span class="sc">|&gt;</span> <span class="fu">Box.test</span>(<span class="at">lag =</span> <span class="dv">10</span>, <span class="at">type =</span> <span class="st">"Ljung"</span>)</span>
-<span id="cb20-396"><a href="#cb20-396" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-397"><a href="#cb20-397" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb20-398"><a href="#cb20-398" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-399"><a href="#cb20-399" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-400"><a href="#cb20-400" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>@fig-lfeature-8 *Large Credit Card Banks* is not stationary i.e. the statistical properties of the time series changes, which makes it difficult to identify trends and patterns. Performing a difference i.e. to get the quarterly change in UBPRE524, makes the series stationary as shown in @fig-acf-2. This can be confirmed by performing an augmented Dickey–Fuller (ADF) test on the differenced value. We also see that, post differencing, there are autocorrelation coefficients above the significance threshold. This is likely due to seasonality as these are at regular intervals. The decreasing magnitude of these coefficients tell us the earlier lags have a stronger influence than values further in the past.</span>
+<span id="cb20-383"><a href="#cb20-383" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>@fig-lfeature-1: *Other Banks* are lumpy. Also we can see from @fig-regulation-2 that lumpiness continued post regulatory changes even though *Other Banks* are subject to the same regulation. </span>
+<span id="cb20-384"><a href="#cb20-384" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>@fig-lfeature-2: For *Large Banks* and *Large Credit Card Banks* the stability is ~0.8 indicating a degree of fluctuation in the data from one year to the next.</span>
+<span id="cb20-385"><a href="#cb20-385" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>@fig-lfeature-3 *Large Credit Card* Banks are seasonal. This can also be seen in the undulating shape in ACF plot (see @fig-acf-1). </span>
+<span id="cb20-386"><a href="#cb20-386" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-387"><a href="#cb20-387" aria-hidden="true" tabindex="-1"></a>    @fig-season shows both *Large Banks* and *Large Credit Card Banks* peak in Q3. Given events like Black Friday, Thanksgiving and Christmas occur in Q4, we may have expected peak delinquency in Q4 or Q1. </span>
+<span id="cb20-388"><a href="#cb20-388" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-391"><a href="#cb20-391" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb20-392"><a href="#cb20-392" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb20-393"><a href="#cb20-393" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
+<span id="cb20-394"><a href="#cb20-394" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-season</span></span>
+<span id="cb20-395"><a href="#cb20-395" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Quarterly Seasonal Subseries. The blue horizontal lines indicate the means for each quarter."</span></span>
+<span id="cb20-396"><a href="#cb20-396" aria-hidden="true" tabindex="-1"></a>df_alltypes <span class="sc">|&gt;</span> <span class="fu">group_by</span>(BankType) <span class="sc">|&gt;</span> </span>
+<span id="cb20-397"><a href="#cb20-397" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">mean =</span> <span class="fu">mean</span>(Value, <span class="at">na.rm=</span>T)) <span class="sc">|&gt;</span> </span>
+<span id="cb20-398"><a href="#cb20-398" aria-hidden="true" tabindex="-1"></a>        <span class="fu">gg_subseries</span>() <span class="sc">+</span></span>
+<span id="cb20-399"><a href="#cb20-399" aria-hidden="true" tabindex="-1"></a>        <span class="fu">labs</span>(<span class="at">y=</span><span class="fu">glue</span>(<span class="st">"{target_label} </span><span class="sc">\n</span><span class="st"> mean"</span>))</span>
+<span id="cb20-400"><a href="#cb20-400" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb20-401"><a href="#cb20-401" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-402"><a href="#cb20-402" aria-hidden="true" tabindex="-1"></a>Autocorrelation, the correlation between the timeseries and its own lagged values, can inform an AutoRegressive Moving Average (ARMA) Model. In @fig-acf we see a Seasonal-ARMA process in *Large Credit Card Banks* as both ACF and PACF are declining gradually around every 4th lag. This confirms what we saw in @fig-lfeature-3.</span>
+<span id="cb20-402"><a href="#cb20-402" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-403"><a href="#cb20-403" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-406"><a href="#cb20-406" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-407"><a href="#cb20-407" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb20-408"><a href="#cb20-408" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
-<span id="cb20-409"><a href="#cb20-409" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-acf</span></span>
-<span id="cb20-410"><a href="#cb20-410" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "ACF and PACF"</span></span>
-<span id="cb20-411"><a href="#cb20-411" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap:</span></span>
-<span id="cb20-412"><a href="#cb20-412" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "ACF on original value"</span></span>
-<span id="cb20-413"><a href="#cb20-413" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "ACF on first difference value"</span></span>
-<span id="cb20-414"><a href="#cb20-414" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "PACF on original value"</span></span>
-<span id="cb20-415"><a href="#cb20-415" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "PACF on first difference value"</span></span>
-<span id="cb20-416"><a href="#cb20-416" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 2</span></span>
-<span id="cb20-417"><a href="#cb20-417" aria-hidden="true" tabindex="-1"></a>agg_df <span class="ot">&lt;-</span> final_df <span class="sc">|&gt;</span> </span>
-<span id="cb20-418"><a href="#cb20-418" aria-hidden="true" tabindex="-1"></a>            <span class="fu">group_by</span>(BankType)<span class="sc">|&gt;</span> </span>
-<span id="cb20-419"><a href="#cb20-419" aria-hidden="true" tabindex="-1"></a>            <span class="fu">summarise</span>(<span class="at">mean_val =</span> <span class="fu">mean</span>(Value, <span class="at">na.rm=</span>T),</span>
-<span id="cb20-420"><a href="#cb20-420" aria-hidden="true" tabindex="-1"></a>                      <span class="at">mean_diff =</span> <span class="fu">mean</span>(value_diff, <span class="at">na.rm=</span>T)) </span>
-<span id="cb20-421"><a href="#cb20-421" aria-hidden="true" tabindex="-1"></a>       </span>
-<span id="cb20-422"><a href="#cb20-422" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">ACF</span>(<span class="at">x=</span>mean_val,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
-<span id="cb20-423"><a href="#cb20-423" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">ACF</span>(<span class="at">x=</span>mean_diff,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
-<span id="cb20-424"><a href="#cb20-424" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-425"><a href="#cb20-425" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">PACF</span>(<span class="at">x=</span>mean_val,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
-<span id="cb20-426"><a href="#cb20-426" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">PACF</span>(<span class="at">x=</span>mean_diff,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
-<span id="cb20-427"><a href="#cb20-427" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-428"><a href="#cb20-428" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-429"><a href="#cb20-429" aria-hidden="true" tabindex="-1"></a>**Dickey–Fuller (ADF) test**</span>
-<span id="cb20-430"><a href="#cb20-430" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-431"><a href="#cb20-431" aria-hidden="true" tabindex="-1"></a>::: {.border}</span>
-<span id="cb20-434"><a href="#cb20-434" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-435"><a href="#cb20-435" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb20-436"><a href="#cb20-436" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-437"><a href="#cb20-437" aria-hidden="true" tabindex="-1"></a>final_df <span class="sc">|&gt;</span> <span class="fu">na.omit</span>() <span class="sc">|&gt;</span> <span class="fu">pull</span>(value_diff) <span class="sc">|&gt;</span> tseries<span class="sc">::</span><span class="fu">adf.test</span>()</span>
-<span id="cb20-438"><a href="#cb20-438" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-439"><a href="#cb20-439" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb20-440"><a href="#cb20-440" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-441"><a href="#cb20-441" aria-hidden="true" tabindex="-1"></a><span class="fu">## Summary</span></span>
-<span id="cb20-442"><a href="#cb20-442" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-443"><a href="#cb20-443" aria-hidden="true" tabindex="-1"></a>In summary, based on exploration of the data we will prepare the data for modelling by:</span>
+<span id="cb20-404"><a href="#cb20-404" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>@fig-lfeature-4 and @fig-lfeature-5 indicates a strong linear trend for *Large Banks* and *Large Credit Card Banks*.</span>
+<span id="cb20-405"><a href="#cb20-405" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>@fig-lfeature-6 the first autocorrelation coefficient is close to 0 which indicates a weak linear relationship between lagged values. Of note the coefficients are negative indicating a tendency for a short-term reversal. This can be seen in @fig-regulation-1 where the values oscillate.</span>
+<span id="cb20-406"><a href="#cb20-406" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>@fig-lfeature-7 the 10th autocorrelation coefficient. Checking overall autocorrelation using the Ljung-Box test proves autocorrelation i.e. data pattern is not due to chance.</span>
+<span id="cb20-407"><a href="#cb20-407" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-408"><a href="#cb20-408" aria-hidden="true" tabindex="-1"></a>**Ljung-Box test**</span>
+<span id="cb20-409"><a href="#cb20-409" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-410"><a href="#cb20-410" aria-hidden="true" tabindex="-1"></a>::: {.border}</span>
+<span id="cb20-413"><a href="#cb20-413" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb20-414"><a href="#cb20-414" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb20-415"><a href="#cb20-415" aria-hidden="true" tabindex="-1"></a>final_df <span class="sc">|&gt;</span> <span class="fu">na.omit</span>() <span class="sc">|&gt;</span> <span class="fu">pull</span>(value_diff) <span class="sc">|&gt;</span> <span class="fu">Box.test</span>(<span class="at">lag =</span> <span class="dv">10</span>, <span class="at">type =</span> <span class="st">"Ljung"</span>)</span>
+<span id="cb20-416"><a href="#cb20-416" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb20-417"><a href="#cb20-417" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb20-418"><a href="#cb20-418" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-419"><a href="#cb20-419" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-420"><a href="#cb20-420" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>@fig-lfeature-8 *Large Credit Card Banks* is not stationary i.e. the statistical properties of the time series changes, which makes it difficult to identify trends and patterns. Performing a difference i.e. to get the quarterly change in UBPRE524, makes the series stationary as shown in @fig-acf-2. This can be confirmed by performing an augmented Dickey–Fuller (ADF) test on the differenced value. We also see that, post differencing, there are autocorrelation coefficients above the significance threshold. This is likely due to seasonality as these are at regular intervals. The decreasing magnitude of these coefficients tell us the earlier lags have a stronger influence than values further in the past.</span>
+<span id="cb20-421"><a href="#cb20-421" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-422"><a href="#cb20-422" aria-hidden="true" tabindex="-1"></a>Autocorrelation, the correlation between the timeseries and its own lagged values, can inform an AutoRegressive Moving Average (ARMA) Model. In @fig-acf we see a Seasonal-ARMA process in *Large Credit Card Banks* as both ACF and PACF are declining gradually around every 4th lag. This confirms what we saw in @fig-lfeature-3.</span>
+<span id="cb20-423"><a href="#cb20-423" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-426"><a href="#cb20-426" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb20-427"><a href="#cb20-427" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb20-428"><a href="#cb20-428" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
+<span id="cb20-429"><a href="#cb20-429" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-acf</span></span>
+<span id="cb20-430"><a href="#cb20-430" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "ACF and PACF"</span></span>
+<span id="cb20-431"><a href="#cb20-431" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap:</span></span>
+<span id="cb20-432"><a href="#cb20-432" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "ACF on original value"</span></span>
+<span id="cb20-433"><a href="#cb20-433" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "ACF on first difference value"</span></span>
+<span id="cb20-434"><a href="#cb20-434" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "PACF on original value"</span></span>
+<span id="cb20-435"><a href="#cb20-435" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "PACF on first difference value"</span></span>
+<span id="cb20-436"><a href="#cb20-436" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 2</span></span>
+<span id="cb20-437"><a href="#cb20-437" aria-hidden="true" tabindex="-1"></a>agg_df <span class="ot">&lt;-</span> final_df <span class="sc">|&gt;</span> </span>
+<span id="cb20-438"><a href="#cb20-438" aria-hidden="true" tabindex="-1"></a>            <span class="fu">group_by</span>(BankType)<span class="sc">|&gt;</span> </span>
+<span id="cb20-439"><a href="#cb20-439" aria-hidden="true" tabindex="-1"></a>            <span class="fu">summarise</span>(<span class="at">mean_val =</span> <span class="fu">mean</span>(Value, <span class="at">na.rm=</span>T),</span>
+<span id="cb20-440"><a href="#cb20-440" aria-hidden="true" tabindex="-1"></a>                      <span class="at">mean_diff =</span> <span class="fu">mean</span>(value_diff, <span class="at">na.rm=</span>T)) </span>
+<span id="cb20-441"><a href="#cb20-441" aria-hidden="true" tabindex="-1"></a>       </span>
+<span id="cb20-442"><a href="#cb20-442" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">ACF</span>(<span class="at">x=</span>mean_val,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
+<span id="cb20-443"><a href="#cb20-443" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">ACF</span>(<span class="at">x=</span>mean_diff,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
 <span id="cb20-444"><a href="#cb20-444" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-445"><a href="#cb20-445" aria-hidden="true" tabindex="-1"></a>***Selecting:***</span>
-<span id="cb20-446"><a href="#cb20-446" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-447"><a href="#cb20-447" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Target measure: *`r target_label`* (UBPRE524).</span>
-<span id="cb20-448"><a href="#cb20-448" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Banks: *Large Banks* and *Large Credit Card* Banks.</span>
-<span id="cb20-449"><a href="#cb20-449" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Date Period: from 2010 Q2.</span>
+<span id="cb20-445"><a href="#cb20-445" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">PACF</span>(<span class="at">x=</span>mean_val,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
+<span id="cb20-446"><a href="#cb20-446" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">PACF</span>(<span class="at">x=</span>mean_diff,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
+<span id="cb20-447"><a href="#cb20-447" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-448"><a href="#cb20-448" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb20-449"><a href="#cb20-449" aria-hidden="true" tabindex="-1"></a>**Dickey–Fuller (ADF) test**</span>
 <span id="cb20-450"><a href="#cb20-450" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-451"><a href="#cb20-451" aria-hidden="true" tabindex="-1"></a>***Removing:***</span>
-<span id="cb20-452"><a href="#cb20-452" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-453"><a href="#cb20-453" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Outlier data points: first 2 quarters.</span>
-<span id="cb20-454"><a href="#cb20-454" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-455"><a href="#cb20-455" aria-hidden="true" tabindex="-1"></a>***Transforming:***</span>
+<span id="cb20-451"><a href="#cb20-451" aria-hidden="true" tabindex="-1"></a>::: {.border}</span>
+<span id="cb20-454"><a href="#cb20-454" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb20-455"><a href="#cb20-455" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
 <span id="cb20-456"><a href="#cb20-456" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-457"><a href="#cb20-457" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>the Target measure to make it stationary. We do this by taking the first difference. </span>
+<span id="cb20-457"><a href="#cb20-457" aria-hidden="true" tabindex="-1"></a>final_df <span class="sc">|&gt;</span> <span class="fu">na.omit</span>() <span class="sc">|&gt;</span> <span class="fu">pull</span>(value_diff) <span class="sc">|&gt;</span> tseries<span class="sc">::</span><span class="fu">adf.test</span>()</span>
+<span id="cb20-458"><a href="#cb20-458" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb20-459"><a href="#cb20-459" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb20-460"><a href="#cb20-460" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-461"><a href="#cb20-461" aria-hidden="true" tabindex="-1"></a><span class="fu">## Summary</span></span>
+<span id="cb20-462"><a href="#cb20-462" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-463"><a href="#cb20-463" aria-hidden="true" tabindex="-1"></a>In summary, based on exploration of the data we will prepare the data for modelling by:</span>
+<span id="cb20-464"><a href="#cb20-464" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-465"><a href="#cb20-465" aria-hidden="true" tabindex="-1"></a>***Selecting:***</span>
+<span id="cb20-466"><a href="#cb20-466" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-467"><a href="#cb20-467" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Target measure: *`r target_label`* (UBPRE524).</span>
+<span id="cb20-468"><a href="#cb20-468" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Banks: *Large Banks* and *Large Credit Card* Banks.</span>
+<span id="cb20-469"><a href="#cb20-469" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Date Period: from 2010 Q2 or from 2010 Q3 year which is when we see more of a steady state post regulatory change.</span>
+<span id="cb20-470"><a href="#cb20-470" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-471"><a href="#cb20-471" aria-hidden="true" tabindex="-1"></a>***Removing:***</span>
+<span id="cb20-472"><a href="#cb20-472" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-473"><a href="#cb20-473" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Outlier data points: first 2 quarters.</span>
+<span id="cb20-474"><a href="#cb20-474" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-475"><a href="#cb20-475" aria-hidden="true" tabindex="-1"></a>***Transforming:***</span>
+<span id="cb20-476"><a href="#cb20-476" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-477"><a href="#cb20-477" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>the Target measure to make it stationary. We do this by taking the first difference. </span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
