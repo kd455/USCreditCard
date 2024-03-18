@@ -163,8 +163,12 @@ tccp <- readxl::read_xlsx("data/cfpb_tccp-data_2022-07-01_2022_12-31.xlsx", skip
                   BankName == "PNC Bank N.A." ~ "PNC BANK, NATIONAL ASSOCIATION",              
                   BankName == "BMO HARRIS BANK NATIONAL ASSOCIATION" ~  "BMO BANK NATIONAL ASSOCIATION",   
                   .default = BankName
-            ))
-
+            )) |>
+  mutate(across(where(is.double), ~na_if(., 9.99))) |> rowwise() |>
+  mutate(MaxAPR=max(across(contains("Maximum APR")), na.rm = TRUE),
+        MedianAPR=max(across(contains("Median APR")), na.rm = TRUE),
+        MinAPR=max(across(contains("Mimimum APR")), na.rm = TRUE))
+              
 final_tccp <- peer_df |> left_join(tccp, by = join_by(Name == BankName)) |> 
                 mutate(BankName = paste0(Name, " (", `ID RSSD`, ")") ) |> 
                     relocate(BankName) |> 
@@ -172,14 +176,28 @@ final_tccp <- peer_df |> left_join(tccp, by = join_by(Name == BankName)) |>
                         separate_wider_delim(TargetTiers," ",names = "LowestTier", too_many = "drop") 
 
 tccp_maxapr <- final_tccp |> 
-                dplyr::select(BankName, BankType, Partner, LowestTier, contains("Maximum APR")) |> rowwise() |>
-                mutate(MaxAPR=max(c_across(contains("Maximum APR")), na.rm = TRUE)) |> relocate(MaxAPR) |> group_by(BankName,BankType, Partner, LowestTier) |> summarise(MaxAPR = median(MaxAPR))
-
+                mutate(MaxAPR=coalesce(MaxAPR, MedianAPR, MinAPR)) |> relocate(MaxAPR) |> group_by(BankName,BankType, Partner, LowestTier) |> 
+                summarise(MaxAPR = mean(MaxAPR,na.rm=TRUE)) |>
+                drop_na(Partner) |>
+                mutate(Partner = if_else(Partner == 1 , "Yes", "No"),MaxAPR = MaxAPR*100)
+   
 tccp_maxapr |> 
   group_by(BankType, Partner) |> 
-  summarise(MaxAPR = median(MaxAPR, na.rm=TRUE)) |> drop_na(Partner) |> mutate(Partner = if_else(Partner == 1 , "Yes", "No"), MaxAPR = MaxAPR*100) |> dplyr::select(`Partnership card` = Partner, `Max APR (%)` = MaxAPR)
+  summarise(MaxAPR = mean(MaxAPR, na.rm=TRUE)) |> 
+  dplyr::select(`Partnership card` = Partner, `Max APR (%)` = MaxAPR)
 
+```
 
+```{r}
+#| warning: false
+#| label: fig-tccp-apr
+#| fig-cap: "Max APR distribution for partnership cards vs. bank branded cards"
+tccp_maxapr |> 
+  mutate(Partner = if_else(Partner == "Yes" , "Partnership", "Bank-branded")) |>
+  ggplot(aes(x=MaxAPR, colour = Partner))+ 
+    geom_density() +
+    labs(x="Max APR") + theme_bw() +
+    theme(legend.position="top",legend.title=element_blank())
 ```
 
 ### Industry Classification

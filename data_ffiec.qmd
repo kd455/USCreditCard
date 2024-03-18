@@ -283,7 +283,7 @@ final_df <- df_alltypes |>
 #| label: fig-quantile
 #| fig-cap: "Density plot"
 ggplot(final_df, aes(x=Value, colour = BankType))+ 
-    geom_density(alpha = .3) +
+    geom_density() +
     labs(x=target_label) + theme_bw() +
     theme(legend.position="top",legend.title=element_blank()) +
     scale_color_manual(values = bank_type.colours())
