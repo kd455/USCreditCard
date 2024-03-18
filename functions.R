@@ -889,7 +889,7 @@ print_ar <- function(prediction_result, partner, bank) {
       rmarkdown::paged_table(options = list(rows.print = 16))
 }
 
-nest_data_for_step_cv <- function(estimation_data) {
+nest_data_for_step_cv <- function(estimation_data, steps = 1) {
     data <- estimation_data |> as_tibble() |>
               mutate(Quarter = format(Quarter, format = "%Y Q%q"),
                      Quarter = factor(Quarter, levels = unique(Quarter))) |> 
@@ -901,7 +901,7 @@ nest_data_for_step_cv <- function(estimation_data) {
                         data |>
                             filter(Quarter_Index < .x)
                         })
-
+  
     est_data_tr <- tibble(
                     Quarter_Index = unique(data$Quarter_Index),
                     data = cumulative_data
@@ -909,9 +909,9 @@ nest_data_for_step_cv <- function(estimation_data) {
 
     step_data_tr <- data |> 
                       group_by(Quarter_Index) |> 
-                      nest(new_data = -c(Quarter_Index))
-
-
+                      nest(new_data = -c(Quarter_Index)) |>
+                      mutate(Quarter_Index = Quarter_Index - steps+1) 
+    
     est_data_tr |> left_join(step_data_tr) |> drop_na(new_data)
 }
 
