@@ -28,8 +28,7 @@ all_data <- get_hierarchy_model_data()
 
 all_data |> dplyr::slice_head(n=10) |> relocate(Qtr, .after = BankType) |> rmarkdown::paged_table()
 
-read_csv("data/Partner_NAICS.csv",show_col_types = FALSE) |> 
-                   dplyr::select(Partner, NAICS) |> rmarkdown::paged_table()
+read_csv("data/Partner_NAICS.csv",show_col_types = FALSE) |> rmarkdown::paged_table()
 
 all_cols <- tibble(Feature = names(all_data))
 feature_desc <- get_feature_labels()
