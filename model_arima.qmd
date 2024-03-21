@@ -229,11 +229,10 @@ run_arima(estimation_data)
 
 ### Results
 
-We can see that for our sub-set of banks the top models are very different. 
+We can see that for our sub-set of banks the top models are very different. With the exception of Capital One all models have explanatory variables. Capital One is the only model the relies solely on its history.
 
-* Capital One's model has no AR errors and is equivalent to the Market model.
-* American Express's model does not have any AR coefficients but is sensitive to seasonal AR errors.
-* The ar1 Error for Barclays and Citibank have a high level of uncertainty (std.error). The p.value (P>0.05) indicating ar1 is not significant.
+For BARCLAYS we could simplify the model by removing terms where p-value > 0.05 as we cannot conclude that these explanatory variables affect our target measure.
+
 
 ::: {#sec-arima-aic .panel-tabset}
 

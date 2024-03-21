@@ -20,6 +20,8 @@ target_label <- credit_card.target_label()
 
 We know from the market model that the group trend is informative. We can take this idea further and instead of treating each bank's time series in isolation, we can instead develop a hierarchical model to provide insights into the shared dynamics across series and how individual firms deviate from group patterns.
 
+Hierarchical models are designed to distinguish between the effects of observed and unobserved variables. We can model fixed effects to capture the impact of observed explanatory variables, while the random effects capture the variability due to unobserved factors across groups. 
+
 For example: 
 $$
 UBPRE524.diff = (1 + UBPRB538.log.diff | BankType/BankName) + UNRATE.log.diff
@@ -179,9 +181,7 @@ cov2cor(vcov(top_model)) |> as.matrix() |> as.data.frame() |>
 ```
 :::
 
-The high t-statistic for UBPRE524.group.log.diff indicates that the effect is quite precise and the likelihood that this finding is due to chance is very small.
-
-Based on the t-statistics, TDSP.log.diff.lag1 appears to be a more statistically significant predictor than TDSP.log.diff. TDSP is *Household Debt Service Payments as a Percent of Disposable Personal Income*.
+The high t-statistics for all the terms indicate that the effects are quite precise and the likelihood that this finding is due to chance is very small.
 
 ### Random Effects
 
@@ -217,7 +217,9 @@ ranef(top_model, condVar = FALSE)$`BankName:BankType` |> as.data.frame() |>
 ```
 :::
 
-From @fig-random-effect we can see that the random effect of *Unused Commitments on Credit Cards* (UBPR3815) in particular varies widely across banks and quarters.
+From @fig-random-effect we can see that the random effect of *Unused Commitments on Credit Cards* (UBPR3815) and *Loans to Individuals for Household, Family, and Other Personal Expenditures:Credit Cards* (UBPRB538) are distinguishable from zero i.e. the contribution to the variability of our target measure is beyond what could be expected by chance alone. 
+
+Interestingly, Qtr3 for BankType was also distinguishable from zero. This aligns with our statistical tests in @fig-season that showed delinquency peaked in Q3. But at the Bank level Q4 appears more significant. 
 
 ### Residual diagnostics {#sec-residual-check-hier}
 

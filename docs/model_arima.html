@@ -487,12 +487,8 @@ div.csl-indent {
 </section>
 <section id="results" class="level3" data-number="7.1.2">
 <h3 data-number="7.1.2" class="anchored" data-anchor-id="results"><span class="header-section-number">7.1.2</span> Results</h3>
-<p>We can see that for our sub-set of banks the top models are very different.</p>
-<ul>
-<li>Capital One’s model has no AR errors and is equivalent to the Market model.</li>
-<li>American Express’s model does not have any AR coefficients but is sensitive to seasonal AR errors.</li>
-<li>The ar1 Error for Barclays and Citibank have a high level of uncertainty (std.error). The p.value (P&gt;0.05) indicating ar1 is not significant.</li>
-</ul>
+<p>We can see that for our sub-set of banks the top models are very different. With the exception of Capital One all models have explanatory variables. Capital One is the only model the relies solely on its history.</p>
+<p>For BARCLAYS we could simplify the model by removing terms where p-value &gt; 0.05 as we cannot conclude that these explanatory variables affect our target measure.</p>
 <div class="tabset-margin-container"></div><div id="sec-arima-aic" class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" aria-current="page">CITIBANK</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">SYNCHRONY</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">BARCLAYS</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">AMERICAN EXPRESS NATIONAL BANK</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false">CAPITAL ONE</a></li></ul>
 <div id="sec-arima-aic" class="tab-content">
@@ -521,7 +517,7 @@ div.csl-indent {
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print_coeff</span>(bank, best_bank_models) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print_coeff</span>(bank, best_bank_models)<span class="co">#| </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="tbl-arima-citi-coef" class="anchored">
@@ -897,7 +893,7 @@ div.csl-indent {
 <div data-pagedtable="false"> <div class="table-caption">(a) <p>Accuracy Metrics on Training and Cross Validation data for sub-set of
 banks</p> </div>
   <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["BankName"],"name":[1],"type":["chr"],"align":["left"]},{"label":["BankType"],"name":[2],"type":["chr"],"align":["left"]},{"label":[".type"],"name":[3],"type":["chr"],"align":["left"]},{"label":["RMSE"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["MAE"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"AMERICAN EXPRESS NATIONAL BANK (1394676)","2":"LargeCreditCardBank","3":"CV","4":"0.050","5":"0.050"},{"1":"AMERICAN EXPRESS NATIONAL BANK (1394676)","2":"LargeCreditCardBank","3":"Training","4":"0.029","5":"0.022"},{"1":"BARCLAYS BANK DELAWARE (2980209)","2":"LargeCreditCardBank","3":"CV","4":"0.093","5":"0.093"},{"1":"BARCLAYS BANK DELAWARE (2980209)","2":"LargeCreditCardBank","3":"Training","4":"0.063","5":"0.045"},{"1":"CAPITAL ONE, NATIONAL ASSOCIATION (112837)","2":"LargeBank","3":"CV","4":"0.056","5":"0.056"},{"1":"CAPITAL ONE, NATIONAL ASSOCIATION (112837)","2":"LargeBank","3":"Training","4":"0.083","5":"0.060"},{"1":"CITIBANK, N.A. (476810)","2":"LargeBank","3":"CV","4":"0.074","5":"0.074"},{"1":"CITIBANK, N.A. (476810)","2":"LargeBank","3":"Training","4":"0.059","5":"0.043"},{"1":"SYNCHRONY BANK (1216022)","2":"LargeCreditCardBank","3":"CV","4":"0.098","5":"0.098"},{"1":"SYNCHRONY BANK (1216022)","2":"LargeCreditCardBank","3":"Training","4":"0.101","5":"0.050"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["BankName"],"name":[1],"type":["chr"],"align":["left"]},{"label":["BankType"],"name":[2],"type":["chr"],"align":["left"]},{"label":[".type"],"name":[3],"type":["chr"],"align":["left"]},{"label":["RMSE"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["MAE"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"AMERICAN EXPRESS NATIONAL BANK (1394676)","2":"LargeCreditCardBank","3":"CV","4":"0.050","5":"0.050"},{"1":"AMERICAN EXPRESS NATIONAL BANK (1394676)","2":"LargeCreditCardBank","3":"Training","4":"0.028","5":"0.021"},{"1":"BARCLAYS BANK DELAWARE (2980209)","2":"LargeCreditCardBank","3":"CV","4":"0.093","5":"0.093"},{"1":"BARCLAYS BANK DELAWARE (2980209)","2":"LargeCreditCardBank","3":"Training","4":"0.065","5":"0.049"},{"1":"CAPITAL ONE, NATIONAL ASSOCIATION (112837)","2":"LargeBank","3":"CV","4":"0.056","5":"0.056"},{"1":"CAPITAL ONE, NATIONAL ASSOCIATION (112837)","2":"LargeBank","3":"Training","4":"0.082","5":"0.066"},{"1":"CITIBANK, N.A. (476810)","2":"LargeBank","3":"CV","4":"0.074","5":"0.074"},{"1":"CITIBANK, N.A. (476810)","2":"LargeBank","3":"Training","4":"0.035","5":"0.030"},{"1":"SYNCHRONY BANK (1216022)","2":"LargeCreditCardBank","3":"CV","4":"0.098","5":"0.098"},{"1":"SYNCHRONY BANK (1216022)","2":"LargeCreditCardBank","3":"Training","4":"0.109","5":"0.069"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
@@ -907,7 +903,7 @@ banks</p> </div>
 
 <div data-pagedtable="false"> <div class="table-caption">(b) <p>Mean Accuracy Metrics for our sub-set of banks</p> </div>
   <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":[".type"],"name":[1],"type":["chr"],"align":["left"]},{"label":["RMSE"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["MAE"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"CV","2":"0.074","3":"0.074"},{"1":"Training","2":"0.063","3":"0.045"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":[".type"],"name":[1],"type":["chr"],"align":["left"]},{"label":["RMSE"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["MAE"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"CV","2":"0.074","3":"0.074"},{"1":"Training","2":"0.065","3":"0.049"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
@@ -917,7 +913,7 @@ banks</p> </div>
 
 <div data-pagedtable="false"> <div class="table-caption">(c) <p>Mean Accuracy Metrics across all banks</p> </div>
   <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":[".type"],"name":[1],"type":["chr"],"align":["left"]},{"label":["RMSE"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["MAE"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"CV","2":"0.087","3":"0.087"},{"1":"Training","2":"0.063","3":"0.045"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":[".type"],"name":[1],"type":["chr"],"align":["left"]},{"label":["RMSE"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["MAE"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"CV","2":"0.087","3":"0.087"},{"1":"Training","2":"0.065","3":"0.049"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
@@ -1415,190 +1411,190 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb23-51"><a href="#cb23-51" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-52"><a href="#cb23-52" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb23-53"><a href="#cb23-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-54"><a href="#cb23-54" aria-hidden="true" tabindex="-1"></a>We will use the Auto ARIMA (Automatic ARIMA) tool from the R 'forecast' package to determine the optimal set of parameters ($p$, $d$, $q$)($P$,$D$,$Q$)<span class="co">[</span><span class="ot">$s$</span><span class="co">]</span> for our model. Auto ARIMA streamlines the process by using a stepwise search to navigate through the model space, aiming to identify the model that achieves the lowest AICc value. The AICc, or Akaike Information Criterion corrected, is a metric that evaluates the fit of a model by balancing its likelihood against its complexity, with adjustments for smaller sample sizes.</span>
-<span id="cb23-55"><a href="#cb23-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-56"><a href="#cb23-56" aria-hidden="true" tabindex="-1"></a>Where:</span>
-<span id="cb23-57"><a href="#cb23-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-58"><a href="#cb23-58" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>$p$,$d$,$q$ are the non-seasonal components (autoregressive order, differencing order, and moving average order, respectively),</span>
-<span id="cb23-59"><a href="#cb23-59" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>$P$,$D$,$Q$ are the seasonal components of the model, with similar definitions but applied on a seasonal cycle, and </span>
-<span id="cb23-60"><a href="#cb23-60" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>$s$ is the length of the seasonal cycle in time units. Quarterly data with an annual cycle have 's=4'.</span>
-<span id="cb23-61"><a href="#cb23-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-62"><a href="#cb23-62" aria-hidden="true" tabindex="-1"></a>Our approach begins with basic ARIMA modelling to predict future values solely based on historical data without explanatory variables.</span>
-<span id="cb23-63"><a href="#cb23-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-64"><a href="#cb23-64" aria-hidden="true" tabindex="-1"></a>Next, to see if we can improve the models (one model for each bank series), we introduce explanatory variables, while also correcting for autocorrelation within the error terms. This transforms the models into a Linear Regression with AR Errors. </span>
-<span id="cb23-65"><a href="#cb23-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-66"><a href="#cb23-66" aria-hidden="true" tabindex="-1"></a>We examine the AICc values of models across various categories of explanatory variables, including Expenditure, Unemployment, Consumer and Household Debt, Portfolio, and Group Trend. This analysis aims to identify explanatory variables that we can combine. This also takes into consideration insights from the data exploratory phase, as well as insights from other modelling techniques such as XGBoost Factor Analysis (see @fig-gain-all).</span>
-<span id="cb23-67"><a href="#cb23-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-68"><a href="#cb23-68" aria-hidden="true" tabindex="-1"></a><span class="fu">## Model selection {#sec-model-arima}</span></span>
-<span id="cb23-69"><a href="#cb23-69" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-70"><a href="#cb23-70" aria-hidden="true" tabindex="-1"></a>Note: using the undifferenced value for <span class="in">`r target_label`</span> as the Auto Arima process will perform the differencing if optimal. </span>
-<span id="cb23-71"><a href="#cb23-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-72"><a href="#cb23-72" aria-hidden="true" tabindex="-1"></a><span class="fu">### Models</span></span>
-<span id="cb23-73"><a href="#cb23-73" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-76"><a href="#cb23-76" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb23-77"><a href="#cb23-77" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb23-78"><a href="#cb23-78" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb23-79"><a href="#cb23-79" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb23-80"><a href="#cb23-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-81"><a href="#cb23-81" aria-hidden="true" tabindex="-1"></a>arima  <span class="ot">&lt;-</span> <span class="st">"UBPRE524.Value"</span></span>
-<span id="cb23-82"><a href="#cb23-82" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-83"><a href="#cb23-83" aria-hidden="true" tabindex="-1"></a><span class="co"># Real Advance Retail and Food Services Sales per capita</span></span>
-<span id="cb23-84"><a href="#cb23-84" aria-hidden="true" tabindex="-1"></a>rrsfs1 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ RRSFS.Pop.log.diff"</span>)</span>
-<span id="cb23-85"><a href="#cb23-85" aria-hidden="true" tabindex="-1"></a>rrsfs2 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ RRSFS.Pop.log.diff.lag1"</span>)</span>
-<span id="cb23-86"><a href="#cb23-86" aria-hidden="true" tabindex="-1"></a>rrsfs3 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1"</span>)</span>
-<span id="cb23-87"><a href="#cb23-87" aria-hidden="true" tabindex="-1"></a>rrsfs4 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + RRSFS.Pop.log.diff.lag2"</span>)</span>
-<span id="cb23-88"><a href="#cb23-88" aria-hidden="true" tabindex="-1"></a>rrsfs5 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + RRSFS.Pop.log.diff.lag2 + RRSFS.Pop.log.diff.lag3"</span>)</span>
-<span id="cb23-89"><a href="#cb23-89" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-90"><a href="#cb23-90" aria-hidden="true" tabindex="-1"></a><span class="co"># Unemployment Rate</span></span>
-<span id="cb23-91"><a href="#cb23-91" aria-hidden="true" tabindex="-1"></a>unrate1 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ UNRATE.log.diff"</span>)</span>
-<span id="cb23-92"><a href="#cb23-92" aria-hidden="true" tabindex="-1"></a>unrate2 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ UNRATE.log.diff.lag1"</span>)</span>
-<span id="cb23-93"><a href="#cb23-93" aria-hidden="true" tabindex="-1"></a>unrate3 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ UNRATE.log.diff + UNRATE.log.diff.lag1"</span>)</span>
-<span id="cb23-94"><a href="#cb23-94" aria-hidden="true" tabindex="-1"></a>unrate4 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ UNRATE.log.diff + UNRATE.log.diff.lag1 + UNRATE.log.diff.lag2"</span>)</span>
-<span id="cb23-95"><a href="#cb23-95" aria-hidden="true" tabindex="-1"></a>unrate5 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ UNRATE.log.diff + UNRATE.log.diff.lag1 + UNRATE.log.diff.lag2 + UNRATE.log.diff.lag3"</span>)</span>
-<span id="cb23-96"><a href="#cb23-96" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-97"><a href="#cb23-97" aria-hidden="true" tabindex="-1"></a><span class="co"># Consumer Debt Service Payments as a Percent of Disposable Personal Income</span></span>
-<span id="cb23-98"><a href="#cb23-98" aria-hidden="true" tabindex="-1"></a>debt1 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ CDSP.log.diff"</span>)</span>
-<span id="cb23-99"><a href="#cb23-99" aria-hidden="true" tabindex="-1"></a>debt2 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ CDSP.log.diff.lag1"</span>)</span>
-<span id="cb23-100"><a href="#cb23-100" aria-hidden="true" tabindex="-1"></a>debt3 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ CDSP.log.diff + CDSP.log.diff.lag1"</span>)</span>
-<span id="cb23-101"><a href="#cb23-101" aria-hidden="true" tabindex="-1"></a>debt4 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ CDSP.log.diff + CDSP.log.diff.lag1 + CDSP.log.diff.lag2"</span>)</span>
-<span id="cb23-102"><a href="#cb23-102" aria-hidden="true" tabindex="-1"></a>debt5 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ CDSP.log.diff + CDSP.log.diff.lag1 + CDSP.log.diff.lag2 + CDSP.log.diff.lag3"</span>)</span>
-<span id="cb23-103"><a href="#cb23-103" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-104"><a href="#cb23-104" aria-hidden="true" tabindex="-1"></a><span class="co"># Household Debt Service Payments as a Percent of Disposable Personal Income</span></span>
-<span id="cb23-105"><a href="#cb23-105" aria-hidden="true" tabindex="-1"></a>debth1 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ TDSP.log.diff"</span>)</span>
-<span id="cb23-106"><a href="#cb23-106" aria-hidden="true" tabindex="-1"></a>debth2 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ TDSP.log.diff.lag1"</span>)</span>
-<span id="cb23-107"><a href="#cb23-107" aria-hidden="true" tabindex="-1"></a>debth3 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ TDSP.log.diff + TDSP.log.diff.lag1"</span>)</span>
-<span id="cb23-108"><a href="#cb23-108" aria-hidden="true" tabindex="-1"></a>debth4 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ TDSP.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2"</span>)</span>
-<span id="cb23-109"><a href="#cb23-109" aria-hidden="true" tabindex="-1"></a>debth5 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ TDSP.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 + TDSP.log.diff.lag3"</span>)</span>
-<span id="cb23-110"><a href="#cb23-110" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-111"><a href="#cb23-111" aria-hidden="true" tabindex="-1"></a><span class="co"># Loans to Individuals for Household, Family, and Other Personal Expenditures:Credit Cards</span></span>
-<span id="cb23-112"><a href="#cb23-112" aria-hidden="true" tabindex="-1"></a>portfolio1 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ UBPRB538.pct_change + UBPRB538.pct_change.lag1"</span>)</span>
-<span id="cb23-113"><a href="#cb23-113" aria-hidden="true" tabindex="-1"></a>portfolio2 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ UBPRB538.log.diff + UBPRB538.log.diff.lag1"</span>)</span>
-<span id="cb23-114"><a href="#cb23-114" aria-hidden="true" tabindex="-1"></a>portfolio3 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ UBPRB538.log.diff + UBPRB538.log.diff.lag1 + UBPR3815.log.diff"</span>)</span>
-<span id="cb23-115"><a href="#cb23-115" aria-hidden="true" tabindex="-1"></a>portfolio4 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ UBPRB538.log.diff + UBPR3815.log.diff"</span>)</span>
-<span id="cb23-116"><a href="#cb23-116" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-117"><a href="#cb23-117" aria-hidden="true" tabindex="-1"></a><span class="co"># Combinations (use Auto ARIMA)</span></span>
-<span id="cb23-118"><a href="#cb23-118" aria-hidden="true" tabindex="-1"></a>comb1 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1"</span>)</span>
-<span id="cb23-119"><a href="#cb23-119" aria-hidden="true" tabindex="-1"></a>comb2 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UNRATE.log.diff + UNRATE.log.diff.lag1"</span>)</span>
-<span id="cb23-120"><a href="#cb23-120" aria-hidden="true" tabindex="-1"></a>comb3 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UNRATE.log.diff + UNRATE.log.diff.lag1 + UNRATE.log.diff.lag2"</span>)</span>
-<span id="cb23-121"><a href="#cb23-121" aria-hidden="true" tabindex="-1"></a>comb4 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.log.diff"</span>)</span>
-<span id="cb23-122"><a href="#cb23-122" aria-hidden="true" tabindex="-1"></a>comb5 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ CDSP.log.diff + CDSP.log.diff.lag1 + UBPRB538.log.diff"</span>)</span>
-<span id="cb23-123"><a href="#cb23-123" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-124"><a href="#cb23-124" aria-hidden="true" tabindex="-1"></a><span class="co"># Combinations (don't use Auto ARIMA)</span></span>
-<span id="cb23-125"><a href="#cb23-125" aria-hidden="true" tabindex="-1"></a>manual1 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.diff ~ 1 + RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(0,0,0)"</span>)</span>
-<span id="cb23-126"><a href="#cb23-126" aria-hidden="true" tabindex="-1"></a>manual2 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.diff ~ 1 + RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)"</span>)</span>
-<span id="cb23-127"><a href="#cb23-127" aria-hidden="true" tabindex="-1"></a>manual3 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.diff ~ 1 + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(0,0,0)"</span>)</span>
-<span id="cb23-128"><a href="#cb23-128" aria-hidden="true" tabindex="-1"></a>manual4 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.diff ~ 1 + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)"</span>)</span>
-<span id="cb23-129"><a href="#cb23-129" aria-hidden="true" tabindex="-1"></a>manual5 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.diff ~ 1 + CDSP.log.diff + CDSP.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(0,0,0)"</span>)</span>
-<span id="cb23-130"><a href="#cb23-130" aria-hidden="true" tabindex="-1"></a>manual6 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.diff ~ 1 + CDSP.log.diff + CDSP.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)"</span>)</span>
-<span id="cb23-131"><a href="#cb23-131" aria-hidden="true" tabindex="-1"></a>manual7 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.diff ~ 1 + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(0,0,0)"</span>)</span>
-<span id="cb23-132"><a href="#cb23-132" aria-hidden="true" tabindex="-1"></a>manual8 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.diff ~ 1 + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)"</span>)</span>
-<span id="cb23-133"><a href="#cb23-133" aria-hidden="true" tabindex="-1"></a>manual9 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.diff ~ 1 + TDSP.log.diff + B069RC1.Pop.CPI.log.diff.lag1 + UBPRB538.log.diff.lag2 + UBPRB538.log.diff.lag3 + UBPR3815.log.diff + RRSFS.Pop.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)"</span>)</span>
-<span id="cb23-134"><a href="#cb23-134" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb23-137"><a href="#cb23-137" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb23-138"><a href="#cb23-138" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb23-139"><a href="#cb23-139" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb23-140"><a href="#cb23-140" aria-hidden="true" tabindex="-1"></a>run_arima <span class="ot">&lt;-</span> <span class="cf">function</span>(estimation_data) {</span>
-<span id="cb23-141"><a href="#cb23-141" aria-hidden="true" tabindex="-1"></a>  <span class="do">## 1. Expenditure</span></span>
-<span id="cb23-142"><a href="#cb23-142" aria-hidden="true" tabindex="-1"></a>  m_table1 <span class="ot">&lt;-</span> estimation_data <span class="sc">|&gt;</span></span>
-<span id="cb23-143"><a href="#cb23-143" aria-hidden="true" tabindex="-1"></a>              fabletools<span class="sc">::</span><span class="fu">model</span>(</span>
-<span id="cb23-144"><a href="#cb23-144" aria-hidden="true" tabindex="-1"></a>                  <span class="at">arima =</span> <span class="fu">ARIMA</span>(UBPRE524.Value),</span>
-<span id="cb23-145"><a href="#cb23-145" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rrsfs1 =</span> <span class="fu">ARIMA</span>(rrsfs1),</span>
-<span id="cb23-146"><a href="#cb23-146" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rrsfs2 =</span> <span class="fu">ARIMA</span>(rrsfs2),</span>
-<span id="cb23-147"><a href="#cb23-147" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rrsfs3 =</span> <span class="fu">ARIMA</span>(rrsfs3),</span>
-<span id="cb23-148"><a href="#cb23-148" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rrsfs4 =</span> <span class="fu">ARIMA</span>(rrsfs4),</span>
-<span id="cb23-149"><a href="#cb23-149" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rrsfs5 =</span> <span class="fu">ARIMA</span>(rrsfs5)</span>
-<span id="cb23-150"><a href="#cb23-150" aria-hidden="true" tabindex="-1"></a>              )</span>
-<span id="cb23-151"><a href="#cb23-151" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-152"><a href="#cb23-152" aria-hidden="true" tabindex="-1"></a>  <span class="fu">save_arima_results</span>(m_table1, <span class="fu">get_model_cols</span>(m_table1, <span class="fu">key_vars</span>(estimation_data)),<span class="fu">glue</span>(<span class="st">"arima_rrsfs_results.csv"</span>))</span>
-<span id="cb23-153"><a href="#cb23-153" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-154"><a href="#cb23-154" aria-hidden="true" tabindex="-1"></a>  <span class="do">## 2. Unemployment</span></span>
-<span id="cb23-155"><a href="#cb23-155" aria-hidden="true" tabindex="-1"></a>  m_table2 <span class="ot">&lt;-</span> estimation_data <span class="sc">|&gt;</span> </span>
-<span id="cb23-156"><a href="#cb23-156" aria-hidden="true" tabindex="-1"></a>              <span class="fu">model</span>(</span>
-<span id="cb23-157"><a href="#cb23-157" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unrate1 =</span> <span class="fu">ARIMA</span>(unrate1),</span>
-<span id="cb23-158"><a href="#cb23-158" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unrate2 =</span> <span class="fu">ARIMA</span>(unrate2),</span>
-<span id="cb23-159"><a href="#cb23-159" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unrate3 =</span> <span class="fu">ARIMA</span>(unrate3),</span>
-<span id="cb23-160"><a href="#cb23-160" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unrate4 =</span> <span class="fu">ARIMA</span>(unrate4),</span>
-<span id="cb23-161"><a href="#cb23-161" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unrate5 =</span> <span class="fu">ARIMA</span>(unrate5)</span>
-<span id="cb23-162"><a href="#cb23-162" aria-hidden="true" tabindex="-1"></a>              )</span>
-<span id="cb23-163"><a href="#cb23-163" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-164"><a href="#cb23-164" aria-hidden="true" tabindex="-1"></a>  <span class="fu">save_arima_results</span>(m_table2, <span class="fu">get_model_cols</span>(m_table2, <span class="fu">key_vars</span>(estimation_data)),<span class="fu">glue</span>(<span class="st">"arima_unrate_results.csv"</span>))</span>
-<span id="cb23-165"><a href="#cb23-165" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-166"><a href="#cb23-166" aria-hidden="true" tabindex="-1"></a>  <span class="do">## 3.1 Debt Consumer</span></span>
-<span id="cb23-167"><a href="#cb23-167" aria-hidden="true" tabindex="-1"></a>  m_table3<span class="fl">.1</span> <span class="ot">&lt;-</span> estimation_data <span class="sc">|&gt;</span></span>
-<span id="cb23-168"><a href="#cb23-168" aria-hidden="true" tabindex="-1"></a>              <span class="fu">model</span>(</span>
-<span id="cb23-169"><a href="#cb23-169" aria-hidden="true" tabindex="-1"></a>                  <span class="at">debt1 =</span> <span class="fu">ARIMA</span>(debt1),</span>
-<span id="cb23-170"><a href="#cb23-170" aria-hidden="true" tabindex="-1"></a>                  <span class="at">debt2 =</span> <span class="fu">ARIMA</span>(debt2),</span>
-<span id="cb23-171"><a href="#cb23-171" aria-hidden="true" tabindex="-1"></a>                  <span class="at">debt3 =</span> <span class="fu">ARIMA</span>(debt3),</span>
-<span id="cb23-172"><a href="#cb23-172" aria-hidden="true" tabindex="-1"></a>                  <span class="at">debt4 =</span> <span class="fu">ARIMA</span>(debt4),</span>
-<span id="cb23-173"><a href="#cb23-173" aria-hidden="true" tabindex="-1"></a>                  <span class="at">debt5 =</span> <span class="fu">ARIMA</span>(debt5)</span>
-<span id="cb23-174"><a href="#cb23-174" aria-hidden="true" tabindex="-1"></a>              )</span>
-<span id="cb23-175"><a href="#cb23-175" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-176"><a href="#cb23-176" aria-hidden="true" tabindex="-1"></a>  <span class="fu">save_arima_results</span>(m_table3<span class="fl">.1</span>, <span class="fu">get_model_cols</span>(m_table3<span class="fl">.1</span>, <span class="fu">key_vars</span>(estimation_data)),<span class="fu">glue</span>(<span class="st">"arima_debt_results.csv"</span>))</span>
-<span id="cb23-177"><a href="#cb23-177" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-178"><a href="#cb23-178" aria-hidden="true" tabindex="-1"></a>  <span class="do">## 3.2 Debt Household</span></span>
-<span id="cb23-179"><a href="#cb23-179" aria-hidden="true" tabindex="-1"></a>  m_table3<span class="fl">.2</span> <span class="ot">&lt;-</span> estimation_data <span class="sc">|&gt;</span></span>
-<span id="cb23-180"><a href="#cb23-180" aria-hidden="true" tabindex="-1"></a>              <span class="fu">model</span>(</span>
-<span id="cb23-181"><a href="#cb23-181" aria-hidden="true" tabindex="-1"></a>                  <span class="at">debth1 =</span> <span class="fu">ARIMA</span>(debth1),</span>
-<span id="cb23-182"><a href="#cb23-182" aria-hidden="true" tabindex="-1"></a>                  <span class="at">debth2 =</span> <span class="fu">ARIMA</span>(debth2),</span>
-<span id="cb23-183"><a href="#cb23-183" aria-hidden="true" tabindex="-1"></a>                  <span class="at">debth3 =</span> <span class="fu">ARIMA</span>(debth3),</span>
-<span id="cb23-184"><a href="#cb23-184" aria-hidden="true" tabindex="-1"></a>                  <span class="at">debth4 =</span> <span class="fu">ARIMA</span>(debth4),</span>
-<span id="cb23-185"><a href="#cb23-185" aria-hidden="true" tabindex="-1"></a>                  <span class="at">debth5 =</span> <span class="fu">ARIMA</span>(debth5)</span>
-<span id="cb23-186"><a href="#cb23-186" aria-hidden="true" tabindex="-1"></a>              )</span>
-<span id="cb23-187"><a href="#cb23-187" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-188"><a href="#cb23-188" aria-hidden="true" tabindex="-1"></a>  <span class="fu">save_arima_results</span>(m_table3<span class="fl">.2</span>, <span class="fu">get_model_cols</span>(m_table3<span class="fl">.2</span>, <span class="fu">key_vars</span>(estimation_data)),<span class="fu">glue</span>(<span class="st">"arima_debth_results.csv"</span>))</span>
-<span id="cb23-189"><a href="#cb23-189" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-190"><a href="#cb23-190" aria-hidden="true" tabindex="-1"></a>  <span class="do">## 4. Portfolio</span></span>
-<span id="cb23-191"><a href="#cb23-191" aria-hidden="true" tabindex="-1"></a>  m_table4 <span class="ot">&lt;-</span> estimation_data <span class="sc">|&gt;</span> </span>
-<span id="cb23-192"><a href="#cb23-192" aria-hidden="true" tabindex="-1"></a>              <span class="fu">model</span>(</span>
-<span id="cb23-193"><a href="#cb23-193" aria-hidden="true" tabindex="-1"></a>                  <span class="at">portfolio1 =</span> <span class="fu">ARIMA</span>(portfolio1),</span>
-<span id="cb23-194"><a href="#cb23-194" aria-hidden="true" tabindex="-1"></a>                  <span class="at">portfolio2=</span> <span class="fu">ARIMA</span>(portfolio2),</span>
-<span id="cb23-195"><a href="#cb23-195" aria-hidden="true" tabindex="-1"></a>                  <span class="at">portfolio3=</span> <span class="fu">ARIMA</span>(portfolio3),</span>
-<span id="cb23-196"><a href="#cb23-196" aria-hidden="true" tabindex="-1"></a>                  <span class="at">portfolio4=</span> <span class="fu">ARIMA</span>(portfolio4),</span>
-<span id="cb23-197"><a href="#cb23-197" aria-hidden="true" tabindex="-1"></a>              )</span>
-<span id="cb23-198"><a href="#cb23-198" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-199"><a href="#cb23-199" aria-hidden="true" tabindex="-1"></a>  <span class="fu">save_arima_results</span>(m_table4, <span class="fu">get_model_cols</span>(m_table4, <span class="fu">key_vars</span>(estimation_data)),<span class="fu">glue</span>(<span class="st">"arima_portfolio_results.csv"</span>))</span>
-<span id="cb23-200"><a href="#cb23-200" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-201"><a href="#cb23-201" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb23-202"><a href="#cb23-202" aria-hidden="true" tabindex="-1"></a>  <span class="do">## 5. Combinations</span></span>
-<span id="cb23-203"><a href="#cb23-203" aria-hidden="true" tabindex="-1"></a>  m_table6 <span class="ot">&lt;-</span> estimation_data <span class="sc">|&gt;</span> </span>
-<span id="cb23-204"><a href="#cb23-204" aria-hidden="true" tabindex="-1"></a>              <span class="fu">model</span>(</span>
-<span id="cb23-205"><a href="#cb23-205" aria-hidden="true" tabindex="-1"></a>                  <span class="at">comb1=</span> <span class="fu">ARIMA</span>(comb1),</span>
-<span id="cb23-206"><a href="#cb23-206" aria-hidden="true" tabindex="-1"></a>                  <span class="at">comb2=</span> <span class="fu">ARIMA</span>(comb2),</span>
-<span id="cb23-207"><a href="#cb23-207" aria-hidden="true" tabindex="-1"></a>                  <span class="at">comb3=</span> <span class="fu">ARIMA</span>(comb3),</span>
-<span id="cb23-208"><a href="#cb23-208" aria-hidden="true" tabindex="-1"></a>                  <span class="at">comb4=</span> <span class="fu">ARIMA</span>(comb4),</span>
-<span id="cb23-209"><a href="#cb23-209" aria-hidden="true" tabindex="-1"></a>                  <span class="at">comb5=</span> <span class="fu">ARIMA</span>(comb5)</span>
-<span id="cb23-210"><a href="#cb23-210" aria-hidden="true" tabindex="-1"></a>              )</span>
-<span id="cb23-211"><a href="#cb23-211" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-212"><a href="#cb23-212" aria-hidden="true" tabindex="-1"></a>  <span class="fu">save_arima_results</span>(m_table6, <span class="fu">get_model_cols</span>(m_table6, <span class="fu">key_vars</span>(estimation_data)),<span class="fu">glue</span>(<span class="st">"arima_other_results.csv"</span>))</span>
-<span id="cb23-213"><a href="#cb23-213" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-214"><a href="#cb23-214" aria-hidden="true" tabindex="-1"></a>  <span class="do">## 6. Manual</span></span>
-<span id="cb23-215"><a href="#cb23-215" aria-hidden="true" tabindex="-1"></a>  m_table7 <span class="ot">&lt;-</span> estimation_data <span class="sc">|&gt;</span> </span>
-<span id="cb23-216"><a href="#cb23-216" aria-hidden="true" tabindex="-1"></a>              <span class="fu">model</span>(</span>
-<span id="cb23-217"><a href="#cb23-217" aria-hidden="true" tabindex="-1"></a>                  <span class="at">manual1=</span> <span class="fu">ARIMA</span>(manual1),</span>
-<span id="cb23-218"><a href="#cb23-218" aria-hidden="true" tabindex="-1"></a>                  <span class="at">manual2=</span> <span class="fu">ARIMA</span>(manual2),</span>
-<span id="cb23-219"><a href="#cb23-219" aria-hidden="true" tabindex="-1"></a>                  <span class="at">manual3=</span> <span class="fu">ARIMA</span>(manual3),</span>
-<span id="cb23-220"><a href="#cb23-220" aria-hidden="true" tabindex="-1"></a>                  <span class="at">manual4=</span> <span class="fu">ARIMA</span>(manual4),</span>
-<span id="cb23-221"><a href="#cb23-221" aria-hidden="true" tabindex="-1"></a>                  <span class="at">manual5=</span> <span class="fu">ARIMA</span>(manual5),</span>
-<span id="cb23-222"><a href="#cb23-222" aria-hidden="true" tabindex="-1"></a>                  <span class="at">manual6=</span> <span class="fu">ARIMA</span>(manual6),</span>
-<span id="cb23-223"><a href="#cb23-223" aria-hidden="true" tabindex="-1"></a>                  <span class="at">manual7=</span> <span class="fu">ARIMA</span>(manual7),</span>
-<span id="cb23-224"><a href="#cb23-224" aria-hidden="true" tabindex="-1"></a>                  <span class="at">manual8=</span> <span class="fu">ARIMA</span>(manual8),</span>
-<span id="cb23-225"><a href="#cb23-225" aria-hidden="true" tabindex="-1"></a>                  <span class="at">manual9=</span> <span class="fu">ARIMA</span>(manual9)</span>
-<span id="cb23-226"><a href="#cb23-226" aria-hidden="true" tabindex="-1"></a>              )</span>
-<span id="cb23-227"><a href="#cb23-227" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-228"><a href="#cb23-228" aria-hidden="true" tabindex="-1"></a>  <span class="fu">save_arima_results</span>(m_table7, <span class="fu">get_model_cols</span>(m_table7, <span class="fu">key_vars</span>(estimation_data)),<span class="fu">glue</span>(<span class="st">"arima_manual_results.csv"</span>))</span>
-<span id="cb23-229"><a href="#cb23-229" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb23-230"><a href="#cb23-230" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-231"><a href="#cb23-231" aria-hidden="true" tabindex="-1"></a><span class="fu">run_arima</span>(estimation_data)</span>
-<span id="cb23-232"><a href="#cb23-232" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-233"><a href="#cb23-233" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb23-234"><a href="#cb23-234" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-235"><a href="#cb23-235" aria-hidden="true" tabindex="-1"></a><span class="fu">### Results</span></span>
-<span id="cb23-236"><a href="#cb23-236" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-237"><a href="#cb23-237" aria-hidden="true" tabindex="-1"></a>We can see that for our sub-set of banks the top models are very different. </span>
-<span id="cb23-238"><a href="#cb23-238" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-239"><a href="#cb23-239" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>Capital One's model has no AR errors and is equivalent to the Market model.</span>
-<span id="cb23-240"><a href="#cb23-240" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>American Express's model does not have any AR coefficients but is sensitive to seasonal AR errors.</span>
-<span id="cb23-241"><a href="#cb23-241" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>The ar1 Error for Barclays and Citibank have a high level of uncertainty (std.error). The p.value (P&gt;0.05) indicating ar1 is not significant.</span>
+<span id="cb23-54"><a href="#cb23-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-55"><a href="#cb23-55" aria-hidden="true" tabindex="-1"></a>We will use the Auto ARIMA (Automatic ARIMA) tool from the R 'forecast' package to determine the optimal set of parameters ($p$, $d$, $q$)($P$,$D$,$Q$)<span class="co">[</span><span class="ot">$s$</span><span class="co">]</span> for our model. Auto ARIMA streamlines the process by using a stepwise search to navigate through the model space, aiming to identify the model that achieves the lowest AICc value. The AICc, or Akaike Information Criterion corrected, is a metric that evaluates the fit of a model by balancing its likelihood against its complexity, with adjustments for smaller sample sizes.</span>
+<span id="cb23-56"><a href="#cb23-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-57"><a href="#cb23-57" aria-hidden="true" tabindex="-1"></a>Where:</span>
+<span id="cb23-58"><a href="#cb23-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-59"><a href="#cb23-59" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>$p$,$d$,$q$ are the non-seasonal components (autoregressive order, differencing order, and moving average order, respectively),</span>
+<span id="cb23-60"><a href="#cb23-60" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>$P$,$D$,$Q$ are the seasonal components of the model, with similar definitions but applied on a seasonal cycle, and </span>
+<span id="cb23-61"><a href="#cb23-61" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>$s$ is the length of the seasonal cycle in time units. Quarterly data with an annual cycle have 's=4'.</span>
+<span id="cb23-62"><a href="#cb23-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-63"><a href="#cb23-63" aria-hidden="true" tabindex="-1"></a>Our approach begins with basic ARIMA modelling to predict future values solely based on historical data without explanatory variables.</span>
+<span id="cb23-64"><a href="#cb23-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-65"><a href="#cb23-65" aria-hidden="true" tabindex="-1"></a>Next, to see if we can improve the models (one model for each bank series), we introduce explanatory variables, while also correcting for autocorrelation within the error terms. This transforms the models into a Linear Regression with AR Errors. </span>
+<span id="cb23-66"><a href="#cb23-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-67"><a href="#cb23-67" aria-hidden="true" tabindex="-1"></a>We examine the AICc values of models across various categories of explanatory variables, including Expenditure, Unemployment, Consumer and Household Debt, Portfolio, and Group Trend. This analysis aims to identify explanatory variables that we can combine. This also takes into consideration insights from the data exploratory phase, as well as insights from other modelling techniques such as XGBoost Factor Analysis (see @fig-gain-all).</span>
+<span id="cb23-68"><a href="#cb23-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-69"><a href="#cb23-69" aria-hidden="true" tabindex="-1"></a><span class="fu">## Model selection {#sec-model-arima}</span></span>
+<span id="cb23-70"><a href="#cb23-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-71"><a href="#cb23-71" aria-hidden="true" tabindex="-1"></a>Note: using the undifferenced value for <span class="in">`r target_label`</span> as the Auto Arima process will perform the differencing if optimal. </span>
+<span id="cb23-72"><a href="#cb23-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-73"><a href="#cb23-73" aria-hidden="true" tabindex="-1"></a><span class="fu">### Models</span></span>
+<span id="cb23-74"><a href="#cb23-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-77"><a href="#cb23-77" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-78"><a href="#cb23-78" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb23-79"><a href="#cb23-79" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb23-80"><a href="#cb23-80" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb23-81"><a href="#cb23-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-82"><a href="#cb23-82" aria-hidden="true" tabindex="-1"></a>arima  <span class="ot">&lt;-</span> <span class="st">"UBPRE524.Value"</span></span>
+<span id="cb23-83"><a href="#cb23-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-84"><a href="#cb23-84" aria-hidden="true" tabindex="-1"></a><span class="co"># Real Advance Retail and Food Services Sales per capita</span></span>
+<span id="cb23-85"><a href="#cb23-85" aria-hidden="true" tabindex="-1"></a>rrsfs1 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ RRSFS.Pop.log.diff"</span>)</span>
+<span id="cb23-86"><a href="#cb23-86" aria-hidden="true" tabindex="-1"></a>rrsfs2 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ RRSFS.Pop.log.diff.lag1"</span>)</span>
+<span id="cb23-87"><a href="#cb23-87" aria-hidden="true" tabindex="-1"></a>rrsfs3 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1"</span>)</span>
+<span id="cb23-88"><a href="#cb23-88" aria-hidden="true" tabindex="-1"></a>rrsfs4 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + RRSFS.Pop.log.diff.lag2"</span>)</span>
+<span id="cb23-89"><a href="#cb23-89" aria-hidden="true" tabindex="-1"></a>rrsfs5 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + RRSFS.Pop.log.diff.lag2 + RRSFS.Pop.log.diff.lag3"</span>)</span>
+<span id="cb23-90"><a href="#cb23-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-91"><a href="#cb23-91" aria-hidden="true" tabindex="-1"></a><span class="co"># Unemployment Rate</span></span>
+<span id="cb23-92"><a href="#cb23-92" aria-hidden="true" tabindex="-1"></a>unrate1 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ UNRATE.log.diff"</span>)</span>
+<span id="cb23-93"><a href="#cb23-93" aria-hidden="true" tabindex="-1"></a>unrate2 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ UNRATE.log.diff.lag1"</span>)</span>
+<span id="cb23-94"><a href="#cb23-94" aria-hidden="true" tabindex="-1"></a>unrate3 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ UNRATE.log.diff + UNRATE.log.diff.lag1"</span>)</span>
+<span id="cb23-95"><a href="#cb23-95" aria-hidden="true" tabindex="-1"></a>unrate4 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ UNRATE.log.diff + UNRATE.log.diff.lag1 + UNRATE.log.diff.lag2"</span>)</span>
+<span id="cb23-96"><a href="#cb23-96" aria-hidden="true" tabindex="-1"></a>unrate5 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ UNRATE.log.diff + UNRATE.log.diff.lag1 + UNRATE.log.diff.lag2 + UNRATE.log.diff.lag3"</span>)</span>
+<span id="cb23-97"><a href="#cb23-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-98"><a href="#cb23-98" aria-hidden="true" tabindex="-1"></a><span class="co"># Consumer Debt Service Payments as a Percent of Disposable Personal Income</span></span>
+<span id="cb23-99"><a href="#cb23-99" aria-hidden="true" tabindex="-1"></a>debt1 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ CDSP.log.diff"</span>)</span>
+<span id="cb23-100"><a href="#cb23-100" aria-hidden="true" tabindex="-1"></a>debt2 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ CDSP.log.diff.lag1"</span>)</span>
+<span id="cb23-101"><a href="#cb23-101" aria-hidden="true" tabindex="-1"></a>debt3 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ CDSP.log.diff + CDSP.log.diff.lag1"</span>)</span>
+<span id="cb23-102"><a href="#cb23-102" aria-hidden="true" tabindex="-1"></a>debt4 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ CDSP.log.diff + CDSP.log.diff.lag1 + CDSP.log.diff.lag2"</span>)</span>
+<span id="cb23-103"><a href="#cb23-103" aria-hidden="true" tabindex="-1"></a>debt5 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ CDSP.log.diff + CDSP.log.diff.lag1 + CDSP.log.diff.lag2 + CDSP.log.diff.lag3"</span>)</span>
+<span id="cb23-104"><a href="#cb23-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-105"><a href="#cb23-105" aria-hidden="true" tabindex="-1"></a><span class="co"># Household Debt Service Payments as a Percent of Disposable Personal Income</span></span>
+<span id="cb23-106"><a href="#cb23-106" aria-hidden="true" tabindex="-1"></a>debth1 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ TDSP.log.diff"</span>)</span>
+<span id="cb23-107"><a href="#cb23-107" aria-hidden="true" tabindex="-1"></a>debth2 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ TDSP.log.diff.lag1"</span>)</span>
+<span id="cb23-108"><a href="#cb23-108" aria-hidden="true" tabindex="-1"></a>debth3 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ TDSP.log.diff + TDSP.log.diff.lag1"</span>)</span>
+<span id="cb23-109"><a href="#cb23-109" aria-hidden="true" tabindex="-1"></a>debth4 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ TDSP.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2"</span>)</span>
+<span id="cb23-110"><a href="#cb23-110" aria-hidden="true" tabindex="-1"></a>debth5 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ TDSP.log.diff + TDSP.log.diff.lag1 + TDSP.log.diff.lag2 + TDSP.log.diff.lag3"</span>)</span>
+<span id="cb23-111"><a href="#cb23-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-112"><a href="#cb23-112" aria-hidden="true" tabindex="-1"></a><span class="co"># Loans to Individuals for Household, Family, and Other Personal Expenditures:Credit Cards</span></span>
+<span id="cb23-113"><a href="#cb23-113" aria-hidden="true" tabindex="-1"></a>portfolio1 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ UBPRB538.pct_change + UBPRB538.pct_change.lag1"</span>)</span>
+<span id="cb23-114"><a href="#cb23-114" aria-hidden="true" tabindex="-1"></a>portfolio2 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ UBPRB538.log.diff + UBPRB538.log.diff.lag1"</span>)</span>
+<span id="cb23-115"><a href="#cb23-115" aria-hidden="true" tabindex="-1"></a>portfolio3 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ UBPRB538.log.diff + UBPRB538.log.diff.lag1 + UBPR3815.log.diff"</span>)</span>
+<span id="cb23-116"><a href="#cb23-116" aria-hidden="true" tabindex="-1"></a>portfolio4 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ UBPRB538.log.diff + UBPR3815.log.diff"</span>)</span>
+<span id="cb23-117"><a href="#cb23-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-118"><a href="#cb23-118" aria-hidden="true" tabindex="-1"></a><span class="co"># Combinations (use Auto ARIMA)</span></span>
+<span id="cb23-119"><a href="#cb23-119" aria-hidden="true" tabindex="-1"></a>comb1 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1"</span>)</span>
+<span id="cb23-120"><a href="#cb23-120" aria-hidden="true" tabindex="-1"></a>comb2 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UNRATE.log.diff + UNRATE.log.diff.lag1"</span>)</span>
+<span id="cb23-121"><a href="#cb23-121" aria-hidden="true" tabindex="-1"></a>comb3 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UNRATE.log.diff + UNRATE.log.diff.lag1 + UNRATE.log.diff.lag2"</span>)</span>
+<span id="cb23-122"><a href="#cb23-122" aria-hidden="true" tabindex="-1"></a>comb4 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.log.diff"</span>)</span>
+<span id="cb23-123"><a href="#cb23-123" aria-hidden="true" tabindex="-1"></a>comb5 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.Value ~ CDSP.log.diff + CDSP.log.diff.lag1 + UBPRB538.log.diff"</span>)</span>
+<span id="cb23-124"><a href="#cb23-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-125"><a href="#cb23-125" aria-hidden="true" tabindex="-1"></a><span class="co"># Combinations (don't use Auto ARIMA)</span></span>
+<span id="cb23-126"><a href="#cb23-126" aria-hidden="true" tabindex="-1"></a>manual1 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.diff ~ 1 + RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(0,0,0)"</span>)</span>
+<span id="cb23-127"><a href="#cb23-127" aria-hidden="true" tabindex="-1"></a>manual2 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.diff ~ 1 + RRSFS.Pop.log.diff + RRSFS.Pop.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)"</span>)</span>
+<span id="cb23-128"><a href="#cb23-128" aria-hidden="true" tabindex="-1"></a>manual3 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.diff ~ 1 + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(0,0,0)"</span>)</span>
+<span id="cb23-129"><a href="#cb23-129" aria-hidden="true" tabindex="-1"></a>manual4 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.diff ~ 1 + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)"</span>)</span>
+<span id="cb23-130"><a href="#cb23-130" aria-hidden="true" tabindex="-1"></a>manual5 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.diff ~ 1 + CDSP.log.diff + CDSP.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(0,0,0)"</span>)</span>
+<span id="cb23-131"><a href="#cb23-131" aria-hidden="true" tabindex="-1"></a>manual6 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.diff ~ 1 + CDSP.log.diff + CDSP.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)"</span>)</span>
+<span id="cb23-132"><a href="#cb23-132" aria-hidden="true" tabindex="-1"></a>manual7 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.diff ~ 1 + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(0,0,0)"</span>)</span>
+<span id="cb23-133"><a href="#cb23-133" aria-hidden="true" tabindex="-1"></a>manual8 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.diff ~ 1 + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 + UBPRB538.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)"</span>)</span>
+<span id="cb23-134"><a href="#cb23-134" aria-hidden="true" tabindex="-1"></a>manual9 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"UBPRE524.diff ~ 1 + TDSP.log.diff + B069RC1.Pop.CPI.log.diff.lag1 + UBPRB538.log.diff.lag2 + UBPRB538.log.diff.lag3 + UBPR3815.log.diff + RRSFS.Pop.log.diff + pdq(1, 0, 0) + PDQ(1,0,0)"</span>)</span>
+<span id="cb23-135"><a href="#cb23-135" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-138"><a href="#cb23-138" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-139"><a href="#cb23-139" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb23-140"><a href="#cb23-140" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb23-141"><a href="#cb23-141" aria-hidden="true" tabindex="-1"></a>run_arima <span class="ot">&lt;-</span> <span class="cf">function</span>(estimation_data) {</span>
+<span id="cb23-142"><a href="#cb23-142" aria-hidden="true" tabindex="-1"></a>  <span class="do">## 1. Expenditure</span></span>
+<span id="cb23-143"><a href="#cb23-143" aria-hidden="true" tabindex="-1"></a>  m_table1 <span class="ot">&lt;-</span> estimation_data <span class="sc">|&gt;</span></span>
+<span id="cb23-144"><a href="#cb23-144" aria-hidden="true" tabindex="-1"></a>              fabletools<span class="sc">::</span><span class="fu">model</span>(</span>
+<span id="cb23-145"><a href="#cb23-145" aria-hidden="true" tabindex="-1"></a>                  <span class="at">arima =</span> <span class="fu">ARIMA</span>(UBPRE524.Value),</span>
+<span id="cb23-146"><a href="#cb23-146" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rrsfs1 =</span> <span class="fu">ARIMA</span>(rrsfs1),</span>
+<span id="cb23-147"><a href="#cb23-147" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rrsfs2 =</span> <span class="fu">ARIMA</span>(rrsfs2),</span>
+<span id="cb23-148"><a href="#cb23-148" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rrsfs3 =</span> <span class="fu">ARIMA</span>(rrsfs3),</span>
+<span id="cb23-149"><a href="#cb23-149" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rrsfs4 =</span> <span class="fu">ARIMA</span>(rrsfs4),</span>
+<span id="cb23-150"><a href="#cb23-150" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rrsfs5 =</span> <span class="fu">ARIMA</span>(rrsfs5)</span>
+<span id="cb23-151"><a href="#cb23-151" aria-hidden="true" tabindex="-1"></a>              )</span>
+<span id="cb23-152"><a href="#cb23-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-153"><a href="#cb23-153" aria-hidden="true" tabindex="-1"></a>  <span class="fu">save_arima_results</span>(m_table1, <span class="fu">get_model_cols</span>(m_table1, <span class="fu">key_vars</span>(estimation_data)),<span class="fu">glue</span>(<span class="st">"arima_rrsfs_results.csv"</span>))</span>
+<span id="cb23-154"><a href="#cb23-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-155"><a href="#cb23-155" aria-hidden="true" tabindex="-1"></a>  <span class="do">## 2. Unemployment</span></span>
+<span id="cb23-156"><a href="#cb23-156" aria-hidden="true" tabindex="-1"></a>  m_table2 <span class="ot">&lt;-</span> estimation_data <span class="sc">|&gt;</span> </span>
+<span id="cb23-157"><a href="#cb23-157" aria-hidden="true" tabindex="-1"></a>              <span class="fu">model</span>(</span>
+<span id="cb23-158"><a href="#cb23-158" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unrate1 =</span> <span class="fu">ARIMA</span>(unrate1),</span>
+<span id="cb23-159"><a href="#cb23-159" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unrate2 =</span> <span class="fu">ARIMA</span>(unrate2),</span>
+<span id="cb23-160"><a href="#cb23-160" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unrate3 =</span> <span class="fu">ARIMA</span>(unrate3),</span>
+<span id="cb23-161"><a href="#cb23-161" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unrate4 =</span> <span class="fu">ARIMA</span>(unrate4),</span>
+<span id="cb23-162"><a href="#cb23-162" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unrate5 =</span> <span class="fu">ARIMA</span>(unrate5)</span>
+<span id="cb23-163"><a href="#cb23-163" aria-hidden="true" tabindex="-1"></a>              )</span>
+<span id="cb23-164"><a href="#cb23-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-165"><a href="#cb23-165" aria-hidden="true" tabindex="-1"></a>  <span class="fu">save_arima_results</span>(m_table2, <span class="fu">get_model_cols</span>(m_table2, <span class="fu">key_vars</span>(estimation_data)),<span class="fu">glue</span>(<span class="st">"arima_unrate_results.csv"</span>))</span>
+<span id="cb23-166"><a href="#cb23-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-167"><a href="#cb23-167" aria-hidden="true" tabindex="-1"></a>  <span class="do">## 3.1 Debt Consumer</span></span>
+<span id="cb23-168"><a href="#cb23-168" aria-hidden="true" tabindex="-1"></a>  m_table3<span class="fl">.1</span> <span class="ot">&lt;-</span> estimation_data <span class="sc">|&gt;</span></span>
+<span id="cb23-169"><a href="#cb23-169" aria-hidden="true" tabindex="-1"></a>              <span class="fu">model</span>(</span>
+<span id="cb23-170"><a href="#cb23-170" aria-hidden="true" tabindex="-1"></a>                  <span class="at">debt1 =</span> <span class="fu">ARIMA</span>(debt1),</span>
+<span id="cb23-171"><a href="#cb23-171" aria-hidden="true" tabindex="-1"></a>                  <span class="at">debt2 =</span> <span class="fu">ARIMA</span>(debt2),</span>
+<span id="cb23-172"><a href="#cb23-172" aria-hidden="true" tabindex="-1"></a>                  <span class="at">debt3 =</span> <span class="fu">ARIMA</span>(debt3),</span>
+<span id="cb23-173"><a href="#cb23-173" aria-hidden="true" tabindex="-1"></a>                  <span class="at">debt4 =</span> <span class="fu">ARIMA</span>(debt4),</span>
+<span id="cb23-174"><a href="#cb23-174" aria-hidden="true" tabindex="-1"></a>                  <span class="at">debt5 =</span> <span class="fu">ARIMA</span>(debt5)</span>
+<span id="cb23-175"><a href="#cb23-175" aria-hidden="true" tabindex="-1"></a>              )</span>
+<span id="cb23-176"><a href="#cb23-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-177"><a href="#cb23-177" aria-hidden="true" tabindex="-1"></a>  <span class="fu">save_arima_results</span>(m_table3<span class="fl">.1</span>, <span class="fu">get_model_cols</span>(m_table3<span class="fl">.1</span>, <span class="fu">key_vars</span>(estimation_data)),<span class="fu">glue</span>(<span class="st">"arima_debt_results.csv"</span>))</span>
+<span id="cb23-178"><a href="#cb23-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-179"><a href="#cb23-179" aria-hidden="true" tabindex="-1"></a>  <span class="do">## 3.2 Debt Household</span></span>
+<span id="cb23-180"><a href="#cb23-180" aria-hidden="true" tabindex="-1"></a>  m_table3<span class="fl">.2</span> <span class="ot">&lt;-</span> estimation_data <span class="sc">|&gt;</span></span>
+<span id="cb23-181"><a href="#cb23-181" aria-hidden="true" tabindex="-1"></a>              <span class="fu">model</span>(</span>
+<span id="cb23-182"><a href="#cb23-182" aria-hidden="true" tabindex="-1"></a>                  <span class="at">debth1 =</span> <span class="fu">ARIMA</span>(debth1),</span>
+<span id="cb23-183"><a href="#cb23-183" aria-hidden="true" tabindex="-1"></a>                  <span class="at">debth2 =</span> <span class="fu">ARIMA</span>(debth2),</span>
+<span id="cb23-184"><a href="#cb23-184" aria-hidden="true" tabindex="-1"></a>                  <span class="at">debth3 =</span> <span class="fu">ARIMA</span>(debth3),</span>
+<span id="cb23-185"><a href="#cb23-185" aria-hidden="true" tabindex="-1"></a>                  <span class="at">debth4 =</span> <span class="fu">ARIMA</span>(debth4),</span>
+<span id="cb23-186"><a href="#cb23-186" aria-hidden="true" tabindex="-1"></a>                  <span class="at">debth5 =</span> <span class="fu">ARIMA</span>(debth5)</span>
+<span id="cb23-187"><a href="#cb23-187" aria-hidden="true" tabindex="-1"></a>              )</span>
+<span id="cb23-188"><a href="#cb23-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-189"><a href="#cb23-189" aria-hidden="true" tabindex="-1"></a>  <span class="fu">save_arima_results</span>(m_table3<span class="fl">.2</span>, <span class="fu">get_model_cols</span>(m_table3<span class="fl">.2</span>, <span class="fu">key_vars</span>(estimation_data)),<span class="fu">glue</span>(<span class="st">"arima_debth_results.csv"</span>))</span>
+<span id="cb23-190"><a href="#cb23-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-191"><a href="#cb23-191" aria-hidden="true" tabindex="-1"></a>  <span class="do">## 4. Portfolio</span></span>
+<span id="cb23-192"><a href="#cb23-192" aria-hidden="true" tabindex="-1"></a>  m_table4 <span class="ot">&lt;-</span> estimation_data <span class="sc">|&gt;</span> </span>
+<span id="cb23-193"><a href="#cb23-193" aria-hidden="true" tabindex="-1"></a>              <span class="fu">model</span>(</span>
+<span id="cb23-194"><a href="#cb23-194" aria-hidden="true" tabindex="-1"></a>                  <span class="at">portfolio1 =</span> <span class="fu">ARIMA</span>(portfolio1),</span>
+<span id="cb23-195"><a href="#cb23-195" aria-hidden="true" tabindex="-1"></a>                  <span class="at">portfolio2=</span> <span class="fu">ARIMA</span>(portfolio2),</span>
+<span id="cb23-196"><a href="#cb23-196" aria-hidden="true" tabindex="-1"></a>                  <span class="at">portfolio3=</span> <span class="fu">ARIMA</span>(portfolio3),</span>
+<span id="cb23-197"><a href="#cb23-197" aria-hidden="true" tabindex="-1"></a>                  <span class="at">portfolio4=</span> <span class="fu">ARIMA</span>(portfolio4),</span>
+<span id="cb23-198"><a href="#cb23-198" aria-hidden="true" tabindex="-1"></a>              )</span>
+<span id="cb23-199"><a href="#cb23-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-200"><a href="#cb23-200" aria-hidden="true" tabindex="-1"></a>  <span class="fu">save_arima_results</span>(m_table4, <span class="fu">get_model_cols</span>(m_table4, <span class="fu">key_vars</span>(estimation_data)),<span class="fu">glue</span>(<span class="st">"arima_portfolio_results.csv"</span>))</span>
+<span id="cb23-201"><a href="#cb23-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-202"><a href="#cb23-202" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb23-203"><a href="#cb23-203" aria-hidden="true" tabindex="-1"></a>  <span class="do">## 5. Combinations</span></span>
+<span id="cb23-204"><a href="#cb23-204" aria-hidden="true" tabindex="-1"></a>  m_table6 <span class="ot">&lt;-</span> estimation_data <span class="sc">|&gt;</span> </span>
+<span id="cb23-205"><a href="#cb23-205" aria-hidden="true" tabindex="-1"></a>              <span class="fu">model</span>(</span>
+<span id="cb23-206"><a href="#cb23-206" aria-hidden="true" tabindex="-1"></a>                  <span class="at">comb1=</span> <span class="fu">ARIMA</span>(comb1),</span>
+<span id="cb23-207"><a href="#cb23-207" aria-hidden="true" tabindex="-1"></a>                  <span class="at">comb2=</span> <span class="fu">ARIMA</span>(comb2),</span>
+<span id="cb23-208"><a href="#cb23-208" aria-hidden="true" tabindex="-1"></a>                  <span class="at">comb3=</span> <span class="fu">ARIMA</span>(comb3),</span>
+<span id="cb23-209"><a href="#cb23-209" aria-hidden="true" tabindex="-1"></a>                  <span class="at">comb4=</span> <span class="fu">ARIMA</span>(comb4),</span>
+<span id="cb23-210"><a href="#cb23-210" aria-hidden="true" tabindex="-1"></a>                  <span class="at">comb5=</span> <span class="fu">ARIMA</span>(comb5)</span>
+<span id="cb23-211"><a href="#cb23-211" aria-hidden="true" tabindex="-1"></a>              )</span>
+<span id="cb23-212"><a href="#cb23-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-213"><a href="#cb23-213" aria-hidden="true" tabindex="-1"></a>  <span class="fu">save_arima_results</span>(m_table6, <span class="fu">get_model_cols</span>(m_table6, <span class="fu">key_vars</span>(estimation_data)),<span class="fu">glue</span>(<span class="st">"arima_other_results.csv"</span>))</span>
+<span id="cb23-214"><a href="#cb23-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-215"><a href="#cb23-215" aria-hidden="true" tabindex="-1"></a>  <span class="do">## 6. Manual</span></span>
+<span id="cb23-216"><a href="#cb23-216" aria-hidden="true" tabindex="-1"></a>  m_table7 <span class="ot">&lt;-</span> estimation_data <span class="sc">|&gt;</span> </span>
+<span id="cb23-217"><a href="#cb23-217" aria-hidden="true" tabindex="-1"></a>              <span class="fu">model</span>(</span>
+<span id="cb23-218"><a href="#cb23-218" aria-hidden="true" tabindex="-1"></a>                  <span class="at">manual1=</span> <span class="fu">ARIMA</span>(manual1),</span>
+<span id="cb23-219"><a href="#cb23-219" aria-hidden="true" tabindex="-1"></a>                  <span class="at">manual2=</span> <span class="fu">ARIMA</span>(manual2),</span>
+<span id="cb23-220"><a href="#cb23-220" aria-hidden="true" tabindex="-1"></a>                  <span class="at">manual3=</span> <span class="fu">ARIMA</span>(manual3),</span>
+<span id="cb23-221"><a href="#cb23-221" aria-hidden="true" tabindex="-1"></a>                  <span class="at">manual4=</span> <span class="fu">ARIMA</span>(manual4),</span>
+<span id="cb23-222"><a href="#cb23-222" aria-hidden="true" tabindex="-1"></a>                  <span class="at">manual5=</span> <span class="fu">ARIMA</span>(manual5),</span>
+<span id="cb23-223"><a href="#cb23-223" aria-hidden="true" tabindex="-1"></a>                  <span class="at">manual6=</span> <span class="fu">ARIMA</span>(manual6),</span>
+<span id="cb23-224"><a href="#cb23-224" aria-hidden="true" tabindex="-1"></a>                  <span class="at">manual7=</span> <span class="fu">ARIMA</span>(manual7),</span>
+<span id="cb23-225"><a href="#cb23-225" aria-hidden="true" tabindex="-1"></a>                  <span class="at">manual8=</span> <span class="fu">ARIMA</span>(manual8),</span>
+<span id="cb23-226"><a href="#cb23-226" aria-hidden="true" tabindex="-1"></a>                  <span class="at">manual9=</span> <span class="fu">ARIMA</span>(manual9)</span>
+<span id="cb23-227"><a href="#cb23-227" aria-hidden="true" tabindex="-1"></a>              )</span>
+<span id="cb23-228"><a href="#cb23-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-229"><a href="#cb23-229" aria-hidden="true" tabindex="-1"></a>  <span class="fu">save_arima_results</span>(m_table7, <span class="fu">get_model_cols</span>(m_table7, <span class="fu">key_vars</span>(estimation_data)),<span class="fu">glue</span>(<span class="st">"arima_manual_results.csv"</span>))</span>
+<span id="cb23-230"><a href="#cb23-230" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb23-231"><a href="#cb23-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-232"><a href="#cb23-232" aria-hidden="true" tabindex="-1"></a><span class="fu">run_arima</span>(estimation_data)</span>
+<span id="cb23-233"><a href="#cb23-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-234"><a href="#cb23-234" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-235"><a href="#cb23-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-236"><a href="#cb23-236" aria-hidden="true" tabindex="-1"></a><span class="fu">### Results</span></span>
+<span id="cb23-237"><a href="#cb23-237" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-238"><a href="#cb23-238" aria-hidden="true" tabindex="-1"></a>We can see that for our sub-set of banks the top models are very different. With the exception of Capital One all models have explanatory variables. Capital One is the only model the relies solely on its history.</span>
+<span id="cb23-239"><a href="#cb23-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-240"><a href="#cb23-240" aria-hidden="true" tabindex="-1"></a>For BARCLAYS we could simplify the model by removing terms where p-value &gt; 0.05 as we cannot conclude that these explanatory variables affect our target measure.</span>
+<span id="cb23-241"><a href="#cb23-241" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-242"><a href="#cb23-242" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-243"><a href="#cb23-243" aria-hidden="true" tabindex="-1"></a>::: {#sec-arima-aic .panel-tabset}</span>
 <span id="cb23-244"><a href="#cb23-244" aria-hidden="true" tabindex="-1"></a></span>
@@ -1618,7 +1614,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb23-262"><a href="#cb23-262" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
 <span id="cb23-263"><a href="#cb23-263" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-arima-citi-coef</span></span>
 <span id="cb23-264"><a href="#cb23-264" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: "Top Model coefficients"</span></span>
-<span id="cb23-265"><a href="#cb23-265" aria-hidden="true" tabindex="-1"></a><span class="fu">print_coeff</span>(bank, best_bank_models) </span>
+<span id="cb23-265"><a href="#cb23-265" aria-hidden="true" tabindex="-1"></a><span class="fu">print_coeff</span>(bank, best_bank_models)<span class="co">#| </span></span>
 <span id="cb23-266"><a href="#cb23-266" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb23-267"><a href="#cb23-267" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-268"><a href="#cb23-268" aria-hidden="true" tabindex="-1"></a><span class="fu">### SYNCHRONY</span></span>

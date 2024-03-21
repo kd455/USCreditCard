@@ -138,7 +138,7 @@ plot_cc_measures(bank, estimation_data,ubpr_labels)
 #| warning: false
 #| label: fig-fit-ae
 #| fig-subcap: 
-#| - "The time plot of the residuals shows a couple of outliers at the start of the time period causing a left skew. The acf shows residuals are uncorrelated."
+#| - "The acf shows significant correlation indicating the model has not fully captured the underlying data patterns. The residuals look normal."
 #| - "Comparative credit card portfolio variables"
 
 bank <- "AMERICAN EXPRESS NATIONAL BANK"
@@ -151,8 +151,8 @@ plot_cc_measures(bank, estimation_data,ubpr_labels)
 #| warning: false
 #| label: fig-fit-cap
 #| fig-subcap: 
-#|   - "The time plot of the residuals shows that the variation of the residuals is relatively constant but with two significant outliers at the start of the series. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outliers." 
-#|   - "Explaining the outlier: Deliquency dropped at a time when CAPITAL ONE's credit card portfolio became a larger business concern. The U shape for deliquency % indicates initial improvement in the portfolio's quality, however, by the end of the estimation period, the % is back up. This increase coincides with a decrease in unused commitments i.e. borrowers are putting more expenditures on their credit cards."
+#|   - "The time plot of the residuals shows that the variation of the residuals is relatively constant. The residuals look normal with the exception of the outliers. The acf shows significant correlation every 2 lags indicating the model has not fully captured the underlying data patterns." 
+#|   - "Comparative credit card portfolio variables"
 
 bank <- "CAPITAL ONE"
 m_table |> filter(grepl(bank,BankName)) |> dplyr::select(tslm) |> gg_tsresiduals()  

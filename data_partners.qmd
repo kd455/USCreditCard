@@ -126,9 +126,10 @@ Increases in credit card loans in the *old* bank, as seen in GAP and Walmart, is
 
 Given our goal to generalise partnership impacts by FICO and/or Industry we need to use additional public data sources to provide this mapping. 
 
-### FICO Score
+### FICO Score and APR
 The *Terms of credit card plans (TCCP) survey* [@TCCP2022] provides credit card details including their target FICO Tiers and Annual Percentage Rate (APR). @boston2000 found that banks faced an adverse selection problem whereby it was profitable to offer credit card deals with high APR that attracted risker borrowers even though there was evidence of higher delinquency. We can see from TCCP's 2022 survey in @tbl-tccp-apr that the APR does not differ between partnership and bank branded cards.
 
+Studies point to the fact that banks have matured their risk management capabilities e.g., through improved technology, and this has allowed them to have risk-based pricing. This means that instead of having a single headline APR for a card, banks offer creditworthy customers relatively low interest rates compared with relatively risky customers at higher rates [@Mann2008] and [@CFPB2023]. Consequently, we would need borrower level information to properly investigate whether there is a relationship between APR and partnership cards.  
 
 [TCCP data download](data/cfpb_tccp-data_2022-07-01_2022_12-31.xlsx)
 

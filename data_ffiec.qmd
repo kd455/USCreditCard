@@ -5,6 +5,8 @@ format: html
 
 US banks are required to report quarterly financial data e.g., Balance Sheet and Income Statements, to the US Federal Financial Institutions Examination Council (FFIEC) who make this data publicly available in a consolidated format as a part of their Uniform Bank Performance Reporting (UBPR) regime. Data is available from 2002 Q4 @ffiec.
 
+Of note, US regulators have access to FR Y-14 [@Fed14M] reporting that breaks down the credit card portfolio by additional attributes. However, this is commercially sensitive and not shared [@CFPB2023]. 
+
 We are interested in measures that will provide insights to Bank's credit card businesses as shown in @tbl-ccmeasures. 
 
 ```{r}
@@ -21,7 +23,7 @@ filter(str_detect(Desc, "Credit|90 days")) |>
 
 ## Measure of portfolio quality
 
-To measure quality, we can use the proportion of credit cards that are delinquent in the portfolio. This is the sum of UBPRE523 and UBPRE524; accounts that are accruing payments but are overdue by 30 days+ or are in non-accrual status i.e. non-performing loans. 
+To measure quality, we can use 'Credit Card Plans-30-89 DAYS P/D %' (UBPRE524), which is the proportion of credit cards that are delinquent in the credit card portfolio after 30 days. In studies we see alternative measures of quality include delinquency at 90+ days (UBPRE521), and charge-off rates ([@FedCharge] and [@CFPB2023]).
 
 However, given we are interested in the impact of a partnership, using measure **Credit Card Plans-30-89 DAYS P/D %** (UBPRE524) is ideal as it gives us the earliest indicator of delinquency.
 
@@ -29,7 +31,7 @@ However, given we are interested in the impact of a partnership, using measure *
 
 The scope of Banks included in our analysis is not limited to the banks involved in credit card partnerships. We can use data from FFIEC to add information about their peers i.e. other banks that are similar. 
 
-@tbl-peergrpcnt details 3 peer groups. National (US-wide) Credit card partnerships occur between banks in the **Large Bank** and **Large Credit Card Bank** groups. These peer groups are defined by FFIEC (see @sec-peers for full list of Banks in each peer group) [@ffiec].
+@tbl-peergrpcnt details 3 peer groups. National (US-wide) Credit card partnerships occur between banks in the **Large Bank** and **Large Credit Card Bank** groups. These peer groups are defined by FFIEC (see @sec-peers for full list of Banks in each peer group) [@ffiec]. Banks belong to either group i.e., membership is mutually exclusive. Notably, partnerships do occur for other banks [@TCCP2022], but we will focus on larger partnerships that occur between Large Banks and Large Credit Card banks. 
 
 A Large Bank like CITIBANK will have multiple businesses: household mortgages and credit cards; market trading; investment banking and more. In contrast, large credit card banks like BARCLAYS US specialise in credit cards only. Consequently, we expect to see the peer groups react differently to external factors or exhibit different internal dynamics and risk profiles. 
 
@@ -288,7 +290,13 @@ ggplot(final_df, aes(x=Value, colour = BankType))+
     theme(legend.position="top",legend.title=element_blank()) +
     scale_color_manual(values = bank_type.colours())
 ```
-
+## Mean
+```{r}
+#| warning: false
+#| error: false
+final_df |>as_tibble() |> group_by(BankType) |> summarise(mean = mean(Value))|> 
+        knitr::kable(format = "html") 
+```
 ## Quantiles - Large Credit Card Banks
 ```{r}
 #| warning: false
@@ -346,8 +354,6 @@ features.plot_violin(all_ftbanks, "linearity")
 
 features.plot_violin(all_ftbanks, "stl_e_acf1")
 
-features.plot_violin(all_ftbanks, "stl_e_acf10")
-
 features.plot_violin(all_ftbanks, "nsdiffs")
 
 ```
@@ -373,7 +379,8 @@ df_alltypes |> group_by(BankType) |>
 
 4. @fig-lfeature-4 and @fig-lfeature-5 indicates a strong linear trend for *Large Banks* and *Large Credit Card Banks*.
 5. @fig-lfeature-6 the first autocorrelation coefficient is close to 0 which indicates a weak linear relationship between lagged values. Of note the coefficients are negative indicating a tendency for a short-term reversal. This can be seen in @fig-regulation-1 where the values oscillate.
-6. @fig-lfeature-7 the 10th autocorrelation coefficient. Checking overall autocorrelation using the Ljung-Box test proves autocorrelation i.e. data pattern is not due to chance.
+
+Checking overall autocorrelation using the Ljung-Box test proves autocorrelation i.e. data pattern is not due to chance.
 
 **Ljung-Box test**
 
@@ -385,9 +392,9 @@ final_df |> na.omit() |> pull(value_diff) |> Box.test(lag = 10, type = "Ljung")
 :::
 
 
-7. @fig-lfeature-8 *Large Credit Card Banks* is not stationary i.e. the statistical properties of the time series changes, which makes it difficult to identify trends and patterns. Performing a difference i.e. to get the quarterly change in UBPRE524, makes the series stationary as shown in @fig-acf-2. This can be confirmed by performing an augmented Dickey–Fuller (ADF) test on the differenced value. We also see that, post differencing, there are autocorrelation coefficients above the significance threshold. This is likely due to seasonality as these are at regular intervals. The decreasing magnitude of these coefficients tell us the earlier lags have a stronger influence than values further in the past.
+7. @fig-lfeature-7 *Large Banks* and *Large Credit Card Banks* is not stationary i.e. the statistical properties of the time series changes, which makes it difficult to identify trends and patterns. Performing a difference i.e. to get the quarterly change in UBPRE524, makes the series stationary as shown in @fig-acf-2. This can be confirmed by performing an augmented Dickey–Fuller (ADF) test on the differenced value. We also see that, post differencing, there are autocorrelation coefficients above the significance threshold. The decreasing magnitude of these coefficients tell us the earlier lags have a stronger influence than values further in the past.
 
-Autocorrelation, the correlation between the timeseries and its own lagged values, can inform an AutoRegressive Moving Average (ARMA) Model. In @fig-acf we see a Seasonal-ARMA process in *Large Credit Card Banks* as both ACF and PACF are declining gradually around every 4th lag. This confirms what we saw in @fig-lfeature-3.
+Autocorrelation, the correlation between the timeseries and its own lagged values, can inform an AutoRegressive Moving Average (ARMA) Model. 
 
 ```{r}
 #| warning: false

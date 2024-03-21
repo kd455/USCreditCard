@@ -124,7 +124,7 @@ result_post <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, a
           list_rbind() |> as_tibble() |> left_join(all_data |> dplyr::select(observed = UBPRE524.Value),by = join_by(IDRSSD, BankName, BankType, Quarter))  |> dplyr::select(Partner, BankName, Quarter, observed, predicted, .model)                         
 ###### end get prediction for Period current + 6 quarters after event###################
 
-#### get prediction for Period - 6 quarters before event ###################|>filter(grepl("BARCLAY|CITIBANK", BankName))
+#### get prediction for Period - 6 quarters before event ###################|>
 models_pre_event <- partner_banks  |>
                       mutate(model_details = map2(Bank, Partner, best_arima_model, all_data, arima_results, -6))
 
@@ -135,6 +135,31 @@ result_pre <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, al
 
 map2(partner_banks$Bank, partner_banks$Partner, plot_prediction_and_history, result_post,result_pre, all_data) 
 
+```
+```{r}
+#| fig-height: 8
+#| eval: false
+
+bank = "CITIBANK, N.A. (476810)"
+partner = "Costco"
+bank_hcast_data <- result_pre |> filter(BankName == bank) |> filter(Partner == partner) 
+bank_fcast_data <- result_post |> filter(BankName == bank) |> filter(Partner == partner) 
+tdsp_series <- all_data |> filter(BankName == bank) |> dplyr::select(TDSP.log.diff) |>
+filter(Quarter >=min(bank_hcast_data$Quarter)-5, Quarter < max(bank_fcast_data$Quarter)+3)
+
+p1 <-
+    plot_prediction(bank, partner, bank_fcast_data, all_data) + 
+    geom_line(aes(x = Quarter, y=predicted, color = "Pre"), 
+              data = bank_hcast_data) +            
+     scale_color_manual( 
+      values = c("Pre" = "blue", "Post" = "red"),
+      labels = c("Pre" = "Predictions Pre Event", "Post" = "Predictions Post Event")) +                  
+    theme(legend.direction = "vertical",legend.position = "top", legend.title = element_blank())
+
+p2 <- tdsp_series |> autoplot() + geom_line(aes(x = Quarter, y = TDSP.log.diff))  +theme_bw() 
+
+with_econ_plot <- patchwork::wrap_elements(p1) / patchwork::wrap_elements(p2)  + plot_layout(heights = c(2,1))
+with_econ_plot
 
 
 ```
@@ -152,7 +177,6 @@ map2(partner_banks$Bank, partner_banks$Partner, plot_prediction_and_history, res
 print_ar(result_pre, "Costco", "AMERICAN EXPRESS NATIONAL BANK (1394676)") 
 print_ar(result_post, "Costco", "AMERICAN EXPRESS NATIONAL BANK (1394676)")
 ```
-
 
 ### Costco - New Partner CITIBANK
 ```{r}

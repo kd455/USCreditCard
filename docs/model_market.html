@@ -510,7 +510,7 @@ AR_{it} = D_{it} – (\alpha_i + \beta_i D_{gt})
 <div id="fig-fit-ae-1" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="model_market_files/figure-html/fig-fit-ae-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Figure&nbsp;6.8: The time plot of the residuals shows a couple of outliers at the start of the time period causing a left skew. The acf shows residuals are uncorrelated.</figcaption>
+<figcaption class="figure-caption">Figure&nbsp;6.8: The acf shows significant correlation indicating the model has not fully captured the underlying data patterns. The residuals look normal.</figcaption>
 </figure>
 </div>
 </div>
@@ -536,7 +536,7 @@ AR_{it} = D_{it} – (\alpha_i + \beta_i D_{gt})
 <div id="fig-fit-cap-1" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="model_market_files/figure-html/fig-fit-cap-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Figure&nbsp;6.10: The time plot of the residuals shows that the variation of the residuals is relatively constant but with two significant outliers at the start of the series. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outliers.</figcaption>
+<figcaption class="figure-caption">Figure&nbsp;6.10: The time plot of the residuals shows that the variation of the residuals is relatively constant. The residuals look normal with the exception of the outliers. The acf shows significant correlation every 2 lags indicating the model has not fully captured the underlying data patterns.</figcaption>
 </figure>
 </div>
 </div>
@@ -544,7 +544,7 @@ AR_{it} = D_{it} – (\alpha_i + \beta_i D_{gt})
 <div id="fig-fit-cap-2" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="model_market_files/figure-html/fig-fit-cap-2.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Figure&nbsp;6.11: Explaining the outlier: Deliquency dropped at a time when CAPITAL ONE’s credit card portfolio became a larger business concern. The U shape for deliquency % indicates initial improvement in the portfolio’s quality, however, by the end of the estimation period, the % is back up. This increase coincides with a decrease in unused commitments i.e.&nbsp;borrowers are putting more expenditures on their credit cards.</figcaption>
+<figcaption class="figure-caption">Figure&nbsp;6.11: Comparative credit card portfolio variables</figcaption>
 </figure>
 </div>
 </div>
@@ -1244,7 +1244,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb14-156"><a href="#cb14-156" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
 <span id="cb14-157"><a href="#cb14-157" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-fit-ae</span></span>
 <span id="cb14-158"><a href="#cb14-158" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap: </span></span>
-<span id="cb14-159"><a href="#cb14-159" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "The time plot of the residuals shows a couple of outliers at the start of the time period causing a left skew. The acf shows residuals are uncorrelated."</span></span>
+<span id="cb14-159"><a href="#cb14-159" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "The acf shows significant correlation indicating the model has not fully captured the underlying data patterns. The residuals look normal."</span></span>
 <span id="cb14-160"><a href="#cb14-160" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "Comparative credit card portfolio variables"</span></span>
 <span id="cb14-161"><a href="#cb14-161" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-162"><a href="#cb14-162" aria-hidden="true" tabindex="-1"></a>bank <span class="ot">&lt;-</span> <span class="st">"AMERICAN EXPRESS NATIONAL BANK"</span></span>
@@ -1257,8 +1257,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb14-171"><a href="#cb14-171" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
 <span id="cb14-172"><a href="#cb14-172" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-fit-cap</span></span>
 <span id="cb14-173"><a href="#cb14-173" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap: </span></span>
-<span id="cb14-174"><a href="#cb14-174" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "The time plot of the residuals shows that the variation of the residuals is relatively constant but with two significant outliers at the start of the series. The acf shows residuals are uncorrelated, and the residuals look normal with the exception of the outliers." </span></span>
-<span id="cb14-175"><a href="#cb14-175" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Explaining the outlier: Deliquency dropped at a time when CAPITAL ONE's credit card portfolio became a larger business concern. The U shape for deliquency % indicates initial improvement in the portfolio's quality, however, by the end of the estimation period, the % is back up. This increase coincides with a decrease in unused commitments i.e. borrowers are putting more expenditures on their credit cards."</span></span>
+<span id="cb14-174"><a href="#cb14-174" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "The time plot of the residuals shows that the variation of the residuals is relatively constant. The residuals look normal with the exception of the outliers. The acf shows significant correlation every 2 lags indicating the model has not fully captured the underlying data patterns." </span></span>
+<span id="cb14-175"><a href="#cb14-175" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Comparative credit card portfolio variables"</span></span>
 <span id="cb14-176"><a href="#cb14-176" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-177"><a href="#cb14-177" aria-hidden="true" tabindex="-1"></a>bank <span class="ot">&lt;-</span> <span class="st">"CAPITAL ONE"</span></span>
 <span id="cb14-178"><a href="#cb14-178" aria-hidden="true" tabindex="-1"></a>m_table <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="fu">grepl</span>(bank,BankName)) <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(tslm) <span class="sc">|&gt;</span> <span class="fu">gg_tsresiduals</span>()  </span>
