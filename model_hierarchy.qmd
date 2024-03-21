@@ -18,11 +18,28 @@ $\epsilon_{it}$ is the error term.
 
 The coefficient $\gamma$ on the dummy variable indicates the average change in the target variable associated with having a partner, controlling for other factors.
 
+```{mermaid}
+gantt
+    dateFormat YYYY-MM-DD
+    section GAP
+        SYNCHRONY : g1, 2013-09-30, 36m
+        another task    :after g1, 5m 
+    section Costco
+        CITIBANK          :c1, 2016-06-30, 29m
+        AMERICAN EXPRESS  :after c1, 26m
+
+```
+
 ```{r}
 #| warning: false
 #| echo: false
 source('functions.R')
 hier_data <- get_hierarchy_model_data()
+
+hier_data |> filter(Partner != "None")
+
+hier_data |> filter(Partner == "GAP", HasPartner == 1, 
+grepl("BARCLAYS",BankName)) |> nrow()
 
 ```
 ```{r}
