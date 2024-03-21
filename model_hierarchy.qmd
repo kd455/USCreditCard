@@ -1,5 +1,5 @@
 ---
-title: "Event study"
+title: "Hierarchical study"
 format: html
 ---
 $$
@@ -9,60 +9,46 @@ In this representation:
 
 $Y_{it}$ is the dependent variable for entity $i$ at time $t$.
 $X_{it}$ represents the independent variable(s) for entity $i$ at time $t$.
-$D_{it}$ is the dummy variable for the event (1 after the event, 0 before).
+$D_{it}$ is the dummy variable for partner (1 has partner, 0 does not have partner).
 $\alpha$ is the constant term.
 $\beta$ is the coefficient for the independent variable(s).
 $\gamma$ is the coefficient for the dummy variable.
 $\mu_i$ represents the entity-specific fixed effect.
 $\epsilon_{it}$ is the error term.
 
-The coefficient $\gamma$ on the dummy variable indicates the average change in the target variable associated with the event, controlling for other factors.
-
-By including this dummy variable, you can directly estimate the impact of the event on the intercept (baseline level) of the dependent variable
+The coefficient $\gamma$ on the dummy variable indicates the average change in the target variable associated with having a partner, controlling for other factors.
 
 ```{r}
 #| warning: false
 #| echo: false
 source('functions.R')
-hier_data <- get_hierarchy_model_data() |> drop_na(UBPRE524.diff.lag4) |> 
-        mutate(BankType = as.factor(BankType),
-         IDRSSD = as.factor(IDRSSD),
-         BankName = as.factor(BankName),
-         Partner= as.factor(Partner),
-         HasPartner = as.factor(HasPartner),
-         Qtr = as.factor(quarter(Quarter)),
-         NAICS2 = as.factor(stringr::str_sub(NAICS,start=1, end=2)),
-         NAICS3 = as.factor(stringr::str_sub(NAICS,start=1, end=3)))
+hier_data <- get_hierarchy_model_data()
 
-# market_formula <- "UBPRE524.diff ~ UBPRE524.group.log.diff"
-# all_data <- get_model_data()
-# market_residuals <- all_data$all_data |>fill_gaps() |> 
-#                         model(tslm = TSLM(as.formula(market_formula))) |> 
-#                             augment() |> dplyr::select(.resid)
+```
+```{r}
+#| warning: false
+#| code-fold: false
+#| eval: true
 
-# final_data <- hier_data |> left_join(market_residuals,by = join_by(BankName, Quarter, IDRSSD, BankType))
+m1 <- lmer(UBPRE524.diff ~ HasPartner + (1 + HasPartner + Qtr+ UBPRB538.log.diff + UBPR3815.log.diff | BankName/Partner) + TDSP.log.diff + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1, data = hier_data, REML = FALSE)
 
-m1 <- lmer(UBPRE524.diff ~ HasPartner + (1 + HasPartner + UBPRB538.log.diff + UBPR3815.log.diff | BankName/Partner) + TDSP.log.diff + TDSP.log.diff.lag1 + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1, data = hier_data, REML = FALSE)
+m2 <- lmer(UBPRE524.diff ~ HasPartner + (1 + HasPartner + Qtr+ UBPRB538.log.diff + UBPR3815.log.diff | BankName/Partner) + TDSP.log.diff + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1 + UNRATE.log.diff.lag2, data = hier_data, REML = FALSE)
 
-m2 <- lmer(UBPRE524.diff ~ HasPartner + (1 + HasPartner + UBPRB538.log.diff + UBPR3815.log.diff | BankName/Partner) + TDSP.log.diff + TDSP.log.diff.lag1, data = hier_data, REML = FALSE)
+m3 <- lmer(UBPRE524.diff ~ HasPartner + (1 + HasPartner + Qtr+ BankType + UBPRB538.log.diff + UBPR3815.log.diff | BankName/Partner) + TDSP.log.diff + TDSP.log.diff.lag1, data = hier_data, REML = FALSE)
 
-m3 <- lmer(UBPRE524.diff ~ HasPartner + (1 + HasPartner + UBPRB538.log.diff + UBPR3815.log.diff | BankName/Partner) + TDSP.log.diff + TDSP.log.diff.lag1 + UBPRE524.group.log.diff, data = hier_data, REML = FALSE)
+m4 <- lmer(UBPRE524.diff ~ HasPartner + (1 + HasPartner + UBPRB538.log.diff + UBPR3815.log.diff | BankName/Partner) + TDSP.log.diff + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1, data = hier_data, REML = FALSE)
 
-m4 <- lmer(UBPRE524.diff ~ HasPartner + (1 + HasPartner + UBPRB538.log.diff + UBPR3815.log.diff | BankName/Partner) + TDSP.log.diff + UBPRE524.group.log.diff, data = hier_data, REML = FALSE)
+m5 <- lmer(UBPRE524.diff ~ HasPartner + (1 + HasPartner + UBPRE524.log.diff.lag1 + UBPRB538.log.diff + UBPR3815.log.diff | BankName/Partner) + TDSP.log.diff + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1, data = hier_data, REML = FALSE)
 
-m5 <- lmer(UBPRE524.diff ~ HasPartner + (1 + HasPartner + UBPR3815.log.diff | Partner) + TDSP.log.diff + TDSP.log.diff.lag1 + UBPRE524.group.log.diff, data = hier_data, REML = FALSE)
+m6 <- lmer(UBPRE524.diff ~ HasPartner + (1 + HasPartner + UBPRE524.log.diff.lag4 + UBPRB538.log.diff + UBPR3815.log.diff | BankName/Partner) + TDSP.log.diff + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1, data = hier_data, REML = FALSE)
 
-m6 <- lmer(UBPRE524.diff ~ HasPartner +  (1 + Qtr + HasPartner + UBPRB538.log.diff + UBPR3815.log.diff | BankName/Partner) + TDSP.log.diff + TDSP.log.diff.lag1 + UBPRE524.group.log.diff, data = hier_data, REML = FALSE)
-
-m7 <- lmer(UBPRE524.diff ~ HasPartner +  (1 + HasPartner + Qtr:BankType + UBPRB538.log.diff + UBPR3815.log.diff | BankName/Partner) + TDSP.log.diff + TDSP.log.diff.lag1 + UBPRE524.group.log.diff, data = hier_data, REML = FALSE)
-
-m8 <- lmer(UBPRE524.diff ~ HasPartner +  (1 + HasPartner + Qtr + UBPRB538.log.diff + UBPR3815.log.diff | BankType/BankName/Partner) + TDSP.log.diff + TDSP.log.diff.lag1 + UBPRE524.group.log.diff, data = hier_data, REML = FALSE)
-
-m9 <- lmer(UBPRE524.diff ~ HasPartner +  (1 + HasPartner + Qtr + UBPR3815.log.diff | BankName/Partner) + TDSP.log.diff + TDSP.log.diff.lag1 + UBPRE524.group.log.diff, data = hier_data, REML = FALSE)
-
-m6.1 <- lmer(UBPRE524.diff ~ HasPartner +  (1 + Qtr + HasPartner + UBPRB538.log.diff + UBPR3815.log.diff | BankName/NAICS2) + TDSP.log.diff + TDSP.log.diff.lag1 + UBPRE524.group.log.diff, data = hier_data, REML = FALSE)
-
-model_compare <- model.sel( m1,m2,m3,m4,m5, m6,m7,m8,m9,m6.1,rank = "AICc")
+m7 <- lmer(UBPRE524.diff ~ HasPartner + (1 + HasPartner + Qtr + UBPRE524.log.diff.lag4 + UBPRB538.log.diff + UBPR3815.log.diff | BankName/Partner) + TDSP.log.diff + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1, data = hier_data, REML = FALSE)
+```
+```{r}
+#| warning: false
+#| label: tbl-hier-aicc
+#| tbl-cap: AICc Summary. The lower the AICc value, the better the balance between model complexity (number of parameters) and goodness of fit
+model_compare <- model.sel( m1,m2,m3,m4,m5,m6,m7, rank = "AICc")
 
 model_compare |> as.data.frame() |> rownames_to_column(var = "Model")|> 
     mutate(across(where(is.numeric), \(x) round(x,2))) |> 
@@ -70,12 +56,180 @@ model_compare |> as.data.frame() |> rownames_to_column(var = "Model")|>
             dplyr::select(Model, df, logLik, AICc, delta, weight) |>
                 rmarkdown::paged_table()  
 
-m <- lmer(formula(m6), data = hier_data, REML = TRUE)
-summary(m)
-coef(m)
+```
+```{r}
+#| warning: false
+top_model <- lmer(formula(m1), data = hier_data, REML = TRUE)
 
-m_naics <- lmer(formula(m6.1), data = hier_data, REML = TRUE)
-summary(m_naics)
-coef(m_naics)
+#summary(top_model)
+#coef(top_model)
+```
+
+```{r}
+#| warning: false
+generate_fixed_random_plts <- function(model) {
+    target_label <- credit_card.target_label()
+    feEx <- FEsim(model, 1000)
+    plotFE <- plotFEsim(feEx) +
+                        theme_bw() + labs(title = "Coefficient Plot",
+                        x = "Median Effect Estimate", y = glue("{target_label} (difference)"))
+
+    reEx <- REsim(model)
+    plotRE <- plotREsim(reEx)     
+
+    list(FE = plotFE, RE = plotRE) 
+}
+```
+
+### Fixed Effects
+
+::: {#panel-random-effects .panel-tabset}
+
+### Plot
+```{r}
+#| warning: false
+#| label: fig-coef-hier-model-plot
+#| fig-cap: "Plot of simulated fixed effects"
+#| results: hide
+#| fig-keep: all
+
+result_plots <- generate_fixed_random_plts(top_model)
+result_plots$FE
+```
+
+### Coefficients and Correlation Data
+
+```{r}
+#| warning: false
+#| label: tbl-coef-hier-model-data
+#| tbl-cap: "Coefficients and Correlation of Fixed Effects"
+#| tbl-subcap:
+#|  - "Coefficients"
+#|  - "Correlation of Fixed Effects"
+tidy(top_model, effects = "fixed") |>
+    mutate(across(where(is.numeric), \(x) round(x,2))) |>  
+    dplyr::select(-effect) |>
+    rmarkdown::paged_table() 
+
+cov2cor(vcov(top_model)) |> as.matrix() |> as.data.frame() |>
+    mutate(across(where(is.numeric), \(x) round(x,2))) |>  
+    rmarkdown::paged_table() 
+
+```
+:::
+
+The high t-statistics for all the terms indicate that the effects are quite precise and the likelihood that this finding is due to chance is very small.
+
+### Random Effects
+
+::: {#sec-random-effects .panel-tabset}
+
+### Plot
+```{r}
+#| warning: false
+#| results: hide
+#| fig-keep: all
+#| label: fig-random-effect
+#| fig-cap: "Random Effects"
+#| fig-height: 8
+result_plots$RE 
+```
+The red line indicates no effect (zero), and the dots represent the random effect estimates with their confidence intervals. Points that are distinguishable from zero (i.e. the confidence band does not cross the red line) are highlighted as black dots, whereas the grey dots are where the confidence band cross the red line.
+
+### Data
+```{r}
+#| warning: false
+#| label: tbl-coef-hier-random
+#| tbl-cap: "Intercept and coefficients"
+#| tbl-subcap:
+#|  - "Random Effects for Partner:BankName"
+
+ranef(top_model, condVar = FALSE)$`Partner:BankName` |> as.data.frame() |> 
+    rownames_to_column(var = "Entity") |> 
+    filter(!grepl("None", Entity)) |>
+    mutate(across(where(is.numeric), \(x) round(x,4))) |>  
+        rmarkdown::paged_table()
+```
+:::
+
+From @fig-random-effect we can see that the random effect of Partnership is not distinguishable from zero i.e. the contribution to the variability of our target measure could be by chance alone. 
+
+## NAICS2
+
+```{r}
+#| warning: false
+m_naics <- lmer(UBPRE524.diff ~ NAICS2 + (1 + NAICS2 + Qtr+ UBPRB538.log.diff + UBPR3815.log.diff | BankName) + TDSP.log.diff + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1, data = hier_data, REML = TRUE)
+#summary(m_naics)
+#coef(m_naics)
+result_naics <- generate_fixed_random_plts(m_naics)
+
+```
 
 
+### Fixed Effects
+
+::: {#panel-random-effects .panel-tabset}
+
+### Plot
+```{r}
+#| warning: false
+#| label: fig-coef-hier-naics
+#| fig-cap: "Plot of simulated fixed effects"
+#| results: hide
+#| fig-keep: all
+
+result_naics$FE
+```
+
+### Coefficients and Correlation Data
+
+```{r}
+#| warning: false
+#| label: tbl-coef-hier-naics
+#| tbl-cap: "Coefficients and Correlation of Fixed Effects"
+#| tbl-subcap:
+#|  - "Coefficients"
+#|  - "Correlation of Fixed Effects"
+tidy(m_naics, effects = "fixed") |>
+    mutate(across(where(is.numeric), \(x) round(x,2))) |>  
+    dplyr::select(-effect) |>
+    rmarkdown::paged_table() 
+
+cov2cor(vcov(m_naics)) |> as.matrix() |> as.data.frame() |>
+    mutate(across(where(is.numeric), \(x) round(x,2))) |>  
+    rmarkdown::paged_table() 
+
+```
+:::
+
+### Random Effects
+
+::: {#sec-random-effects .panel-tabset}
+
+### Plot
+```{r}
+#| warning: false
+#| results: hide
+#| fig-keep: all
+#| label: fig-random-effect-naics
+#| fig-cap: "Random Effects"
+#| fig-height: 8
+result_naics$RE 
+```
+The red line indicates no effect (zero), and the dots represent the random effect estimates with their confidence intervals. Points that are distinguishable from zero (i.e. the confidence band does not cross the red line) are highlighted as black dots, whereas the grey dots are where the confidence band cross the red line.
+
+### Data
+```{r}
+#| warning: false
+#| label: tbl-coef-hier-naics-random
+#| tbl-cap: "Intercept and coefficients"
+#| tbl-subcap:
+#|  - "Random Effects for BankName"
+
+ranef(m_naics, condVar = FALSE)$BankName |> as.data.frame() |> 
+    rownames_to_column(var = "Entity") |> 
+    filter(!grepl("None", Entity)) |>
+    mutate(across(where(is.numeric), \(x) round(x,4))) |>  
+        rmarkdown::paged_table()
+```
+:::

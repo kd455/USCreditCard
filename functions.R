@@ -714,13 +714,26 @@ generate_model_data <- function() {
      as_tsibble(index = Quarter, key = c(IDRSSD, BankName, BankType))
 }
 
-get_hierarchy_model_data <- function() {
+.read_hierarchy_model_data <- function() {
   file_loc <- "data/final_hierarchy_model_data.csv"
   if (!file.exists(file_loc)) {
     .generate_model_hierachy_data()
   }
   read_csv("data/final_hierarchy_model_data.csv", show_col_types = FALSE) |> 
     mutate(Quarter = yearquarter(Quarter))      
+}
+
+get_hierarchy_model_data <- function() {
+  .read_hierarchy_model_data() |> 
+    drop_na(UBPRE524.diff.lag4) |> 
+        mutate(BankType = as.factor(BankType),
+         IDRSSD = as.factor(IDRSSD),
+         BankName = as.factor(BankName),
+         Partner= as.factor(Partner),
+         HasPartner = as.factor(HasPartner),
+         Qtr = as.factor(quarter(Quarter)),
+         NAICS2 = as.factor(stringr::str_sub(NAICS,start=1, end=2)),
+         NAICS3 = as.factor(stringr::str_sub(NAICS,start=1, end=3)))
 }
 
 .read_model_data <- function() {

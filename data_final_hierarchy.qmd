@@ -1,0 +1,43 @@
+---
+title: "Hierarchical Study Dataset"
+format: html
+---
+
+[Download All](/data/final_hierarchy_model_data.csv)
+
+[NAICS Partner Mapping](/data/Partner_NAICS.csv)
+
+Sources: 
+
+* US Federal Financial Institutions Examination Council [-@ffiec] 
+* US Federal Reserve Economic Data [-@fred]
+* North American Industry Classification System [-@naics]
+
+```{r}
+#| warning: false
+#| echo: false
+#| label: tbl-features-hier
+#| tbl-cap: Final Dataset 
+#| tbl-subcap: 
+#| -    Data glimpse (10 rows)
+#| -    NAICS Partner Mapping
+#| -    Feature Descriptions
+source('functions.R')
+
+all_data <- get_hierarchy_model_data()
+
+all_data |> dplyr::slice_head(n=10) |> relocate(Qtr, .after = BankType) |> rmarkdown::paged_table()
+
+read_csv("data/Partner_NAICS.csv",show_col_types = FALSE) |> 
+                   dplyr::select(Partner, NAICS) |> rmarkdown::paged_table()
+
+all_cols <- tibble(Feature = names(all_data))
+feature_desc <- get_feature_labels()
+
+all_cols |> mutate(Code = stringr::str_split_i(Feature,"\\.",1)) |> 
+    left_join(feature_desc,by = join_by(Code)) |> 
+    dplyr::select(Feature, Code, Source, Desc) |> mutate(Source = replace_na(Source, "FFIEC"))|>
+    dplyr::select(Source, Code, Desc) |> distinct() |>
+    dplyr::arrange( !is.na(Desc),Source,Code) |> knitr::kable()
+
+``` 

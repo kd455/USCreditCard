@@ -22,10 +22,14 @@ book:
         - model_ml.qmd
         - model_event_summary.qmd
     - references.qmd   
+    - part: "Hierarchical Study"
+      chapters:
+        - model_hierarchy.qmd
     - part: "Appendix"
       chapters:
         - data_banks.qmd
         - data_final_event.qmd
+        - data_final_hierarchy.qmd
 bibliography: references.bib
 
 format:

@@ -379,6 +379,7 @@ result <- map2(partner_banks$Bank, partner_banks$Partner, get_prediction, all_da
 
 map2(partner_banks$Bank, partner_banks$Partner, plot_prediction, result, all_data) 
 ```
+
 ## Abnormal Results
 ```{r}
 #| warning: false
