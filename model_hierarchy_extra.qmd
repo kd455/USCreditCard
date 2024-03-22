@@ -12,7 +12,7 @@ hier_data <- get_hierarchy_model_data()
 target_label <- credit_card.target_label()
 ```
 
-Instead of focusing on individual partnerships we can use a hierarhical model to explore other effects. 
+Instead of focusing on individual partnerships we can use a hierarchical model to explore other effects. 
 
 We will look at:
 
@@ -29,7 +29,7 @@ We will look at:
 3. NAICS type. If we group partnerships by their NAICS level 2 will we see an effect?
 
     Conclusions: \
-    Compared with having no partner, we see a fixed effect of 0.08 percent point increase (with std.err 0.02) in *`r target_label`* for Manufacturng companies (NAICS2 = 33). There was no effect for retail companies. Because we focused on partnerships that had partner events our partner list is limited (see @tbl-naics-partner). For Manufacturing companies we have a sample size of 2 - Apple and GM. This could be a future area of study where we look at all partnership cards a bank issues which can be found in the *Terms of Credit Card Plans Survey* [-@TCCP2022] and research when these partnerships were established.
+    Compared with having no partner, we see a fixed effect of 0.08 percent point increase (with std.err 0.02) in *`r target_label`* for Manufacturing companies (NAICS2 = 33). There was no effect for retail companies. Because we focused on partnerships that had partner events our partner list is limited (see @tbl-naics-partner). For Manufacturing companies we have a sample size of 2 - Apple and GM. This could be a future area of study where we look at all partnership cards a bank issues which can be found in the *Terms of Credit Card Plans Survey* [-@TCCP2022] and research when these partnerships were established.
 
 ## Bank Type
 

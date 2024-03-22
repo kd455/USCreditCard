@@ -4,7 +4,7 @@ project:
 book:
   title: "US Credit Card Partnerships"
   author: "Kathryn Dobinson"
-  date: "03/03/2024"
+  date: "22/03/2024"
   chapters:
     - index.qmd
     - intro.qmd
