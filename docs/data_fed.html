@@ -245,6 +245,23 @@ div.csl-indent {
 </li>
       </ul>
   </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text">Hierarchical Study</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model_hierarchy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Hierarchical study</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./references.html" class="sidebar-item-text sidebar-link">
@@ -253,23 +270,29 @@ div.csl-indent {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
  <span class="menu-text">Appendix</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./data_banks.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bank Peer Groups</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bank Peer Groups</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./data_final_event.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Event Study Dataset</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Event Study Dataset</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data_final_hierarchy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hierarchical Study Dataset</span></span></a>
   </div>
 </li>
       </ul>
@@ -317,14 +340,14 @@ div.csl-indent {
 
 <section id="us-economic-data" class="level2" data-number="4.1">
 <h2 data-number="4.1" class="anchored" data-anchor-id="us-economic-data"><span class="header-section-number">4.1</span> US Economic Data</h2>
-<p>As discussed in <a href="data_partners.html#sec-trend-event"><span>Section&nbsp;3.2</span></a> the impact of the partnership event can be masked by trends and seasonality.</p>
-<p>The simplest model approach we look at is the Market model, see <a href="model_market.html#sec-model-market"><span>Section&nbsp;6.1</span></a>, which involves adjusting each Bank’s <em>Credit Card Plans-30-89 DAYS P/D %</em> by removing the influence of the broader trend within its respective group (Large Banks or Large Credit Card Banks). We assume the residuals are due to the unique characteristics of each Bank’s credit card portfolio. These characteristics might include the bank’s specific credit policies, customer risk profiles, or portfolio management strategies.</p>
+<p>As discussed in <a href="#sec-trend-event"><span class="quarto-unresolved-ref">sec-trend-event</span></a> the impact of the partnership event can be masked by trends and seasonality.</p>
+<p>The simplest model approach we look at is the Market model, see <a href="#sec-model-market"><span class="quarto-unresolved-ref">sec-model-market</span></a>, which involves adjusting each Bank’s <em>Credit Card Plans-30-89 DAYS P/D %</em> by removing the influence of the broader trend within its respective group (Large Banks or Large Credit Card Banks). We assume the residuals are due to the unique characteristics of each Bank’s credit card portfolio. These characteristics might include the bank’s specific credit policies, customer risk profiles, or portfolio management strategies.</p>
 <p>This approach assumes that the broader “market” trend takes into account, to some extent, the impact of macroeconomic variables. However, we may want to include macroeconomic variables to improve the model’s ability to explain credit card delinquencies that are not captured by the group trend alone.</p>
-<p>US Federal Reserve Economic Data <span class="citation" data-cites="fred">(<a href="references.html#ref-fred" role="doc-biblioref">2023</a>)</span> provides macroeconomic data series; we can use published literature and new analysis to inform our choice of variables.</p>
-<p>The figures below plot data series related to consumer financial behaviour before and after the 2008 financial crisis and the enactment of the Credit Card Accountability Responsibility and Disclosure (CARD) Act in 2010 (see <a href="data_ffiec.html#sec-cardact"><span>Section&nbsp;2.3</span></a>). We can see that the onset of the COVID-19 pandemic marks a distinct phase of economic upheaval.</p>
+<p>US Federal Reserve Economic Data <span class="citation" data-cites="fred">(<a href="#ref-fred" role="doc-biblioref">2023</a>)</span> provides macroeconomic data series; we can use published literature and new analysis to inform our choice of variables.</p>
+<p>The figures below plot data series related to consumer financial behaviour before and after the 2008 financial crisis and the enactment of the Credit Card Accountability Responsibility and Disclosure (CARD) Act in 2010 (see <a href="#sec-cardact"><span class="quarto-unresolved-ref">sec-cardact</span></a>). We can see that the onset of the COVID-19 pandemic marks a distinct phase of economic upheaval.</p>
 <p>Each variable has been adjusted for population changes and inflation to ensure we can compare across different time periods.</p>
-<p><span class="citation" data-cites="GHJ2001">Grieb, Hegji, and Jones (<a href="references.html#ref-GHJ2001" role="doc-biblioref">2001</a>)</span>, over the period 1981 to 1999, found that delinquency is positively correlated with the <em>consumer debt service ratio</em>, which is the ability for borrowers to service their consumer loans relative to disposable income. Consumer loans include credit cards, other revolving credit and term loans. In the decade that ensued post 2008 crisis, there is a noticeable trend of increasing personal expenditures and although personal incomes also increase, their rate of increase does not match that of expenditures. This divergence results in a gradual rise in the consumer debt service ratio (CDSP), indicating an expanding gap between income and debt obligations. Notably, this isn’t reflected in credit card delinquency rates which remain relatively stable suggesting consumer debt is no longer a strong determinant of delinquency by itself. The broader measure, household debt (TDSP), which is consumer debt plus mortgage loans, may be a more informative of measure of a household’s overall financial health. We can see in <a href="#fig-econ-cat-comb-3">Figure&nbsp;<span>4.3</span></a> that household debt was decreasing while consumer debt increased.</p>
-<p><span class="citation" data-cites="Agarwal2003">Liu and Agarwal (<a href="references.html#ref-Agarwal2003" role="doc-biblioref">2003</a>)</span>, using proprietary credit card data of 700 thousand customers from 1995 to 2001, concluded that <em>unemployment</em> is a key determinant of consumer delinquency and bankruptcy. However, <span class="citation" data-cites="taghiyeh2021">Taghiyeh, Lengacher, and Handfield (<a href="references.html#ref-taghiyeh2021" role="doc-biblioref">2021</a>)</span> in their 2021 study concluded that unemployment is no longer sufficient. This can be seen in <a href="#fig-econ-cat-comb-4">Figure&nbsp;<span>4.4</span></a> where post 2008 financial crisis delinquency decreased as unemployment decreased but has since remained relatively stable as unemployment as decreased further. <span class="citation" data-cites="taghiyeh2021">Taghiyeh, Lengacher, and Handfield (<a href="references.html#ref-taghiyeh2021" role="doc-biblioref">2021</a>)</span> found the most significant variables to predict credit card loss was: previous quarter <em>Unemployment</em>, <em>Building permits</em> and <em>Initial unemployment insurance claims</em>; previous year’s (lag 4) <em>Money stock</em> and <em>ISM Purchasing Mangers Index</em> and the current quarter’s <em>Weekly hours worked by manufacturing workers</em>.</p>
+<p><span class="citation" data-cites="GHJ2001">Grieb, Hegji, and Jones (<a href="#ref-GHJ2001" role="doc-biblioref">2001</a>)</span>, over the period 1981 to 1999, found that delinquency is positively correlated with the <em>consumer debt service ratio</em>, which is the ability for borrowers to service their consumer loans relative to disposable income. Consumer loans include credit cards, other revolving credit and term loans. In the decade that ensued post 2008 crisis, there is a noticeable trend of increasing personal expenditures and although personal incomes also increase, their rate of increase does not match that of expenditures. This divergence results in a gradual rise in the consumer debt service ratio (CDSP), indicating an expanding gap between income and debt obligations. Notably, this isn’t reflected in credit card delinquency rates which remain relatively stable suggesting consumer debt is no longer a strong determinant of delinquency by itself. The broader measure, household debt (TDSP), which is consumer debt plus mortgage loans, may be a more informative of measure of a household’s overall financial health. We can see in <a href="#fig-econ-cat-comb-3">Figure&nbsp;<span class="quarto-unresolved-ref">fig-econ-cat-comb-3</span></a> that household debt was decreasing while consumer debt increased.</p>
+<p><span class="citation" data-cites="Agarwal2003">Liu and Agarwal (<a href="#ref-Agarwal2003" role="doc-biblioref">2003</a>)</span>, using proprietary credit card data of 700 thousand customers from 1995 to 2001, concluded that <em>unemployment</em> is a key determinant of consumer delinquency and bankruptcy. However, <span class="citation" data-cites="taghiyeh2021">Taghiyeh, Lengacher, and Handfield (<a href="#ref-taghiyeh2021" role="doc-biblioref">2021</a>)</span> in their 2021 study concluded that unemployment is no longer sufficient. This can be seen in <a href="#fig-econ-cat-comb-4">Figure&nbsp;<span class="quarto-unresolved-ref">fig-econ-cat-comb-4</span></a> where post 2008 financial crisis delinquency decreased as unemployment decreased but has since remained relatively stable as unemployment as decreased further. <span class="citation" data-cites="taghiyeh2021">Taghiyeh, Lengacher, and Handfield (<a href="#ref-taghiyeh2021" role="doc-biblioref">2021</a>)</span> found the most significant variables to predict credit card loss was: previous quarter <em>Unemployment</em>, <em>Building permits</em> and <em>Initial unemployment insurance claims</em>; previous year’s (lag 4) <em>Money stock</em> and <em>ISM Purchasing Mangers Index</em> and the current quarter’s <em>Weekly hours worked by manufacturing workers</em>.</p>
 <div class="tabset-margin-container"></div><div id="fig-usmeasures" class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" aria-current="page">Combined</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Large Bank</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Large Credit Card Bank</a></li></ul>
 <div id="fig-usmeasures" class="tab-content">
@@ -499,7 +522,7 @@ div.csl-indent {
 <section id="granger-test" class="level4" data-number="4.1.1.1">
 <h4 data-number="4.1.1.1" class="anchored" data-anchor-id="granger-test"><span class="header-section-number">4.1.1.1</span> Granger Test</h4>
 <p>Intuitively, changes in the macroeconomic environment will take time to impact credit card delinquency. We can test for significance of different lags using the Granger test for each variable.</p>
-<p>“X is said to Granger-cause Y if Y can be better predicted using the histories of both X and Y than it can by using the history of Y alone.”<span class="citation" data-cites="granger2011">(<a href="references.html#ref-granger2011" role="doc-biblioref">Giles 2011</a>)</span></p>
+<p>“X is said to Granger-cause Y if Y can be better predicted using the histories of both X and Y than it can by using the history of Y alone.”<span class="citation" data-cites="granger2011">(<a href="#ref-granger2011" role="doc-biblioref">Giles 2011</a>)</span></p>
 <p>The tables presented below, show the macroeconomic variable and lag (Df column) that Granger-cause <em>Credit Card Plans-30-89 DAYS P/D %</em> (Y).</p>
 <div class="tabset-margin-container"></div><div id="fig-granger" class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Combined</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Large Bank</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false">Large Credit Card Bank</a></li></ul>
@@ -857,7 +880,7 @@ div.csl-indent {
 </div>
 <section id="cross-correlation-between-macro-economic-variables" class="level5" data-number="4.1.1.2.1">
 <h5 data-number="4.1.1.2.1" class="anchored" data-anchor-id="cross-correlation-between-macro-economic-variables"><span class="header-section-number">4.1.1.2.1</span> Cross-Correlation between macro economic variables</h5>
-<p><a href="#fig-ccf-rrsfs-1">Figure&nbsp;<span>4.16 (a)</span></a> and <a href="#fig-ccf-rrsfs-2">Figure&nbsp;<span>4.16 (b)</span></a> assumes <em>Real Advance Retail and Food Services Sales per capita</em> (RRSFS.Pop) is our dependant variable (Y). we observe significant correlations at both positive and negative lags. This pattern indicates a bidirectional or feedback relationship between X and the dependent variable Y. For example, <a href="#fig-ccf-rrsfs-2">Figure&nbsp;<span>4.16 (b)</span></a> shows significant correlation at -1 lag suggesting that changes in unemployment have an impact on retail and food sales in the next quarter. But there’s also a weaker but significant correlation at +1 which suggests a change in retail and food sales impacts unemployment in the following quarter. To remove the potential risk of multicollinearity we would only have one of these variables included in the same model.</p>
+<p><a href="#fig-ccf-rrsfs-1">Figure&nbsp;<span class="quarto-unresolved-ref">fig-ccf-rrsfs-1</span></a> and <a href="#fig-ccf-rrsfs-2">Figure&nbsp;<span class="quarto-unresolved-ref">fig-ccf-rrsfs-2</span></a> assumes <em>Real Advance Retail and Food Services Sales per capita</em> (RRSFS.Pop) is our dependant variable (Y). we observe significant correlations at both positive and negative lags. This pattern indicates a bidirectional or feedback relationship between X and the dependent variable Y. For example, <a href="#fig-ccf-rrsfs-2">Figure&nbsp;<span class="quarto-unresolved-ref">fig-ccf-rrsfs-2</span></a> shows significant correlation at -1 lag suggesting that changes in unemployment have an impact on retail and food sales in the next quarter. But there’s also a weaker but significant correlation at +1 which suggests a change in retail and food sales impacts unemployment in the following quarter. To remove the potential risk of multicollinearity we would only have one of these variables included in the same model.</p>
 <div>
 <details>
 <summary>Code</summary>
@@ -917,7 +940,7 @@ div.csl-indent {
 <section id="portfolio-data" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="portfolio-data"><span class="header-section-number">4.2</span> Portfolio Data</h2>
 <p>Banks have the capability to influence both the quantity and quality of their credit card portfolios. By adjusting their risk appetite, banks can navigate economic downturns more effectively; for instance, by tightening lending criteria.</p>
-<p>Similarly, borrowers’ payment behaviours can evolve. <span class="citation" data-cites="Boston2016">Cole (<a href="references.html#ref-Boston2016" role="doc-biblioref">2016</a>)</span> monitored the same individuals’ credit card usage and employment status over time, revealed that borrowers tend to reduce their reliance on credit cards when they are unemployed.</p>
+<p>Similarly, borrowers’ payment behaviours can evolve. <span class="citation" data-cites="Boston2016">Cole (<a href="#ref-Boston2016" role="doc-biblioref">2016</a>)</span> monitored the same individuals’ credit card usage and employment status over time, revealed that borrowers tend to reduce their reliance on credit cards when they are unemployed.</p>
 <p>To further understand delinquency, we can employ portfolio-level explanatory variables, such as unused credit commitments and the volume of credit card loans. For instance, an uptick in delinquency rates, absent any alterations in the portfolio, could signal macroeconomic factors affecting current borrowers. Conversely, changes within the portfolio might suggest different causes, such as a strategic decision to capture more market share by adding higher-risk borrowers - including via a partnership.</p>
 <section id="statistical-tests-1" class="level3" data-number="4.2.1">
 <h3 data-number="4.2.1" class="anchored" data-anchor-id="statistical-tests-1"><span class="header-section-number">4.2.1</span> Statistical tests</h3>
@@ -1153,7 +1176,7 @@ div.csl-indent {
 
 <!-- -->
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-Boston2016" class="csl-entry" role="listitem">
 Cole, Allison. 2016. <span>“Do Consumers Rely More Heavily on Credit Cards While Unemployed?”</span> <a href="https://www.bostonfed.org/publications/research-data-report/2016/do-consumers-rely-more-heavily-on-credit-cards-while-unemployed.aspx">https://www.bostonfed.org/publications/research-data-report/2016/do-consumers-rely-more-heavily-on-credit-cards-while-unemployed.aspx</a>.
 </div>

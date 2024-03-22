@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>US Credit Card Partnerships - 14&nbsp; Hierarchical Study Dataset</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./data_final_event.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./data_banks.html">Appendix</a></li><li class="breadcrumb-item"><a href="./data_final_hierarchy.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hierarchical Study Dataset</span></a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">US Credit Card Partnerships</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Data</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data_ffiec.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Bank Data</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data_partners.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Bank Partnerships</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data_fed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Explanatory Data</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text">Event Study</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model_event.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Event Studies</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model_market.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Market Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model_arima.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Linear Regression with AR Errors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model_hierarchy_event.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Hierarchical Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model_ml.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">XGBoost Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model_event_summary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Overall Results</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text">Hierarchical Study</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model_hierarchy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Hierarchical study</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text">Appendix</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data_banks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bank Peer Groups</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data_final_event.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Event Study Dataset</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data_final_hierarchy.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hierarchical Study Dataset</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hierarchical Study Dataset</span></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<p><a href="./data/final_hierarchy_model_data.csv">Download All</a></p>
+<p><a href="./data/Partner_NAICS.csv">NAICS Partner Mapping</a></p>
+<p>Sources:</p>
+<ul>
+<li>US Federal Financial Institutions Examination Council <span class="citation" data-cites="ffiec">(<a href="references.html#ref-ffiec" role="doc-biblioref">2023</a>)</span></li>
+<li>US Federal Reserve Economic Data <span class="citation" data-cites="fred">(<a href="references.html#ref-fred" role="doc-biblioref">2023</a>)</span></li>
+<li>North American Industry Classification System <span class="citation" data-cites="naics">(<a href="references.html#ref-naics" role="doc-biblioref">2024</a>)</span></li>
+</ul>
+<div id="tbl-features-hier" class="cell tbl-parent quarto-layout-panel anchored">
+<div class="panel-caption table-caption">
+<p>Table&nbsp;14.1: Final Dataset</p>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div id="tbl-features-hier-1" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-features-hier" style="flex-basis: 100.0%;justify-content: center;">
+
+<div data-pagedtable="false"> <div class="table-caption">(a) <p>Data glimpse (10 rows)</p> </div>
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Partner"],"name":[1],"type":["fct"],"align":["left"]},{"label":["BankName"],"name":[2],"type":["fct"],"align":["left"]},{"label":["Quarter"],"name":[3],"type":["qtr"],"align":["right"]},{"label":["HasPartner"],"name":[4],"type":["fct"],"align":["left"]},{"label":["IDRSSD"],"name":[5],"type":["fct"],"align":["left"]},{"label":["BankType"],"name":[6],"type":["fct"],"align":["left"]},{"label":["Qtr"],"name":[7],"type":["fct"],"align":["left"]},{"label":["UBPR3815.Value"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["UBPRB538.Value"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["UBPRE263.Value"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["UBPRE425.Value"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.Value"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["UBPR3815.diff"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["UBPRB538.diff"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["UBPRE263.diff"],"name":[15],"type":["dbl"],"align":["right"]},{"label":["UBPRE425.diff"],"name":[16],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.diff"],"name":[17],"type":["dbl"],"align":["right"]},{"label":["UBPR3815.log"],"name":[18],"type":["dbl"],"align":["right"]},{"label":["UBPRB538.log"],"name":[19],"type":["dbl"],"align":["right"]},{"label":["UBPRE263.log"],"name":[20],"type":["dbl"],"align":["right"]},{"label":["UBPRE425.log"],"name":[21],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.log"],"name":[22],"type":["dbl"],"align":["right"]},{"label":["UBPR3815.log.diff"],"name":[23],"type":["dbl"],"align":["right"]},{"label":["UBPRB538.log.diff"],"name":[24],"type":["dbl"],"align":["right"]},{"label":["UBPRE263.log.diff"],"name":[25],"type":["dbl"],"align":["right"]},{"label":["UBPRE425.log.diff"],"name":[26],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.log.diff"],"name":[27],"type":["dbl"],"align":["right"]},{"label":["UBPR3815.log.diff.lag1"],"name":[28],"type":["dbl"],"align":["right"]},{"label":["UBPRB538.log.diff.lag1"],"name":[29],"type":["dbl"],"align":["right"]},{"label":["UBPRE263.log.diff.lag1"],"name":[30],"type":["dbl"],"align":["right"]},{"label":["UBPRE425.log.diff.lag1"],"name":[31],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.log.diff.lag1"],"name":[32],"type":["dbl"],"align":["right"]},{"label":["UBPR3815.log.diff.lag2"],"name":[33],"type":["dbl"],"align":["right"]},{"label":["UBPRB538.log.diff.lag2"],"name":[34],"type":["dbl"],"align":["right"]},{"label":["UBPRE263.log.diff.lag2"],"name":[35],"type":["dbl"],"align":["right"]},{"label":["UBPRE425.log.diff.lag2"],"name":[36],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.log.diff.lag2"],"name":[37],"type":["dbl"],"align":["right"]},{"label":["UBPR3815.log.diff.lag3"],"name":[38],"type":["dbl"],"align":["right"]},{"label":["UBPRB538.log.diff.lag3"],"name":[39],"type":["dbl"],"align":["right"]},{"label":["UBPRE263.log.diff.lag3"],"name":[40],"type":["dbl"],"align":["right"]},{"label":["UBPRE425.log.diff.lag3"],"name":[41],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.log.diff.lag3"],"name":[42],"type":["dbl"],"align":["right"]},{"label":["UBPR3815.log.diff.lag4"],"name":[43],"type":["dbl"],"align":["right"]},{"label":["UBPRB538.log.diff.lag4"],"name":[44],"type":["dbl"],"align":["right"]},{"label":["UBPRE263.log.diff.lag4"],"name":[45],"type":["dbl"],"align":["right"]},{"label":["UBPRE425.log.diff.lag4"],"name":[46],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.log.diff.lag4"],"name":[47],"type":["dbl"],"align":["right"]},{"label":["UBPR3815.diff.lag1"],"name":[48],"type":["dbl"],"align":["right"]},{"label":["UBPRB538.diff.lag1"],"name":[49],"type":["dbl"],"align":["right"]},{"label":["UBPRE263.diff.lag1"],"name":[50],"type":["dbl"],"align":["right"]},{"label":["UBPRE425.diff.lag1"],"name":[51],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.diff.lag1"],"name":[52],"type":["dbl"],"align":["right"]},{"label":["UBPR3815.diff.lag2"],"name":[53],"type":["dbl"],"align":["right"]},{"label":["UBPRB538.diff.lag2"],"name":[54],"type":["dbl"],"align":["right"]},{"label":["UBPRE263.diff.lag2"],"name":[55],"type":["dbl"],"align":["right"]},{"label":["UBPRE425.diff.lag2"],"name":[56],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.diff.lag2"],"name":[57],"type":["dbl"],"align":["right"]},{"label":["UBPR3815.diff.lag3"],"name":[58],"type":["dbl"],"align":["right"]},{"label":["UBPRB538.diff.lag3"],"name":[59],"type":["dbl"],"align":["right"]},{"label":["UBPRE263.diff.lag3"],"name":[60],"type":["dbl"],"align":["right"]},{"label":["UBPRE425.diff.lag3"],"name":[61],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.diff.lag3"],"name":[62],"type":["dbl"],"align":["right"]},{"label":["UBPR3815.diff.lag4"],"name":[63],"type":["dbl"],"align":["right"]},{"label":["UBPRB538.diff.lag4"],"name":[64],"type":["dbl"],"align":["right"]},{"label":["UBPRE263.diff.lag4"],"name":[65],"type":["dbl"],"align":["right"]},{"label":["UBPRE425.diff.lag4"],"name":[66],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.diff.lag4"],"name":[67],"type":["dbl"],"align":["right"]},{"label":["UBPR3815.pct_change"],"name":[68],"type":["dbl"],"align":["right"]},{"label":["UBPRB538.pct_change"],"name":[69],"type":["dbl"],"align":["right"]},{"label":["UBPRE263.pct_change"],"name":[70],"type":["dbl"],"align":["right"]},{"label":["UBPRE425.pct_change"],"name":[71],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.pct_change"],"name":[72],"type":["dbl"],"align":["right"]},{"label":["UBPR3815.pct_change.lag1"],"name":[73],"type":["dbl"],"align":["right"]},{"label":["UBPRB538.pct_change.lag1"],"name":[74],"type":["dbl"],"align":["right"]},{"label":["UBPRE263.pct_change.lag1"],"name":[75],"type":["dbl"],"align":["right"]},{"label":["UBPRE425.pct_change.lag1"],"name":[76],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.pct_change.lag1"],"name":[77],"type":["dbl"],"align":["right"]},{"label":["UBPR3815.pct_change.lag2"],"name":[78],"type":["dbl"],"align":["right"]},{"label":["UBPRB538.pct_change.lag2"],"name":[79],"type":["dbl"],"align":["right"]},{"label":["UBPRE263.pct_change.lag2"],"name":[80],"type":["dbl"],"align":["right"]},{"label":["UBPRE425.pct_change.lag2"],"name":[81],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.pct_change.lag2"],"name":[82],"type":["dbl"],"align":["right"]},{"label":["UBPR3815.pct_change.lag3"],"name":[83],"type":["dbl"],"align":["right"]},{"label":["UBPRB538.pct_change.lag3"],"name":[84],"type":["dbl"],"align":["right"]},{"label":["UBPRE263.pct_change.lag3"],"name":[85],"type":["dbl"],"align":["right"]},{"label":["UBPRE425.pct_change.lag3"],"name":[86],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.pct_change.lag3"],"name":[87],"type":["dbl"],"align":["right"]},{"label":["UBPR3815.pct_change.lag4"],"name":[88],"type":["dbl"],"align":["right"]},{"label":["UBPRB538.pct_change.lag4"],"name":[89],"type":["dbl"],"align":["right"]},{"label":["UBPRE263.pct_change.lag4"],"name":[90],"type":["dbl"],"align":["right"]},{"label":["UBPRE425.pct_change.lag4"],"name":[91],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.pct_change.lag4"],"name":[92],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.group"],"name":[93],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.group.diff"],"name":[94],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.group.log"],"name":[95],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.group.log.diff"],"name":[96],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.group.log.diff.lag1"],"name":[97],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.group.log.diff.lag2"],"name":[98],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.group.log.diff.lag3"],"name":[99],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.group.log.diff.lag4"],"name":[100],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.group.diff.lag1"],"name":[101],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.group.diff.lag2"],"name":[102],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.group.diff.lag3"],"name":[103],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.group.diff.lag4"],"name":[104],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.group.pct_change"],"name":[105],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.group.pct_change.lag1"],"name":[106],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.group.pct_change.lag2"],"name":[107],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.group.pct_change.lag3"],"name":[108],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.group.pct_change.lag4"],"name":[109],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.all"],"name":[110],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.all.diff"],"name":[111],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.all.log"],"name":[112],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.all.log.diff"],"name":[113],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.all.log.diff.lag1"],"name":[114],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.all.log.diff.lag2"],"name":[115],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.all.log.diff.lag3"],"name":[116],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.all.log.diff.lag4"],"name":[117],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.all.diff.lag1"],"name":[118],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.all.diff.lag2"],"name":[119],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.all.diff.lag3"],"name":[120],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.all.diff.lag4"],"name":[121],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.all.pct_change"],"name":[122],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.all.pct_change.lag1"],"name":[123],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.all.pct_change.lag2"],"name":[124],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.all.pct_change.lag3"],"name":[125],"type":["dbl"],"align":["right"]},{"label":["UBPRE524.all.pct_change.lag4"],"name":[126],"type":["dbl"],"align":["right"]},{"label":["UNRATE.raw"],"name":[127],"type":["dbl"],"align":["right"]},{"label":["PSAVERT.raw"],"name":[128],"type":["dbl"],"align":["right"]},{"label":["CSCICP03USM665S.raw"],"name":[129],"type":["dbl"],"align":["right"]},{"label":["CDSP.raw"],"name":[130],"type":["dbl"],"align":["right"]},{"label":["TDSP.raw"],"name":[131],"type":["dbl"],"align":["right"]},{"label":["PSAVE.raw"],"name":[132],"type":["dbl"],"align":["right"]},{"label":["B069RC1.Pop.CPI.raw"],"name":[133],"type":["dbl"],"align":["right"]},{"label":["PCEDG.Pop.CPI.raw"],"name":[134],"type":["dbl"],"align":["right"]},{"label":["PCE.Pop.CPI.raw"],"name":[135],"type":["dbl"],"align":["right"]},{"label":["RRSFS.Pop.raw"],"name":[136],"type":["dbl"],"align":["right"]},{"label":["A229RC0.CPI.raw"],"name":[137],"type":["dbl"],"align":["right"]},{"label":["UNRATE.diff"],"name":[138],"type":["dbl"],"align":["right"]},{"label":["PSAVERT.diff"],"name":[139],"type":["dbl"],"align":["right"]},{"label":["CSCICP03USM665S.diff"],"name":[140],"type":["dbl"],"align":["right"]},{"label":["CDSP.diff"],"name":[141],"type":["dbl"],"align":["right"]},{"label":["TDSP.diff"],"name":[142],"type":["dbl"],"align":["right"]},{"label":["PSAVE.diff"],"name":[143],"type":["dbl"],"align":["right"]},{"label":["B069RC1.Pop.CPI.diff"],"name":[144],"type":["dbl"],"align":["right"]},{"label":["PCEDG.Pop.CPI.diff"],"name":[145],"type":["dbl"],"align":["right"]},{"label":["PCE.Pop.CPI.diff"],"name":[146],"type":["dbl"],"align":["right"]},{"label":["RRSFS.Pop.diff"],"name":[147],"type":["dbl"],"align":["right"]},{"label":["A229RC0.CPI.diff"],"name":[148],"type":["dbl"],"align":["right"]},{"label":["UNRATE.log"],"name":[149],"type":["dbl"],"align":["right"]},{"label":["PSAVERT.log"],"name":[150],"type":["dbl"],"align":["right"]},{"label":["CSCICP03USM665S.log"],"name":[151],"type":["dbl"],"align":["right"]},{"label":["CDSP.log"],"name":[152],"type":["dbl"],"align":["right"]},{"label":["TDSP.log"],"name":[153],"type":["dbl"],"align":["right"]},{"label":["PSAVE.log"],"name":[154],"type":["dbl"],"align":["right"]},{"label":["B069RC1.Pop.CPI.log"],"name":[155],"type":["dbl"],"align":["right"]},{"label":["PCEDG.Pop.CPI.log"],"name":[156],"type":["dbl"],"align":["right"]},{"label":["PCE.Pop.CPI.log"],"name":[157],"type":["dbl"],"align":["right"]},{"label":["RRSFS.Pop.log"],"name":[158],"type":["dbl"],"align":["right"]},{"label":["A229RC0.CPI.log"],"name":[159],"type":["dbl"],"align":["right"]},{"label":["UNRATE.log.diff"],"name":[160],"type":["dbl"],"align":["right"]},{"label":["PSAVERT.log.diff"],"name":[161],"type":["dbl"],"align":["right"]},{"label":["CSCICP03USM665S.log.diff"],"name":[162],"type":["dbl"],"align":["right"]},{"label":["CDSP.log.diff"],"name":[163],"type":["dbl"],"align":["right"]},{"label":["TDSP.log.diff"],"name":[164],"type":["dbl"],"align":["right"]},{"label":["PSAVE.log.diff"],"name":[165],"type":["dbl"],"align":["right"]},{"label":["B069RC1.Pop.CPI.log.diff"],"name":[166],"type":["dbl"],"align":["right"]},{"label":["PCEDG.Pop.CPI.log.diff"],"name":[167],"type":["dbl"],"align":["right"]},{"label":["PCE.Pop.CPI.log.diff"],"name":[168],"type":["dbl"],"align":["right"]},{"label":["RRSFS.Pop.log.diff"],"name":[169],"type":["dbl"],"align":["right"]},{"label":["A229RC0.CPI.log.diff"],"name":[170],"type":["dbl"],"align":["right"]},{"label":["UNRATE.log.diff.lag1"],"name":[171],"type":["dbl"],"align":["right"]},{"label":["PSAVERT.log.diff.lag1"],"name":[172],"type":["dbl"],"align":["right"]},{"label":["CSCICP03USM665S.log.diff.lag1"],"name":[173],"type":["dbl"],"align":["right"]},{"label":["CDSP.log.diff.lag1"],"name":[174],"type":["dbl"],"align":["right"]},{"label":["TDSP.log.diff.lag1"],"name":[175],"type":["dbl"],"align":["right"]},{"label":["PSAVE.log.diff.lag1"],"name":[176],"type":["dbl"],"align":["right"]},{"label":["B069RC1.Pop.CPI.log.diff.lag1"],"name":[177],"type":["dbl"],"align":["right"]},{"label":["PCEDG.Pop.CPI.log.diff.lag1"],"name":[178],"type":["dbl"],"align":["right"]},{"label":["PCE.Pop.CPI.log.diff.lag1"],"name":[179],"type":["dbl"],"align":["right"]},{"label":["RRSFS.Pop.log.diff.lag1"],"name":[180],"type":["dbl"],"align":["right"]},{"label":["A229RC0.CPI.log.diff.lag1"],"name":[181],"type":["dbl"],"align":["right"]},{"label":["UNRATE.log.diff.lag2"],"name":[182],"type":["dbl"],"align":["right"]},{"label":["PSAVERT.log.diff.lag2"],"name":[183],"type":["dbl"],"align":["right"]},{"label":["CSCICP03USM665S.log.diff.lag2"],"name":[184],"type":["dbl"],"align":["right"]},{"label":["CDSP.log.diff.lag2"],"name":[185],"type":["dbl"],"align":["right"]},{"label":["TDSP.log.diff.lag2"],"name":[186],"type":["dbl"],"align":["right"]},{"label":["PSAVE.log.diff.lag2"],"name":[187],"type":["dbl"],"align":["right"]},{"label":["B069RC1.Pop.CPI.log.diff.lag2"],"name":[188],"type":["dbl"],"align":["right"]},{"label":["PCEDG.Pop.CPI.log.diff.lag2"],"name":[189],"type":["dbl"],"align":["right"]},{"label":["PCE.Pop.CPI.log.diff.lag2"],"name":[190],"type":["dbl"],"align":["right"]},{"label":["RRSFS.Pop.log.diff.lag2"],"name":[191],"type":["dbl"],"align":["right"]},{"label":["A229RC0.CPI.log.diff.lag2"],"name":[192],"type":["dbl"],"align":["right"]},{"label":["UNRATE.log.diff.lag3"],"name":[193],"type":["dbl"],"align":["right"]},{"label":["PSAVERT.log.diff.lag3"],"name":[194],"type":["dbl"],"align":["right"]},{"label":["CSCICP03USM665S.log.diff.lag3"],"name":[195],"type":["dbl"],"align":["right"]},{"label":["CDSP.log.diff.lag3"],"name":[196],"type":["dbl"],"align":["right"]},{"label":["TDSP.log.diff.lag3"],"name":[197],"type":["dbl"],"align":["right"]},{"label":["PSAVE.log.diff.lag3"],"name":[198],"type":["dbl"],"align":["right"]},{"label":["B069RC1.Pop.CPI.log.diff.lag3"],"name":[199],"type":["dbl"],"align":["right"]},{"label":["PCEDG.Pop.CPI.log.diff.lag3"],"name":[200],"type":["dbl"],"align":["right"]},{"label":["PCE.Pop.CPI.log.diff.lag3"],"name":[201],"type":["dbl"],"align":["right"]},{"label":["RRSFS.Pop.log.diff.lag3"],"name":[202],"type":["dbl"],"align":["right"]},{"label":["A229RC0.CPI.log.diff.lag3"],"name":[203],"type":["dbl"],"align":["right"]},{"label":["UNRATE.log.diff.lag4"],"name":[204],"type":["dbl"],"align":["right"]},{"label":["PSAVERT.log.diff.lag4"],"name":[205],"type":["dbl"],"align":["right"]},{"label":["CSCICP03USM665S.log.diff.lag4"],"name":[206],"type":["dbl"],"align":["right"]},{"label":["CDSP.log.diff.lag4"],"name":[207],"type":["dbl"],"align":["right"]},{"label":["TDSP.log.diff.lag4"],"name":[208],"type":["dbl"],"align":["right"]},{"label":["PSAVE.log.diff.lag4"],"name":[209],"type":["dbl"],"align":["right"]},{"label":["B069RC1.Pop.CPI.log.diff.lag4"],"name":[210],"type":["dbl"],"align":["right"]},{"label":["PCEDG.Pop.CPI.log.diff.lag4"],"name":[211],"type":["dbl"],"align":["right"]},{"label":["PCE.Pop.CPI.log.diff.lag4"],"name":[212],"type":["dbl"],"align":["right"]},{"label":["RRSFS.Pop.log.diff.lag4"],"name":[213],"type":["dbl"],"align":["right"]},{"label":["A229RC0.CPI.log.diff.lag4"],"name":[214],"type":["dbl"],"align":["right"]},{"label":["UNRATE.diff.lag1"],"name":[215],"type":["dbl"],"align":["right"]},{"label":["PSAVERT.diff.lag1"],"name":[216],"type":["dbl"],"align":["right"]},{"label":["CSCICP03USM665S.diff.lag1"],"name":[217],"type":["dbl"],"align":["right"]},{"label":["CDSP.diff.lag1"],"name":[218],"type":["dbl"],"align":["right"]},{"label":["TDSP.diff.lag1"],"name":[219],"type":["dbl"],"align":["right"]},{"label":["PSAVE.diff.lag1"],"name":[220],"type":["dbl"],"align":["right"]},{"label":["B069RC1.Pop.CPI.diff.lag1"],"name":[221],"type":["dbl"],"align":["right"]},{"label":["PCEDG.Pop.CPI.diff.lag1"],"name":[222],"type":["dbl"],"align":["right"]},{"label":["PCE.Pop.CPI.diff.lag1"],"name":[223],"type":["dbl"],"align":["right"]},{"label":["RRSFS.Pop.diff.lag1"],"name":[224],"type":["dbl"],"align":["right"]},{"label":["A229RC0.CPI.diff.lag1"],"name":[225],"type":["dbl"],"align":["right"]},{"label":["UNRATE.diff.lag2"],"name":[226],"type":["dbl"],"align":["right"]},{"label":["PSAVERT.diff.lag2"],"name":[227],"type":["dbl"],"align":["right"]},{"label":["CSCICP03USM665S.diff.lag2"],"name":[228],"type":["dbl"],"align":["right"]},{"label":["CDSP.diff.lag2"],"name":[229],"type":["dbl"],"align":["right"]},{"label":["TDSP.diff.lag2"],"name":[230],"type":["dbl"],"align":["right"]},{"label":["PSAVE.diff.lag2"],"name":[231],"type":["dbl"],"align":["right"]},{"label":["B069RC1.Pop.CPI.diff.lag2"],"name":[232],"type":["dbl"],"align":["right"]},{"label":["PCEDG.Pop.CPI.diff.lag2"],"name":[233],"type":["dbl"],"align":["right"]},{"label":["PCE.Pop.CPI.diff.lag2"],"name":[234],"type":["dbl"],"align":["right"]},{"label":["RRSFS.Pop.diff.lag2"],"name":[235],"type":["dbl"],"align":["right"]},{"label":["A229RC0.CPI.diff.lag2"],"name":[236],"type":["dbl"],"align":["right"]},{"label":["UNRATE.diff.lag3"],"name":[237],"type":["dbl"],"align":["right"]},{"label":["PSAVERT.diff.lag3"],"name":[238],"type":["dbl"],"align":["right"]},{"label":["CSCICP03USM665S.diff.lag3"],"name":[239],"type":["dbl"],"align":["right"]},{"label":["CDSP.diff.lag3"],"name":[240],"type":["dbl"],"align":["right"]},{"label":["TDSP.diff.lag3"],"name":[241],"type":["dbl"],"align":["right"]},{"label":["PSAVE.diff.lag3"],"name":[242],"type":["dbl"],"align":["right"]},{"label":["B069RC1.Pop.CPI.diff.lag3"],"name":[243],"type":["dbl"],"align":["right"]},{"label":["PCEDG.Pop.CPI.diff.lag3"],"name":[244],"type":["dbl"],"align":["right"]},{"label":["PCE.Pop.CPI.diff.lag3"],"name":[245],"type":["dbl"],"align":["right"]},{"label":["RRSFS.Pop.diff.lag3"],"name":[246],"type":["dbl"],"align":["right"]},{"label":["A229RC0.CPI.diff.lag3"],"name":[247],"type":["dbl"],"align":["right"]},{"label":["UNRATE.diff.lag4"],"name":[248],"type":["dbl"],"align":["right"]},{"label":["PSAVERT.diff.lag4"],"name":[249],"type":["dbl"],"align":["right"]},{"label":["CSCICP03USM665S.diff.lag4"],"name":[250],"type":["dbl"],"align":["right"]},{"label":["CDSP.diff.lag4"],"name":[251],"type":["dbl"],"align":["right"]},{"label":["TDSP.diff.lag4"],"name":[252],"type":["dbl"],"align":["right"]},{"label":["PSAVE.diff.lag4"],"name":[253],"type":["dbl"],"align":["right"]},{"label":["B069RC1.Pop.CPI.diff.lag4"],"name":[254],"type":["dbl"],"align":["right"]},{"label":["PCEDG.Pop.CPI.diff.lag4"],"name":[255],"type":["dbl"],"align":["right"]},{"label":["PCE.Pop.CPI.diff.lag4"],"name":[256],"type":["dbl"],"align":["right"]},{"label":["RRSFS.Pop.diff.lag4"],"name":[257],"type":["dbl"],"align":["right"]},{"label":["A229RC0.CPI.diff.lag4"],"name":[258],"type":["dbl"],"align":["right"]},{"label":["UNRATE.pct_change"],"name":[259],"type":["dbl"],"align":["right"]},{"label":["PSAVERT.pct_change"],"name":[260],"type":["dbl"],"align":["right"]},{"label":["CSCICP03USM665S.pct_change"],"name":[261],"type":["dbl"],"align":["right"]},{"label":["CDSP.pct_change"],"name":[262],"type":["dbl"],"align":["right"]},{"label":["TDSP.pct_change"],"name":[263],"type":["dbl"],"align":["right"]},{"label":["PSAVE.pct_change"],"name":[264],"type":["dbl"],"align":["right"]},{"label":["B069RC1.Pop.CPI.pct_change"],"name":[265],"type":["dbl"],"align":["right"]},{"label":["PCEDG.Pop.CPI.pct_change"],"name":[266],"type":["dbl"],"align":["right"]},{"label":["PCE.Pop.CPI.pct_change"],"name":[267],"type":["dbl"],"align":["right"]},{"label":["RRSFS.Pop.pct_change"],"name":[268],"type":["dbl"],"align":["right"]},{"label":["A229RC0.CPI.pct_change"],"name":[269],"type":["dbl"],"align":["right"]},{"label":["UNRATE.pct_change.lag1"],"name":[270],"type":["dbl"],"align":["right"]},{"label":["PSAVERT.pct_change.lag1"],"name":[271],"type":["dbl"],"align":["right"]},{"label":["CSCICP03USM665S.pct_change.lag1"],"name":[272],"type":["dbl"],"align":["right"]},{"label":["CDSP.pct_change.lag1"],"name":[273],"type":["dbl"],"align":["right"]},{"label":["TDSP.pct_change.lag1"],"name":[274],"type":["dbl"],"align":["right"]},{"label":["PSAVE.pct_change.lag1"],"name":[275],"type":["dbl"],"align":["right"]},{"label":["B069RC1.Pop.CPI.pct_change.lag1"],"name":[276],"type":["dbl"],"align":["right"]},{"label":["PCEDG.Pop.CPI.pct_change.lag1"],"name":[277],"type":["dbl"],"align":["right"]},{"label":["PCE.Pop.CPI.pct_change.lag1"],"name":[278],"type":["dbl"],"align":["right"]},{"label":["RRSFS.Pop.pct_change.lag1"],"name":[279],"type":["dbl"],"align":["right"]},{"label":["A229RC0.CPI.pct_change.lag1"],"name":[280],"type":["dbl"],"align":["right"]},{"label":["UNRATE.pct_change.lag2"],"name":[281],"type":["dbl"],"align":["right"]},{"label":["PSAVERT.pct_change.lag2"],"name":[282],"type":["dbl"],"align":["right"]},{"label":["CSCICP03USM665S.pct_change.lag2"],"name":[283],"type":["dbl"],"align":["right"]},{"label":["CDSP.pct_change.lag2"],"name":[284],"type":["dbl"],"align":["right"]},{"label":["TDSP.pct_change.lag2"],"name":[285],"type":["dbl"],"align":["right"]},{"label":["PSAVE.pct_change.lag2"],"name":[286],"type":["dbl"],"align":["right"]},{"label":["B069RC1.Pop.CPI.pct_change.lag2"],"name":[287],"type":["dbl"],"align":["right"]},{"label":["PCEDG.Pop.CPI.pct_change.lag2"],"name":[288],"type":["dbl"],"align":["right"]},{"label":["PCE.Pop.CPI.pct_change.lag2"],"name":[289],"type":["dbl"],"align":["right"]},{"label":["RRSFS.Pop.pct_change.lag2"],"name":[290],"type":["dbl"],"align":["right"]},{"label":["A229RC0.CPI.pct_change.lag2"],"name":[291],"type":["dbl"],"align":["right"]},{"label":["UNRATE.pct_change.lag3"],"name":[292],"type":["dbl"],"align":["right"]},{"label":["PSAVERT.pct_change.lag3"],"name":[293],"type":["dbl"],"align":["right"]},{"label":["CSCICP03USM665S.pct_change.lag3"],"name":[294],"type":["dbl"],"align":["right"]},{"label":["CDSP.pct_change.lag3"],"name":[295],"type":["dbl"],"align":["right"]},{"label":["TDSP.pct_change.lag3"],"name":[296],"type":["dbl"],"align":["right"]},{"label":["PSAVE.pct_change.lag3"],"name":[297],"type":["dbl"],"align":["right"]},{"label":["B069RC1.Pop.CPI.pct_change.lag3"],"name":[298],"type":["dbl"],"align":["right"]},{"label":["PCEDG.Pop.CPI.pct_change.lag3"],"name":[299],"type":["dbl"],"align":["right"]},{"label":["PCE.Pop.CPI.pct_change.lag3"],"name":[300],"type":["dbl"],"align":["right"]},{"label":["RRSFS.Pop.pct_change.lag3"],"name":[301],"type":["dbl"],"align":["right"]},{"label":["A229RC0.CPI.pct_change.lag3"],"name":[302],"type":["dbl"],"align":["right"]},{"label":["UNRATE.pct_change.lag4"],"name":[303],"type":["dbl"],"align":["right"]},{"label":["PSAVERT.pct_change.lag4"],"name":[304],"type":["dbl"],"align":["right"]},{"label":["CSCICP03USM665S.pct_change.lag4"],"name":[305],"type":["dbl"],"align":["right"]},{"label":["CDSP.pct_change.lag4"],"name":[306],"type":["dbl"],"align":["right"]},{"label":["TDSP.pct_change.lag4"],"name":[307],"type":["dbl"],"align":["right"]},{"label":["PSAVE.pct_change.lag4"],"name":[308],"type":["dbl"],"align":["right"]},{"label":["B069RC1.Pop.CPI.pct_change.lag4"],"name":[309],"type":["dbl"],"align":["right"]},{"label":["PCEDG.Pop.CPI.pct_change.lag4"],"name":[310],"type":["dbl"],"align":["right"]},{"label":["PCE.Pop.CPI.pct_change.lag4"],"name":[311],"type":["dbl"],"align":["right"]},{"label":["RRSFS.Pop.pct_change.lag4"],"name":[312],"type":["dbl"],"align":["right"]},{"label":["A229RC0.CPI.pct_change.lag4"],"name":[313],"type":["dbl"],"align":["right"]},{"label":["NAICS"],"name":[314],"type":["dbl"],"align":["right"]},{"label":["NAICS2"],"name":[315],"type":["fct"],"align":["left"]},{"label":["NAICS3"],"name":[316],"type":["fct"],"align":["left"]}],"data":[{"1":"Costco","2":"CITIBANK, N.A. (476810)","3":"2010 Q1","4":"0","5":"476810","6":"LargeBank","7":"1","8":"108948000","9":"36134000","10":"9.30","11":"7.29","12":"3.07","13":"-5148000","14":"-613000","15":"-0.52","16":"0.37","17":"-0.35","18":"18.50638","19":"17.40274","20":"2.230014","21":"1.986504","22":"1.1216776","23":"-0.046169495","24":"-0.01682234","25":"-0.054406722","26":"0.05208778","27":"-0.10796299","28":"0.0009733385","29":"-0.01303144","30":"0.022658024","31":"0.02043867","32":"-0.00291971","33":"0.0065397391","34":"0.001720569","35":"-0.012422520","36":"0.01785762","37":"-0.01734148","38":"0.0512458889","39":"0.081914497","40":"0.03241266","41":"0.01665443","42":"-0.06113014","43":"-0.0824557727","44":"-0.103738384","45":"-0.01162190","46":"0.01228894","47":"0.17640915","48":"111000","49":"-482000","50":"0.22","51":"0.14","52":"-0.01","53":"743000","54":"64000","55":"-0.12","56":"0.12","57":"-0.06","58":"5657000","59":"2923000","60":"0.31","61":"0.11","62":"-0.22","63":"-9247000","64":"-3743000","65":"-0.11","66":"0.08","67":"0.60","68":"-0.045119899","69":"-0.01668163","70":"-0.052953157","71":"0.053468208","72":"-0.102339181","73":"0.0009738123","74":"-0.01294690","75":"0.022916667","76":"0.020648968","77":"-0.002915452","78":"0.0065611699","79":"0.00172205","80":"-0.012345679","81":"0.018018018","82":"-0.017191977","83":"0.0525816796","84":"0.08536300","85":"0.03294368","86":"0.016793893","87":"-0.059299191","88":"-0.0791478362","89":"-0.09853890","90":"-0.01155462","91":"0.012364760","92":"0.192926045","93":"2.468333","94":"-0.355454545","95":"0.9035432","96":"-0.071359475","97":"-0.009216655","98":"0.039565092","99":"0.062509904","100":"-0.371757097","101":"-0.024545455","102":"0.051818182","103":"0.155833333","104":"-0.923333333","105":"-0.134087791","106":"-0.009174312","107":"0.020149649","108":"0.064505002","109":"-0.263535720","110":"2.662222","111":"-0.18176471","112":"0.9791612","113":"-0.03008400","114":"-0.11511128","115":"0.05926267","116":"0.05936871","117":"-0.19901212","118":"-0.33470588","119":"0.12411765","120":"0.16722222","121":"-0.50166667","122":"-0.06625214","123":"-0.10873304","124":"0.04278280","125":"0.06116643","126":"-0.15038500","127":"9.833333","128":"5.400000","129":"98.53856","130":"5.298321","131":"11.66822","132":"601.846","133":"8.914974e-06","134":"3.665578e-05","135":"0.0003626458","136":"0.5196991","137":"398.3680","138":"-0.10000000","139":"0.06666667","140":"0.31788362","141":"-0.117813","142":"-0.289846","143":"14.192","144":"-1.753748e-07","145":"3.340880e-08","146":"1.365738e-06","147":"5.506935e-03","148":"1.58107744","149":"2.285778","150":"1.686399","151":"4.590448","152":"1.667390","153":"2.456869","154":"6.400002","155":"-11.62778","156":"-10.21394","157":"-7.922084","158":"-0.6545053","159":"5.987376","160":"-0.010118130","161":"0.012422520","162":"0.0032311968","163":"-0.0219922989","164":"-0.024537131","165":"0.02386326","166":"-0.0194809469","167":"0.0009118352","168":"3.773147e-03","169":"1.065293e-02","170":"0.0039767837","171":"0.030666798","172":"0.044735894","173":"0.002346584","174":"-0.0301833103","175":"-0.024276638","176":"0.06163242","177":"-0.012331774","178":"-0.0304265866","179":"-0.0034213739","180":"-3.900755e-03","181":"-0.0008567832","182":"0.035214906","183":"-0.287682072","184":"0.002843251","185":"-0.0091383497","186":"-0.010126068","187":"-0.29640679","188":"-0.011997129","189":"0.0306811466","190":"0.0043895680","191":"9.064167e-03","192":"-0.0144955948","193":"0.117783036","194":"0.17645644","195":"0.009093878","196":"-0.029354650","197":"-0.026157936","198":"0.18700525","199":"-0.01084396","200":"-0.0158258559","201":"-0.0069871130","202":"-4.174715e-03","203":"0.0046248445","204":"0.185552577","205":"0.02366974","206":"-0.0003445281","207":"-0.009667377","208":"-0.008172032","209":"0.01629012","210":"-0.008690569","211":"0.0012927325","212":"-0.004556823","213":"-1.681186e-02","214":"-0.0028089328","215":"0.30000000","216":"0.23333333","217":"0.23021288","218":"-0.165969","219":"-0.293854","220":"35.125","221":"-1.127942e-07","222":"-1.131419e-06","223":"-1.238191e-06","224":"-2.009655e-03","225":"-0.34010604","226":"0.33333333","227":"-1.70000000","228":"0.27821578","229":"-0.051245","230":"-0.124694","231":"-190.632","232":"-1.110763e-07","233":"1.140741e-06","234":"1.587811e-06","235":"4.657798e-03","236":"-5.79851732","237":"1.03333333","238":"1.10000000","239":"0.88455508","240":"-0.167816","241":"-0.328018","242":"126.754","243":"-1.015526e-07","244":"-5.840422e-07","245":"-2.530692e-06","246":"-2.140014e-03","247":"1.8591655","248":"1.40000000","249":"0.13333333","250":"-0.03336561","251":"-0.056354","252":"-0.104248","253":"9.960","254":"-8.218502e-08","255":"4.805482e-08","256":"-1.660007e-06","257":"-8.708988e-03","258":"-1.1281522","259":"-0.010067114","260":"0.012500000","261":"0.0032364227","262":"-0.0217522314","263":"-0.024238543","264":"0.024150265","265":"-0.0192924195","266":"0.0009122510","267":"0.0037802743","268":"1.070988e-02","269":"0.0039847016","270":"0.031141869","271":"0.045751634","272":"0.002349340","273":"-0.0297323428","274":"-0.023984330","275":"0.063571324","276":"-0.012256049","277":"-0.0299683572","278":"-0.0034155276","279":"-3.893157e-03","280":"-0.0008564163","281":"0.035842294","282":"-0.250000000","283":"0.002847297","284":"-0.0090967219","285":"-0.010074972","286":"-0.256515075","287":"-0.011925450","288":"0.0311566637","289":"0.0043992163","290":"9.105371e-03","291":"-0.0143910395","292":"0.125000000","293":"0.19298246","294":"0.009135353","295":"-0.0289279876","296":"-0.025818780","297":"0.205633615","298":"-0.01078537","299":"-0.0157012850","300":"-0.0069627599","301":"-4.166013e-03","302":"0.0046355556","303":"0.203883495","304":"0.02395210","305":"-0.0003444687","306":"-0.0096207984","307":"-0.008138731","308":"0.016423529","309":"-0.008652916","310":"0.001293568","311":"-0.0045464563","312":"-1.667133e-02","313":"-0.0028049915","314":"455211","315":"45","316":"455"},{"1":"Costco","2":"CITIBANK, N.A. (476810)","3":"2010 Q2","4":"0","5":"476810","6":"LargeBank","7":"2","8":"103893000","9":"35011000","10":"8.97","11":"7.23","12":"3.19","13":"-5055000","14":"-1123000","15":"-0.33","16":"-0.06","17":"0.12","18":"18.45887","19":"17.37117","20":"2.193886","21":"1.978239","22":"1.1600209","23":"-0.047509181","24":"-0.03157195","25":"-0.036128724","26":"-0.00826451","27":"0.03834336","28":"-0.0461694951","29":"-0.01682234","30":"-0.054406722","31":"0.05208778","32":"-0.10796299","33":"0.0009733385","34":"-0.013031438","35":"0.022658024","36":"0.02043867","37":"-0.00291971","38":"0.0065397391","39":"0.001720569","40":"-0.01242252","41":"0.01785762","42":"-0.01734148","43":"0.0512458889","44":"0.081914497","45":"0.03241266","46":"0.01665443","47":"-0.06113014","48":"-5148000","49":"-613000","50":"-0.52","51":"0.37","52":"-0.35","53":"111000","54":"-482000","55":"0.22","56":"0.14","57":"-0.01","58":"743000","59":"64000","60":"-0.12","61":"0.12","62":"-0.06","63":"5657000","64":"2923000","65":"0.31","66":"0.11","67":"-0.22","68":"-0.046398282","69":"-0.03107876","70":"-0.035483871","71":"-0.008230453","72":"0.039087948","73":"-0.0451198990","74":"-0.01668163","75":"-0.052953157","76":"0.053468208","77":"-0.102339181","78":"0.0009738123","79":"-0.01294690","80":"0.022916667","81":"0.020648968","82":"-0.002915452","83":"0.0065611699","84":"0.00172205","85":"-0.01234568","86":"0.018018018","87":"-0.017191977","88":"0.0525816796","89":"0.08536300","90":"0.03294368","91":"0.016793893","92":"-0.059299191","93":"2.303333","94":"-0.165000000","95":"0.8343573","96":"-0.069185810","97":"-0.071359475","98":"-0.009216655","99":"0.039565092","100":"0.062509904","101":"-0.355454545","102":"-0.024545455","103":"0.051818182","104":"0.155833333","105":"-0.066846725","106":"-0.134087791","107":"-0.009174312","108":"0.020149649","109":"0.064505002","110":"2.443889","111":"-0.21833333","112":"0.8935906","113":"-0.08557062","114":"-0.03008400","115":"-0.11511128","116":"0.05926267","117":"0.05936871","118":"-0.18176471","119":"-0.33470588","120":"0.12411765","121":"0.16722222","122":"-0.08201169","123":"-0.06625214","124":"-0.10873304","125":"0.04278280","126":"0.06116643","127":"9.633333","128":"6.200000","129":"98.50195","130":"5.130423","131":"11.32998","132":"702.739","133":"8.742383e-06","134":"3.734745e-05","135":"0.0003652026","136":"0.5278746","137":"404.2221","138":"-0.20000000","139":"0.80000000","140":"-0.03660254","141":"-0.167898","142":"-0.338233","143":"100.893","144":"-1.725908e-07","145":"6.916705e-07","146":"2.556819e-06","147":"8.175551e-03","148":"5.85411371","149":"2.265229","150":"1.824549","151":"4.590076","152":"1.635188","153":"2.427453","154":"6.554986","155":"-11.64733","156":"-10.19525","157":"-7.915058","158":"-0.6388965","159":"6.001964","160":"-0.020548668","161":"0.138150338","162":"-0.0003715230","163":"-0.0322018660","164":"-0.029415989","165":"0.15498396","166":"-0.0195495114","167":"0.0186935256","168":"7.025722e-03","169":"1.560886e-02","170":"0.0145883124","171":"-0.010118130","172":"0.012422520","173":"0.003231197","174":"-0.0219922989","175":"-0.024537131","176":"0.02386326","177":"-0.019480947","178":"0.0009118352","179":"0.0037731470","180":"1.065293e-02","181":"0.0039767837","182":"0.030666798","183":"0.044735894","184":"0.002346584","185":"-0.0301833103","186":"-0.024276638","187":"0.06163242","188":"-0.012331774","189":"-0.0304265866","190":"-0.0034213739","191":"-3.900755e-03","192":"-0.0008567832","193":"0.035214906","194":"-0.28768207","195":"0.002843251","196":"-0.009138350","197":"-0.010126068","198":"-0.29640679","199":"-0.01199713","200":"0.0306811466","201":"0.0043895680","202":"9.064167e-03","203":"-0.0144955948","204":"0.117783036","205":"0.17645644","206":"0.0090938776","207":"-0.029354650","208":"-0.026157936","209":"0.18700525","210":"-0.010843958","211":"-0.0158258559","212":"-0.006987113","213":"-4.174715e-03","214":"0.0046248445","215":"-0.10000000","216":"0.06666667","217":"0.31788362","218":"-0.117813","219":"-0.289846","220":"14.192","221":"-1.753748e-07","222":"3.340880e-08","223":"1.365738e-06","224":"5.506935e-03","225":"1.58107744","226":"0.30000000","227":"0.23333333","228":"0.23021288","229":"-0.165969","230":"-0.293854","231":"35.125","232":"-1.127942e-07","233":"-1.131419e-06","234":"-1.238191e-06","235":"-2.009655e-03","236":"-0.34010604","237":"0.33333333","238":"-1.70000000","239":"0.27821578","240":"-0.051245","241":"-0.124694","242":"-190.632","243":"-1.110763e-07","244":"1.140741e-06","245":"1.587811e-06","246":"4.657798e-03","247":"-5.7985173","248":"1.03333333","249":"1.10000000","250":"0.88455508","251":"-0.167816","252":"-0.328018","253":"126.754","254":"-1.015526e-07","255":"-5.840422e-07","256":"-2.530692e-06","257":"-2.140014e-03","258":"1.8591655","259":"-0.020338983","260":"0.148148148","261":"-0.0003714540","262":"-0.0316889067","263":"-0.028987550","264":"0.167639230","265":"-0.0193596589","266":"0.0188693434","267":"0.0070504599","268":"1.573132e-02","269":"0.0146952412","270":"-0.010067114","271":"0.012500000","272":"0.003236423","273":"-0.0217522314","274":"-0.024238543","275":"0.024150265","276":"-0.019292420","277":"0.0009122510","278":"0.0037802743","279":"1.070988e-02","280":"0.0039847016","281":"0.031141869","282":"0.045751634","283":"0.002349340","284":"-0.0297323428","285":"-0.023984330","286":"0.063571324","287":"-0.012256049","288":"-0.0299683572","289":"-0.0034155276","290":"-3.893157e-03","291":"-0.0008564163","292":"0.035842294","293":"-0.25000000","294":"0.002847297","295":"-0.0090967219","296":"-0.010074972","297":"-0.256515075","298":"-0.01192545","299":"0.0311566637","300":"0.0043992163","301":"9.105371e-03","302":"-0.0143910395","303":"0.125000000","304":"0.19298246","305":"0.0091353525","306":"-0.0289279876","307":"-0.025818780","308":"0.205633615","309":"-0.010785374","310":"-0.015701285","311":"-0.0069627599","312":"-4.166013e-03","313":"0.0046355556","314":"455211","315":"45","316":"455"},{"1":"Costco","2":"CITIBANK, N.A. (476810)","3":"2010 Q3","4":"0","5":"476810","6":"LargeBank","7":"3","8":"102792000","9":"35447000","10":"8.50","11":"7.23","12":"3.18","13":"-1101000","14":"436000","15":"-0.47","16":"0.00","17":"-0.01","18":"18.44822","19":"17.38355","20":"2.140066","21":"1.978239","22":"1.1568812","23":"-0.010653994","24":"0.01237633","25":"-0.053819513","26":"0.00000000","27":"-0.00313972","28":"-0.0475091808","29":"-0.03157195","30":"-0.036128724","31":"-0.00826451","32":"0.03834336","33":"-0.0461694951","34":"-0.016822339","35":"-0.054406722","36":"0.05208778","37":"-0.10796299","38":"0.0009733385","39":"-0.013031438","40":"0.02265802","41":"0.02043867","42":"-0.00291971","43":"0.0065397391","44":"0.001720569","45":"-0.01242252","46":"0.01785762","47":"-0.01734148","48":"-5055000","49":"-1123000","50":"-0.33","51":"-0.06","52":"0.12","53":"-5148000","54":"-613000","55":"-0.52","56":"0.37","57":"-0.35","58":"111000","59":"-482000","60":"0.22","61":"0.14","62":"-0.01","63":"743000","64":"64000","65":"-0.12","66":"0.12","67":"-0.06","68":"-0.010597442","69":"0.01245323","70":"-0.052396878","71":"0.000000000","72":"-0.003134796","73":"-0.0463982817","74":"-0.03107876","75":"-0.035483871","76":"-0.008230453","77":"0.039087948","78":"-0.0451198990","79":"-0.01668163","80":"-0.052953157","81":"0.053468208","82":"-0.102339181","83":"0.0009738123","84":"-0.01294690","85":"0.02291667","86":"0.020648968","87":"-0.002915452","88":"0.0065611699","89":"0.00172205","90":"-0.01234568","91":"0.018018018","92":"-0.017191977","93":"2.310000","94":"0.006666667","95":"0.8372475","96":"0.002890175","97":"-0.069185810","98":"-0.071359475","99":"-0.009216655","100":"0.039565092","101":"-0.165000000","102":"-0.355454545","103":"-0.024545455","104":"0.051818182","105":"0.002894356","106":"-0.066846725","107":"-0.134087791","108":"-0.009174312","109":"0.020149649","110":"2.488889","111":"0.04500000","112":"0.9118364","113":"0.01824580","114":"-0.08557062","115":"-0.03008400","116":"-0.11511128","117":"0.05926267","118":"-0.21833333","119":"-0.18176471","120":"-0.33470588","121":"0.12411765","122":"0.01841328","123":"-0.08201169","124":"-0.06625214","125":"-0.10873304","126":"0.04278280","127":"9.466667","128":"6.133333","129":"98.02176","130":"5.037316","131":"11.13901","132":"696.731","133":"8.544446e-06","134":"3.749906e-05","135":"0.0003670253","136":"0.5278952","137":"405.5517","138":"-0.16666667","139":"-0.06666667","140":"-0.48019005","141":"-0.093107","142":"-0.190970","143":"-6.008","144":"-1.979366e-07","145":"1.516035e-07","146":"1.822697e-06","147":"2.060993e-05","148":"1.32961195","149":"2.247777","150":"1.813738","151":"4.585190","152":"1.616873","153":"2.410454","154":"6.546399","155":"-11.67023","156":"-10.19119","157":"-7.910080","158":"-0.6388574","159":"6.005248","160":"-0.017452450","161":"-0.010810916","162":"-0.0048868504","163":"-0.0183147114","164":"-0.016998944","165":"-0.00858616","166":"-0.0229012846","167":"0.0040510563","168":"4.978508e-03","169":"3.904247e-05","170":"0.0032839124","171":"-0.020548668","172":"0.138150338","173":"-0.000371523","174":"-0.0322018660","175":"-0.029415989","176":"0.15498396","177":"-0.019549511","178":"0.0186935256","179":"0.0070257216","180":"1.560886e-02","181":"0.0145883124","182":"-0.010118130","183":"0.012422520","184":"0.003231197","185":"-0.0219922989","186":"-0.024537131","187":"0.02386326","188":"-0.019480947","189":"0.0009118352","190":"0.0037731470","191":"1.065293e-02","192":"0.0039767837","193":"0.030666798","194":"0.04473589","195":"0.002346584","196":"-0.030183310","197":"-0.024276638","198":"0.06163242","199":"-0.01233177","200":"-0.0304265866","201":"-0.0034213739","202":"-3.900755e-03","203":"-0.0008567832","204":"0.035214906","205":"-0.28768207","206":"0.0028432511","207":"-0.009138350","208":"-0.010126068","209":"-0.29640679","210":"-0.011997129","211":"0.0306811466","212":"0.004389568","213":"9.064167e-03","214":"-0.0144955948","215":"-0.20000000","216":"0.80000000","217":"-0.03660254","218":"-0.167898","219":"-0.338233","220":"100.893","221":"-1.725908e-07","222":"6.916705e-07","223":"2.556819e-06","224":"8.175551e-03","225":"5.85411371","226":"-0.10000000","227":"0.06666667","228":"0.31788362","229":"-0.117813","230":"-0.289846","231":"14.192","232":"-1.753748e-07","233":"3.340880e-08","234":"1.365738e-06","235":"5.506935e-03","236":"1.58107744","237":"0.30000000","238":"0.23333333","239":"0.23021288","240":"-0.165969","241":"-0.293854","242":"35.125","243":"-1.127942e-07","244":"-1.131419e-06","245":"-1.238191e-06","246":"-2.009655e-03","247":"-0.3401060","248":"0.33333333","249":"-1.70000000","250":"0.27821578","251":"-0.051245","252":"-0.124694","253":"-190.632","254":"-1.110763e-07","255":"1.140741e-06","256":"1.587811e-06","257":"4.657798e-03","258":"-5.7985173","259":"-0.017301038","260":"-0.010752688","261":"-0.0048749291","262":"-0.0181480163","263":"-0.016855277","264":"-0.008549405","265":"-0.0226410406","266":"0.0040592729","267":"0.0049909210","268":"3.904323e-05","269":"0.0032893103","270":"-0.020338983","271":"0.148148148","272":"-0.000371454","273":"-0.0316889067","274":"-0.028987550","275":"0.167639230","276":"-0.019359659","277":"0.0188693434","278":"0.0070504599","279":"1.573132e-02","280":"0.0146952412","281":"-0.010067114","282":"0.012500000","283":"0.003236423","284":"-0.0217522314","285":"-0.024238543","286":"0.024150265","287":"-0.019292420","288":"0.0009122510","289":"0.0037802743","290":"1.070988e-02","291":"0.0039847016","292":"0.031141869","293":"0.04575163","294":"0.002349340","295":"-0.0297323428","296":"-0.023984330","297":"0.063571324","298":"-0.01225605","299":"-0.0299683572","300":"-0.0034155276","301":"-3.893157e-03","302":"-0.0008564163","303":"0.035842294","304":"-0.25000000","305":"0.0028472970","306":"-0.0090967219","307":"-0.010074972","308":"-0.256515075","309":"-0.011925450","310":"0.031156664","311":"0.0043992163","312":"9.105371e-03","313":"-0.0143910395","314":"455211","315":"45","316":"455"},{"1":"Costco","2":"CITIBANK, N.A. (476810)","3":"2010 Q4","4":"0","5":"476810","6":"LargeBank","7":"4","8":"105442000","9":"36881000","10":"9.13","11":"7.39","12":"2.84","13":"2650000","14":"1434000","15":"0.63","16":"0.16","17":"-0.34","18":"18.47367","19":"17.42321","20":"2.211566","21":"2.000128","22":"1.0438041","23":"0.025453510","24":"0.03965789","25":"0.071499531","26":"0.02188870","27":"-0.11307714","28":"-0.0106539944","29":"0.01237633","30":"-0.053819513","31":"0.00000000","32":"-0.00313972","33":"-0.0475091808","34":"-0.031571953","35":"-0.036128724","36":"-0.00826451","37":"0.03834336","38":"-0.0461694951","39":"-0.016822339","40":"-0.05440672","41":"0.05208778","42":"-0.10796299","43":"0.0009733385","44":"-0.013031438","45":"0.02265802","46":"0.02043867","47":"-0.00291971","48":"-1101000","49":"436000","50":"-0.47","51":"0.00","52":"-0.01","53":"-5055000","54":"-1123000","55":"-0.33","56":"-0.06","57":"0.12","58":"-5148000","59":"-613000","60":"-0.52","61":"0.37","62":"-0.35","63":"111000","64":"-482000","65":"0.22","66":"0.14","67":"-0.01","68":"0.025780216","69":"0.04045476","70":"0.074117647","71":"0.022130014","72":"-0.106918239","73":"-0.0105974416","74":"0.01245323","75":"-0.052396878","76":"0.000000000","77":"-0.003134796","78":"-0.0463982817","79":"-0.03107876","80":"-0.035483871","81":"-0.008230453","82":"0.039087948","83":"-0.0451198990","84":"-0.01668163","85":"-0.05295316","86":"0.053468208","87":"-0.102339181","88":"0.0009738123","89":"-0.01294690","90":"0.02291667","91":"0.020648968","92":"-0.002915452","93":"1.910000","94":"-0.400000000","95":"0.6471032","96":"-0.190144282","97":"0.002890175","98":"-0.069185810","99":"-0.071359475","100":"-0.009216655","101":"0.006666667","102":"-0.165000000","103":"-0.355454545","104":"-0.024545455","105":"-0.173160173","106":"0.002894356","107":"-0.066846725","108":"-0.134087791","109":"-0.009174312","110":"2.085000","111":"-0.40388889","112":"0.7347689","113":"-0.17706753","114":"0.01824580","115":"-0.08557062","116":"-0.03008400","117":"-0.11511128","118":"0.04500000","119":"-0.21833333","120":"-0.18176471","121":"-0.33470588","122":"-0.16227679","123":"0.01841328","124":"-0.08201169","125":"-0.06625214","126":"-0.10873304","127":"9.500000","128":"5.966667","129":"98.28313","130":"5.034306","131":"10.99056","132":"684.383","133":"8.366873e-06","134":"3.810014e-05","135":"0.0003684806","136":"0.5368503","137":"406.2082","138":"0.03333333","139":"-0.16666667","140":"0.26136117","141":"-0.003010","142":"-0.148454","143":"-12.348","144":"-1.775729e-07","145":"6.010852e-07","146":"1.455298e-06","147":"8.955105e-03","148":"0.65647331","149":"2.251292","150":"1.786188","151":"4.587852","152":"1.616276","153":"2.397037","154":"6.528518","155":"-11.69123","156":"-10.17529","157":"-7.906123","158":"-0.6220359","159":"6.006866","160":"0.003514942","161":"-0.027549952","162":"0.0026628102","163":"-0.0005977190","164":"-0.013416999","165":"-0.01788169","166":"-0.0210012481","167":"0.0159022300","168":"3.957276e-03","169":"1.682151e-02","170":"0.0016174079","171":"-0.017452450","172":"-0.010810916","173":"-0.004886850","174":"-0.0183147114","175":"-0.016998944","176":"-0.00858616","177":"-0.022901285","178":"0.0040510563","179":"0.0049785077","180":"3.904247e-05","181":"0.0032839124","182":"-0.020548668","183":"0.138150338","184":"-0.000371523","185":"-0.0322018660","186":"-0.029415989","187":"0.15498396","188":"-0.019549511","189":"0.0186935256","190":"0.0070257216","191":"1.560886e-02","192":"0.0145883124","193":"-0.010118130","194":"0.01242252","195":"0.003231197","196":"-0.021992299","197":"-0.024537131","198":"0.02386326","199":"-0.01948095","200":"0.0009118352","201":"0.0037731470","202":"1.065293e-02","203":"0.0039767837","204":"0.030666798","205":"0.04473589","206":"0.0023465843","207":"-0.030183310","208":"-0.024276638","209":"0.06163242","210":"-0.012331774","211":"-0.0304265866","212":"-0.003421374","213":"-3.900755e-03","214":"-0.0008567832","215":"-0.16666667","216":"-0.06666667","217":"-0.48019005","218":"-0.093107","219":"-0.190970","220":"-6.008","221":"-1.979366e-07","222":"1.516035e-07","223":"1.822697e-06","224":"2.060993e-05","225":"1.32961195","226":"-0.20000000","227":"0.80000000","228":"-0.03660254","229":"-0.167898","230":"-0.338233","231":"100.893","232":"-1.725908e-07","233":"6.916705e-07","234":"2.556819e-06","235":"8.175551e-03","236":"5.85411371","237":"-0.10000000","238":"0.06666667","239":"0.31788362","240":"-0.117813","241":"-0.289846","242":"14.192","243":"-1.753748e-07","244":"3.340880e-08","245":"1.365738e-06","246":"5.506935e-03","247":"1.5810774","248":"0.30000000","249":"0.23333333","250":"0.23021288","251":"-0.165969","252":"-0.293854","253":"35.125","254":"-1.127942e-07","255":"-1.131419e-06","256":"-1.238191e-06","257":"-2.009655e-03","258":"-0.3401060","259":"0.003521127","260":"-0.027173913","261":"0.0026663586","262":"-0.0005975404","263":"-0.013327393","264":"-0.017722765","265":"-0.0207822576","266":"0.0160293434","267":"0.0039651165","268":"1.696379e-02","269":"0.0016187166","270":"-0.017301038","271":"-0.010752688","272":"-0.004874929","273":"-0.0181480163","274":"-0.016855277","275":"-0.008549405","276":"-0.022641041","277":"0.0040592729","278":"0.0049909210","279":"3.904323e-05","280":"0.0032893103","281":"-0.020338983","282":"0.148148148","283":"-0.000371454","284":"-0.0316889067","285":"-0.028987550","286":"0.167639230","287":"-0.019359659","288":"0.0188693434","289":"0.0070504599","290":"1.573132e-02","291":"0.0146952412","292":"-0.010067114","293":"0.01250000","294":"0.003236423","295":"-0.0217522314","296":"-0.024238543","297":"0.024150265","298":"-0.01929242","299":"0.0009122510","300":"0.0037802743","301":"1.070988e-02","302":"0.0039847016","303":"0.031141869","304":"0.04575163","305":"0.0023493397","306":"-0.0297323428","307":"-0.023984330","308":"0.063571324","309":"-0.012256049","310":"-0.029968357","311":"-0.0034155276","312":"-3.893157e-03","313":"-0.0008564163","314":"455211","315":"45","316":"455"},{"1":"Costco","2":"CITIBANK, N.A. (476810)","3":"2011 Q1","4":"0","5":"476810","6":"LargeBank","7":"1","8":"108186000","9":"36247000","10":"9.32","11":"8.03","12":"2.97","13":"2744000","14":"-634000","15":"0.19","16":"0.64","17":"0.13","18":"18.49936","19":"17.40587","20":"2.232163","21":"2.083185","22":"1.0885620","23":"0.025690929","24":"-0.01733989","25":"0.020596934","26":"0.08305679","27":"0.04475790","28":"0.0254535097","29":"0.03965789","30":"0.071499531","31":"0.02188870","32":"-0.11307714","33":"-0.0106539944","34":"0.012376325","35":"-0.053819513","36":"0.00000000","37":"-0.00313972","38":"-0.0475091808","39":"-0.031571953","40":"-0.03612872","41":"-0.00826451","42":"0.03834336","43":"-0.0461694951","44":"-0.016822339","45":"-0.05440672","46":"0.05208778","47":"-0.10796299","48":"2650000","49":"1434000","50":"0.63","51":"0.16","52":"-0.34","53":"-1101000","54":"436000","55":"-0.47","56":"0.00","57":"-0.01","58":"-5055000","59":"-1123000","60":"-0.33","61":"-0.06","62":"0.12","63":"-5148000","64":"-613000","65":"-0.52","66":"0.37","67":"-0.35","68":"0.026023786","69":"-0.01719042","70":"0.020810515","71":"0.086603518","72":"0.045774648","73":"0.0257802164","74":"0.04045476","75":"0.074117647","76":"0.022130014","77":"-0.106918239","78":"-0.0105974416","79":"0.01245323","80":"-0.052396878","81":"0.000000000","82":"-0.003134796","83":"-0.0463982817","84":"-0.03107876","85":"-0.03548387","86":"-0.008230453","87":"0.039087948","88":"-0.0451198990","89":"-0.01668163","90":"-0.05295316","91":"0.053468208","92":"-0.102339181","93":"1.977692","94":"0.082500000","95":"0.6819307","96":"0.034827422","97":"-0.190144282","98":"0.002890175","99":"-0.069185810","100":"-0.071359475","101":"-0.400000000","102":"0.006666667","103":"-0.165000000","104":"-0.355454545","105":"0.043193717","106":"-0.173160173","107":"0.002894356","108":"-0.066846725","109":"-0.134087791","110":"2.014737","111":"-0.05833333","112":"0.7004886","113":"-0.03428027","114":"-0.17706753","115":"0.01824580","116":"-0.08557062","117":"-0.03008400","118":"-0.40388889","119":"0.04500000","120":"-0.21833333","121":"-0.18176471","122":"-0.02797762","123":"-0.16227679","124":"0.01841328","125":"-0.08201169","126":"-0.06625214","127":"9.033333","128":"6.600000","129":"98.52999","130":"5.070338","131":"10.79568","132":"773.709","133":"8.114503e-06","134":"3.804585e-05","135":"0.0003692280","136":"0.5424816","137":"409.5648","138":"-0.46666667","139":"0.63333333","140":"0.24686749","141":"0.036032","142":"-0.194880","143":"89.326","144":"-2.523701e-07","145":"-5.428711e-08","146":"7.474533e-07","147":"5.631232e-03","148":"3.35664317","149":"2.200921","150":"1.887070","151":"4.590361","152":"1.623407","153":"2.379146","154":"6.651196","155":"-11.72186","156":"-10.17672","157":"-7.904096","158":"-0.6116012","159":"6.015095","160":"-0.050370359","161":"0.100881225","162":"0.0025086500","163":"0.0071318005","164":"-0.017890670","165":"0.12267813","166":"-0.0306272692","167":"-0.0014258693","168":"2.026420e-03","169":"1.043476e-02","170":"0.0082294021","171":"0.003514942","172":"-0.027549952","173":"0.002662810","174":"-0.0005977190","175":"-0.013416999","176":"-0.01788169","177":"-0.021001248","178":"0.0159022300","179":"0.0039572761","180":"1.682151e-02","181":"0.0016174079","182":"-0.017452450","183":"-0.010810916","184":"-0.004886850","185":"-0.0183147114","186":"-0.016998944","187":"-0.00858616","188":"-0.022901285","189":"0.0040510563","190":"0.0049785077","191":"3.904247e-05","192":"0.0032839124","193":"-0.020548668","194":"0.13815034","195":"-0.000371523","196":"-0.032201866","197":"-0.029415989","198":"0.15498396","199":"-0.01954951","200":"0.0186935256","201":"0.0070257216","202":"1.560886e-02","203":"0.0145883124","204":"-0.010118130","205":"0.01242252","206":"0.0032311968","207":"-0.021992299","208":"-0.024537131","209":"0.02386326","210":"-0.019480947","211":"0.0009118352","212":"0.003773147","213":"1.065293e-02","214":"0.0039767837","215":"0.03333333","216":"-0.16666667","217":"0.26136117","218":"-0.003010","219":"-0.148454","220":"-12.348","221":"-1.775729e-07","222":"6.010852e-07","223":"1.455298e-06","224":"8.955105e-03","225":"0.65647331","226":"-0.16666667","227":"-0.06666667","228":"-0.48019005","229":"-0.093107","230":"-0.190970","231":"-6.008","232":"-1.979366e-07","233":"1.516035e-07","234":"1.822697e-06","235":"2.060993e-05","236":"1.32961195","237":"-0.20000000","238":"0.80000000","239":"-0.03660254","240":"-0.167898","241":"-0.338233","242":"100.893","243":"-1.725908e-07","244":"6.916705e-07","245":"2.556819e-06","246":"8.175551e-03","247":"5.8541137","248":"-0.10000000","249":"0.06666667","250":"0.31788362","251":"-0.117813","252":"-0.289846","253":"14.192","254":"-1.753748e-07","255":"3.340880e-08","256":"1.365738e-06","257":"5.506935e-03","258":"1.5810774","259":"-0.049122807","260":"0.106145251","261":"0.0025117993","262":"0.0071572924","263":"-0.017731582","264":"0.130520483","265":"-0.0301630062","266":"-0.0014248533","267":"0.0020284741","268":"1.048939e-02","269":"0.0082633567","270":"0.003521127","271":"-0.027173913","272":"0.002666359","273":"-0.0005975404","274":"-0.013327393","275":"-0.017722765","276":"-0.020782258","277":"0.0160293434","278":"0.0039651165","279":"1.696379e-02","280":"0.0016187166","281":"-0.017301038","282":"-0.010752688","283":"-0.004874929","284":"-0.0181480163","285":"-0.016855277","286":"-0.008549405","287":"-0.022641041","288":"0.0040592729","289":"0.0049909210","290":"3.904323e-05","291":"0.0032893103","292":"-0.020338983","293":"0.14814815","294":"-0.000371454","295":"-0.0316889067","296":"-0.028987550","297":"0.167639230","298":"-0.01935966","299":"0.0188693434","300":"0.0070504599","301":"1.573132e-02","302":"0.0146952412","303":"-0.010067114","304":"0.01250000","305":"0.0032364227","306":"-0.0217522314","307":"-0.024238543","308":"0.024150265","309":"-0.019292420","310":"0.000912251","311":"0.0037802743","312":"1.070988e-02","313":"0.0039847016","314":"455211","315":"45","316":"455"},{"1":"Costco","2":"CITIBANK, N.A. (476810)","3":"2011 Q2","4":"0","5":"476810","6":"LargeBank","7":"2","8":"124139000","9":"34986000","10":"10.21","11":"7.61","12":"2.90","13":"15953000","14":"-1261000","15":"0.89","16":"-0.42","17":"-0.07","18":"18.63691","19":"17.37046","20":"2.323368","21":"2.029463","22":"1.0647107","23":"0.137549938","24":"-0.03540864","25":"0.091205003","26":"-0.05372136","27":"-0.02385122","28":"0.0256909293","29":"-0.01733989","30":"0.020596934","31":"0.08305679","32":"0.04475790","33":"0.0254535097","34":"0.039657890","35":"0.071499531","36":"0.02188870","37":"-0.11307714","38":"-0.0106539944","39":"0.012376325","40":"-0.05381951","41":"0.00000000","42":"-0.00313972","43":"-0.0475091808","44":"-0.031571953","45":"-0.03612872","46":"-0.00826451","47":"0.03834336","48":"2744000","49":"-634000","50":"0.19","51":"0.64","52":"0.13","53":"2650000","54":"1434000","55":"0.63","56":"0.16","57":"-0.34","58":"-1101000","59":"436000","60":"-0.47","61":"0.00","62":"-0.01","63":"-5055000","64":"-1123000","65":"-0.33","66":"-0.06","67":"0.12","68":"0.147459006","69":"-0.03478909","70":"0.095493562","71":"-0.052303861","72":"-0.023569024","73":"0.0260237856","74":"-0.01719042","75":"0.020810515","76":"0.086603518","77":"0.045774648","78":"0.0257802164","79":"0.04045476","80":"0.074117647","81":"0.022130014","82":"-0.106918239","83":"-0.0105974416","84":"0.01245323","85":"-0.05239688","86":"0.000000000","87":"-0.003134796","88":"-0.0463982817","89":"-0.03107876","90":"-0.03548387","91":"-0.008230453","92":"0.039087948","93":"1.850769","94":"-0.126923077","95":"0.6156014","96":"-0.066329311","97":"0.034827422","98":"-0.190144282","99":"0.002890175","100":"-0.069185810","101":"0.082500000","102":"-0.400000000","103":"0.006666667","104":"-0.165000000","105":"-0.064177363","106":"0.043193717","107":"-0.173160173","108":"0.002894356","109":"-0.066846725","110":"1.894211","111":"-0.12052632","112":"0.6388021","113":"-0.06168644","114":"-0.03428027","115":"-0.17706753","116":"0.01824580","117":"-0.08557062","118":"-0.05833333","119":"-0.40388889","120":"0.04500000","121":"-0.21833333","122":"-0.05982236","123":"-0.02797762","124":"-0.16227679","125":"0.01841328","126":"-0.08201169","127":"9.066667","128":"6.366667","129":"98.18069","130":"5.053158","131":"10.70923","132":"749.284","133":"7.984131e-06","134":"3.743382e-05","135":"0.0003689421","136":"0.5441555","137":"408.0134","138":"0.03333333","139":"-0.23333333","140":"-0.34930668","141":"-0.017180","142":"-0.086451","143":"-24.425","144":"-1.303725e-07","145":"-6.120322e-07","146":"-2.859652e-07","147":"1.673890e-03","148":"-1.55148343","149":"2.204605","150":"1.851076","151":"4.586810","152":"1.620013","153":"2.371106","154":"6.619118","155":"-11.73805","156":"-10.19294","157":"-7.904871","158":"-0.6085203","159":"6.011300","160":"0.003683245","161":"-0.035993603","162":"-0.0035514803","163":"-0.0033940877","164":"-0.008040162","165":"-0.03207775","166":"-0.0161970651","167":"-0.0162174961","168":"-7.747950e-04","169":"3.080866e-03","170":"-0.0037953197","171":"-0.050370359","172":"0.100881225","173":"0.002508650","174":"0.0071318005","175":"-0.017890670","176":"0.12267813","177":"-0.030627269","178":"-0.0014258693","179":"0.0020264195","180":"1.043476e-02","181":"0.0082294021","182":"0.003514942","183":"-0.027549952","184":"0.002662810","185":"-0.0005977190","186":"-0.013416999","187":"-0.01788169","188":"-0.021001248","189":"0.0159022300","190":"0.0039572761","191":"1.682151e-02","192":"0.0016174079","193":"-0.017452450","194":"-0.01081092","195":"-0.004886850","196":"-0.018314711","197":"-0.016998944","198":"-0.00858616","199":"-0.02290128","200":"0.0040510563","201":"0.0049785077","202":"3.904247e-05","203":"0.0032839124","204":"-0.020548668","205":"0.13815034","206":"-0.0003715230","207":"-0.032201866","208":"-0.029415989","209":"0.15498396","210":"-0.019549511","211":"0.0186935256","212":"0.007025722","213":"1.560886e-02","214":"0.0145883124","215":"-0.46666667","216":"0.63333333","217":"0.24686749","218":"0.036032","219":"-0.194880","220":"89.326","221":"-2.523701e-07","222":"-5.428711e-08","223":"7.474533e-07","224":"5.631232e-03","225":"3.35664317","226":"0.03333333","227":"-0.16666667","228":"0.26136117","229":"-0.003010","230":"-0.148454","231":"-12.348","232":"-1.775729e-07","233":"6.010852e-07","234":"1.455298e-06","235":"8.955105e-03","236":"0.65647331","237":"-0.16666667","238":"-0.06666667","239":"-0.48019005","240":"-0.093107","241":"-0.190970","242":"-6.008","243":"-1.979366e-07","244":"1.516035e-07","245":"1.822697e-06","246":"2.060993e-05","247":"1.3296120","248":"-0.20000000","249":"0.80000000","250":"-0.03660254","251":"-0.167898","252":"-0.338233","253":"100.893","254":"-1.725908e-07","255":"6.916705e-07","256":"2.556819e-06","257":"8.175551e-03","258":"5.8541137","259":"0.003690037","260":"-0.035353535","261":"-0.0035451812","262":"-0.0033883343","263":"-0.008007926","264":"-0.031568716","265":"-0.0160665980","266":"-0.0160867005","267":"-0.0007744949","268":"3.085617e-03","269":"-0.0037881266","270":"-0.049122807","271":"0.106145251","272":"0.002511799","273":"0.0071572924","274":"-0.017731582","275":"0.130520483","276":"-0.030163006","277":"-0.0014248533","278":"0.0020284741","279":"1.048939e-02","280":"0.0082633567","281":"0.003521127","282":"-0.027173913","283":"0.002666359","284":"-0.0005975404","285":"-0.013327393","286":"-0.017722765","287":"-0.020782258","288":"0.0160293434","289":"0.0039651165","290":"1.696379e-02","291":"0.0016187166","292":"-0.017301038","293":"-0.01075269","294":"-0.004874929","295":"-0.0181480163","296":"-0.016855277","297":"-0.008549405","298":"-0.02264104","299":"0.0040592729","300":"0.0049909210","301":"3.904323e-05","302":"0.0032893103","303":"-0.020338983","304":"0.14814815","305":"-0.0003714540","306":"-0.0316889067","307":"-0.028987550","308":"0.167639230","309":"-0.019359659","310":"0.018869343","311":"0.0070504599","312":"1.573132e-02","313":"0.0146952412","314":"455211","315":"45","316":"455"},{"1":"Costco","2":"CITIBANK, N.A. (476810)","3":"2011 Q3","4":"0","5":"476810","6":"LargeBank","7":"3","8":"648212000","9":"140670000","10":"49.84","11":"12.44","12":"2.17","13":"524073000","14":"105684000","15":"39.63","16":"4.83","17":"-0.73","18":"20.28973","19":"18.76193","20":"3.908818","21":"2.520917","22":"0.7747272","23":"1.652815898","24":"1.39146874","25":"1.585450242","26":"0.49145392","27":"-0.28998357","28":"0.1375499375","29":"-0.03540864","30":"0.091205003","31":"-0.05372136","32":"-0.02385122","33":"0.0256909293","34":"-0.017339894","35":"0.020596934","36":"0.08305679","37":"0.04475790","38":"0.0254535097","39":"0.039657890","40":"0.07149953","41":"0.02188870","42":"-0.11307714","43":"-0.0106539944","44":"0.012376325","45":"-0.05381951","46":"0.00000000","47":"-0.00313972","48":"15953000","49":"-1261000","50":"0.89","51":"-0.42","52":"-0.07","53":"2744000","54":"-634000","55":"0.19","56":"0.64","57":"0.13","58":"2650000","59":"1434000","60":"0.63","61":"0.16","62":"-0.34","63":"-1101000","64":"436000","65":"-0.47","66":"0.00","67":"-0.01","68":"4.221662813","69":"3.02075116","70":"3.881488737","71":"0.634691196","72":"-0.251724138","73":"0.1474590058","74":"-0.03478909","75":"0.095493562","76":"-0.052303861","77":"-0.023569024","78":"0.0260237856","79":"-0.01719042","80":"0.020810515","81":"0.086603518","82":"0.045774648","83":"0.0257802164","84":"0.04045476","85":"0.07411765","86":"0.022130014","87":"-0.106918239","88":"-0.0105974416","89":"0.01245323","90":"-0.05239688","91":"0.000000000","92":"-0.003134796","93":"1.775385","94":"-0.075384615","95":"0.5740171","96":"-0.041584269","97":"-0.066329311","98":"0.034827422","99":"-0.190144282","100":"0.002890175","101":"-0.126923077","102":"0.082500000","103":"-0.400000000","104":"0.006666667","105":"-0.040731505","106":"-0.064177363","107":"0.043193717","108":"-0.173160173","109":"0.002894356","110":"1.920526","111":"0.02631579","112":"0.6525993","113":"0.01379713","114":"-0.06168644","115":"-0.03428027","116":"-0.17706753","117":"0.01824580","118":"-0.12052632","119":"-0.05833333","120":"-0.40388889","121":"0.04500000","122":"0.01389275","123":"-0.05982236","124":"-0.02797762","125":"-0.16227679","126":"0.01841328","127":"9.000000","128":"6.600000","129":"97.04543","130":"5.019475","131":"10.58966","132":"785.916","133":"7.854667e-06","134":"3.745043e-05","135":"0.0003692778","136":"0.5444508","137":"409.3175","138":"-0.06666667","139":"0.23333333","140":"-1.13525643","141":"-0.033683","142":"-0.119570","143":"36.632","144":"-1.294640e-07","145":"1.660547e-08","146":"3.357702e-07","147":"2.953503e-04","148":"1.30412760","149":"2.197225","150":"1.887070","151":"4.575179","152":"1.613325","153":"2.359878","154":"6.666850","155":"-11.75440","156":"-10.19249","157":"-7.903961","158":"-0.6079777","159":"6.014491","160":"-0.007380107","161":"0.035993603","162":"-0.0116303008","163":"-0.0066880478","164":"-0.011227935","165":"0.04773183","166":"-0.0163480659","167":"0.0004434969","168":"9.096754e-04","169":"5.426210e-04","170":"0.0031911893","171":"0.003683245","172":"-0.035993603","173":"-0.003551480","174":"-0.0033940877","175":"-0.008040162","176":"-0.03207775","177":"-0.016197065","178":"-0.0162174961","179":"-0.0007747950","180":"3.080866e-03","181":"-0.0037953197","182":"-0.050370359","183":"0.100881225","184":"0.002508650","185":"0.0071318005","186":"-0.017890670","187":"0.12267813","188":"-0.030627269","189":"-0.0014258693","190":"0.0020264195","191":"1.043476e-02","192":"0.0082294021","193":"0.003514942","194":"-0.02754995","195":"0.002662810","196":"-0.000597719","197":"-0.013416999","198":"-0.01788169","199":"-0.02100125","200":"0.0159022300","201":"0.0039572761","202":"1.682151e-02","203":"0.0016174079","204":"-0.017452450","205":"-0.01081092","206":"-0.0048868504","207":"-0.018314711","208":"-0.016998944","209":"-0.00858616","210":"-0.022901285","211":"0.0040510563","212":"0.004978508","213":"3.904247e-05","214":"0.0032839124","215":"0.03333333","216":"-0.23333333","217":"-0.34930668","218":"-0.017180","219":"-0.086451","220":"-24.425","221":"-1.303725e-07","222":"-6.120322e-07","223":"-2.859652e-07","224":"1.673890e-03","225":"-1.55148343","226":"-0.46666667","227":"0.63333333","228":"0.24686749","229":"0.036032","230":"-0.194880","231":"89.326","232":"-2.523701e-07","233":"-5.428711e-08","234":"7.474533e-07","235":"5.631232e-03","236":"3.35664317","237":"0.03333333","238":"-0.16666667","239":"0.26136117","240":"-0.003010","241":"-0.148454","242":"-12.348","243":"-1.775729e-07","244":"6.010852e-07","245":"1.455298e-06","246":"8.955105e-03","247":"0.6564733","248":"-0.16666667","249":"-0.06666667","250":"-0.48019005","251":"-0.093107","252":"-0.190970","253":"-6.008","254":"-1.979366e-07","255":"1.516035e-07","256":"1.822697e-06","257":"2.060993e-05","258":"1.3296120","259":"-0.007352941","260":"0.036649215","261":"-0.0115629303","262":"-0.0066657326","263":"-0.011165137","264":"0.048889340","265":"-0.0162151615","266":"0.0004435953","267":"0.0009100893","268":"5.427683e-04","269":"0.0031962866","270":"0.003690037","271":"-0.035353535","272":"-0.003545181","273":"-0.0033883343","274":"-0.008007926","275":"-0.031568716","276":"-0.016066598","277":"-0.0160867005","278":"-0.0007744949","279":"3.085617e-03","280":"-0.0037881266","281":"-0.049122807","282":"0.106145251","283":"0.002511799","284":"0.0071572924","285":"-0.017731582","286":"0.130520483","287":"-0.030163006","288":"-0.0014248533","289":"0.0020284741","290":"1.048939e-02","291":"0.0082633567","292":"0.003521127","293":"-0.02717391","294":"0.002666359","295":"-0.0005975404","296":"-0.013327393","297":"-0.017722765","298":"-0.02078226","299":"0.0160293434","300":"0.0039651165","301":"1.696379e-02","302":"0.0016187166","303":"-0.017301038","304":"-0.01075269","305":"-0.0048749291","306":"-0.0181480163","307":"-0.016855277","308":"-0.008549405","309":"-0.022641041","310":"0.004059273","311":"0.0049909210","312":"3.904323e-05","313":"0.0032893103","314":"455211","315":"45","316":"455"},{"1":"Costco","2":"CITIBANK, N.A. (476810)","3":"2011 Q4","4":"0","5":"476810","6":"LargeBank","7":"4","8":"640658000","9":"145916000","10":"49.72","11":"15.22","12":"2.04","13":"-7554000","14":"5246000","15":"-0.12","16":"2.78","17":"-0.13","18":"20.27801","19":"18.79854","20":"3.906407","21":"2.722610","22":"0.7129498","23":"-0.011722030","24":"0.03661439","25":"-0.002410608","26":"0.20169327","27":"-0.06177736","28":"1.6528158978","29":"1.39146874","30":"1.585450242","31":"0.49145392","32":"-0.28998357","33":"0.1375499375","34":"-0.035408638","35":"0.091205003","36":"-0.05372136","37":"-0.02385122","38":"0.0256909293","39":"-0.017339894","40":"0.02059693","41":"0.08305679","42":"0.04475790","43":"0.0254535097","44":"0.039657890","45":"0.07149953","46":"0.02188870","47":"-0.11307714","48":"524073000","49":"105684000","50":"39.63","51":"4.83","52":"-0.73","53":"15953000","54":"-1261000","55":"0.89","56":"-0.42","57":"-0.07","58":"2744000","59":"-634000","60":"0.19","61":"0.64","62":"0.13","63":"2650000","64":"1434000","65":"0.63","66":"0.16","67":"-0.34","68":"-0.011653595","69":"0.03729296","70":"-0.002407705","71":"0.223472669","72":"-0.059907834","73":"4.2216628135","74":"3.02075116","75":"3.881488737","76":"0.634691196","77":"-0.251724138","78":"0.1474590058","79":"-0.03478909","80":"0.095493562","81":"-0.052303861","82":"-0.023569024","83":"0.0260237856","84":"-0.01719042","85":"0.02081051","86":"0.086603518","87":"0.045774648","88":"0.0257802164","89":"0.04045476","90":"0.07411765","91":"0.022130014","92":"-0.106918239","93":"1.526667","94":"-0.176923077","95":"0.4230867","96":"-0.150930375","97":"-0.041584269","98":"-0.066329311","99":"0.034827422","100":"-0.190144282","101":"-0.075384615","102":"-0.126923077","103":"0.082500000","104":"-0.400000000","105":"-0.099653380","106":"-0.040731505","107":"-0.064177363","108":"0.043193717","109":"-0.173160173","110":"1.684286","111":"-0.17052632","112":"0.5213416","113":"-0.13125771","114":"0.01379713","115":"-0.06168644","116":"-0.03428027","117":"-0.17706753","118":"0.02631579","119":"-0.12052632","120":"-0.05833333","121":"-0.40388889","122":"-0.08879145","123":"0.01389275","124":"-0.05982236","125":"-0.02797762","126":"-0.16227679","127":"8.633333","128":"6.633333","129":"97.54373","130":"5.022145","131":"10.47124","132":"796.225","133":"7.786656e-06","134":"3.798986e-05","135":"0.0003691460","136":"0.5495278","137":"409.3842","138":"-0.36666667","139":"0.03333333","140":"0.49830301","141":"0.002670","142":"-0.118416","143":"10.309","144":"-6.801059e-08","145":"5.394292e-07","146":"-1.318090e-07","147":"5.076939e-03","148":"0.06669491","149":"2.155631","150":"1.892107","151":"4.580301","152":"1.613857","153":"2.348633","154":"6.679882","155":"-11.76310","156":"-10.17819","157":"-7.904318","158":"-0.5986960","159":"6.014654","160":"-0.041593897","161":"0.005037794","162":"0.0051216017","163":"0.0005317867","164":"-0.011245222","165":"0.01303189","166":"-0.0086963256","167":"0.0143010703","168":"-3.570010e-04","169":"9.281674e-03","170":"0.0001629285","171":"-0.007380107","172":"0.035993603","173":"-0.011630301","174":"-0.0066880478","175":"-0.011227935","176":"0.04773183","177":"-0.016348066","178":"0.0004434969","179":"0.0009096754","180":"5.426210e-04","181":"0.0031911893","182":"0.003683245","183":"-0.035993603","184":"-0.003551480","185":"-0.0033940877","186":"-0.008040162","187":"-0.03207775","188":"-0.016197065","189":"-0.0162174961","190":"-0.0007747950","191":"3.080866e-03","192":"-0.0037953197","193":"-0.050370359","194":"0.10088122","195":"0.002508650","196":"0.007131801","197":"-0.017890670","198":"0.12267813","199":"-0.03062727","200":"-0.0014258693","201":"0.0020264195","202":"1.043476e-02","203":"0.0082294021","204":"0.003514942","205":"-0.02754995","206":"0.0026628102","207":"-0.000597719","208":"-0.013416999","209":"-0.01788169","210":"-0.021001248","211":"0.0159022300","212":"0.003957276","213":"1.682151e-02","214":"0.0016174079","215":"-0.06666667","216":"0.23333333","217":"-1.13525643","218":"-0.033683","219":"-0.119570","220":"36.632","221":"-1.294640e-07","222":"1.660547e-08","223":"3.357702e-07","224":"2.953503e-04","225":"1.30412760","226":"0.03333333","227":"-0.23333333","228":"-0.34930668","229":"-0.017180","230":"-0.086451","231":"-24.425","232":"-1.303725e-07","233":"-6.120322e-07","234":"-2.859652e-07","235":"1.673890e-03","236":"-1.55148343","237":"-0.46666667","238":"0.63333333","239":"0.24686749","240":"0.036032","241":"-0.194880","242":"89.326","243":"-2.523701e-07","244":"-5.428711e-08","245":"7.474533e-07","246":"5.631232e-03","247":"3.3566432","248":"0.03333333","249":"-0.16666667","250":"0.26136117","251":"-0.003010","252":"-0.148454","253":"-12.348","254":"-1.775729e-07","255":"6.010852e-07","256":"1.455298e-06","257":"8.955105e-03","258":"0.6564733","259":"-0.040740741","260":"0.005050505","261":"0.0051347396","262":"0.0005319281","263":"-0.011182231","264":"0.013117178","265":"-0.0086586220","266":"0.0144038198","267":"-0.0003569372","268":"9.324882e-03","269":"0.0001629418","270":"-0.007352941","271":"0.036649215","272":"-0.011562930","273":"-0.0066657326","274":"-0.011165137","275":"0.048889340","276":"-0.016215162","277":"0.0004435953","278":"0.0009100893","279":"5.427683e-04","280":"0.0031962866","281":"0.003690037","282":"-0.035353535","283":"-0.003545181","284":"-0.0033883343","285":"-0.008007926","286":"-0.031568716","287":"-0.016066598","288":"-0.0160867005","289":"-0.0007744949","290":"3.085617e-03","291":"-0.0037881266","292":"-0.049122807","293":"0.10614525","294":"0.002511799","295":"0.0071572924","296":"-0.017731582","297":"0.130520483","298":"-0.03016301","299":"-0.0014248533","300":"0.0020284741","301":"1.048939e-02","302":"0.0082633567","303":"0.003521127","304":"-0.02717391","305":"0.0026663586","306":"-0.0005975404","307":"-0.013327393","308":"-0.017722765","309":"-0.020782258","310":"0.016029343","311":"0.0039651165","312":"1.696379e-02","313":"0.0016187166","314":"455211","315":"45","316":"455"},{"1":"Costco","2":"CITIBANK, N.A. (476810)","3":"2012 Q1","4":"0","5":"476810","6":"LargeBank","7":"1","8":"642365000","9":"137665000","10":"48.93","11":"23.96","12":"1.90","13":"1707000","14":"-8251000","15":"-0.79","16":"8.74","17":"-0.14","18":"20.28067","19":"18.74033","20":"3.890391","21":"3.176386","22":"0.6418539","23":"0.002660905","24":"-0.05820792","25":"-0.016016561","26":"0.45377542","27":"-0.07109592","28":"-0.0117220301","29":"0.03661439","30":"-0.002410608","31":"0.20169327","32":"-0.06177736","33":"1.6528158978","34":"1.391468740","35":"1.585450242","36":"0.49145392","37":"-0.28998357","38":"0.1375499375","39":"-0.035408638","40":"0.09120500","41":"-0.05372136","42":"-0.02385122","43":"0.0256909293","44":"-0.017339894","45":"0.02059693","46":"0.08305679","47":"0.04475790","48":"-7554000","49":"5246000","50":"-0.12","51":"2.78","52":"-0.13","53":"524073000","54":"105684000","55":"39.63","56":"4.83","57":"-0.73","58":"15953000","59":"-1261000","60":"0.89","61":"-0.42","62":"-0.07","63":"2744000","64":"-634000","65":"0.19","66":"0.64","67":"0.13","68":"0.002664448","69":"-0.05654623","70":"-0.015888978","71":"0.574244415","72":"-0.068627451","73":"-0.0116535948","74":"0.03729296","75":"-0.002407705","76":"0.223472669","77":"-0.059907834","78":"4.2216628135","79":"3.02075116","80":"3.881488737","81":"0.634691196","82":"-0.251724138","83":"0.1474590058","84":"-0.03478909","85":"0.09549356","86":"-0.052303861","87":"-0.023569024","88":"0.0260237856","89":"-0.01719042","90":"0.02081051","91":"0.086603518","92":"0.045774648","93":"1.300000","94":"-0.226666667","95":"0.2623643","96":"-0.160722445","97":"-0.150930375","98":"-0.041584269","99":"-0.066329311","100":"0.034827422","101":"-0.176923077","102":"-0.075384615","103":"-0.126923077","104":"0.082500000","105":"-0.148471616","106":"-0.099653380","107":"-0.040731505","108":"-0.064177363","109":"0.043193717","110":"1.441905","111":"-0.24238095","112":"0.3659650","113":"-0.15537657","114":"-0.13125771","115":"0.01379713","116":"-0.06168644","117":"-0.03428027","118":"-0.17052632","119":"0.02631579","120":"-0.12052632","121":"-0.05833333","122":"-0.14390727","123":"-0.08879145","124":"0.01389275","125":"-0.05982236","126":"-0.02797762","127":"8.266667","128":"7.433333","129":"98.73339","130":"4.958773","131":"10.26220","132":"909.651","133":"7.734754e-06","134":"3.854305e-05","135":"0.0003711485","136":"0.5569341","137":"414.9307","138":"-0.36666667","139":"0.80000000","140":"1.18965865","141":"-0.063372","142":"-0.209042","143":"113.426","144":"-5.190247e-08","145":"5.531938e-07","146":"2.002483e-06","147":"7.406327e-03","148":"5.54654595","149":"2.112231","150":"2.005974","151":"4.592423","152":"1.601158","153":"2.328467","154":"6.813061","155":"-11.76979","156":"-10.16373","157":"-7.898908","158":"-0.5853084","159":"6.028112","160":"-0.043399316","161":"0.113866947","162":"0.0121223828","163":"-0.0126988022","164":"-0.020165401","165":"0.13317920","166":"-0.0066878793","167":"0.0144566157","168":"5.409976e-03","169":"1.338761e-02","170":"0.0134575505","171":"-0.041593897","172":"0.005037794","173":"0.005121602","174":"0.0005317867","175":"-0.011245222","176":"0.01303189","177":"-0.008696326","178":"0.0143010703","179":"-0.0003570010","180":"9.281674e-03","181":"0.0001629285","182":"-0.007380107","183":"0.035993603","184":"-0.011630301","185":"-0.0066880478","186":"-0.011227935","187":"0.04773183","188":"-0.016348066","189":"0.0004434969","190":"0.0009096754","191":"5.426210e-04","192":"0.0031911893","193":"0.003683245","194":"-0.03599360","195":"-0.003551480","196":"-0.003394088","197":"-0.008040162","198":"-0.03207775","199":"-0.01619707","200":"-0.0162174961","201":"-0.0007747950","202":"3.080866e-03","203":"-0.0037953197","204":"-0.050370359","205":"0.10088122","206":"0.0025086500","207":"0.007131801","208":"-0.017890670","209":"0.12267813","210":"-0.030627269","211":"-0.0014258693","212":"0.002026420","213":"1.043476e-02","214":"0.0082294021","215":"-0.36666667","216":"0.03333333","217":"0.49830301","218":"0.002670","219":"-0.118416","220":"10.309","221":"-6.801059e-08","222":"5.394292e-07","223":"-1.318090e-07","224":"5.076939e-03","225":"0.06669491","226":"-0.06666667","227":"0.23333333","228":"-1.13525643","229":"-0.033683","230":"-0.119570","231":"36.632","232":"-1.294640e-07","233":"1.660547e-08","234":"3.357702e-07","235":"2.953503e-04","236":"1.30412760","237":"0.03333333","238":"-0.23333333","239":"-0.34930668","240":"-0.017180","241":"-0.086451","242":"-24.425","243":"-1.303725e-07","244":"-6.120322e-07","245":"-2.859652e-07","246":"1.673890e-03","247":"-1.5514834","248":"-0.46666667","249":"0.63333333","250":"0.24686749","251":"0.036032","252":"-0.194880","253":"89.326","254":"-2.523701e-07","255":"-5.428711e-08","256":"7.474533e-07","257":"5.631232e-03","258":"3.3566432","259":"-0.042471042","260":"0.120603015","261":"0.0121961567","262":"-0.0126185126","263":"-0.019963439","264":"0.142454708","265":"-0.0066655652","266":"0.0145616180","267":"0.0054246364","268":"1.347762e-02","269":"0.0135485109","270":"-0.040740741","271":"0.005050505","272":"0.005134740","273":"0.0005319281","274":"-0.011182231","275":"0.013117178","276":"-0.008658622","277":"0.0144038198","278":"-0.0003569372","279":"9.324882e-03","280":"0.0001629418","281":"-0.007352941","282":"0.036649215","283":"-0.011562930","284":"-0.0066657326","285":"-0.011165137","286":"0.048889340","287":"-0.016215162","288":"0.0004435953","289":"0.0009100893","290":"5.427683e-04","291":"0.0031962866","292":"0.003690037","293":"-0.03535354","294":"-0.003545181","295":"-0.0033883343","296":"-0.008007926","297":"-0.031568716","298":"-0.01606660","299":"-0.0160867005","300":"-0.0007744949","301":"3.085617e-03","302":"-0.0037881266","303":"-0.049122807","304":"0.10614525","305":"0.0025117993","306":"0.0071572924","307":"-0.017731582","308":"0.130520483","309":"-0.030163006","310":"-0.001424853","311":"0.0020284741","312":"1.048939e-02","313":"0.0082633567","314":"455211","315":"45","316":"455"},{"1":"Costco","2":"CITIBANK, N.A. (476810)","3":"2012 Q2","4":"0","5":"476810","6":"LargeBank","7":"2","8":"619422000","9":"136238000","10":"45.96","11":"23.57","12":"1.69","13":"-22943000","14":"-1427000","15":"-2.97","16":"-0.39","17":"-0.21","18":"20.24430","19":"18.72991","20":"3.827771","21":"3.159975","22":"0.5247285","23":"-0.036369893","24":"-0.01041984","25":"-0.062619252","26":"-0.01641106","27":"-0.11712536","28":"0.0026609048","29":"-0.05820792","30":"-0.016016561","31":"0.45377542","32":"-0.07109592","33":"-0.0117220301","34":"0.036614392","35":"-0.002410608","36":"0.20169327","37":"-0.06177736","38":"1.6528158978","39":"1.391468740","40":"1.58545024","41":"0.49145392","42":"-0.28998357","43":"0.1375499375","44":"-0.035408638","45":"0.09120500","46":"-0.05372136","47":"-0.02385122","48":"1707000","49":"-8251000","50":"-0.79","51":"8.74","52":"-0.14","53":"-7554000","54":"5246000","55":"-0.12","56":"2.78","57":"-0.13","58":"524073000","59":"105684000","60":"39.63","61":"4.83","62":"-0.73","63":"15953000","64":"-1261000","65":"0.89","66":"-0.42","67":"-0.07","68":"-0.035716454","69":"-0.01036574","70":"-0.060698958","71":"-0.016277129","72":"-0.110526316","73":"0.0026644481","74":"-0.05654623","75":"-0.015888978","76":"0.574244415","77":"-0.068627451","78":"-0.0116535948","79":"0.03729296","80":"-0.002407705","81":"0.223472669","82":"-0.059907834","83":"4.2216628135","84":"3.02075116","85":"3.88148874","86":"0.634691196","87":"-0.251724138","88":"0.1474590058","89":"-0.03478909","90":"0.09549356","91":"-0.052303861","92":"-0.023569024","93":"1.310667","94":"0.010666667","95":"0.2705359","96":"0.008171649","97":"-0.160722445","98":"-0.150930375","99":"-0.041584269","100":"-0.066329311","101":"-0.226666667","102":"-0.176923077","103":"-0.075384615","104":"-0.126923077","105":"0.008205128","106":"-0.148471616","107":"-0.099653380","108":"-0.040731505","109":"-0.064177363","110":"1.499091","111":"0.03000000","112":"0.4048589","113":"0.03889387","114":"-0.15537657","115":"-0.13125771","116":"0.01379713","117":"-0.06168644","118":"-0.24238095","119":"-0.17052632","120":"0.02631579","121":"-0.12052632","122":"0.02080581","123":"-0.14390727","124":"-0.08879145","125":"0.01389275","126":"-0.05982236","127":"8.200000","128":"7.900000","129":"98.83193","130":"4.948530","131":"10.15359","132":"974.069","133":"7.730748e-06","134":"3.822887e-05","135":"0.0003711384","136":"0.5536252","137":"416.9750","138":"-0.06666667","139":"0.46666667","140":"0.09854030","141":"-0.010243","142":"-0.108610","143":"64.418","144":"-4.006200e-09","145":"-3.141828e-07","146":"-1.015952e-08","147":"-3.308841e-03","148":"2.04428677","149":"2.104134","150":"2.066863","151":"4.593421","152":"1.599091","153":"2.317827","154":"6.881482","155":"-11.77030","156":"-10.17192","157":"-7.898936","158":"-0.5912673","159":"6.033026","160":"-0.008097210","161":"0.060888370","162":"0.0009975466","163":"-0.0020677683","164":"-0.010639904","165":"0.06842113","166":"-0.0005180821","167":"-0.0081848827","168":"-2.737358e-05","169":"-5.958892e-03","170":"0.0049147177","171":"-0.043399316","172":"0.113866947","173":"0.012122383","174":"-0.0126988022","175":"-0.020165401","176":"0.13317920","177":"-0.006687879","178":"0.0144566157","179":"0.0054099761","180":"1.338761e-02","181":"0.0134575505","182":"-0.041593897","183":"0.005037794","184":"0.005121602","185":"0.0005317867","186":"-0.011245222","187":"0.01303189","188":"-0.008696326","189":"0.0143010703","190":"-0.0003570010","191":"9.281674e-03","192":"0.0001629285","193":"-0.007380107","194":"0.03599360","195":"-0.011630301","196":"-0.006688048","197":"-0.011227935","198":"0.04773183","199":"-0.01634807","200":"0.0004434969","201":"0.0009096754","202":"5.426210e-04","203":"0.0031911893","204":"0.003683245","205":"-0.03599360","206":"-0.0035514803","207":"-0.003394088","208":"-0.008040162","209":"-0.03207775","210":"-0.016197065","211":"-0.0162174961","212":"-0.000774795","213":"3.080866e-03","214":"-0.0037953197","215":"-0.36666667","216":"0.80000000","217":"1.18965865","218":"-0.063372","219":"-0.209042","220":"113.426","221":"-5.190247e-08","222":"5.531938e-07","223":"2.002483e-06","224":"7.406327e-03","225":"5.54654595","226":"-0.36666667","227":"0.03333333","228":"0.49830301","229":"0.002670","230":"-0.118416","231":"10.309","232":"-6.801059e-08","233":"5.394292e-07","234":"-1.318090e-07","235":"5.076939e-03","236":"0.06669491","237":"-0.06666667","238":"0.23333333","239":"-1.13525643","240":"-0.033683","241":"-0.119570","242":"36.632","243":"-1.294640e-07","244":"1.660547e-08","245":"3.357702e-07","246":"2.953503e-04","247":"1.3041276","248":"0.03333333","249":"-0.23333333","250":"-0.34930668","251":"-0.017180","252":"-0.086451","253":"-24.425","254":"-1.303725e-07","255":"-6.120322e-07","256":"-2.859652e-07","257":"1.673890e-03","258":"-1.5514834","259":"-0.008064516","260":"0.062780269","261":"0.0009980443","262":"-0.0020656320","263":"-0.010583501","264":"0.070816170","265":"-0.0005179479","266":"-0.0081514778","267":"-0.0000273732","268":"-5.941173e-03","269":"0.0049268147","270":"-0.042471042","271":"0.120603015","272":"0.012196157","273":"-0.0126185126","274":"-0.019963439","275":"0.142454708","276":"-0.006665565","277":"0.0145616180","278":"0.0054246364","279":"1.347762e-02","280":"0.0135485109","281":"-0.040740741","282":"0.005050505","283":"0.005134740","284":"0.0005319281","285":"-0.011182231","286":"0.013117178","287":"-0.008658622","288":"0.0144038198","289":"-0.0003569372","290":"9.324882e-03","291":"0.0001629418","292":"-0.007352941","293":"0.03664921","294":"-0.011562930","295":"-0.0066657326","296":"-0.011165137","297":"0.048889340","298":"-0.01621516","299":"0.0004435953","300":"0.0009100893","301":"5.427683e-04","302":"0.0031962866","303":"0.003690037","304":"-0.03535354","305":"-0.0035451812","306":"-0.0033883343","307":"-0.008007926","308":"-0.031568716","309":"-0.016066598","310":"-0.016086700","311":"-0.0007744949","312":"3.085617e-03","313":"-0.0037881266","314":"455211","315":"45","316":"455"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div id="tbl-features-hier-2" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-features-hier" style="flex-basis: 100.0%;justify-content: center;">
+
+<div data-pagedtable="false"> <div class="table-caption">(b) <p>NAICS Partner Mapping</p> </div>
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Partner"],"name":[1],"type":["chr"],"align":["left"]},{"label":["NAICS"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Level6"],"name":[3],"type":["chr"],"align":["left"]},{"label":["Level5"],"name":[4],"type":["chr"],"align":["left"]},{"label":["Level3"],"name":[5],"type":["chr"],"align":["left"]},{"label":["Level2"],"name":[6],"type":["chr"],"align":["left"]}],"data":[{"1":"Costco","2":"455211","3":"Warehouse Clubs and Supercenters","4":"Department Stores","5":"General Merchandise Retailers","6":"Retail Trade"},{"1":"Walmart","2":"455110","3":"Department Stores","4":"Department Stores","5":"General Merchandise Retailers","6":"Retail Trade"},{"1":"GAP","2":"458110","3":"Clothing and Clothing Accessories Retailers","4":"Clothing and Clothing Accessories Retailers","5":"Clothing, Clothing Accessories, Shoe, and Jewelry Retailers","6":"Retail Trade"},{"1":"GM","2":"336390","3":"Other Motor Vehicle Parts Manufacturing","4":"Other Motor Vehicle Parts Manufacturing","5":"Transportation Equipment Manufacturing","6":"Computer and Electronic Product Manufacturing"},{"1":"Apple","2":"334111","3":"Electronic Computer Manufacturing","4":"Computer and Peripheral Equipment Manufacturing","5":"Computer and Electronic Product Manufacturing","6":"Computer and Electronic Product Manufacturing"},{"1":"Wayfair","2":"459999","3":"All Other Miscellaneous Retailers","4":"All Other Miscellaneous Retailers","5":"Sporting Goods, Hobby, Musical Instrument, Book, and Miscellaneous Retailers","6":"Retail Trade"},{"1":"BestBuy","2":"449210","3":"Electronics and Appliance Retailers","4":"Electronics and Appliance Retailers","5":"Electronics and Appliance Retailers","6":"Electronics and Appliance Retailers"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div id="tbl-features-hier-3" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-features-hier" style="flex-basis: 100.0%;justify-content: center;">
+<table class="table table-sm table-striped small">
+<caption>(c) Feature Descriptions</caption>
+<colgroup>
+<col style="width: 6%">
+<col style="width: 14%">
+<col style="width: 79%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Source</th>
+<th style="text-align: left;">Code</th>
+<th style="text-align: left;">Desc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">FFIEC</td>
+<td style="text-align: left;">BankName</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FFIEC</td>
+<td style="text-align: left;">BankType</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">FFIEC</td>
+<td style="text-align: left;">HasPartner</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FFIEC</td>
+<td style="text-align: left;">IDRSSD</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">FFIEC</td>
+<td style="text-align: left;">NAICS</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FFIEC</td>
+<td style="text-align: left;">NAICS2</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">FFIEC</td>
+<td style="text-align: left;">NAICS3</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FFIEC</td>
+<td style="text-align: left;">Partner</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">FFIEC</td>
+<td style="text-align: left;">Qtr</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FFIEC</td>
+<td style="text-align: left;">Quarter</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">FED</td>
+<td style="text-align: left;">A229RC0</td>
+<td style="text-align: left;">Disposable Personal Income: Per capita: Current dollars</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FED</td>
+<td style="text-align: left;">B069RC1</td>
+<td style="text-align: left;">Personal interest payments</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">FED</td>
+<td style="text-align: left;">CDSP</td>
+<td style="text-align: left;">Consumer Debt Service Payments as a Percent of Disposable Personal Income</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FED</td>
+<td style="text-align: left;">CSCICP03USM665S</td>
+<td style="text-align: left;">US Composite Confidence Indicator</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">FED</td>
+<td style="text-align: left;">PCE</td>
+<td style="text-align: left;">Personal Consumption Expenditures</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FED</td>
+<td style="text-align: left;">PCEDG</td>
+<td style="text-align: left;">Personal Consumption Expenditures: Durable Goods</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">FED</td>
+<td style="text-align: left;">PSAVE</td>
+<td style="text-align: left;">Quarterly Personal Saving</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FED</td>
+<td style="text-align: left;">PSAVERT</td>
+<td style="text-align: left;">US Personal Savings Rate</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">FED</td>
+<td style="text-align: left;">RRSFS</td>
+<td style="text-align: left;">Real Retail and Food Services Sales</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FED</td>
+<td style="text-align: left;">TDSP</td>
+<td style="text-align: left;">Household Debt Service Payments as a Percent of Disposable Personal Income</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">FED</td>
+<td style="text-align: left;">UNRATE</td>
+<td style="text-align: left;">Unemployment Rate</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FFIEC</td>
+<td style="text-align: left;">UBPR3815</td>
+<td style="text-align: left;">Unused Commitments on Credit Cards</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">FFIEC</td>
+<td style="text-align: left;">UBPRB538</td>
+<td style="text-align: left;">Loans to Individuals for Household, Family, and Other Personal Expenditures:Credit Cards</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FFIEC</td>
+<td style="text-align: left;">UBPRE263</td>
+<td style="text-align: left;">Unused Commitments on Credit Cards as a percent of Total Assets</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">FFIEC</td>
+<td style="text-align: left;">UBPRE425</td>
+<td style="text-align: left;">Credit Card Loans, % Gross LN&amp;LS</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FFIEC</td>
+<td style="text-align: left;">UBPRE524</td>
+<td style="text-align: left;">Credit Card Plans-30-89 DAYS P/D %</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+<!-- -->
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-naics" class="csl-entry" role="listitem">
+Bureau, US Census. 2024. <span>“North American Industry Classification System (NAICS).”</span> <a href="https://www.census.gov/naics/">https://www.census.gov/naics/</a>.
+</div>
+<div id="ref-ffiec" class="csl-entry" role="listitem">
+FFIEC. 2023. <span>“Central Data Repository.”</span> Federal Financial Institutions Examination Council. <a href="https://cdr.ffiec.gov/">https://cdr.ffiec.gov/</a>.
+</div>
+<div id="ref-fred" class="csl-entry" role="listitem">
+St. Louis, Federal Reserve Bank of. 2023. <span>“Federal Reserve Economic Data.”</span> Federal Reserve Bank of St. Louis. <a href="https://fred.stlouisfed.org/">https://fred.stlouisfed.org/</a>.
+</div>
+</div>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./data_final_event.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Event Study Dataset</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Hierarchical Study Dataset"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Download All</span><span class="co">](/data/final_hierarchy_model_data.csv)</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">NAICS Partner Mapping</span><span class="co">](/data/Partner_NAICS.csv)</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>Sources: </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>US Federal Financial Institutions Examination Council <span class="co">[</span><span class="ot">-@ffiec</span><span class="co">]</span> </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>US Federal Reserve Economic Data <span class="co">[</span><span class="ot">-@fred</span><span class="co">]</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>North American Industry Classification System <span class="co">[</span><span class="ot">-@naics</span><span class="co">]</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-features-hier</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: Final Dataset </span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-subcap: </span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co">#| -    Data glimpse (10 rows)</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co">#| -    NAICS Partner Mapping</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co">#| -    Feature Descriptions</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">'functions.R'</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>all_data <span class="ot">&lt;-</span> <span class="fu">get_hierarchy_model_data</span>()</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>all_data <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">slice_head</span>(<span class="at">n=</span><span class="dv">10</span>) <span class="sc">|&gt;</span> <span class="fu">relocate</span>(Qtr, <span class="at">.after =</span> BankType) <span class="sc">|&gt;</span> rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="fu">read_csv</span>(<span class="st">"data/Partner_NAICS.csv"</span>,<span class="at">show_col_types =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span> rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>all_cols <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">Feature =</span> <span class="fu">names</span>(all_data))</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>feature_desc <span class="ot">&lt;-</span> <span class="fu">get_feature_labels</span>()</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>all_cols <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Code =</span> stringr<span class="sc">::</span><span class="fu">str_split_i</span>(Feature,<span class="st">"</span><span class="sc">\\</span><span class="st">."</span>,<span class="dv">1</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(feature_desc,<span class="at">by =</span> <span class="fu">join_by</span>(Code)) <span class="sc">|&gt;</span> </span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(Feature, Code, Source, Desc) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Source =</span> <span class="fu">replace_na</span>(Source, <span class="st">"FFIEC"</span>))<span class="sc">|&gt;</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(Source, Code, Desc) <span class="sc">|&gt;</span> <span class="fu">distinct</span>() <span class="sc">|&gt;</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">arrange</span>( <span class="sc">!</span><span class="fu">is.na</span>(Desc),Source,Code) <span class="sc">|&gt;</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="in">```</span> </span>
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+</body></html>

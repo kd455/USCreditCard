@@ -240,6 +240,23 @@ div.csl-indent {
 </li>
       </ul>
   </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text">Hierarchical Study</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model_hierarchy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Hierarchical study</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./references.html" class="sidebar-item-text sidebar-link">
@@ -248,23 +265,29 @@ div.csl-indent {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
  <span class="menu-text">Appendix</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./data_banks.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bank Peer Groups</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bank Peer Groups</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./data_final_event.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Event Study Dataset</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Event Study Dataset</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data_final_hierarchy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hierarchical Study Dataset</span></span></a>
   </div>
 </li>
       </ul>
@@ -308,7 +331,7 @@ div.csl-indent {
 <section id="sec-data-split" class="level2" data-number="5.1">
 <h2 data-number="5.1" class="anchored" data-anchor-id="sec-data-split"><span class="header-section-number">5.1</span> Estimation and Observation Data</h2>
 <p>Following the process described by <span class="citation" data-cites="HuntingtonKlein">Huntington-Klein (<a href="references.html#ref-HuntingtonKlein" role="doc-biblioref">2022</a>, chap 17.2.1)</span>, we pick an “estimation period” and an “observation period”.</p>
-<p>The observation period chosen is the quarter of the event + 7 quarters after the event. Based on partnership agreement the portfolio can be transferred with delinquent borrowers on day one <span class="citation" data-cites="gap2021">(e.g., <a href="references.html#ref-gap2021" role="doc-biblioref">Barclays 2021</a>)</span> or the impact may be some quarters after the acquisition as borrowers receive and start using their new partner cards. It will take least 30 days to determine if any of these borrowers are delinquent.</p>
+<p>The observation period chosen is the quarter of the event + 5 quarters after the event. Based on partnership agreement the portfolio can be transferred with delinquent borrowers on day one <span class="citation" data-cites="gap2021">(e.g., <a href="references.html#ref-gap2021" role="doc-biblioref">Barclays 2021</a>)</span> or the impact may be some quarters after the acquisition as borrowers receive and start using their new partner cards. It will take least 30 days to determine if any of these borrowers are delinquent.</p>
 
 
 <!-- -->
@@ -633,7 +656,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>Following the process described by @HuntingtonKlein <span class="co">[</span><span class="ot">chap 17.2.1</span><span class="co">]</span>, we pick an "estimation period" and an "observation period".</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>The observation period chosen is the quarter of the event + 7 quarters after the event. Based on partnership agreement the portfolio can be transferred with delinquent borrowers on day one <span class="co">[</span><span class="ot">e.g., @gap2021</span><span class="co">]</span> or the impact may be some quarters after the acquisition as borrowers receive and start using their new partner cards. It will take least 30 days to determine if any of these borrowers are delinquent.</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>The observation period chosen is the quarter of the event + 5 quarters after the event. Based on partnership agreement the portfolio can be transferred with delinquent borrowers on day one <span class="co">[</span><span class="ot">e.g., @gap2021</span><span class="co">]</span> or the impact may be some quarters after the acquisition as borrowers receive and start using their new partner cards. It will take least 30 days to determine if any of these borrowers are delinquent.</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

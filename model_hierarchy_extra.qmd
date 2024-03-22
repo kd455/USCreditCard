@@ -1,0 +1,274 @@
+---
+title: "Hierarchical study - extra"
+format: html
+---
+
+
+```{r}
+#| warning: false
+#| echo: false
+source('functions.R')
+hier_data <- get_hierarchy_model_data()
+target_label <- credit_card.target_label()
+```
+
+Instead of focusing on individual partnerships we can use a hierarhical model to explore other effects. 
+
+We will look at:
+
+1. Bank Type 
+    
+    Conclusions: \
+    There was a fixed effect of 0.25 percentage point increase in *`r target_label`* if a bank was a *Large Credit Card Bank*. The std.err at 0.10 suggests that we still can improve the model as there is some uncertainty about the true value of the coefficient.
+
+2. Numeric proxy for Bank Type - measure *Credit Card Loans, % Gross LN&LS* (UBPRE425). *Large Credit Card Banks* will have higher proportions in credit card loans compared with other loan types e.g., personal, car and mortgage loans.
+
+    Conclusions: \
+    Our term is UBPRE425.log.diff. The log difference is a good approximation of percentage change when changes are small. Assuming this, we can say a 1% increase in *Credit Card Loans, % Gross LN&LS* results is a fixed effect of 0.65 percentage point increase in *`r target_label`*. The std.err term is 0.13 indicating this estimate is quite precise. The random effect of UBPRE425.log.diff was not distinguishable from zero i.e. the contribution to the variability of our target measure could be by chance alone. 
+
+3. NAICS type. If we group partnerships by their NAICS level 2 will we see an effect?
+
+    Conclusions: \
+    Compared with having no partner, we see a fixed effect of 0.08 percent point increase (with std.err 0.02) in *`r target_label`* for Manufacturng companies (NAICS2 = 33). There was no effect for retail companies. Because we focused on partnerships that had partner events our partner list is limited (see @tbl-naics-partner). For Manufacturing companies we have a sample size of 2 - Apple and GM. This could be a future area of study where we look at all partnership cards a bank issues which can be found in the *Terms of Credit Card Plans Survey* [-@TCCP2022] and research when these partnerships were established.
+
+## Bank Type
+
+```{r}
+#| warning: false
+#| code-fold: false
+#| eval: true
+m_bt <- lmer(UBPRE524.diff ~ BankType + (1 + Qtr+ UBPRB538.log.diff + UBPR3815.log.diff | BankType/BankName) + TDSP.log.diff + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1, data = hier_data, REML = TRUE)
+```
+### Fixed Effects
+
+::: {#panel-random-effects .panel-tabset}
+
+### Plot
+```{r}
+#| warning: false
+#| label: fig-coef-hier-bt
+#| fig-cap: "Plot of simulated fixed effects"
+#| results: hide
+#| fig-keep: all
+result_bt <- generate_fixed_random_plts(m_bt)
+result_bt$FE
+```
+
+### Coefficients and Correlation Data
+
+```{r}
+#| warning: false
+#| label: tbl-coef-hier-bt
+#| tbl-cap: "Coefficients and Correlation of Fixed Effects"
+#| tbl-subcap:
+#|  - "Coefficients"
+#|  - "Correlation of Fixed Effects"
+tidy(m_bt, effects = "fixed") |>
+    mutate(across(where(is.numeric), \(x) round(x,2))) |>  
+    dplyr::select(-effect) |>
+    rmarkdown::paged_table() 
+
+cov2cor(vcov(m_bt)) |> as.matrix() |> as.data.frame() |>
+    mutate(across(where(is.numeric), \(x) round(x,2))) |>  
+    rmarkdown::paged_table() 
+
+```
+:::
+
+### Random Effects
+
+::: {#sec-random-effects .panel-tabset}
+
+### Plot
+```{r}
+#| warning: false
+#| results: hide
+#| fig-keep: all
+#| label: fig-random-effect-bt
+#| fig-cap: "Random Effects"
+#| fig-height: 8
+result_bt$RE 
+```
+The red line indicates no effect (zero), and the dots represent the random effect estimates with their confidence intervals. Points that are distinguishable from zero (i.e. the confidence band does not cross the red line) are highlighted as black dots, whereas the grey dots are where the confidence band cross the red line.
+
+### Data
+```{r}
+#| warning: false
+#| label: tbl-coef-hier-bt-random
+#| tbl-cap: "Intercept and coefficients"
+#| tbl-subcap:
+#|  - "Random Effects for BankName"
+ranef(m_bt, condVar = FALSE)$BankName |> as.data.frame() |> 
+    rownames_to_column(var = "Entity") |> 
+    filter(!grepl("None", Entity)) |>
+    mutate(across(where(is.numeric), \(x) round(x,2))) |>  
+        rmarkdown::paged_table()
+```
+:::
+
+## UBPRE425
+
+```{r}
+#| warning: false
+#| code-fold: false
+#| eval: true
+m <- lmer(UBPRE524.diff ~ UBPRE425.log.diff + (1 + Qtr+ UBPRE425.log.diff+ UBPRB538.log.diff + UBPR3815.log.diff | BankName) + TDSP.log.diff + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1, data = hier_data, REML = TRUE)
+```
+### Fixed Effects
+
+::: {#panel-random-effects .panel-tabset}
+
+### Plot
+```{r}
+#| warning: false
+#| label: fig-coef-hier-425
+#| fig-cap: "Plot of simulated fixed effects"
+#| results: hide
+#| fig-keep: all
+result <- generate_fixed_random_plts(m)
+result$FE
+```
+
+### Coefficients and Correlation Data
+
+```{r}
+#| warning: false
+#| label: tbl-coef-hier-425
+#| tbl-cap: "Coefficients and Correlation of Fixed Effects"
+#| tbl-subcap:
+#|  - "Coefficients"
+#|  - "Correlation of Fixed Effects"
+tidy(m, effects = "fixed") |>
+    mutate(across(where(is.numeric), \(x) round(x,2))) |>  
+    dplyr::select(-effect) |>
+    rmarkdown::paged_table() 
+
+cov2cor(vcov(m)) |> as.matrix() |> as.data.frame() |>
+    mutate(across(where(is.numeric), \(x) round(x,2))) |>  
+    rmarkdown::paged_table() 
+
+```
+:::
+
+### Random Effects
+
+::: {#sec-random-effects .panel-tabset}
+
+### Plot
+```{r}
+#| warning: false
+#| results: hide
+#| fig-keep: all
+#| label: fig-random-effect-425
+#| fig-cap: "Random Effects"
+#| fig-height: 8
+result$RE 
+```
+The red line indicates no effect (zero), and the dots represent the random effect estimates with their confidence intervals. Points that are distinguishable from zero (i.e. the confidence band does not cross the red line) are highlighted as black dots, whereas the grey dots are where the confidence band cross the red line.
+
+### Data
+```{r}
+#| warning: false
+#| label: tbl-coef-hier-425-random
+#| tbl-cap: "Intercept and coefficients"
+#| tbl-subcap:
+#|  - "Random Effects for BankName"
+ranef(m, condVar = FALSE)$BankName |> as.data.frame() |> 
+    rownames_to_column(var = "Entity") |> 
+    filter(!grepl("None", Entity)) |>
+    mutate(across(where(is.numeric), \(x) round(x,2))) |>  
+        rmarkdown::paged_table()
+```
+:::
+
+## NAICS2
+
+Going back to our initial **Hypotheses 2**: The sector e.g., retail, energy, airline, of a partnership card is a determinant of the partnership quality. 
+
+We can see if there is an effect based on the sector. We use the grouping 45,46, 33 with reference point 0 (no partner). This is the first 2 numbers of NAICS classification.
+
+```{r}
+#| warning: false
+#| label: tbl-naics-partner
+#| tbl-cap: NAICS Partner Mapping
+read_csv("data/Partner_NAICS.csv",show_col_types = FALSE) |> relocate(Level2, .after = "Partner") |> rmarkdown::paged_table()
+```
+
+```{r}
+#| warning: false
+#| code-fold: false
+m_naics <- lmer(UBPRE524.diff ~ NAICS2 + UBPRE425.log.diff + (1 + NAICS2 + Qtr+ UBPRE425.log.diff + UBPRB538.log.diff + UBPR3815.log.diff | BankName) + TDSP.log.diff + RRSFS.Pop.log.diff + UNRATE.log.diff + UNRATE.log.diff.lag1, data = hier_data, REML = TRUE)
+```
+
+
+### Fixed Effects
+
+::: {#panel-random-effects .panel-tabset}
+
+### Plot
+```{r}
+#| warning: false
+#| label: fig-coef-hier-naics
+#| fig-cap: "Plot of simulated fixed effects"
+#| results: hide
+#| fig-keep: all
+
+#summary(m_naics)
+#coef(m_naics)
+result_naics <- generate_fixed_random_plts(m_naics)
+result_naics$FE
+```
+
+### Coefficients and Correlation Data
+
+```{r}
+#| warning: false
+#| label: tbl-coef-hier-naics
+#| tbl-cap: "Coefficients and Correlation of Fixed Effects"
+#| tbl-subcap:
+#|  - "Coefficients"
+#|  - "Correlation of Fixed Effects"
+tidy(m_naics, effects = "fixed") |>
+    mutate(across(where(is.numeric), \(x) round(x,2))) |>  
+    dplyr::select(-effect) |>
+    rmarkdown::paged_table() 
+
+cov2cor(vcov(m_naics)) |> as.matrix() |> as.data.frame() |>
+    mutate(across(where(is.numeric), \(x) round(x,2))) |>  
+    rmarkdown::paged_table() 
+
+```
+:::
+
+### Random Effects
+
+::: {#sec-random-effects .panel-tabset}
+
+### Plot
+```{r}
+#| warning: false
+#| results: hide
+#| fig-keep: all
+#| label: fig-random-effect-naics
+#| fig-cap: "Random Effects"
+#| fig-height: 8
+result_naics$RE 
+```
+The red line indicates no effect (zero), and the dots represent the random effect estimates with their confidence intervals. Points that are distinguishable from zero (i.e. the confidence band does not cross the red line) are highlighted as black dots, whereas the grey dots are where the confidence band cross the red line.
+
+### Data
+```{r}
+#| warning: false
+#| label: tbl-coef-hier-naics-random
+#| tbl-cap: "Intercept and coefficients"
+#| tbl-subcap:
+#|  - "Random Effects for BankName"
+
+ranef(m_naics, condVar = FALSE)$BankName |> as.data.frame() |> 
+    rownames_to_column(var = "Entity") |> 
+    filter(!grepl("None", Entity)) |>
+    mutate(across(where(is.numeric), \(x) round(x,2))) |>  
+        rmarkdown::paged_table()
+    
+```
+:::

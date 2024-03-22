@@ -4,6 +4,11 @@ format: html
 ---
 
 ## Comparative Model Accuracy
+
+The predictions using the estimation data are summarised by selected banks, peer group and total in @tbl-cv-train-diff. The models generalised well to unseen data as we see the difference between RMSE on the training and test data is small. 
+
+Overall, the ARIMA models were the most performant. The results for our selected banks, shown in @tbl-cv-train-diff-1, reveal a more mixed picture where ARIMA was not always the best model, however, for simplicity we will focus on ARIMA. Each bank has its own specification identified by the Auto ARIMA process.
+
 ```{r}
 #| warning: false
 #| label: tbl-cv-train-diff
@@ -69,9 +74,14 @@ bind_rows(xg_results$tbl3, arima_results$tbl3, market_results$tbl3, hier_results
     rmarkdown::paged_table()
 
 ```
-## Prediction 
+## Conclusions
 
-The joint test problem arises because we are effectively testing two things: the counterfactual model and the event impact. Consequently, we need an approach to accurately evaluate if our counterfactual model results are credible. One approach suggested by @HuntingtonKlein is to test using observations where we expect no effect; if there were resulting "abnormal returns" this would point to an issue with the model.
+For our observation period of 6 quarters, we calculated the average effect (cumulative mean) and total effect (cumulative sum) of each case study event as shown in @sec-ab.
+
+Ostensibly, we can say that there is an event impact if the AR is not zero. However, we face what is called the 'joint test problem' which arises because we are effectively testing two things: the counterfactual model predictions and the event impact. Consequently, we need an approach to evaluate if our predictions are credible. An approach suggested by Huntington-Klein is to test using data where we expect no effect; if there were abnormal returns this would point to an issue with the model [-@HuntingtonKlein]. We decided to predict 6 periods before each event (refitting the model with this data removed), as our pre-event test period. 
+
+By comparing the pre and post abnormal returns, we cannot credibly assert that partnership events have had an impact as we see from the pre-event predictions that they too have abnormal returns. 
+
 
 ```{r}
 #| warning: false
@@ -139,7 +149,6 @@ map2(partner_banks$Bank, partner_banks$Partner, plot_prediction_and_history, res
 ```{r}
 #| fig-height: 8
 #| eval: false
-
 bank = "CITIBANK, N.A. (476810)"
 partner = "Costco"
 bank_hcast_data <- result_pre |> filter(BankName == bank) |> filter(Partner == partner) 
@@ -160,17 +169,16 @@ p2 <- tdsp_series |> autoplot() + geom_line(aes(x = Quarter, y = TDSP.log.diff))
 
 with_econ_plot <- patchwork::wrap_elements(p1) / patchwork::wrap_elements(p2)  + plot_layout(heights = c(2,1))
 with_econ_plot
-
-
 ```
 
-## Abnormal Results 
+### Abnormal Results  {#sec-ab}
 
-### Costco - Old Partner AMERICAN EXPRESS NATIONAL BANK
+#### Costco 
+
 ```{r}
 #| warning: false
 #| label: tbl-ar-market-costco-ar
-#| tbl-cap: "Credit Card Plans-30-89 DAYS P/D %: Abnormal Returns (original scale)"
+#| tbl-cap: "AMERICAN EXPRESS (Old Partner) Abnormal Returns (original scale)"
 #| tbl-subcap: 
 #| - "Pre Event"
 #| - "Post Event"
@@ -178,11 +186,10 @@ print_ar(result_pre, "Costco", "AMERICAN EXPRESS NATIONAL BANK (1394676)")
 print_ar(result_post, "Costco", "AMERICAN EXPRESS NATIONAL BANK (1394676)")
 ```
 
-### Costco - New Partner CITIBANK
 ```{r}
 #| warning: false
 #| label: tbl-ar-market-costco-citi
-#| tbl-cap: "Credit Card Plans-30-89 DAYS P/D %: Abnormal Returns (original scale)"
+#| tbl-cap: "CITIBANK (New Partner) Abnormal Returns (original scale)"
 #| tbl-subcap: 
 #| - "Pre Event"
 #| - "Post Event"
@@ -190,22 +197,23 @@ print_ar(result_pre, "Costco", "CITIBANK, N.A. (476810)")
 print_ar(result_post, "Costco", "CITIBANK, N.A. (476810)")
 ```
 
-### Walmart - Old Partner SYNCHRONY
+#### Walmart
+
 ```{r}
 #| warning: false
 #| label: tbl-ar-market-walmart-sync
-#| tbl-cap: "Credit Card Plans-30-89 DAYS P/D %: Abnormal Returns (original scale)"
+#| tbl-cap: "SYNCHRONY (Old Partner) Abnormal Returns (original scale)"
 #| tbl-subcap: 
 #| - "Pre Event"
 #| - "Post Event"
 print_ar(result_pre, "Walmart", "SYNCHRONY BANK (1216022)")
 print_ar(result_post, "Walmart", "SYNCHRONY BANK (1216022)")
 ```
-### Walmart - New Partner CAPITAL ONE
+
 ```{r}
 #| warning: false
 #| label: tbl-ar-market-walmart-cap
-#| tbl-cap: "Credit Card Plans-30-89 DAYS P/D %: Abnormal Returns (original scale)"
+#| tbl-cap: "CAPITAL ONE (New Partner) Abnormal Returns (original scale)"
 #| tbl-subcap: 
 #| - "Pre Event"
 #| - "Post Event"
@@ -213,11 +221,12 @@ print_ar(result_pre, "Walmart", "CAPITAL ONE, NATIONAL ASSOCIATION (112837)")
 print_ar(result_post, "Walmart", "CAPITAL ONE, NATIONAL ASSOCIATION (112837)")
 ```
 
-### GAP - Old Partner SYNCHRONY 
+#### GAP 
+
 ```{r}
 #| warning: false
 #| label: tbl-ar-market-gap-sync
-#| tbl-cap: "Credit Card Plans-30-89 DAYS P/D %: Abnormal Returns (original scale)"
+#| tbl-cap: "SYNCHRONY (Old Partner) Abnormal Returns (original scale)"
 #| tbl-subcap: 
 #| - "Pre Event"
 #| - "Post Event"
@@ -225,11 +234,10 @@ print_ar(result_pre, "GAP", "SYNCHRONY BANK (1216022)")
 print_ar(result_post, "GAP", "SYNCHRONY BANK (1216022)")
 ```
 
-### GAP - New Partner BARCLAYS BANK 
 ```{r}
 #| warning: false
 #| label: tbl-ar-market-gap-bar
-#| tbl-cap: "Credit Card Plans-30-89 DAYS P/D %: Abnormal Returns (original scale)"
+#| tbl-cap: "BARCLAYS BANK (New Partner) Abnormal Returns (original scale)"
 #| tbl-subcap: 
 #| - "Pre Event"
 #| - "Post Event"

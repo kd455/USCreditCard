@@ -245,6 +245,23 @@ div.csl-indent {
 </li>
       </ul>
   </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text">Hierarchical Study</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model_hierarchy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Hierarchical study</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./references.html" class="sidebar-item-text sidebar-link">
@@ -253,23 +270,29 @@ div.csl-indent {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
  <span class="menu-text">Appendix</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./data_banks.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bank Peer Groups</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bank Peer Groups</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./data_final_event.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Event Study Dataset</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Event Study Dataset</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data_final_hierarchy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hierarchical Study Dataset</span></span></a>
   </div>
 </li>
       </ul>
@@ -326,7 +349,7 @@ div.csl-indent {
 </ul>
 <p>Our approach begins with basic ARIMA modelling to predict future values solely based on historical data without explanatory variables.</p>
 <p>Next, to see if we can improve the models (one model for each bank series), we introduce explanatory variables, while also correcting for autocorrelation within the error terms. This transforms the models into a Linear Regression with AR Errors.</p>
-<p>We examine the AICc values of models across various categories of explanatory variables, including Expenditure, Unemployment, Consumer and Household Debt, Portfolio, and Group Trend. This analysis aims to identify explanatory variables that we can combine. This also takes into consideration insights from the data exploratory phase, as well as insights from other modelling techniques such as XGBoost Factor Analysis (see <a href="model_ml.html#fig-gain-all">Figure&nbsp;<span>9.3</span></a>).</p>
+<p>We examine the AICc values of models across various categories of explanatory variables, including Expenditure, Unemployment, Consumer and Household Debt, Portfolio, and Group Trend. This analysis aims to identify explanatory variables that we can combine. This also takes into consideration insights from the data exploratory phase, as well as insights from other modelling techniques such as XGBoost Factor Analysis (see <a href="#fig-gain-all">Figure&nbsp;<span class="quarto-unresolved-ref">fig-gain-all</span></a>).</p>
 <section id="sec-model-arima" class="level2" data-number="7.1">
 <h2 data-number="7.1" class="anchored" data-anchor-id="sec-model-arima"><span class="header-section-number">7.1</span> Model selection</h2>
 <p>Note: using the undifferenced value for Credit Card Plans-30-89 DAYS P/D % as the Auto Arima process will perform the differencing if optimal.</p>
@@ -699,7 +722,7 @@ div.csl-indent {
 </section>
 <section id="sec-residual-check-arima" class="level3" data-number="7.1.4">
 <h3 data-number="7.1.4" class="anchored" data-anchor-id="sec-residual-check-arima"><span class="header-section-number">7.1.4</span> Residual diagnostics</h3>
-<p>Residuals should have the following properties <span class="citation" data-cites="Hyndman2021">(<a href="references.html#ref-Hyndman2021" role="doc-biblioref">Hyndman and Athanasopoulos 2021</a>, ch.&nbsp;5.4)</span>. Residuals:</p>
+<p>Residuals should have the following properties <span class="citation" data-cites="Hyndman2021">(<a href="#ref-Hyndman2021" role="doc-biblioref">Hyndman and Athanasopoulos 2021</a>, ch.&nbsp;5.4)</span>. Residuals:</p>
 <ul>
 <li>Are uncorrelated. Correlations indicate that the model is missing information left in the residuals.</li>
 <li>Have zero mean. If they have a mean other than zero, then the forecasts are biased.</li>
@@ -798,8 +821,8 @@ div.csl-indent {
 </div>
 <section id="residuals-white-noise" class="level4" data-number="7.1.4.1">
 <h4 data-number="7.1.4.1" class="anchored" data-anchor-id="residuals-white-noise"><span class="header-section-number">7.1.4.1</span> Residuals White Noise</h4>
-<p>The sub-set of banks analysed in <a href="#sec-residual-check-arima"><span>Section&nbsp;7.1.4</span></a> did not exhibit significant autocorrelation.</p>
-<p><a href="#tbl-lb-arima">Table&nbsp;<span>7.11</span></a> lists banks where we reject the null hypothesis of the Ljung–Box test, indicating the presence of significant autocorrelation in the residuals.</p>
+<p>The sub-set of banks analysed in <a href="#sec-residual-check-arima"><span class="quarto-unresolved-ref">sec-residual-check-arima</span></a> did not exhibit significant autocorrelation.</p>
+<p><a href="#tbl-lb-arima">Table&nbsp;<span class="quarto-unresolved-ref">tbl-lb-arima</span></a> lists banks where we reject the null hypothesis of the Ljung–Box test, indicating the presence of significant autocorrelation in the residuals.</p>
 <p>Banks not listed have residuals that are indistinguishable from a white noise series i.e.&nbsp;have uncorrelated observations and with constant variance.</p>
 <div class="cell">
 <details>
@@ -825,7 +848,7 @@ div.csl-indent {
 </section>
 <section id="time-series-cross-validation" class="level2" data-number="7.2">
 <h2 data-number="7.2" class="anchored" data-anchor-id="time-series-cross-validation"><span class="header-section-number">7.2</span> Time Series Cross-Validation</h2>
-<p>Selecting the best model for each bank, we use one-step ahead cross-validation to assess their performance on unseen data. The outcomes, detailed in <a href="#tbl-arima-cv">Table&nbsp;<span>7.12</span></a>, reveal that, with the exception of Capital One, the models underperform compared to the Market model (see <a href="model_market.html#tbl-market-cv">Table&nbsp;<span>6.4</span></a>). This discrepancy suggests that the models are overfitting, meaning they have learned the training data too well, capturing noise rather than the underlying signal, which diminishes their predictive accuracy on new, unseen data. To reduce overfitting we may have to look at simpler models i.e.&nbsp;those with higher AICc but fewer parameters.</p>
+<p>Selecting the best model for each bank, we use one-step ahead cross-validation to assess their performance on unseen data. The outcomes, detailed in <a href="#tbl-arima-cv">Table&nbsp;<span class="quarto-unresolved-ref">tbl-arima-cv</span></a>, reveal that, with the exception of Capital One, the models underperform compared to the Market model (see <a href="#tbl-market-cv">Table&nbsp;<span class="quarto-unresolved-ref">tbl-market-cv</span></a>). This discrepancy suggests that the models are overfitting, meaning they have learned the training data too well, capturing noise rather than the underlying signal, which diminishes their predictive accuracy on new, unseen data. To reduce overfitting we may have to look at simpler models i.e.&nbsp;those with higher AICc but fewer parameters.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -1056,7 +1079,7 @@ banks</p> </div>
 
 <!-- -->
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-Hyndman2021" class="csl-entry" role="listitem">
 Hyndman, Rob J., and George Athanasopoulos. 2021. <em>Forecasting: Principles and Practice</em>. OTexts. <a href="https://otexts.com/fpp3/">https://otexts.com/fpp3/</a>.
 </div>

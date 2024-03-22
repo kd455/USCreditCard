@@ -732,8 +732,12 @@ get_hierarchy_model_data <- function() {
          Partner= as.factor(Partner),
          HasPartner = as.factor(HasPartner),
          Qtr = as.factor(quarter(Quarter)),
-         NAICS2 = as.factor(stringr::str_sub(NAICS,start=1, end=2)),
-         NAICS3 = as.factor(stringr::str_sub(NAICS,start=1, end=3)))
+         NAICS2 = stringr::str_sub(NAICS,start=1, end=2),
+         NAICS3 = stringr::str_sub(NAICS,start=1, end=3)) |>
+    mutate(NAICS2 = as.factor(replace_na(NAICS2, "0")),
+           NAICS3 = as.factor(replace_na(NAICS3, "0"))) |>
+    mutate(NAICS2 = relevel(NAICS2, ref = "0"),
+            NAICS3 = relevel(NAICS3, ref = "0"))   
 }
 
 .read_model_data <- function() {
@@ -1042,6 +1046,19 @@ diff_arima_results <- function(data) {
   } else {
     data
   }
+}
+
+generate_fixed_random_plts <- function(model) {
+    target_label <- credit_card.target_label()
+    feEx <- FEsim(model, 1000)
+    plotFE <- plotFEsim(feEx) +
+                        theme_bw() + labs(title = "Coefficient Plot",
+                        x = "Median Effect Estimate", y = glue("{target_label} (difference)"))
+
+    reEx <- REsim(model)
+    plotRE <- plotREsim(reEx)     
+
+    list(FE = plotFE, RE = plotRE) 
 }
 
 

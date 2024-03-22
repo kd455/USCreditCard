@@ -245,6 +245,29 @@ div.csl-indent {
 </li>
       </ul>
   </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text">Hierarchical Study</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model_hierarchy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Hierarchical study</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model_hierarchy_extra.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Hierarchical study - extra</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./references.html" class="sidebar-item-text sidebar-link">
@@ -253,23 +276,29 @@ div.csl-indent {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
  <span class="menu-text">Appendix</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./data_banks.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bank Peer Groups</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bank Peer Groups</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./data_final_event.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Event Study Dataset</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Event Study Dataset</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data_final_hierarchy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Hierarchical Study Dataset</span></span></a>
   </div>
 </li>
       </ul>
@@ -603,7 +632,7 @@ between model complexity (number of parameters) and goodness of fit</p> </div>
 </div>
 </div>
 </div>
-<p>From <a href="#fig-random-effect">Figure&nbsp;<span>8.3</span></a> we can see that the random effect of <em>Unused Commitments on Credit Cards</em> (UBPR3815) and <em>Loans to Individuals for Household, Family, and Other Personal Expenditures:Credit Cards</em> (UBPRB538) are distinguishable from zero i.e.&nbsp;the contribution to the variability of our target measure is beyond what could be expected by chance alone.</p>
+<p>From <a href="model_hierarchy.html#fig-random-effect">Figure&nbsp;<span>11.2</span></a> we can see that the random effect of <em>Unused Commitments on Credit Cards</em> (UBPR3815) and <em>Loans to Individuals for Household, Family, and Other Personal Expenditures:Credit Cards</em> (UBPRB538) are distinguishable from zero i.e.&nbsp;the contribution to the variability of our target measure is beyond what could be expected by chance alone.</p>
 <p>Interestingly, Qtr3 for BankType was also distinguishable from zero. This aligns with our statistical tests in <a href="data_ffiec.html#fig-season">Figure&nbsp;<span>2.8</span></a> that showed delinquency peaked in Q3. But at the Bank level Q4 appears more significant.</p>
 </section>
 <section id="sec-residual-check-hier" class="level3" data-number="8.1.5">
@@ -1656,26 +1685,27 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb21-419"><a href="#cb21-419" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-420"><a href="#cb21-420" aria-hidden="true" tabindex="-1"></a><span class="fu">map2</span>(partner_banks<span class="sc">$</span>Bank, partner_banks<span class="sc">$</span>Partner, plot_prediction, result, all_data) </span>
 <span id="cb21-421"><a href="#cb21-421" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb21-422"><a href="#cb21-422" aria-hidden="true" tabindex="-1"></a><span class="fu">## Abnormal Results</span></span>
-<span id="cb21-425"><a href="#cb21-425" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb21-426"><a href="#cb21-426" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb21-427"><a href="#cb21-427" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-abnormal-hier</span></span>
-<span id="cb21-428"><a href="#cb21-428" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: "Credit Card Plans-30-89 DAYS P/D %: Abnormal Returns (original scale)"</span></span>
-<span id="cb21-429"><a href="#cb21-429" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-subcap: </span></span>
-<span id="cb21-430"><a href="#cb21-430" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "Costco (Old) - AMERICAN EXPRESS NATIONAL BANK (1394676)"</span></span>
-<span id="cb21-431"><a href="#cb21-431" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "Costco (New) - CITIBANK, N.A. (476810)"</span></span>
-<span id="cb21-432"><a href="#cb21-432" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "Walmart (Old) - SYNCHRONY BANK (1216022)"</span></span>
-<span id="cb21-433"><a href="#cb21-433" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "Walmart (New) - CAPITAL ONE, NATIONAL ASSOCIATION (112837)"</span></span>
-<span id="cb21-434"><a href="#cb21-434" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "GAP (Old) - SYNCHRONY BANK (1216022)"</span></span>
-<span id="cb21-435"><a href="#cb21-435" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "GAP (New) - BARCLAYS BANK DELAWARE (2980209)"</span></span>
-<span id="cb21-436"><a href="#cb21-436" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"Costco"</span>, <span class="st">"AMERICAN EXPRESS NATIONAL BANK (1394676)"</span>)</span>
-<span id="cb21-437"><a href="#cb21-437" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"Costco"</span>, <span class="st">"CITIBANK, N.A. (476810)"</span>)</span>
-<span id="cb21-438"><a href="#cb21-438" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"Walmart"</span>, <span class="st">"SYNCHRONY BANK (1216022)"</span>)</span>
-<span id="cb21-439"><a href="#cb21-439" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"Walmart"</span>, <span class="st">"CAPITAL ONE, NATIONAL ASSOCIATION (112837)"</span>)</span>
-<span id="cb21-440"><a href="#cb21-440" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"GAP"</span>, <span class="st">"SYNCHRONY BANK (1216022)"</span>)</span>
-<span id="cb21-441"><a href="#cb21-441" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"GAP"</span>, <span class="st">"BARCLAYS BANK DELAWARE (2980209)"</span>)</span>
-<span id="cb21-442"><a href="#cb21-442" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-443"><a href="#cb21-443" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb21-422"><a href="#cb21-422" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-423"><a href="#cb21-423" aria-hidden="true" tabindex="-1"></a><span class="fu">## Abnormal Results</span></span>
+<span id="cb21-426"><a href="#cb21-426" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb21-427"><a href="#cb21-427" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb21-428"><a href="#cb21-428" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-abnormal-hier</span></span>
+<span id="cb21-429"><a href="#cb21-429" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: "Credit Card Plans-30-89 DAYS P/D %: Abnormal Returns (original scale)"</span></span>
+<span id="cb21-430"><a href="#cb21-430" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-subcap: </span></span>
+<span id="cb21-431"><a href="#cb21-431" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "Costco (Old) - AMERICAN EXPRESS NATIONAL BANK (1394676)"</span></span>
+<span id="cb21-432"><a href="#cb21-432" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "Costco (New) - CITIBANK, N.A. (476810)"</span></span>
+<span id="cb21-433"><a href="#cb21-433" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "Walmart (Old) - SYNCHRONY BANK (1216022)"</span></span>
+<span id="cb21-434"><a href="#cb21-434" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "Walmart (New) - CAPITAL ONE, NATIONAL ASSOCIATION (112837)"</span></span>
+<span id="cb21-435"><a href="#cb21-435" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "GAP (Old) - SYNCHRONY BANK (1216022)"</span></span>
+<span id="cb21-436"><a href="#cb21-436" aria-hidden="true" tabindex="-1"></a><span class="co">#| - "GAP (New) - BARCLAYS BANK DELAWARE (2980209)"</span></span>
+<span id="cb21-437"><a href="#cb21-437" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"Costco"</span>, <span class="st">"AMERICAN EXPRESS NATIONAL BANK (1394676)"</span>)</span>
+<span id="cb21-438"><a href="#cb21-438" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"Costco"</span>, <span class="st">"CITIBANK, N.A. (476810)"</span>)</span>
+<span id="cb21-439"><a href="#cb21-439" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"Walmart"</span>, <span class="st">"SYNCHRONY BANK (1216022)"</span>)</span>
+<span id="cb21-440"><a href="#cb21-440" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"Walmart"</span>, <span class="st">"CAPITAL ONE, NATIONAL ASSOCIATION (112837)"</span>)</span>
+<span id="cb21-441"><a href="#cb21-441" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"GAP"</span>, <span class="st">"SYNCHRONY BANK (1216022)"</span>)</span>
+<span id="cb21-442"><a href="#cb21-442" aria-hidden="true" tabindex="-1"></a><span class="fu">print_ar</span>(result, <span class="st">"GAP"</span>, <span class="st">"BARCLAYS BANK DELAWARE (2980209)"</span>)</span>
+<span id="cb21-443"><a href="#cb21-443" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-444"><a href="#cb21-444" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

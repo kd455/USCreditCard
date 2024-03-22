@@ -21,10 +21,11 @@ book:
         - model_hierarchy_event.qmd
         - model_ml.qmd
         - model_event_summary.qmd
-    - references.qmd   
     - part: "Hierarchical Study"
       chapters:
         - model_hierarchy.qmd
+        - model_hierarchy_extra.qmd
+    - references.qmd   
     - part: "Appendix"
       chapters:
         - data_banks.qmd
