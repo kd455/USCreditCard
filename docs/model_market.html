@@ -260,6 +260,12 @@ div.csl-indent {
  <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Hierarchical study</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model_hierarchy_extra.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Hierarchical study - extra</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item">
@@ -280,19 +286,19 @@ div.csl-indent {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./data_banks.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bank Peer Groups</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bank Peer Groups</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./data_final_event.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Event Study Dataset</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Event Study Dataset</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./data_final_hierarchy.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hierarchical Study Dataset</span></span></a>
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Hierarchical Study Dataset</span></span></a>
   </div>
 </li>
       </ul>
@@ -342,7 +348,7 @@ div.csl-indent {
 
 <section id="sec-model-market" class="level2" data-number="6.1">
 <h2 data-number="6.1" class="anchored" data-anchor-id="sec-model-market"><span class="header-section-number">6.1</span> Specification</h2>
-<p>To determine the normal return we can adopt the market model <span class="citation" data-cites="MacKinlay1997">(<a href="#ref-MacKinlay1997" role="doc-biblioref">MacKinlay 1997</a>)</span> <span class="math display">\[
+<p>To determine the normal return we can adopt the market model <span class="citation" data-cites="MacKinlay1997">(<a href="references.html#ref-MacKinlay1997" role="doc-biblioref">MacKinlay 1997</a>)</span> <span class="math display">\[
 D_{it} = \alpha_i + \beta_i D_{gt} + \epsilon_{it}
 \]</span></p>
 <p>And the AR is the Observed Return - Predicted Return <span class="math display">\[
@@ -374,9 +380,9 @@ AR_{it} = D_{it} – (\alpha_i + \beta_i D_{gt})
 </div>
 <section id="estimated-fit" class="level3" data-number="6.2.1">
 <h3 data-number="6.2.1" class="anchored" data-anchor-id="estimated-fit"><span class="header-section-number">6.2.1</span> Estimated Fit</h3>
-<p>As outlined in <a href="#sec-data-split"><span class="quarto-unresolved-ref">sec-data-split</span></a>, we have split our data into estimation and observation periods. For firms that do not have partnership events, the full data series is used in the estimation period. For firms with partnership events the estimation period is up to the quarter before each event.</p>
+<p>As outlined in <a href="model_event.html#sec-data-split"><span>Section&nbsp;5.1</span></a>, we have split our data into estimation and observation periods. For firms that do not have partnership events, the full data series is used in the estimation period. For firms with partnership events the estimation period is up to the quarter before each event.</p>
 <p>If the market model demonstrates a robust fit with the estimation data, this instils confidence in our ability to forecast the “normal” return using the unseen data from the observation period.</p>
-<p><a href="#fig-plot-fit">Figure&nbsp;<span class="quarto-unresolved-ref">fig-plot-fit</span></a> displays fitted vs actual results for a sub-set of firms. The Intercept and Coefficient is displayed in <a href="#tbl-coef-market">Table&nbsp;<span class="quarto-unresolved-ref">tbl-coef-market</span></a>. The model is</p>
+<p><a href="#fig-plot-fit">Figure&nbsp;<span>6.1</span></a> displays fitted vs actual results for a sub-set of firms. The Intercept and Coefficient is displayed in <a href="#tbl-coef-market">Table&nbsp;<span>6.2</span></a>. The model is</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -410,7 +416,7 @@ AR_{it} = D_{it} – (\alpha_i + \beta_i D_{gt})
 </div>
 </div>
 </div>
-<p>In <a href="#tbl-coef-market">Table&nbsp;<span class="quarto-unresolved-ref">tbl-coef-market</span></a> we can see the standard error of <em>UBPRE524.group.log.diff</em> is small relative to its estimate indicating a precise estimate. A small p-value (typically &lt;0.05) suggests strong evidence against the null hypothesis, indicating that <em>UBPRE524.group.log.diff</em> is statistically significant.</p>
+<p>In <a href="#tbl-coef-market">Table&nbsp;<span>6.2</span></a> we can see the standard error of <em>UBPRE524.group.log.diff</em> is small relative to its estimate indicating a precise estimate. A small p-value (typically &lt;0.05) suggests strong evidence against the null hypothesis, indicating that <em>UBPRE524.group.log.diff</em> is statistically significant.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -433,7 +439,7 @@ AR_{it} = D_{it} – (\alpha_i + \beta_i D_{gt})
 </section>
 <section id="sec-residual-check" class="level3" data-number="6.2.2">
 <h3 data-number="6.2.2" class="anchored" data-anchor-id="sec-residual-check"><span class="header-section-number">6.2.2</span> Residual diagnostics</h3>
-<p>Residuals should have the following properties <span class="citation" data-cites="Hyndman2021">(<a href="#ref-Hyndman2021" role="doc-biblioref">Hyndman and Athanasopoulos 2021</a>, ch.&nbsp;5.4)</span>. Residuals:</p>
+<p>Residuals should have the following properties <span class="citation" data-cites="Hyndman2021">(<a href="references.html#ref-Hyndman2021" role="doc-biblioref">Hyndman and Athanasopoulos 2021</a>, ch.&nbsp;5.4)</span>. Residuals:</p>
 <ul>
 <li>Are uncorrelated. Correlations indicate that the model is missing information left in the residuals.</li>
 <li>Have zero mean. If they have a mean other than zero, then the forecasts are biased.</li>
@@ -578,8 +584,8 @@ AR_{it} = D_{it} – (\alpha_i + \beta_i D_{gt})
 </section>
 <section id="residuals-white-noise" class="level3" data-number="6.2.3">
 <h3 data-number="6.2.3" class="anchored" data-anchor-id="residuals-white-noise"><span class="header-section-number">6.2.3</span> Residuals White Noise</h3>
-<p>The sub-set of banks analysed in <a href="#sec-residual-check"><span class="quarto-unresolved-ref">sec-residual-check</span></a> did not exhibit significant autocorrelation.</p>
-<p><a href="#tbl-lb-market">Table&nbsp;<span class="quarto-unresolved-ref">tbl-lb-market</span></a> lists banks where we reject the null hypothesis of the Ljung–Box test, indicating the presence of significant autocorrelation in the residuals.</p>
+<p>The sub-set of banks analysed in <a href="#sec-residual-check"><span>Section&nbsp;6.2.2</span></a> did not exhibit significant autocorrelation.</p>
+<p><a href="#tbl-lb-market">Table&nbsp;<span>6.3</span></a> lists banks where we reject the null hypothesis of the Ljung–Box test, indicating the presence of significant autocorrelation in the residuals.</p>
 <p>Banks not listed have residuals that are indistinguishable from a white noise series i.e.&nbsp;have uncorrelated observations and with constant variance.</p>
 <div class="cell">
 <details>
@@ -605,7 +611,7 @@ AR_{it} = D_{it} – (\alpha_i + \beta_i D_{gt})
 <section id="time-series-cross-validation" class="level2" data-number="6.3">
 <h2 data-number="6.3" class="anchored" data-anchor-id="time-series-cross-validation"><span class="header-section-number">6.3</span> Time Series Cross-Validation</h2>
 <p>One approach to evaluate the predictive performance of our model is to use One-step ahead cross-validation, also known as walk-forward validation, which is specifically designed for time series. This approach involves progressively moving forward in time, making predictions one step ahead. To quantify the accuracy of predictions made during this process, the Root Mean Square Error (RMSE) and Mean Absolute Error (MAE) is commonly used. RMSE measures the average magnitude of the errors between the predicted and actual values, giving more weight to larger errors due to its squaring component. MAE is the average of the absolute differences between the predicted values and actual values so is not as sensitive to outliers.</p>
-<p>The results <a href="#tbl-market-cv">Table&nbsp;<span class="quarto-unresolved-ref">tbl-market-cv</span></a> show that the RMSE and MAE of the cross-validated models (CV) closely matches the RMSE and MAE observed in the initial model evaluation (Training). This indicates that the model is generalising well to unseen data and not overfitting.</p>
+<p>The results <a href="#tbl-market-cv">Table&nbsp;<span>6.4</span></a> show that the RMSE and MAE of the cross-validated models (CV) closely matches the RMSE and MAE observed in the initial model evaluation (Training). This indicates that the model is generalising well to unseen data and not overfitting.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -820,7 +826,7 @@ banks</p> </div>
 
 <!-- -->
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
 <div id="ref-Hyndman2021" class="csl-entry" role="listitem">
 Hyndman, Rob J., and George Athanasopoulos. 2021. <em>Forecasting: Principles and Practice</em>. OTexts. <a href="https://otexts.com/fpp3/">https://otexts.com/fpp3/</a>.
 </div>

@@ -298,16 +298,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#fixed-effects" id="toc-fixed-effects" class="nav-link" data-scroll-target="#fixed-effects"><span class="header-section-number">11.0.2</span> Fixed Effects</a></li>
   <li><a href="#random-effects" id="toc-random-effects" class="nav-link" data-scroll-target="#random-effects"><span class="header-section-number">11.0.3</span> Random Effects</a></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">11.0.4</span> Conclusion</a></li>
-  <li><a href="#effect-of-bank-type" id="toc-effect-of-bank-type" class="nav-link" data-scroll-target="#effect-of-bank-type"><span class="header-section-number">11.1</span> Effect of Bank Type</a>
-  <ul class="collapse">
-  <li><a href="#fixed-effects-1" id="toc-fixed-effects-1" class="nav-link" data-scroll-target="#fixed-effects-1"><span class="header-section-number">11.1.1</span> Fixed Effects</a></li>
-  <li><a href="#random-effects-1" id="toc-random-effects-1" class="nav-link" data-scroll-target="#random-effects-1"><span class="header-section-number">11.1.2</span> Random Effects</a></li>
-  </ul></li>
-  <li><a href="#naics2" id="toc-naics2" class="nav-link" data-scroll-target="#naics2"><span class="header-section-number">11.2</span> NAICS2</a>
-  <ul class="collapse">
-  <li><a href="#fixed-effects-2" id="toc-fixed-effects-2" class="nav-link" data-scroll-target="#fixed-effects-2"><span class="header-section-number">11.2.1</span> Fixed Effects</a></li>
-  <li><a href="#random-effects-2" id="toc-random-effects-2" class="nav-link" data-scroll-target="#random-effects-2"><span class="header-section-number">11.2.2</span> Random Effects</a></li>
-  </ul></li>
   </ul>
 </nav>
     </div>
@@ -547,326 +537,10 @@ between model complexity (number of parameters) and goodness of fit</p> </div>
 <section id="conclusion" class="level3" data-number="11.0.4">
 <h3 data-number="11.0.4" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">11.0.4</span> Conclusion</h3>
 <p>We did not find conclusive evidence that partnerships directly impact credit card delinquency.</p>
-</section>
-<section id="effect-of-bank-type" class="level2" data-number="11.1">
-<h2 data-number="11.1" class="anchored" data-anchor-id="effect-of-bank-type"><span class="header-section-number">11.1</span> Effect of Bank Type</h2>
-<div class="cell">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>m_bt1 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(UBPRE524.diff <span class="sc">~</span> BankType <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> Qtr<span class="sc">+</span> UBPRB538.log.diff <span class="sc">+</span> UBPR3815.log.diff <span class="sc">|</span> BankType<span class="sc">/</span>BankName) <span class="sc">+</span> TDSP.log.diff <span class="sc">+</span> RRSFS.Pop.log.diff <span class="sc">+</span> UNRATE.log.diff <span class="sc">+</span> UNRATE.log.diff.lag1, <span class="at">data =</span> hier_data, <span class="at">REML =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>m_bt2 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(UBPRE524.diff <span class="sc">~</span> UBPRE425.log.diff <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> Qtr<span class="sc">+</span> UBPRE425.log.diff <span class="sc">+</span> UBPRB538.log.diff <span class="sc">+</span> UBPR3815.log.diff <span class="sc">|</span> BankName) <span class="sc">+</span> TDSP.log.diff <span class="sc">+</span> RRSFS.Pop.log.diff <span class="sc">+</span> UNRATE.log.diff <span class="sc">+</span> UNRATE.log.diff.lag1, <span class="at">data =</span> hier_data, <span class="at">REML =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<div class="cell">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>model_compare <span class="ot">&lt;-</span> <span class="fu">model.sel</span>( m_bt1,m_bt2, <span class="at">rank =</span> <span class="st">"AICc"</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>model_compare <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"Model"</span>)<span class="sc">|&gt;</span> </span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">2</span>))) <span class="sc">|&gt;</span> </span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">relocate</span>(df<span class="sc">:</span>weight, <span class="at">.after =</span> Model) <span class="sc">|&gt;</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>            dplyr<span class="sc">::</span><span class="fu">select</span>(Model, df, logLik, AICc, delta, weight) <span class="sc">|&gt;</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div id="tbl-hier-aicc-bt" class="anchored">
-
-<div data-pagedtable="false"> <div class="table-caption">Table&nbsp;11.4:  <p>AICc Summary. The lower the AICc value, the better the balance
-between model complexity (number of parameters) and goodness of fit</p> </div>
-  <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["Model"],"name":[1],"type":["chr"],"align":["left"]},{"label":["df"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["logLik"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["AICc"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["delta"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["weight"],"name":[6],"type":["mdl.wght"],"align":["right"]}],"data":[{"1":"m_bt2","2":"35","3":"627.57","4":"-1183.60","5":"0.00","6":"1"},{"1":"m_bt1","2":"49","3":"603.10","4":"-1105.17","5":"78.43","6":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-</div>
-</div>
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>top_bt <span class="ot">=</span> top_model <span class="ot">&lt;-</span> <span class="fu">lmer</span>(<span class="fu">formula</span>(m_bt2), <span class="at">data =</span> hier_data, <span class="at">REML =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>result_bt <span class="ot">&lt;-</span> <span class="fu">generate_fixed_random_plts</span>(top_bt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<section id="fixed-effects-1" class="level3" data-number="11.1.1">
-<h3 data-number="11.1.1" class="anchored" data-anchor-id="fixed-effects-1"><span class="header-section-number">11.1.1</span> Fixed Effects</h3>
-<div class="tabset-margin-container"></div><div id="panel-random-effects" class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">Plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Coefficients and Correlation Data</a></li></ul>
-<div id="panel-random-effects" class="tab-content">
-<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
-<div class="cell">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>result_bt<span class="sc">$</span>FE</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div id="fig-coef-hier-bt" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="model_hierarchy_files/figure-html/fig-coef-hier-bt-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Figure&nbsp;11.3: Plot of simulated fixed effects</figcaption>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
-<div>
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(top_bt, <span class="at">effects =</span> <span class="st">"fixed"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">2</span>))) <span class="sc">|&gt;</span>  </span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>effect) <span class="sc">|&gt;</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>() </span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cov2cor</span>(<span class="fu">vcov</span>(top_bt)) <span class="sc">|&gt;</span> <span class="fu">as.matrix</span>() <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">2</span>))) <span class="sc">|&gt;</span>  </span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div id="tbl-coef-hier-bt" class="cell tbl-parent quarto-layout-panel anchored">
-<div class="panel-caption table-caption">
-<p>Table&nbsp;11.5: Coefficients and Correlation of Fixed Effects</p>
-</div>
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div id="tbl-coef-hier-bt-1" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-coef-hier-bt" style="flex-basis: 100.0%;justify-content: center;">
-<div id="tbl-coef-hier-bt-1" data-ref-parent="tbl-coef-hier-bt" class="anchored">
-
-<div data-pagedtable="false"> <div class="table-caption">(a) <p>Coefficients</p> </div>
-  <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["term"],"name":[1],"type":["chr"],"align":["left"]},{"label":["estimate"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["std.error"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["statistic"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"(Intercept)","2":"0.01","3":"0.00","4":"1.20"},{"1":"UBPRE425.log.diff","2":"0.65","3":"0.13","4":"4.84"},{"1":"TDSP.log.diff","2":"0.64","3":"0.16","4":"3.90"},{"1":"RRSFS.Pop.log.diff","2":"-3.30","3":"0.29","4":"-11.22"},{"1":"UNRATE.log.diff","2":"-0.46","3":"0.03","4":"-13.78"},{"1":"UNRATE.log.diff.lag1","2":"0.08","3":"0.03","4":"2.65"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-</div>
-<p><strong>?(caption)</strong></p>
-</div>
-</div>
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div id="tbl-coef-hier-bt-2" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-coef-hier-bt" style="flex-basis: 100.0%;justify-content: center;">
-<div id="tbl-coef-hier-bt-2" data-ref-parent="tbl-coef-hier-bt" class="anchored">
-
-<div data-pagedtable="false"> <div class="table-caption">(b) <p>Correlation of Fixed Effects</p> </div>
-  <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["(Intercept)"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["UBPRE425.log.diff"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["TDSP.log.diff"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["RRSFS.Pop.log.diff"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["UNRATE.log.diff"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["UNRATE.log.diff.lag1"],"name":[6],"type":["dbl"],"align":["right"]}],"data":[{"1":"1.00","2":"-0.08","3":"0.12","4":"-0.23","5":"-0.04","6":"0.17","_rn_":"(Intercept)"},{"1":"-0.08","2":"1.00","3":"-0.03","4":"0.13","5":"0.10","6":"-0.14","_rn_":"UBPRE425.log.diff"},{"1":"0.12","2":"-0.03","3":"1.00","4":"0.17","5":"0.49","6":"-0.17","_rn_":"TDSP.log.diff"},{"1":"-0.23","2":"0.13","3":"0.17","4":"1.00","5":"0.69","6":"-0.69","_rn_":"RRSFS.Pop.log.diff"},{"1":"-0.04","2":"0.10","3":"0.49","4":"0.69","5":"1.00","6":"-0.44","_rn_":"UNRATE.log.diff"},{"1":"0.17","2":"-0.14","3":"-0.17","4":"-0.69","5":"-0.44","6":"1.00","_rn_":"UNRATE.log.diff.lag1"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-</div>
-<p><strong>?(caption)</strong></p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="random-effects-1" class="level3" data-number="11.1.2">
-<h3 data-number="11.1.2" class="anchored" data-anchor-id="random-effects-1"><span class="header-section-number">11.1.2</span> Random Effects</h3>
-<div class="tabset-margin-container"></div><div id="sec-random-effects" class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">Plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">Data</a></li></ul>
-<div id="sec-random-effects" class="tab-content">
-<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
-<div class="cell">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>result_bt<span class="sc">$</span>RE </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div id="fig-random-effect-bt" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="model_hierarchy_files/figure-html/fig-random-effect-bt-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Figure&nbsp;11.4: Random Effects</figcaption>
-</figure>
-</div>
-</div>
-</div>
-<p>The red line indicates no effect (zero), and the dots represent the random effect estimates with their confidence intervals. Points that are distinguishable from zero (i.e.&nbsp;the confidence band does not cross the red line) are highlighted as black dots, whereas the grey dots are where the confidence band cross the red line.</p>
-</div>
-<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
-<div>
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ranef</span>(top_bt, <span class="at">condVar =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>BankName <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"Entity"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">grepl</span>(<span class="st">"None"</span>, Entity)) <span class="sc">|&gt;</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">2</span>))) <span class="sc">|&gt;</span>  </span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>        rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div id="tbl-coef-hier-bt-random" class="cell tbl-parent quarto-layout-panel anchored">
-<div class="panel-caption table-caption">
-<p>Table&nbsp;11.6: Intercept and coefficients</p>
-</div>
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div id="tbl-coef-hier-bt-random-1" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-coef-hier-bt-random" style="flex-basis: 100.0%;justify-content: center;">
-<div id="tbl-coef-hier-bt-random-1" data-ref-parent="tbl-coef-hier-bt-random" class="anchored">
-
-<div data-pagedtable="false"> <div class="table-caption">(a) <p>Random Effects for BankName</p> </div>
-  <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["Entity"],"name":[1],"type":["chr"],"align":["left"]},{"label":["(Intercept)"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Qtr2"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Qtr3"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Qtr4"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["UBPRE425.log.diff"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["UBPRB538.log.diff"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["UBPR3815.log.diff"],"name":[8],"type":["dbl"],"align":["right"]}],"data":[{"1":"AMERICAN EXPRESS NATIONAL BANK (1394676)","2":"-0.02","3":"0.01","4":"0.05","5":"0.01","6":"-0.46","7":"-0.30","8":"-0.01"},{"1":"BANK OF AMERICA, NATIONAL ASSOCIATION (480228)","2":"-0.06","3":"0.06","4":"0.09","5":"0.07","6":"-0.40","7":"-0.67","8":"0.34"},{"1":"BARCLAYS BANK DELAWARE (2980209)","2":"-0.11","3":"0.08","4":"0.23","5":"0.07","6":"-1.09","7":"-0.45","8":"0.17"},{"1":"BMO HARRIS BANK NATIONAL ASSOCIATION (75633)","2":"-0.13","3":"0.17","4":"0.10","5":"0.17","6":"1.01","7":"-1.84","8":"1.57"},{"1":"CAPITAL ONE, NATIONAL ASSOCIATION (112837)","2":"0.15","3":"-0.11","4":"0.02","5":"-0.47","6":"-0.73","7":"1.71","8":"-2.21"},{"1":"CITIBANK, N.A. (476810)","2":"-0.05","3":"0.03","4":"0.12","5":"0.03","6":"-0.77","7":"-0.63","8":"0.09"},{"1":"CITIZENS BANK, NATIONAL ASSOCIATION (3303298)","2":"-0.04","3":"0.04","4":"0.08","5":"0.00","6":"-0.26","7":"0.27","8":"-0.08"},{"1":"COMENITY BANK (1391778)","2":"-0.18","3":"0.35","4":"0.41","5":"-0.10","6":"-0.54","7":"0.29","8":"-0.04"},{"1":"COMENITY CAPITAL BANK (3224580)","2":"-0.12","3":"0.23","4":"0.27","5":"-0.11","6":"0.19","7":"0.99","8":"-0.22"},{"1":"DISCOVER BANK (30810)","2":"-0.05","3":"0.02","4":"0.09","5":"0.02","6":"-0.26","7":"0.44","8":"-0.07"},{"1":"FIFTH THIRD BANK, NATIONAL ASSOCIATION (723112)","2":"-0.05","3":"0.03","4":"0.12","5":"0.00","6":"-0.44","7":"0.68","8":"-0.22"},{"1":"FIRST-CITIZENS BANK & TRUST COMPANY (491224)","2":"-0.06","3":"0.03","4":"0.10","5":"0.08","6":"-0.55","7":"-0.92","8":"0.38"},{"1":"GOLDMAN SACHS BANK USA (2182786)","2":"-0.04","3":"0.12","4":"0.06","5":"0.01","6":"0.09","7":"-0.02","8":"0.20"},{"1":"HSBC BANK USA, NATIONAL ASSOCIATION (413208)","2":"-0.03","3":"-0.05","4":"0.08","5":"0.00","6":"-0.59","7":"-0.07","8":"-0.16"},{"1":"HUNTINGTON NATIONAL BANK, THE (12311)","2":"0.02","3":"-0.06","4":"0.03","5":"-0.07","6":"-0.66","7":"1.19","8":"-0.78"},{"1":"JPMORGAN CHASE BANK, NATIONAL ASSOCIATION (852218)","2":"-0.06","3":"0.06","4":"0.11","5":"0.03","6":"-0.65","7":"-0.64","8":"0.17"},{"1":"KEYBANK NATIONAL ASSOCIATION (280110)","2":"-0.13","3":"0.08","4":"0.15","5":"0.21","6":"-0.37","7":"-0.54","8":"0.80"},{"1":"MANUFACTURERS AND TRADERS TRUST COMPANY (501105)","2":"-0.09","3":"0.11","4":"0.17","5":"0.04","6":"-0.56","7":"0.00","8":"0.11"},{"1":"MERRICK BANK CORPORATION (2615190)","2":"-0.45","3":"0.40","4":"0.73","5":"0.28","6":"-0.98","7":"3.91","8":"0.17"},{"1":"PNC BANK, NATIONAL ASSOCIATION (817824)","2":"-0.18","3":"0.16","4":"0.23","5":"0.22","6":"-0.52","7":"-0.57","8":"0.92"},{"1":"REGIONS BANK (233031)","2":"-0.08","3":"0.04","4":"0.18","5":"0.03","6":"-0.98","7":"0.47","8":"-0.24"},{"1":"SANTANDER BANK, NATIONAL ASSOCIATION (722777)","2":"-0.24","3":"0.38","4":"0.20","5":"0.34","6":"0.88","7":"-4.43","8":"2.96"},{"1":"SYNCHRONY BANK (1216022)","2":"-0.07","3":"0.06","4":"0.24","5":"-0.12","6":"-0.87","7":"1.81","8":"-0.98"},{"1":"TD BANK, N.A. (497404)","2":"-0.03","3":"0.00","4":"0.13","5":"-0.05","6":"-1.06","7":"0.51","8":"-0.57"},{"1":"TRUIST BANK (852320)","2":"-0.17","3":"0.15","4":"0.27","5":"0.22","6":"-1.79","7":"-1.13","8":"0.65"},{"1":"U.S. BANK NATIONAL ASSOCIATION (504713)","2":"-0.06","3":"0.03","4":"0.13","5":"0.03","6":"-0.81","7":"-0.19","8":"-0.02"},{"1":"UBS BANK USA (3212149)","2":"-0.04","3":"0.00","4":"0.13","5":"-0.01","6":"-1.32","7":"-0.37","8":"-0.28"},{"1":"WELLS FARGO BANK, NATIONAL ASSOCIATION (451965)","2":"-0.13","3":"0.10","4":"0.19","5":"0.09","6":"-0.08","7":"0.23","8":"0.39"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-</div>
-<p><strong>?(caption)</strong></p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-</section>
-<section id="naics2" class="level2" data-number="11.2">
-<h2 data-number="11.2" class="anchored" data-anchor-id="naics2"><span class="header-section-number">11.2</span> NAICS2</h2>
-<p>Going back to our initial <strong>Hypotheses 2</strong>: The sector e.g., retail, energy, airline, of a partnership card is a determinant of the partnership quality.</p>
-<p>We can see if there is an effect based on the sector. We use the grouping 45,46, 33 with reference point 0 (no partner). This is the first 2 numbers of NAICS classification (see <span class="citation" data-cites="naics-partner">(<a href="references.html#ref-naics-partner" role="doc-biblioref"><strong>naics-partner?</strong></a>)</span>).</p>
-<div class="cell">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_csv</span>(<span class="st">"data/Partner_NAICS.csv"</span>,<span class="at">show_col_types =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span> <span class="fu">relocate</span>(Level2, <span class="at">.after =</span> <span class="st">"Partner"</span>) <span class="sc">|&gt;</span> rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-
-<div data-pagedtable="false"> <div class="table-caption"><p>naics-partner</p></div>
-  <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["Partner"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Level2"],"name":[2],"type":["chr"],"align":["left"]},{"label":["NAICS"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Level6"],"name":[4],"type":["chr"],"align":["left"]},{"label":["Level5"],"name":[5],"type":["chr"],"align":["left"]},{"label":["Level3"],"name":[6],"type":["chr"],"align":["left"]}],"data":[{"1":"Costco","2":"Retail Trade","3":"455211","4":"Warehouse Clubs and Supercenters","5":"Department Stores","6":"General Merchandise Retailers"},{"1":"Walmart","2":"Retail Trade","3":"455110","4":"Department Stores","5":"Department Stores","6":"General Merchandise Retailers"},{"1":"GAP","2":"Retail Trade","3":"458110","4":"Clothing and Clothing Accessories Retailers","5":"Clothing and Clothing Accessories Retailers","6":"Clothing, Clothing Accessories, Shoe, and Jewelry Retailers"},{"1":"GM","2":"Computer and Electronic Product Manufacturing","3":"336390","4":"Other Motor Vehicle Parts Manufacturing","5":"Other Motor Vehicle Parts Manufacturing","6":"Transportation Equipment Manufacturing"},{"1":"Apple","2":"Computer and Electronic Product Manufacturing","3":"334111","4":"Electronic Computer Manufacturing","5":"Computer and Peripheral Equipment Manufacturing","6":"Computer and Electronic Product Manufacturing"},{"1":"Wayfair","2":"Retail Trade","3":"459999","4":"All Other Miscellaneous Retailers","5":"All Other Miscellaneous Retailers","6":"Sporting Goods, Hobby, Musical Instrument, Book, and Miscellaneous Retailers"},{"1":"BestBuy","2":"Electronics and Appliance Retailers","3":"449210","4":"Electronics and Appliance Retailers","5":"Electronics and Appliance Retailers","6":"Electronics and Appliance Retailers"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-</div>
-</div>
-<div class="cell">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>m_naics <span class="ot">&lt;-</span> <span class="fu">lmer</span>(UBPRE524.diff <span class="sc">~</span> NAICS2 <span class="sc">+</span> UBPRE425.log.diff <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> NAICS2 <span class="sc">+</span> Qtr<span class="sc">+</span> UBPRE425.log.diff <span class="sc">+</span> UBPRB538.log.diff <span class="sc">+</span> UBPR3815.log.diff <span class="sc">|</span> BankName) <span class="sc">+</span> TDSP.log.diff <span class="sc">+</span> RRSFS.Pop.log.diff <span class="sc">+</span> UNRATE.log.diff <span class="sc">+</span> UNRATE.log.diff.lag1, <span class="at">data =</span> hier_data, <span class="at">REML =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co">#summary(m_naics)</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co">#coef(m_naics)</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>result_naics <span class="ot">&lt;-</span> <span class="fu">generate_fixed_random_plts</span>(m_naics)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<section id="fixed-effects-2" class="level3" data-number="11.2.1">
-<h3 data-number="11.2.1" class="anchored" data-anchor-id="fixed-effects-2"><span class="header-section-number">11.2.1</span> Fixed Effects</h3>
-<div class="tabset-margin-container"></div><div id="panel-random-effects" class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true">Plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false">Coefficients and Correlation Data</a></li></ul>
-<div id="panel-random-effects" class="tab-content">
-<div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
-<div class="cell">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>result_naics<span class="sc">$</span>FE</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div id="fig-coef-hier-naics" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="model_hierarchy_files/figure-html/fig-coef-hier-naics-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Figure&nbsp;11.5: Plot of simulated fixed effects</figcaption>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
-<div>
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(m_naics, <span class="at">effects =</span> <span class="st">"fixed"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">2</span>))) <span class="sc">|&gt;</span>  </span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>effect) <span class="sc">|&gt;</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>() </span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cov2cor</span>(<span class="fu">vcov</span>(m_naics)) <span class="sc">|&gt;</span> <span class="fu">as.matrix</span>() <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">2</span>))) <span class="sc">|&gt;</span>  </span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div id="tbl-coef-hier-naics" class="cell tbl-parent quarto-layout-panel anchored">
-<div class="panel-caption table-caption">
-<p>Table&nbsp;11.7: Coefficients and Correlation of Fixed Effects</p>
-</div>
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div id="tbl-coef-hier-naics-1" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-coef-hier-naics" style="flex-basis: 100.0%;justify-content: center;">
-<div id="tbl-coef-hier-naics-1" data-ref-parent="tbl-coef-hier-naics" class="anchored">
-
-<div data-pagedtable="false"> <div class="table-caption">(a) <p>Coefficients</p> </div>
-  <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["term"],"name":[1],"type":["chr"],"align":["left"]},{"label":["estimate"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["std.error"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["statistic"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"(Intercept)","2":"0.00","3":"0.01","4":"-0.71"},{"1":"NAICS233","2":"0.08","3":"0.02","4":"3.94"},{"1":"NAICS244","2":"-0.02","3":"0.02","4":"-1.42"},{"1":"NAICS245","2":"0.00","3":"0.01","4":"-0.40"},{"1":"UBPRE425.log.diff","2":"0.19","3":"0.14","4":"1.33"},{"1":"TDSP.log.diff","2":"0.64","3":"0.16","4":"3.95"},{"1":"RRSFS.Pop.log.diff","2":"-3.31","3":"0.29","4":"-11.28"},{"1":"UNRATE.log.diff","2":"-0.46","3":"0.03","4":"-13.73"},{"1":"UNRATE.log.diff.lag1","2":"0.08","3":"0.03","4":"2.70"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-</div>
-<p><strong>?(caption)</strong></p>
-</div>
-</div>
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div id="tbl-coef-hier-naics-2" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-coef-hier-naics" style="flex-basis: 100.0%;justify-content: center;">
-<div id="tbl-coef-hier-naics-2" data-ref-parent="tbl-coef-hier-naics" class="anchored">
-
-<div data-pagedtable="false"> <div class="table-caption">(b) <p>Correlation of Fixed Effects</p> </div>
-  <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["(Intercept)"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["NAICS233"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["NAICS244"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["NAICS245"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["UBPRE425.log.diff"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["TDSP.log.diff"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["RRSFS.Pop.log.diff"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["UNRATE.log.diff"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["UNRATE.log.diff.lag1"],"name":[9],"type":["dbl"],"align":["right"]}],"data":[{"1":"1.00","2":"-0.23","3":"-0.27","4":"-0.46","5":"-0.08","6":"0.08","7":"-0.24","8":"-0.06","9":"0.21","_rn_":"(Intercept)"},{"1":"-0.23","2":"1.00","3":"0.07","4":"0.11","5":"-0.07","6":"0.02","7":"0.05","8":"0.07","9":"-0.07","_rn_":"NAICS233"},{"1":"-0.27","2":"0.07","3":"1.00","4":"0.16","5":"-0.02","6":"0.00","7":"-0.01","8":"-0.01","9":"0.01","_rn_":"NAICS244"},{"1":"-0.46","2":"0.11","3":"0.16","4":"1.00","5":"0.11","6":"-0.01","7":"0.01","8":"0.00","9":"-0.01","_rn_":"NAICS245"},{"1":"-0.08","2":"-0.07","3":"-0.02","4":"0.11","5":"1.00","6":"-0.06","7":"0.09","8":"0.06","9":"-0.07","_rn_":"UBPRE425.log.diff"},{"1":"0.08","2":"0.02","3":"0.00","4":"-0.01","5":"-0.06","6":"1.00","7":"0.18","8":"0.49","9":"-0.17","_rn_":"TDSP.log.diff"},{"1":"-0.24","2":"0.05","3":"-0.01","4":"0.01","5":"0.09","6":"0.18","7":"1.00","8":"0.69","9":"-0.69","_rn_":"RRSFS.Pop.log.diff"},{"1":"-0.06","2":"0.07","3":"-0.01","4":"0.00","5":"0.06","6":"0.49","7":"0.69","8":"1.00","9":"-0.44","_rn_":"UNRATE.log.diff"},{"1":"0.21","2":"-0.07","3":"0.01","4":"-0.01","5":"-0.07","6":"-0.17","7":"-0.69","8":"-0.44","9":"1.00","_rn_":"UNRATE.log.diff.lag1"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-</div>
-<p><strong>?(caption)</strong></p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="random-effects-2" class="level3" data-number="11.2.2">
-<h3 data-number="11.2.2" class="anchored" data-anchor-id="random-effects-2"><span class="header-section-number">11.2.2</span> Random Effects</h3>
-<div class="tabset-margin-container"></div><div id="sec-random-effects" class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true">Plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false">Data</a></li></ul>
-<div id="sec-random-effects" class="tab-content">
-<div id="tabset-6-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-6-1-tab">
-<div class="cell">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>result_naics<span class="sc">$</span>RE </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div id="fig-random-effect-naics" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="model_hierarchy_files/figure-html/fig-random-effect-naics-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Figure&nbsp;11.6: Random Effects</figcaption>
-</figure>
-</div>
-</div>
-</div>
-<p>The red line indicates no effect (zero), and the dots represent the random effect estimates with their confidence intervals. Points that are distinguishable from zero (i.e.&nbsp;the confidence band does not cross the red line) are highlighted as black dots, whereas the grey dots are where the confidence band cross the red line.</p>
-</div>
-<div id="tabset-6-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-2-tab">
-<div>
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ranef</span>(m_naics, <span class="at">condVar =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>BankName <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"Entity"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">grepl</span>(<span class="st">"None"</span>, Entity)) <span class="sc">|&gt;</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">2</span>))) <span class="sc">|&gt;</span>  </span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>        rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div id="tbl-coef-hier-naics-random" class="cell tbl-parent quarto-layout-panel anchored">
-<div class="panel-caption table-caption">
-<p>Table&nbsp;11.8: Intercept and coefficients</p>
-</div>
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div id="tbl-coef-hier-naics-random-1" class="quarto-layout-cell quarto-layout-cell-subref anchored" data-ref-parent="tbl-coef-hier-naics-random" style="flex-basis: 100.0%;justify-content: center;">
-<div id="tbl-coef-hier-naics-random-1" data-ref-parent="tbl-coef-hier-naics-random" class="anchored">
-
-<div data-pagedtable="false"> <div class="table-caption">(a) <p>Random Effects for BankName</p> </div>
-  <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["Entity"],"name":[1],"type":["chr"],"align":["left"]},{"label":["(Intercept)"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["NAICS233"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["NAICS244"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["NAICS245"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["Qtr2"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["Qtr3"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["Qtr4"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["UBPRE425.log.diff"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["UBPRB538.log.diff"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["UBPR3815.log.diff"],"name":[11],"type":["dbl"],"align":["right"]}],"data":[{"1":"AMERICAN EXPRESS NATIONAL BANK (1394676)","2":"-0.01","3":"-0.02","4":"0.00","5":"0.00","6":"0.01","7":"0.04","8":"0.00","9":"0.00","10":"-0.28","11":"0.00"},{"1":"BANK OF AMERICA, NATIONAL ASSOCIATION (480228)","2":"-0.05","3":"-0.02","4":"0.00","5":"0.00","6":"0.06","7":"0.10","8":"0.07","9":"0.04","10":"-0.81","11":"0.37"},{"1":"BARCLAYS BANK DELAWARE (2980209)","2":"-0.10","3":"-0.08","4":"0.01","5":"0.00","6":"0.08","7":"0.23","8":"0.07","9":"-0.19","10":"-0.49","11":"0.20"},{"1":"BMO HARRIS BANK NATIONAL ASSOCIATION (75633)","2":"-0.13","3":"0.00","4":"0.00","5":"0.03","6":"0.16","7":"0.14","8":"0.18","9":"1.63","10":"-1.88","11":"1.50"},{"1":"CAPITAL ONE, NATIONAL ASSOCIATION (112837)","2":"0.17","3":"-0.09","4":"0.01","5":"-0.01","6":"-0.11","7":"0.02","8":"-0.46","9":"-0.27","10":"1.70","11":"-2.20"},{"1":"CITIBANK, N.A. (476810)","2":"-0.02","3":"-0.04","4":"0.00","5":"-0.01","6":"0.02","7":"0.10","8":"0.01","9":"-0.32","10":"-0.47","11":"-0.04"},{"1":"CITIZENS BANK, NATIONAL ASSOCIATION (3303298)","2":"-0.04","3":"-0.02","4":"0.00","5":"0.00","6":"0.04","7":"0.08","8":"0.01","9":"-0.06","10":"0.26","11":"0.00"},{"1":"COMENITY BANK (1391778)","2":"-0.17","3":"-0.06","4":"0.01","5":"0.00","6":"0.34","7":"0.42","8":"-0.10","9":"-0.02","10":"0.29","11":"-0.04"},{"1":"COMENITY CAPITAL BANK (3224580)","2":"-0.11","3":"-0.04","4":"0.00","5":"0.01","6":"0.22","7":"0.27","8":"-0.12","9":"0.43","10":"0.99","11":"-0.19"},{"1":"DISCOVER BANK (30810)","2":"-0.04","3":"-0.04","4":"0.00","5":"0.00","6":"0.01","7":"0.09","8":"0.02","9":"-0.14","10":"0.43","11":"-0.06"},{"1":"FIFTH THIRD BANK, NATIONAL ASSOCIATION (723112)","2":"-0.06","3":"-0.05","4":"0.01","5":"0.00","6":"0.03","7":"0.14","8":"0.02","9":"-0.12","10":"0.44","11":"-0.08"},{"1":"FIRST-CITIZENS BANK & TRUST COMPANY (491224)","2":"-0.05","3":"-0.06","4":"0.01","5":"0.00","6":"0.02","7":"0.13","8":"0.09","9":"-0.07","10":"-0.97","11":"0.31"},{"1":"GOLDMAN SACHS BANK USA (2182786)","2":"-0.07","3":"0.04","4":"-0.01","5":"0.00","6":"0.14","7":"0.06","8":"0.09","9":"-0.01","10":"-0.68","11":"0.63"},{"1":"HSBC BANK USA, NATIONAL ASSOCIATION (413208)","2":"-0.02","3":"-0.08","4":"0.01","5":"0.00","6":"-0.05","7":"0.10","8":"0.02","9":"-0.13","10":"-0.06","11":"-0.18"},{"1":"HUNTINGTON NATIONAL BANK, THE (12311)","2":"0.03","3":"-0.02","4":"0.00","5":"-0.01","6":"-0.06","7":"0.00","8":"-0.08","9":"-0.33","10":"1.20","11":"-0.61"},{"1":"JPMORGAN CHASE BANK, NATIONAL ASSOCIATION (852218)","2":"-0.05","3":"-0.03","4":"0.00","5":"0.00","6":"0.06","7":"0.11","8":"0.04","9":"-0.19","10":"-0.68","11":"0.18"},{"1":"KEYBANK NATIONAL ASSOCIATION (280110)","2":"-0.13","3":"-0.03","4":"0.00","5":"0.00","6":"0.09","7":"0.16","8":"0.22","9":"0.08","10":"-0.77","11":"0.95"},{"1":"MANUFACTURERS AND TRADERS TRUST COMPANY (501105)","2":"-0.08","3":"-0.02","4":"0.00","5":"0.00","6":"0.11","7":"0.16","8":"0.03","9":"-0.19","10":"0.02","11":"0.16"},{"1":"MERRICK BANK CORPORATION (2615190)","2":"-0.44","3":"-0.12","4":"0.01","5":"-0.03","6":"0.38","7":"0.68","8":"0.24","9":"-1.73","10":"4.44","11":"0.20"},{"1":"PNC BANK, NATIONAL ASSOCIATION (817824)","2":"-0.17","3":"-0.02","4":"0.00","5":"0.00","6":"0.16","7":"0.22","8":"0.21","9":"-0.28","10":"-0.44","11":"0.90"},{"1":"REGIONS BANK (233031)","2":"-0.07","3":"-0.07","4":"0.01","5":"-0.01","6":"0.05","7":"0.19","8":"0.03","9":"-0.52","10":"0.30","11":"-0.13"},{"1":"SANTANDER BANK, NATIONAL ASSOCIATION (722777)","2":"-0.23","3":"0.07","4":"-0.01","5":"0.03","6":"0.40","7":"0.22","8":"0.37","9":"1.59","10":"-4.57","11":"2.89"},{"1":"SYNCHRONY BANK (1216022)","2":"-0.03","3":"-0.09","4":"0.01","5":"-0.02","6":"0.03","7":"0.20","8":"-0.17","9":"-0.85","10":"2.21","11":"-1.20"},{"1":"TD BANK, N.A. (497404)","2":"-0.01","3":"-0.06","4":"0.01","5":"-0.01","6":"-0.01","7":"0.10","8":"-0.06","9":"-0.78","10":"0.76","11":"-0.64"},{"1":"TRUIST BANK (852320)","2":"-0.15","3":"-0.03","4":"0.00","5":"-0.02","6":"0.16","7":"0.24","8":"0.21","9":"-1.37","10":"-1.01","11":"0.61"},{"1":"U.S. BANK NATIONAL ASSOCIATION (504713)","2":"-0.05","3":"-0.05","4":"0.01","5":"0.00","6":"0.03","7":"0.14","8":"0.04","9":"-0.28","10":"-0.25","11":"0.03"},{"1":"UBS BANK USA (3212149)","2":"-0.02","3":"-0.07","4":"0.01","5":"-0.01","6":"0.00","7":"0.13","8":"0.00","9":"-0.66","10":"-0.42","11":"-0.27"},{"1":"WELLS FARGO BANK, NATIONAL ASSOCIATION (451965)","2":"-0.13","3":"-0.05","4":"0.00","5":"0.01","6":"0.12","7":"0.21","8":"0.11","9":"0.39","10":"-0.02","11":"0.59"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-</div>
-<p><strong>?(caption)</strong></p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
 
 
 <!-- -->
 
-</section>
 </section>
 
 </main> <!-- /main -->
@@ -1166,170 +840,170 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb21" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Hierarchical study"</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html</span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>This approach is comparable to a treatment study that compare outcomes before and after an intervention. In our case the treatment is the partnership. </span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>For example, for Costco our dummy variable 'HasPartner' is True for AMERICAN EXPRESS until 2016 Q2, then False after the portfolio is transferred to CITIBANK. CITIBANK's 'HasPartner' is now True for Costco. </span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>We can represent this as:</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>Y_{it} = \alpha + \beta X_{it} + \gamma D_{it} + \mu_i + \epsilon_{it}</span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>Where:</span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>$Y_{it}$ is the dependent variable for entity $i$ at time $t$.\</span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>$X_{it}$ represents the independent variable(s) for entity $i$ at time $t$.\</span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>$D_{it}$ is the dummy variable 'HasPartner' for partner (1 has partner, 0 does not have partner).\</span>
-<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>$\alpha$ is the constant term.\</span>
-<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>$\beta$ is the coefficient for the independent variable(s).\</span>
-<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>$\gamma$ is the coefficient for the dummy variable.\</span>
-<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>$\mu_i$ represents the entity-specific fixed effect.\</span>
-<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>$\epsilon_{it}$ is the error term.\</span>
-<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>The coefficient $\gamma$ on the dummy variable indicates the average change in the target variable associated with having a partner, controlling for other factors.</span>
-<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>Various models are tested to identify which achieves the lowest AICc value. We can leverage what we have learnt so far; our starting point takes the model variables used by the best hierarchical event study.</span>
-<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">'functions.R'</span>)</span>
-<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a>hier_data <span class="ot">&lt;-</span> <span class="fu">get_hierarchy_model_data</span>()</span>
-<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a><span class="fu">### Model Choice</span></span>
-<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-42"><a href="#cb21-42" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb21-43"><a href="#cb21-43" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb21-44"><a href="#cb21-44" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb21-45"><a href="#cb21-45" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb21-46"><a href="#cb21-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-47"><a href="#cb21-47" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(UBPRE524.diff <span class="sc">~</span> HasPartner <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> HasPartner <span class="sc">+</span> Qtr<span class="sc">+</span> UBPRB538.log.diff <span class="sc">+</span> UBPR3815.log.diff <span class="sc">|</span> BankName<span class="sc">/</span>Partner) <span class="sc">+</span> TDSP.log.diff <span class="sc">+</span> RRSFS.Pop.log.diff <span class="sc">+</span> UNRATE.log.diff <span class="sc">+</span> UNRATE.log.diff.lag1, <span class="at">data =</span> hier_data, <span class="at">REML =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb21-48"><a href="#cb21-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-49"><a href="#cb21-49" aria-hidden="true" tabindex="-1"></a>m2 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(UBPRE524.diff <span class="sc">~</span> HasPartner <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> HasPartner <span class="sc">+</span> Qtr<span class="sc">+</span> UBPRB538.log.diff <span class="sc">+</span> UBPR3815.log.diff <span class="sc">|</span> BankName<span class="sc">/</span>Partner) <span class="sc">+</span> TDSP.log.diff <span class="sc">+</span> RRSFS.Pop.log.diff <span class="sc">+</span> UNRATE.log.diff <span class="sc">+</span> UNRATE.log.diff.lag1 <span class="sc">+</span> UNRATE.log.diff.lag2, <span class="at">data =</span> hier_data, <span class="at">REML =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb21-50"><a href="#cb21-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-51"><a href="#cb21-51" aria-hidden="true" tabindex="-1"></a>m3 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(UBPRE524.diff <span class="sc">~</span> HasPartner <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> HasPartner <span class="sc">+</span> Qtr<span class="sc">+</span> BankType <span class="sc">+</span> UBPRB538.log.diff <span class="sc">+</span> UBPR3815.log.diff <span class="sc">|</span> BankName<span class="sc">/</span>Partner) <span class="sc">+</span> TDSP.log.diff <span class="sc">+</span> TDSP.log.diff.lag1, <span class="at">data =</span> hier_data, <span class="at">REML =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb21-52"><a href="#cb21-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-53"><a href="#cb21-53" aria-hidden="true" tabindex="-1"></a>m4 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(UBPRE524.diff <span class="sc">~</span> HasPartner <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> HasPartner <span class="sc">+</span> UBPRB538.log.diff <span class="sc">+</span> UBPR3815.log.diff <span class="sc">|</span> BankName<span class="sc">/</span>Partner) <span class="sc">+</span> TDSP.log.diff <span class="sc">+</span> RRSFS.Pop.log.diff <span class="sc">+</span> UNRATE.log.diff <span class="sc">+</span> UNRATE.log.diff.lag1, <span class="at">data =</span> hier_data, <span class="at">REML =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb21-54"><a href="#cb21-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-55"><a href="#cb21-55" aria-hidden="true" tabindex="-1"></a>m5 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(UBPRE524.diff <span class="sc">~</span> HasPartner <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> HasPartner <span class="sc">+</span> UBPRE524.log.diff.lag1 <span class="sc">+</span> UBPRB538.log.diff <span class="sc">+</span> UBPR3815.log.diff <span class="sc">|</span> BankName<span class="sc">/</span>Partner) <span class="sc">+</span> TDSP.log.diff <span class="sc">+</span> RRSFS.Pop.log.diff <span class="sc">+</span> UNRATE.log.diff <span class="sc">+</span> UNRATE.log.diff.lag1, <span class="at">data =</span> hier_data, <span class="at">REML =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb21-56"><a href="#cb21-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-57"><a href="#cb21-57" aria-hidden="true" tabindex="-1"></a>m6 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(UBPRE524.diff <span class="sc">~</span> HasPartner <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> HasPartner <span class="sc">+</span> UBPRE524.log.diff.lag4 <span class="sc">+</span> UBPRB538.log.diff <span class="sc">+</span> UBPR3815.log.diff <span class="sc">|</span> BankName<span class="sc">/</span>Partner) <span class="sc">+</span> TDSP.log.diff <span class="sc">+</span> RRSFS.Pop.log.diff <span class="sc">+</span> UNRATE.log.diff <span class="sc">+</span> UNRATE.log.diff.lag1, <span class="at">data =</span> hier_data, <span class="at">REML =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb21-58"><a href="#cb21-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-59"><a href="#cb21-59" aria-hidden="true" tabindex="-1"></a>m7 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(UBPRE524.diff <span class="sc">~</span> HasPartner <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> HasPartner <span class="sc">+</span> Qtr <span class="sc">+</span> UBPRE524.log.diff.lag4 <span class="sc">+</span> UBPRB538.log.diff <span class="sc">+</span> UBPR3815.log.diff <span class="sc">|</span> BankName<span class="sc">/</span>Partner) <span class="sc">+</span> TDSP.log.diff <span class="sc">+</span> RRSFS.Pop.log.diff <span class="sc">+</span> UNRATE.log.diff <span class="sc">+</span> UNRATE.log.diff.lag1, <span class="at">data =</span> hier_data, <span class="at">REML =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb21-60"><a href="#cb21-60" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb21-63"><a href="#cb21-63" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb21-64"><a href="#cb21-64" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb21-65"><a href="#cb21-65" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-hier-aicc</span></span>
-<span id="cb21-66"><a href="#cb21-66" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: AICc Summary. The lower the AICc value, the better the balance between model complexity (number of parameters) and goodness of fit</span></span>
-<span id="cb21-67"><a href="#cb21-67" aria-hidden="true" tabindex="-1"></a>model_compare <span class="ot">&lt;-</span> <span class="fu">model.sel</span>( m1,m2,m3,m4,m5,m6,m7, <span class="at">rank =</span> <span class="st">"AICc"</span>)</span>
-<span id="cb21-68"><a href="#cb21-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-69"><a href="#cb21-69" aria-hidden="true" tabindex="-1"></a>model_compare <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"Model"</span>)<span class="sc">|&gt;</span> </span>
-<span id="cb21-70"><a href="#cb21-70" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">2</span>))) <span class="sc">|&gt;</span> </span>
-<span id="cb21-71"><a href="#cb21-71" aria-hidden="true" tabindex="-1"></a>        <span class="fu">relocate</span>(df<span class="sc">:</span>weight, <span class="at">.after =</span> Model) <span class="sc">|&gt;</span></span>
-<span id="cb21-72"><a href="#cb21-72" aria-hidden="true" tabindex="-1"></a>            dplyr<span class="sc">::</span><span class="fu">select</span>(Model, df, logLik, AICc, delta, weight) <span class="sc">|&gt;</span></span>
-<span id="cb21-73"><a href="#cb21-73" aria-hidden="true" tabindex="-1"></a>                rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()  </span>
-<span id="cb21-74"><a href="#cb21-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-75"><a href="#cb21-75" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb21-76"><a href="#cb21-76" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-77"><a href="#cb21-77" aria-hidden="true" tabindex="-1"></a>The best model based on AICc is model m1.</span>
-<span id="cb21-80"><a href="#cb21-80" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb21-81"><a href="#cb21-81" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb21-82"><a href="#cb21-82" aria-hidden="true" tabindex="-1"></a>top_model <span class="ot">&lt;-</span> <span class="fu">lmer</span>(<span class="fu">formula</span>(m1), <span class="at">data =</span> hier_data, <span class="at">REML =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb21-83"><a href="#cb21-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-84"><a href="#cb21-84" aria-hidden="true" tabindex="-1"></a><span class="co">#summary(top_model)</span></span>
-<span id="cb21-85"><a href="#cb21-85" aria-hidden="true" tabindex="-1"></a><span class="co">#coef(top_model)</span></span>
-<span id="cb21-86"><a href="#cb21-86" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb21-87"><a href="#cb21-87" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-88"><a href="#cb21-88" aria-hidden="true" tabindex="-1"></a><span class="fu">### Fixed Effects</span></span>
-<span id="cb21-89"><a href="#cb21-89" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-90"><a href="#cb21-90" aria-hidden="true" tabindex="-1"></a>::: {#panel-random-effects .panel-tabset}</span>
-<span id="cb21-91"><a href="#cb21-91" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-92"><a href="#cb21-92" aria-hidden="true" tabindex="-1"></a><span class="fu">### Plot</span></span>
-<span id="cb21-95"><a href="#cb21-95" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb21-96"><a href="#cb21-96" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb21-97"><a href="#cb21-97" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-coef-hier-model-plot</span></span>
-<span id="cb21-98"><a href="#cb21-98" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Plot of simulated fixed effects"</span></span>
-<span id="cb21-99"><a href="#cb21-99" aria-hidden="true" tabindex="-1"></a><span class="co">#| results: hide</span></span>
-<span id="cb21-100"><a href="#cb21-100" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-keep: all</span></span>
-<span id="cb21-101"><a href="#cb21-101" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-102"><a href="#cb21-102" aria-hidden="true" tabindex="-1"></a>result_plots <span class="ot">&lt;-</span> <span class="fu">generate_fixed_random_plts</span>(top_model)</span>
-<span id="cb21-103"><a href="#cb21-103" aria-hidden="true" tabindex="-1"></a>result_plots<span class="sc">$</span>FE</span>
-<span id="cb21-104"><a href="#cb21-104" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb21-105"><a href="#cb21-105" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-106"><a href="#cb21-106" aria-hidden="true" tabindex="-1"></a><span class="fu">### Coefficients and Correlation Data</span></span>
-<span id="cb21-107"><a href="#cb21-107" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-110"><a href="#cb21-110" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb21-111"><a href="#cb21-111" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb21-112"><a href="#cb21-112" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-coef-hier-model-data</span></span>
-<span id="cb21-113"><a href="#cb21-113" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: "Coefficients and Correlation of Fixed Effects"</span></span>
-<span id="cb21-114"><a href="#cb21-114" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-subcap:</span></span>
-<span id="cb21-115"><a href="#cb21-115" aria-hidden="true" tabindex="-1"></a><span class="co">#|  - "Coefficients"</span></span>
-<span id="cb21-116"><a href="#cb21-116" aria-hidden="true" tabindex="-1"></a><span class="co">#|  - "Correlation of Fixed Effects"</span></span>
-<span id="cb21-117"><a href="#cb21-117" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(top_model, <span class="at">effects =</span> <span class="st">"fixed"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb21-118"><a href="#cb21-118" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">2</span>))) <span class="sc">|&gt;</span>  </span>
-<span id="cb21-119"><a href="#cb21-119" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>effect) <span class="sc">|&gt;</span></span>
-<span id="cb21-120"><a href="#cb21-120" aria-hidden="true" tabindex="-1"></a>    rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>() </span>
-<span id="cb21-121"><a href="#cb21-121" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-122"><a href="#cb21-122" aria-hidden="true" tabindex="-1"></a><span class="fu">cov2cor</span>(<span class="fu">vcov</span>(top_model)) <span class="sc">|&gt;</span> <span class="fu">as.matrix</span>() <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
-<span id="cb21-123"><a href="#cb21-123" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">2</span>))) <span class="sc">|&gt;</span>  </span>
-<span id="cb21-124"><a href="#cb21-124" aria-hidden="true" tabindex="-1"></a>    rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>() </span>
-<span id="cb21-125"><a href="#cb21-125" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-126"><a href="#cb21-126" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb21-127"><a href="#cb21-127" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb21-128"><a href="#cb21-128" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-129"><a href="#cb21-129" aria-hidden="true" tabindex="-1"></a>If we look at the effect of 'HasPartner' this is 0.02 percentage points of our target measure. The std.error is half at 0.01. This suggests that the estimate is less precise, meaning there's more uncertainty about the true value of the coefficient.</span>
-<span id="cb21-130"><a href="#cb21-130" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-131"><a href="#cb21-131" aria-hidden="true" tabindex="-1"></a>The high t-statistics for all the other terms, particularly UNRATE.log.diff, indicate that the effects are quite precise and the likelihood that this finding is due to chance is very small.</span>
-<span id="cb21-132"><a href="#cb21-132" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-133"><a href="#cb21-133" aria-hidden="true" tabindex="-1"></a><span class="fu">### Random Effects</span></span>
-<span id="cb21-134"><a href="#cb21-134" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-135"><a href="#cb21-135" aria-hidden="true" tabindex="-1"></a>::: {#sec-random-effects .panel-tabset}</span>
-<span id="cb21-136"><a href="#cb21-136" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-137"><a href="#cb21-137" aria-hidden="true" tabindex="-1"></a><span class="fu">### Plot</span></span>
-<span id="cb21-140"><a href="#cb21-140" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb21-141"><a href="#cb21-141" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb21-142"><a href="#cb21-142" aria-hidden="true" tabindex="-1"></a><span class="co">#| results: hide</span></span>
-<span id="cb21-143"><a href="#cb21-143" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-keep: all</span></span>
-<span id="cb21-144"><a href="#cb21-144" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-random-effect</span></span>
-<span id="cb21-145"><a href="#cb21-145" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Random Effects"</span></span>
-<span id="cb21-146"><a href="#cb21-146" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-height: 8</span></span>
-<span id="cb21-147"><a href="#cb21-147" aria-hidden="true" tabindex="-1"></a>result_plots<span class="sc">$</span>RE </span>
-<span id="cb21-148"><a href="#cb21-148" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb21-149"><a href="#cb21-149" aria-hidden="true" tabindex="-1"></a>The red line indicates no effect (zero), and the dots represent the random effect estimates with their confidence intervals. Points that are distinguishable from zero (i.e. the confidence band does not cross the red line) are highlighted as black dots, whereas the grey dots are where the confidence band cross the red line.</span>
-<span id="cb21-150"><a href="#cb21-150" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-151"><a href="#cb21-151" aria-hidden="true" tabindex="-1"></a><span class="fu">### Data</span></span>
-<span id="cb21-154"><a href="#cb21-154" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb21-155"><a href="#cb21-155" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb21-156"><a href="#cb21-156" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-coef-hier-random</span></span>
-<span id="cb21-157"><a href="#cb21-157" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: "Intercept and coefficients"</span></span>
-<span id="cb21-158"><a href="#cb21-158" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-subcap:</span></span>
-<span id="cb21-159"><a href="#cb21-159" aria-hidden="true" tabindex="-1"></a><span class="co">#|  - "Random Effects for BankName"</span></span>
-<span id="cb21-160"><a href="#cb21-160" aria-hidden="true" tabindex="-1"></a><span class="co">#|  - "Random Effects for Partner:BankName"</span></span>
-<span id="cb21-161"><a href="#cb21-161" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-162"><a href="#cb21-162" aria-hidden="true" tabindex="-1"></a><span class="fu">ranef</span>(top_model, <span class="at">condVar =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>BankName <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb21-163"><a href="#cb21-163" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"Entity"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb21-164"><a href="#cb21-164" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">grepl</span>(<span class="st">"None"</span>, Entity)) <span class="sc">|&gt;</span></span>
-<span id="cb21-165"><a href="#cb21-165" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">2</span>))) <span class="sc">|&gt;</span>  </span>
-<span id="cb21-166"><a href="#cb21-166" aria-hidden="true" tabindex="-1"></a>        rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()    </span>
-<span id="cb21-167"><a href="#cb21-167" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-168"><a href="#cb21-168" aria-hidden="true" tabindex="-1"></a><span class="fu">ranef</span>(top_model, <span class="at">condVar =</span> <span class="cn">FALSE</span>)<span class="sc">$</span><span class="st">`</span><span class="at">Partner:BankName</span><span class="st">`</span> <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb21-169"><a href="#cb21-169" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"Entity"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb21-170"><a href="#cb21-170" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">grepl</span>(<span class="st">"None"</span>, Entity)) <span class="sc">|&gt;</span></span>
-<span id="cb21-171"><a href="#cb21-171" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">2</span>))) <span class="sc">|&gt;</span>  </span>
-<span id="cb21-172"><a href="#cb21-172" aria-hidden="true" tabindex="-1"></a>        rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span>
-<span id="cb21-173"><a href="#cb21-173" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb21-174"><a href="#cb21-174" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb21-175"><a href="#cb21-175" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-176"><a href="#cb21-176" aria-hidden="true" tabindex="-1"></a>From @fig-random-effect we can see that the random effect of Partnership is not distinguishable from zero i.e. the contribution to the variability of our target measure could be by chance alone. </span>
-<span id="cb21-177"><a href="#cb21-177" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-178"><a href="#cb21-178" aria-hidden="true" tabindex="-1"></a><span class="fu">### Conclusion</span></span>
-<span id="cb21-179"><a href="#cb21-179" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-180"><a href="#cb21-180" aria-hidden="true" tabindex="-1"></a>We did not find conclusive evidence that partnerships directly impact credit card delinquency. </span>
+<div class="sourceCode" id="cb8" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Hierarchical study"</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>This approach is comparable to a treatment study that compare outcomes before and after an intervention. In our case the treatment is the partnership. </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>For example, for Costco our dummy variable 'HasPartner' is True for AMERICAN EXPRESS until 2016 Q2, then False after the portfolio is transferred to CITIBANK. CITIBANK's 'HasPartner' is now True for Costco. </span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>We can represent this as:</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>Y_{it} = \alpha + \beta X_{it} + \gamma D_{it} + \mu_i + \epsilon_{it}</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>Where:</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>$Y_{it}$ is the dependent variable for entity $i$ at time $t$.\</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>$X_{it}$ represents the independent variable(s) for entity $i$ at time $t$.\</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>$D_{it}$ is the dummy variable 'HasPartner' for partner (1 has partner, 0 does not have partner).\</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>$\alpha$ is the constant term.\</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>$\beta$ is the coefficient for the independent variable(s).\</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>$\gamma$ is the coefficient for the dummy variable.\</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>$\mu_i$ represents the entity-specific fixed effect.\</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>$\epsilon_{it}$ is the error term.\</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>The coefficient $\gamma$ on the dummy variable indicates the average change in the target variable associated with having a partner, controlling for other factors.</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>Various models are tested to identify which achieves the lowest AICc value. We can leverage what we have learnt so far; our starting point takes the model variables used by the best hierarchical event study.</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">'functions.R'</span>)</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>hier_data <span class="ot">&lt;-</span> <span class="fu">get_hierarchy_model_data</span>()</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="fu">### Model Choice</span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(UBPRE524.diff <span class="sc">~</span> HasPartner <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> HasPartner <span class="sc">+</span> Qtr<span class="sc">+</span> UBPRB538.log.diff <span class="sc">+</span> UBPR3815.log.diff <span class="sc">|</span> BankName<span class="sc">/</span>Partner) <span class="sc">+</span> TDSP.log.diff <span class="sc">+</span> RRSFS.Pop.log.diff <span class="sc">+</span> UNRATE.log.diff <span class="sc">+</span> UNRATE.log.diff.lag1, <span class="at">data =</span> hier_data, <span class="at">REML =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>m2 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(UBPRE524.diff <span class="sc">~</span> HasPartner <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> HasPartner <span class="sc">+</span> Qtr<span class="sc">+</span> UBPRB538.log.diff <span class="sc">+</span> UBPR3815.log.diff <span class="sc">|</span> BankName<span class="sc">/</span>Partner) <span class="sc">+</span> TDSP.log.diff <span class="sc">+</span> RRSFS.Pop.log.diff <span class="sc">+</span> UNRATE.log.diff <span class="sc">+</span> UNRATE.log.diff.lag1 <span class="sc">+</span> UNRATE.log.diff.lag2, <span class="at">data =</span> hier_data, <span class="at">REML =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>m3 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(UBPRE524.diff <span class="sc">~</span> HasPartner <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> HasPartner <span class="sc">+</span> Qtr<span class="sc">+</span> BankType <span class="sc">+</span> UBPRB538.log.diff <span class="sc">+</span> UBPR3815.log.diff <span class="sc">|</span> BankName<span class="sc">/</span>Partner) <span class="sc">+</span> TDSP.log.diff <span class="sc">+</span> TDSP.log.diff.lag1, <span class="at">data =</span> hier_data, <span class="at">REML =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>m4 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(UBPRE524.diff <span class="sc">~</span> HasPartner <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> HasPartner <span class="sc">+</span> UBPRB538.log.diff <span class="sc">+</span> UBPR3815.log.diff <span class="sc">|</span> BankName<span class="sc">/</span>Partner) <span class="sc">+</span> TDSP.log.diff <span class="sc">+</span> RRSFS.Pop.log.diff <span class="sc">+</span> UNRATE.log.diff <span class="sc">+</span> UNRATE.log.diff.lag1, <span class="at">data =</span> hier_data, <span class="at">REML =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>m5 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(UBPRE524.diff <span class="sc">~</span> HasPartner <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> HasPartner <span class="sc">+</span> UBPRE524.log.diff.lag1 <span class="sc">+</span> UBPRB538.log.diff <span class="sc">+</span> UBPR3815.log.diff <span class="sc">|</span> BankName<span class="sc">/</span>Partner) <span class="sc">+</span> TDSP.log.diff <span class="sc">+</span> RRSFS.Pop.log.diff <span class="sc">+</span> UNRATE.log.diff <span class="sc">+</span> UNRATE.log.diff.lag1, <span class="at">data =</span> hier_data, <span class="at">REML =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>m6 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(UBPRE524.diff <span class="sc">~</span> HasPartner <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> HasPartner <span class="sc">+</span> UBPRE524.log.diff.lag4 <span class="sc">+</span> UBPRB538.log.diff <span class="sc">+</span> UBPR3815.log.diff <span class="sc">|</span> BankName<span class="sc">/</span>Partner) <span class="sc">+</span> TDSP.log.diff <span class="sc">+</span> RRSFS.Pop.log.diff <span class="sc">+</span> UNRATE.log.diff <span class="sc">+</span> UNRATE.log.diff.lag1, <span class="at">data =</span> hier_data, <span class="at">REML =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>m7 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(UBPRE524.diff <span class="sc">~</span> HasPartner <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> HasPartner <span class="sc">+</span> Qtr <span class="sc">+</span> UBPRE524.log.diff.lag4 <span class="sc">+</span> UBPRB538.log.diff <span class="sc">+</span> UBPR3815.log.diff <span class="sc">|</span> BankName<span class="sc">/</span>Partner) <span class="sc">+</span> TDSP.log.diff <span class="sc">+</span> RRSFS.Pop.log.diff <span class="sc">+</span> UNRATE.log.diff <span class="sc">+</span> UNRATE.log.diff.lag1, <span class="at">data =</span> hier_data, <span class="at">REML =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-hier-aicc</span></span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: AICc Summary. The lower the AICc value, the better the balance between model complexity (number of parameters) and goodness of fit</span></span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>model_compare <span class="ot">&lt;-</span> <span class="fu">model.sel</span>( m1,m2,m3,m4,m5,m6,m7, <span class="at">rank =</span> <span class="st">"AICc"</span>)</span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a>model_compare <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"Model"</span>)<span class="sc">|&gt;</span> </span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">2</span>))) <span class="sc">|&gt;</span> </span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a>        <span class="fu">relocate</span>(df<span class="sc">:</span>weight, <span class="at">.after =</span> Model) <span class="sc">|&gt;</span></span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>            dplyr<span class="sc">::</span><span class="fu">select</span>(Model, df, logLik, AICc, delta, weight) <span class="sc">|&gt;</span></span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>                rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()  </span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>The best model based on AICc is model m1.</span>
+<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a>top_model <span class="ot">&lt;-</span> <span class="fu">lmer</span>(<span class="fu">formula</span>(m1), <span class="at">data =</span> hier_data, <span class="at">REML =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a><span class="co">#summary(top_model)</span></span>
+<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a><span class="co">#coef(top_model)</span></span>
+<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a><span class="fu">### Fixed Effects</span></span>
+<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a>::: {#panel-random-effects .panel-tabset}</span>
+<span id="cb8-91"><a href="#cb8-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a><span class="fu">### Plot</span></span>
+<span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-coef-hier-model-plot</span></span>
+<span id="cb8-98"><a href="#cb8-98" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Plot of simulated fixed effects"</span></span>
+<span id="cb8-99"><a href="#cb8-99" aria-hidden="true" tabindex="-1"></a><span class="co">#| results: hide</span></span>
+<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-keep: all</span></span>
+<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a>result_plots <span class="ot">&lt;-</span> <span class="fu">generate_fixed_random_plts</span>(top_model)</span>
+<span id="cb8-103"><a href="#cb8-103" aria-hidden="true" tabindex="-1"></a>result_plots<span class="sc">$</span>FE</span>
+<span id="cb8-104"><a href="#cb8-104" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-105"><a href="#cb8-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-106"><a href="#cb8-106" aria-hidden="true" tabindex="-1"></a><span class="fu">### Coefficients and Correlation Data</span></span>
+<span id="cb8-107"><a href="#cb8-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-110"><a href="#cb8-110" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb8-111"><a href="#cb8-111" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb8-112"><a href="#cb8-112" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-coef-hier-model-data</span></span>
+<span id="cb8-113"><a href="#cb8-113" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: "Coefficients and Correlation of Fixed Effects"</span></span>
+<span id="cb8-114"><a href="#cb8-114" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-subcap:</span></span>
+<span id="cb8-115"><a href="#cb8-115" aria-hidden="true" tabindex="-1"></a><span class="co">#|  - "Coefficients"</span></span>
+<span id="cb8-116"><a href="#cb8-116" aria-hidden="true" tabindex="-1"></a><span class="co">#|  - "Correlation of Fixed Effects"</span></span>
+<span id="cb8-117"><a href="#cb8-117" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(top_model, <span class="at">effects =</span> <span class="st">"fixed"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-118"><a href="#cb8-118" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">2</span>))) <span class="sc">|&gt;</span>  </span>
+<span id="cb8-119"><a href="#cb8-119" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>effect) <span class="sc">|&gt;</span></span>
+<span id="cb8-120"><a href="#cb8-120" aria-hidden="true" tabindex="-1"></a>    rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>() </span>
+<span id="cb8-121"><a href="#cb8-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-122"><a href="#cb8-122" aria-hidden="true" tabindex="-1"></a><span class="fu">cov2cor</span>(<span class="fu">vcov</span>(top_model)) <span class="sc">|&gt;</span> <span class="fu">as.matrix</span>() <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
+<span id="cb8-123"><a href="#cb8-123" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">2</span>))) <span class="sc">|&gt;</span>  </span>
+<span id="cb8-124"><a href="#cb8-124" aria-hidden="true" tabindex="-1"></a>    rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>() </span>
+<span id="cb8-125"><a href="#cb8-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-126"><a href="#cb8-126" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-127"><a href="#cb8-127" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-128"><a href="#cb8-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-129"><a href="#cb8-129" aria-hidden="true" tabindex="-1"></a>If we look at the effect of 'HasPartner' this is 0.02 percentage points of our target measure. The std.error is half at 0.01. This suggests that the estimate is less precise, meaning there's more uncertainty about the true value of the coefficient.</span>
+<span id="cb8-130"><a href="#cb8-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-131"><a href="#cb8-131" aria-hidden="true" tabindex="-1"></a>The high t-statistics for all the other terms, particularly UNRATE.log.diff, indicate that the effects are quite precise and the likelihood that this finding is due to chance is very small.</span>
+<span id="cb8-132"><a href="#cb8-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-133"><a href="#cb8-133" aria-hidden="true" tabindex="-1"></a><span class="fu">### Random Effects</span></span>
+<span id="cb8-134"><a href="#cb8-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-135"><a href="#cb8-135" aria-hidden="true" tabindex="-1"></a>::: {#sec-random-effects .panel-tabset}</span>
+<span id="cb8-136"><a href="#cb8-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-137"><a href="#cb8-137" aria-hidden="true" tabindex="-1"></a><span class="fu">### Plot</span></span>
+<span id="cb8-140"><a href="#cb8-140" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb8-141"><a href="#cb8-141" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb8-142"><a href="#cb8-142" aria-hidden="true" tabindex="-1"></a><span class="co">#| results: hide</span></span>
+<span id="cb8-143"><a href="#cb8-143" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-keep: all</span></span>
+<span id="cb8-144"><a href="#cb8-144" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-random-effect</span></span>
+<span id="cb8-145"><a href="#cb8-145" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Random Effects"</span></span>
+<span id="cb8-146"><a href="#cb8-146" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-height: 8</span></span>
+<span id="cb8-147"><a href="#cb8-147" aria-hidden="true" tabindex="-1"></a>result_plots<span class="sc">$</span>RE </span>
+<span id="cb8-148"><a href="#cb8-148" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-149"><a href="#cb8-149" aria-hidden="true" tabindex="-1"></a>The red line indicates no effect (zero), and the dots represent the random effect estimates with their confidence intervals. Points that are distinguishable from zero (i.e. the confidence band does not cross the red line) are highlighted as black dots, whereas the grey dots are where the confidence band cross the red line.</span>
+<span id="cb8-150"><a href="#cb8-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-151"><a href="#cb8-151" aria-hidden="true" tabindex="-1"></a><span class="fu">### Data</span></span>
+<span id="cb8-154"><a href="#cb8-154" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb8-155"><a href="#cb8-155" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb8-156"><a href="#cb8-156" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-coef-hier-random</span></span>
+<span id="cb8-157"><a href="#cb8-157" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: "Intercept and coefficients"</span></span>
+<span id="cb8-158"><a href="#cb8-158" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-subcap:</span></span>
+<span id="cb8-159"><a href="#cb8-159" aria-hidden="true" tabindex="-1"></a><span class="co">#|  - "Random Effects for BankName"</span></span>
+<span id="cb8-160"><a href="#cb8-160" aria-hidden="true" tabindex="-1"></a><span class="co">#|  - "Random Effects for Partner:BankName"</span></span>
+<span id="cb8-161"><a href="#cb8-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-162"><a href="#cb8-162" aria-hidden="true" tabindex="-1"></a><span class="fu">ranef</span>(top_model, <span class="at">condVar =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>BankName <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb8-163"><a href="#cb8-163" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"Entity"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb8-164"><a href="#cb8-164" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">grepl</span>(<span class="st">"None"</span>, Entity)) <span class="sc">|&gt;</span></span>
+<span id="cb8-165"><a href="#cb8-165" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">2</span>))) <span class="sc">|&gt;</span>  </span>
+<span id="cb8-166"><a href="#cb8-166" aria-hidden="true" tabindex="-1"></a>        rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()    </span>
+<span id="cb8-167"><a href="#cb8-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-168"><a href="#cb8-168" aria-hidden="true" tabindex="-1"></a><span class="fu">ranef</span>(top_model, <span class="at">condVar =</span> <span class="cn">FALSE</span>)<span class="sc">$</span><span class="st">`</span><span class="at">Partner:BankName</span><span class="st">`</span> <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb8-169"><a href="#cb8-169" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"Entity"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb8-170"><a href="#cb8-170" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">grepl</span>(<span class="st">"None"</span>, Entity)) <span class="sc">|&gt;</span></span>
+<span id="cb8-171"><a href="#cb8-171" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x,<span class="dv">2</span>))) <span class="sc">|&gt;</span>  </span>
+<span id="cb8-172"><a href="#cb8-172" aria-hidden="true" tabindex="-1"></a>        rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span>
+<span id="cb8-173"><a href="#cb8-173" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-174"><a href="#cb8-174" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-175"><a href="#cb8-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-176"><a href="#cb8-176" aria-hidden="true" tabindex="-1"></a>From @fig-random-effect we can see that the random effect of Partnership is not distinguishable from zero i.e. the contribution to the variability of our target measure could be by chance alone. </span>
+<span id="cb8-177"><a href="#cb8-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-178"><a href="#cb8-178" aria-hidden="true" tabindex="-1"></a><span class="fu">### Conclusion</span></span>
+<span id="cb8-179"><a href="#cb8-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-180"><a href="#cb8-180" aria-hidden="true" tabindex="-1"></a>We did not find conclusive evidence that partnerships directly impact credit card delinquency. </span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
