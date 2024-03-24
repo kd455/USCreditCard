@@ -2031,7 +2031,7 @@ Note
 <div id="fig-lfeature-7" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="data_ffiec_files/figure-html/fig-lfeature-7.png" class="img-fluid figure-img" data-ref-parent="fig-lfeature" width="672"></p>
-<figcaption class="figure-caption">(g) Autocorrelation - 10th autocorrelation coefficient. In a completely random series (white noise), we would expect autocorrelation coefficients near zero for all lags</figcaption>
+<figcaption class="figure-caption">(g) Minimum number of differences necessary to obtain a stationary time series</figcaption>
 </figure>
 </div>
 </div>
@@ -2169,7 +2169,7 @@ alternative hypothesis: stationary</code></pre>
 <ol type="1">
 <li>Target measure: <em>Credit Card Plans-30-89 DAYS P/D %</em> (UBPRE524).</li>
 <li>Banks: <em>Large Banks</em> and <em>Large Credit Card</em> Banks.</li>
-<li>Date Period: from 2010 Q2 or from 2010 Q3 year which is when we see more of a steady state post regulatory change.</li>
+<li>Date Period: from 2011 Q3 year which is when we see more of a steady state post regulatory change.</li>
 </ol>
 <p><strong><em>Removing:</em></strong></p>
 <ol start="4" type="1">
@@ -2857,114 +2857,113 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb21-368"><a href="#cb21-368" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "STL decomposition Trend Strength - 0 is week (no trend), 1 is strong"</span></span>
 <span id="cb21-369"><a href="#cb21-369" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Linearity -  values around 0 indicate the series is linear"</span></span>
 <span id="cb21-370"><a href="#cb21-370" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Autocorrelation - first autocorrelation coefficient"</span></span>
-<span id="cb21-371"><a href="#cb21-371" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Autocorrelation - 10th autocorrelation coefficient. In a completely random series (white noise), we would expect autocorrelation coefficients near zero for all lags"</span></span>
-<span id="cb21-372"><a href="#cb21-372" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Minimum number of differences necessary to obtain a stationary time series"</span></span>
-<span id="cb21-373"><a href="#cb21-373" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 2</span></span>
-<span id="cb21-374"><a href="#cb21-374" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-375"><a href="#cb21-375" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"var_tiled_var"</span>)</span>
-<span id="cb21-376"><a href="#cb21-376" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-377"><a href="#cb21-377" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"var_tiled_mean"</span>)</span>
-<span id="cb21-378"><a href="#cb21-378" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-379"><a href="#cb21-379" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"seasonal_strength_year"</span>)</span>
-<span id="cb21-380"><a href="#cb21-380" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-381"><a href="#cb21-381" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"trend_strength"</span>)</span>
-<span id="cb21-382"><a href="#cb21-382" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-383"><a href="#cb21-383" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"linearity"</span>)</span>
-<span id="cb21-384"><a href="#cb21-384" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-385"><a href="#cb21-385" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"stl_e_acf1"</span>)</span>
-<span id="cb21-386"><a href="#cb21-386" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-387"><a href="#cb21-387" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"nsdiffs"</span>)</span>
-<span id="cb21-388"><a href="#cb21-388" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-389"><a href="#cb21-389" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb21-390"><a href="#cb21-390" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-391"><a href="#cb21-391" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>@fig-lfeature-1: *Other Banks* are lumpy. Also we can see from @fig-regulation-2 that lumpiness continued post regulatory changes even though *Other Banks* are subject to the same regulation. </span>
-<span id="cb21-392"><a href="#cb21-392" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>@fig-lfeature-2: For *Large Banks* and *Large Credit Card Banks* the stability is ~0.8 indicating a degree of fluctuation in the data from one year to the next.</span>
-<span id="cb21-393"><a href="#cb21-393" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>@fig-lfeature-3 *Large Credit Card* Banks are seasonal. This can also be seen in the undulating shape in ACF plot (see @fig-acf-1). </span>
-<span id="cb21-394"><a href="#cb21-394" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-395"><a href="#cb21-395" aria-hidden="true" tabindex="-1"></a>    @fig-season shows both *Large Banks* and *Large Credit Card Banks* peak in Q3. Given events like Black Friday, Thanksgiving and Christmas occur in Q4, we may have expected peak delinquency in Q4 or Q1. </span>
-<span id="cb21-396"><a href="#cb21-396" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-399"><a href="#cb21-399" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb21-400"><a href="#cb21-400" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb21-401"><a href="#cb21-401" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
-<span id="cb21-402"><a href="#cb21-402" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-season</span></span>
-<span id="cb21-403"><a href="#cb21-403" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Quarterly Seasonal Subseries. The blue horizontal lines indicate the means for each quarter."</span></span>
-<span id="cb21-404"><a href="#cb21-404" aria-hidden="true" tabindex="-1"></a>df_alltypes <span class="sc">|&gt;</span> <span class="fu">group_by</span>(BankType) <span class="sc">|&gt;</span> </span>
-<span id="cb21-405"><a href="#cb21-405" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">mean =</span> <span class="fu">mean</span>(Value, <span class="at">na.rm=</span>T)) <span class="sc">|&gt;</span> </span>
-<span id="cb21-406"><a href="#cb21-406" aria-hidden="true" tabindex="-1"></a>        <span class="fu">gg_subseries</span>() <span class="sc">+</span></span>
-<span id="cb21-407"><a href="#cb21-407" aria-hidden="true" tabindex="-1"></a>        <span class="fu">labs</span>(<span class="at">y=</span><span class="fu">glue</span>(<span class="st">"{target_label} </span><span class="sc">\n</span><span class="st"> mean"</span>))</span>
-<span id="cb21-408"><a href="#cb21-408" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb21-371"><a href="#cb21-371" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "Minimum number of differences necessary to obtain a stationary time series"</span></span>
+<span id="cb21-372"><a href="#cb21-372" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 2</span></span>
+<span id="cb21-373"><a href="#cb21-373" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-374"><a href="#cb21-374" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"var_tiled_var"</span>)</span>
+<span id="cb21-375"><a href="#cb21-375" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-376"><a href="#cb21-376" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"var_tiled_mean"</span>)</span>
+<span id="cb21-377"><a href="#cb21-377" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-378"><a href="#cb21-378" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"seasonal_strength_year"</span>)</span>
+<span id="cb21-379"><a href="#cb21-379" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-380"><a href="#cb21-380" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"trend_strength"</span>)</span>
+<span id="cb21-381"><a href="#cb21-381" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-382"><a href="#cb21-382" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"linearity"</span>)</span>
+<span id="cb21-383"><a href="#cb21-383" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-384"><a href="#cb21-384" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"stl_e_acf1"</span>)</span>
+<span id="cb21-385"><a href="#cb21-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-386"><a href="#cb21-386" aria-hidden="true" tabindex="-1"></a><span class="fu">features.plot_violin</span>(all_ftbanks, <span class="st">"nsdiffs"</span>)</span>
+<span id="cb21-387"><a href="#cb21-387" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-388"><a href="#cb21-388" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb21-389"><a href="#cb21-389" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-390"><a href="#cb21-390" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>@fig-lfeature-1: *Other Banks* are lumpy. Also we can see from @fig-regulation-2 that lumpiness continued post regulatory changes even though *Other Banks* are subject to the same regulation. </span>
+<span id="cb21-391"><a href="#cb21-391" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>@fig-lfeature-2: For *Large Banks* and *Large Credit Card Banks* the stability is ~0.8 indicating a degree of fluctuation in the data from one year to the next.</span>
+<span id="cb21-392"><a href="#cb21-392" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>@fig-lfeature-3 *Large Credit Card* Banks are seasonal. This can also be seen in the undulating shape in ACF plot (see @fig-acf-1). </span>
+<span id="cb21-393"><a href="#cb21-393" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-394"><a href="#cb21-394" aria-hidden="true" tabindex="-1"></a>    @fig-season shows both *Large Banks* and *Large Credit Card Banks* peak in Q3. Given events like Black Friday, Thanksgiving and Christmas occur in Q4, we may have expected peak delinquency in Q4 or Q1. </span>
+<span id="cb21-395"><a href="#cb21-395" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-398"><a href="#cb21-398" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb21-399"><a href="#cb21-399" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb21-400"><a href="#cb21-400" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
+<span id="cb21-401"><a href="#cb21-401" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-season</span></span>
+<span id="cb21-402"><a href="#cb21-402" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Quarterly Seasonal Subseries. The blue horizontal lines indicate the means for each quarter."</span></span>
+<span id="cb21-403"><a href="#cb21-403" aria-hidden="true" tabindex="-1"></a>df_alltypes <span class="sc">|&gt;</span> <span class="fu">group_by</span>(BankType) <span class="sc">|&gt;</span> </span>
+<span id="cb21-404"><a href="#cb21-404" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">mean =</span> <span class="fu">mean</span>(Value, <span class="at">na.rm=</span>T)) <span class="sc">|&gt;</span> </span>
+<span id="cb21-405"><a href="#cb21-405" aria-hidden="true" tabindex="-1"></a>        <span class="fu">gg_subseries</span>() <span class="sc">+</span></span>
+<span id="cb21-406"><a href="#cb21-406" aria-hidden="true" tabindex="-1"></a>        <span class="fu">labs</span>(<span class="at">y=</span><span class="fu">glue</span>(<span class="st">"{target_label} </span><span class="sc">\n</span><span class="st"> mean"</span>))</span>
+<span id="cb21-407"><a href="#cb21-407" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb21-408"><a href="#cb21-408" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-409"><a href="#cb21-409" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-410"><a href="#cb21-410" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-411"><a href="#cb21-411" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-412"><a href="#cb21-412" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>@fig-lfeature-4 and @fig-lfeature-5 indicates a strong linear trend for *Large Banks* and *Large Credit Card Banks*.</span>
-<span id="cb21-413"><a href="#cb21-413" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>@fig-lfeature-6 the first autocorrelation coefficient is close to 0 which indicates a weak linear relationship between lagged values. Of note the coefficients are negative indicating a tendency for a short-term reversal. This can be seen in @fig-regulation-1 where the values oscillate.</span>
-<span id="cb21-414"><a href="#cb21-414" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-415"><a href="#cb21-415" aria-hidden="true" tabindex="-1"></a>Checking overall autocorrelation using the Ljung-Box test proves autocorrelation i.e. data pattern is not due to chance.</span>
-<span id="cb21-416"><a href="#cb21-416" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-417"><a href="#cb21-417" aria-hidden="true" tabindex="-1"></a>**Ljung-Box test**</span>
-<span id="cb21-418"><a href="#cb21-418" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-419"><a href="#cb21-419" aria-hidden="true" tabindex="-1"></a>::: {.border}</span>
-<span id="cb21-422"><a href="#cb21-422" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb21-423"><a href="#cb21-423" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb21-424"><a href="#cb21-424" aria-hidden="true" tabindex="-1"></a>final_df <span class="sc">|&gt;</span> <span class="fu">na.omit</span>() <span class="sc">|&gt;</span> <span class="fu">pull</span>(value_diff) <span class="sc">|&gt;</span> <span class="fu">Box.test</span>(<span class="at">lag =</span> <span class="dv">10</span>, <span class="at">type =</span> <span class="st">"Ljung"</span>)</span>
-<span id="cb21-425"><a href="#cb21-425" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb21-426"><a href="#cb21-426" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb21-411"><a href="#cb21-411" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>@fig-lfeature-4 and @fig-lfeature-5 indicates a strong linear trend for *Large Banks* and *Large Credit Card Banks*.</span>
+<span id="cb21-412"><a href="#cb21-412" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>@fig-lfeature-6 the first autocorrelation coefficient is close to 0 which indicates a weak linear relationship between lagged values. Of note the coefficients are negative indicating a tendency for a short-term reversal. This can be seen in @fig-regulation-1 where the values oscillate.</span>
+<span id="cb21-413"><a href="#cb21-413" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-414"><a href="#cb21-414" aria-hidden="true" tabindex="-1"></a>Checking overall autocorrelation using the Ljung-Box test proves autocorrelation i.e. data pattern is not due to chance.</span>
+<span id="cb21-415"><a href="#cb21-415" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-416"><a href="#cb21-416" aria-hidden="true" tabindex="-1"></a>**Ljung-Box test**</span>
+<span id="cb21-417"><a href="#cb21-417" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-418"><a href="#cb21-418" aria-hidden="true" tabindex="-1"></a>::: {.border}</span>
+<span id="cb21-421"><a href="#cb21-421" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb21-422"><a href="#cb21-422" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb21-423"><a href="#cb21-423" aria-hidden="true" tabindex="-1"></a>final_df <span class="sc">|&gt;</span> <span class="fu">na.omit</span>() <span class="sc">|&gt;</span> <span class="fu">pull</span>(value_diff) <span class="sc">|&gt;</span> <span class="fu">Box.test</span>(<span class="at">lag =</span> <span class="dv">10</span>, <span class="at">type =</span> <span class="st">"Ljung"</span>)</span>
+<span id="cb21-424"><a href="#cb21-424" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb21-425"><a href="#cb21-425" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb21-426"><a href="#cb21-426" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-427"><a href="#cb21-427" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-428"><a href="#cb21-428" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-429"><a href="#cb21-429" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>@fig-lfeature-7 *Large Banks* and *Large Credit Card Banks* is not stationary i.e. the statistical properties of the time series changes, which makes it difficult to identify trends and patterns. Performing a difference i.e. to get the quarterly change in UBPRE524, makes the series stationary as shown in @fig-acf-2. This can be confirmed by performing an augmented Dickey–Fuller (ADF) test on the differenced value. We also see that, post differencing, there are autocorrelation coefficients above the significance threshold. The decreasing magnitude of these coefficients tell us the earlier lags have a stronger influence than values further in the past.</span>
-<span id="cb21-430"><a href="#cb21-430" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-431"><a href="#cb21-431" aria-hidden="true" tabindex="-1"></a>Autocorrelation, the correlation between the timeseries and its own lagged values, can inform an AutoRegressive Moving Average (ARMA) Model. </span>
-<span id="cb21-432"><a href="#cb21-432" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-435"><a href="#cb21-435" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb21-436"><a href="#cb21-436" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb21-437"><a href="#cb21-437" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
-<span id="cb21-438"><a href="#cb21-438" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-acf</span></span>
-<span id="cb21-439"><a href="#cb21-439" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "ACF and PACF"</span></span>
-<span id="cb21-440"><a href="#cb21-440" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap:</span></span>
-<span id="cb21-441"><a href="#cb21-441" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "ACF on original value"</span></span>
-<span id="cb21-442"><a href="#cb21-442" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "ACF on first difference value"</span></span>
-<span id="cb21-443"><a href="#cb21-443" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "PACF on original value"</span></span>
-<span id="cb21-444"><a href="#cb21-444" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "PACF on first difference value"</span></span>
-<span id="cb21-445"><a href="#cb21-445" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 2</span></span>
-<span id="cb21-446"><a href="#cb21-446" aria-hidden="true" tabindex="-1"></a>agg_df <span class="ot">&lt;-</span> final_df <span class="sc">|&gt;</span> </span>
-<span id="cb21-447"><a href="#cb21-447" aria-hidden="true" tabindex="-1"></a>            <span class="fu">group_by</span>(BankType)<span class="sc">|&gt;</span> </span>
-<span id="cb21-448"><a href="#cb21-448" aria-hidden="true" tabindex="-1"></a>            <span class="fu">summarise</span>(<span class="at">mean_val =</span> <span class="fu">mean</span>(Value, <span class="at">na.rm=</span>T),</span>
-<span id="cb21-449"><a href="#cb21-449" aria-hidden="true" tabindex="-1"></a>                      <span class="at">mean_diff =</span> <span class="fu">mean</span>(value_diff, <span class="at">na.rm=</span>T)) </span>
-<span id="cb21-450"><a href="#cb21-450" aria-hidden="true" tabindex="-1"></a>       </span>
-<span id="cb21-451"><a href="#cb21-451" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">ACF</span>(<span class="at">x=</span>mean_val,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
-<span id="cb21-452"><a href="#cb21-452" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">ACF</span>(<span class="at">x=</span>mean_diff,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
-<span id="cb21-453"><a href="#cb21-453" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-454"><a href="#cb21-454" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">PACF</span>(<span class="at">x=</span>mean_val,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
-<span id="cb21-455"><a href="#cb21-455" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">PACF</span>(<span class="at">x=</span>mean_diff,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
-<span id="cb21-456"><a href="#cb21-456" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-457"><a href="#cb21-457" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb21-458"><a href="#cb21-458" aria-hidden="true" tabindex="-1"></a>**Dickey–Fuller (ADF) test**</span>
-<span id="cb21-459"><a href="#cb21-459" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-460"><a href="#cb21-460" aria-hidden="true" tabindex="-1"></a>::: {.border}</span>
-<span id="cb21-463"><a href="#cb21-463" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb21-464"><a href="#cb21-464" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb21-465"><a href="#cb21-465" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-466"><a href="#cb21-466" aria-hidden="true" tabindex="-1"></a>final_df <span class="sc">|&gt;</span> <span class="fu">na.omit</span>() <span class="sc">|&gt;</span> <span class="fu">pull</span>(value_diff) <span class="sc">|&gt;</span> tseries<span class="sc">::</span><span class="fu">adf.test</span>()</span>
-<span id="cb21-467"><a href="#cb21-467" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb21-468"><a href="#cb21-468" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb21-469"><a href="#cb21-469" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-470"><a href="#cb21-470" aria-hidden="true" tabindex="-1"></a><span class="fu">## Summary</span></span>
-<span id="cb21-471"><a href="#cb21-471" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-472"><a href="#cb21-472" aria-hidden="true" tabindex="-1"></a>In summary, based on exploration of the data we will prepare the data for modelling by:</span>
-<span id="cb21-473"><a href="#cb21-473" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-474"><a href="#cb21-474" aria-hidden="true" tabindex="-1"></a>***Selecting:***</span>
-<span id="cb21-475"><a href="#cb21-475" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-476"><a href="#cb21-476" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Target measure: *`r target_label`* (UBPRE524).</span>
-<span id="cb21-477"><a href="#cb21-477" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Banks: *Large Banks* and *Large Credit Card* Banks.</span>
-<span id="cb21-478"><a href="#cb21-478" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Date Period: from 2010 Q2 or from 2010 Q3 year which is when we see more of a steady state post regulatory change.</span>
-<span id="cb21-479"><a href="#cb21-479" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-480"><a href="#cb21-480" aria-hidden="true" tabindex="-1"></a>***Removing:***</span>
-<span id="cb21-481"><a href="#cb21-481" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-482"><a href="#cb21-482" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Outlier data points: first 2 quarters.</span>
-<span id="cb21-483"><a href="#cb21-483" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-484"><a href="#cb21-484" aria-hidden="true" tabindex="-1"></a>***Transforming:***</span>
-<span id="cb21-485"><a href="#cb21-485" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-486"><a href="#cb21-486" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>the Target measure to make it stationary. We do this by taking the first difference. </span>
+<span id="cb21-428"><a href="#cb21-428" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>@fig-lfeature-7 *Large Banks* and *Large Credit Card Banks* is not stationary i.e. the statistical properties of the time series changes, which makes it difficult to identify trends and patterns. Performing a difference i.e. to get the quarterly change in UBPRE524, makes the series stationary as shown in @fig-acf-2. This can be confirmed by performing an augmented Dickey–Fuller (ADF) test on the differenced value. We also see that, post differencing, there are autocorrelation coefficients above the significance threshold. The decreasing magnitude of these coefficients tell us the earlier lags have a stronger influence than values further in the past.</span>
+<span id="cb21-429"><a href="#cb21-429" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-430"><a href="#cb21-430" aria-hidden="true" tabindex="-1"></a>Autocorrelation, the correlation between the timeseries and its own lagged values, can inform an AutoRegressive Moving Average (ARMA) Model. </span>
+<span id="cb21-431"><a href="#cb21-431" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-434"><a href="#cb21-434" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb21-435"><a href="#cb21-435" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb21-436"><a href="#cb21-436" aria-hidden="true" tabindex="-1"></a><span class="co">#| error: false</span></span>
+<span id="cb21-437"><a href="#cb21-437" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-acf</span></span>
+<span id="cb21-438"><a href="#cb21-438" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "ACF and PACF"</span></span>
+<span id="cb21-439"><a href="#cb21-439" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-subcap:</span></span>
+<span id="cb21-440"><a href="#cb21-440" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "ACF on original value"</span></span>
+<span id="cb21-441"><a href="#cb21-441" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "ACF on first difference value"</span></span>
+<span id="cb21-442"><a href="#cb21-442" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "PACF on original value"</span></span>
+<span id="cb21-443"><a href="#cb21-443" aria-hidden="true" tabindex="-1"></a><span class="co">#|   - "PACF on first difference value"</span></span>
+<span id="cb21-444"><a href="#cb21-444" aria-hidden="true" tabindex="-1"></a><span class="co">#| layout-ncol: 2</span></span>
+<span id="cb21-445"><a href="#cb21-445" aria-hidden="true" tabindex="-1"></a>agg_df <span class="ot">&lt;-</span> final_df <span class="sc">|&gt;</span> </span>
+<span id="cb21-446"><a href="#cb21-446" aria-hidden="true" tabindex="-1"></a>            <span class="fu">group_by</span>(BankType)<span class="sc">|&gt;</span> </span>
+<span id="cb21-447"><a href="#cb21-447" aria-hidden="true" tabindex="-1"></a>            <span class="fu">summarise</span>(<span class="at">mean_val =</span> <span class="fu">mean</span>(Value, <span class="at">na.rm=</span>T),</span>
+<span id="cb21-448"><a href="#cb21-448" aria-hidden="true" tabindex="-1"></a>                      <span class="at">mean_diff =</span> <span class="fu">mean</span>(value_diff, <span class="at">na.rm=</span>T)) </span>
+<span id="cb21-449"><a href="#cb21-449" aria-hidden="true" tabindex="-1"></a>       </span>
+<span id="cb21-450"><a href="#cb21-450" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">ACF</span>(<span class="at">x=</span>mean_val,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
+<span id="cb21-451"><a href="#cb21-451" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">ACF</span>(<span class="at">x=</span>mean_diff,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
+<span id="cb21-452"><a href="#cb21-452" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-453"><a href="#cb21-453" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">PACF</span>(<span class="at">x=</span>mean_val,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
+<span id="cb21-454"><a href="#cb21-454" aria-hidden="true" tabindex="-1"></a>agg_df <span class="sc">|&gt;</span> <span class="fu">PACF</span>(<span class="at">x=</span>mean_diff,<span class="at">lag_max =</span> <span class="dv">42</span>) <span class="sc">|&gt;</span> <span class="fu">autoplot</span>()</span>
+<span id="cb21-455"><a href="#cb21-455" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-456"><a href="#cb21-456" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb21-457"><a href="#cb21-457" aria-hidden="true" tabindex="-1"></a>**Dickey–Fuller (ADF) test**</span>
+<span id="cb21-458"><a href="#cb21-458" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-459"><a href="#cb21-459" aria-hidden="true" tabindex="-1"></a>::: {.border}</span>
+<span id="cb21-462"><a href="#cb21-462" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb21-463"><a href="#cb21-463" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb21-464"><a href="#cb21-464" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-465"><a href="#cb21-465" aria-hidden="true" tabindex="-1"></a>final_df <span class="sc">|&gt;</span> <span class="fu">na.omit</span>() <span class="sc">|&gt;</span> <span class="fu">pull</span>(value_diff) <span class="sc">|&gt;</span> tseries<span class="sc">::</span><span class="fu">adf.test</span>()</span>
+<span id="cb21-466"><a href="#cb21-466" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb21-467"><a href="#cb21-467" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb21-468"><a href="#cb21-468" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-469"><a href="#cb21-469" aria-hidden="true" tabindex="-1"></a><span class="fu">## Summary</span></span>
+<span id="cb21-470"><a href="#cb21-470" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-471"><a href="#cb21-471" aria-hidden="true" tabindex="-1"></a>In summary, based on exploration of the data we will prepare the data for modelling by:</span>
+<span id="cb21-472"><a href="#cb21-472" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-473"><a href="#cb21-473" aria-hidden="true" tabindex="-1"></a>***Selecting:***</span>
+<span id="cb21-474"><a href="#cb21-474" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-475"><a href="#cb21-475" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Target measure: *`r target_label`* (UBPRE524).</span>
+<span id="cb21-476"><a href="#cb21-476" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Banks: *Large Banks* and *Large Credit Card* Banks.</span>
+<span id="cb21-477"><a href="#cb21-477" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Date Period: from 2011 Q3 year which is when we see more of a steady state post regulatory change.</span>
+<span id="cb21-478"><a href="#cb21-478" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-479"><a href="#cb21-479" aria-hidden="true" tabindex="-1"></a>***Removing:***</span>
+<span id="cb21-480"><a href="#cb21-480" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-481"><a href="#cb21-481" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Outlier data points: first 2 quarters.</span>
+<span id="cb21-482"><a href="#cb21-482" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-483"><a href="#cb21-483" aria-hidden="true" tabindex="-1"></a>***Transforming:***</span>
+<span id="cb21-484"><a href="#cb21-484" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-485"><a href="#cb21-485" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>the Target measure to make it stationary. We do this by taking the first difference. </span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

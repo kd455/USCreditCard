@@ -338,7 +338,6 @@ The *Other Banks* peer group has been added for interest.
 #|   - "STL decomposition Trend Strength - 0 is week (no trend), 1 is strong"
 #|   - "Linearity -  values around 0 indicate the series is linear"
 #|   - "Autocorrelation - first autocorrelation coefficient"
-#|   - "Autocorrelation - 10th autocorrelation coefficient. In a completely random series (white noise), we would expect autocorrelation coefficients near zero for all lags"
 #|   - "Minimum number of differences necessary to obtain a stationary time series"
 #| layout-ncol: 2
 
@@ -437,7 +436,7 @@ In summary, based on exploration of the data we will prepare the data for modell
 
 1. Target measure: *`r target_label`* (UBPRE524).
 2. Banks: *Large Banks* and *Large Credit Card* Banks.
-3. Date Period: from 2010 Q2 or from 2010 Q3 year which is when we see more of a steady state post regulatory change.
+3. Date Period: from 2011 Q3 year which is when we see more of a steady state post regulatory change.
 
 ***Removing:***
 
